@@ -66,7 +66,7 @@ public class IntroSliderActivity extends AppCompatActivity {
                     introSliderViewPager.setCurrentItem(introSliderViewPager.getCurrentItem() + 1);
                 }
                 else {
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), SignupActivity.class));
                     finish();
                 }
             }

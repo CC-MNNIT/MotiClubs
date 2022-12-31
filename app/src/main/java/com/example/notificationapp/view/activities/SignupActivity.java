@@ -1,10 +1,15 @@
 package com.example.notificationapp.view.activities;
 
 import static android.widget.Toast.makeText;
+import static com.google.android.gms.common.util.CollectionUtils.listOf;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -17,18 +22,51 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class SignupActivity extends AppCompatActivity {
-    TextInputEditText et_email, et_password, et_name, et_year, et_course, et_mobile, et_regno;
+    TextInputEditText et_email, et_password, et_name, et_mobile, et_regno;
+    AutoCompleteTextView et_year, et_course;
+    String course, year;
     Button signup_btn;
+    ArrayAdapter adapterCourse, adapterYear;
+    List<String> itemsCourse = listOf("B. Tech", "M. Tech", "MBA", "MCA", "PhD" );
+    List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        Objects.requireNonNull(getSupportActionBar()).hide();
         mAuth = FirebaseAuth.getInstance();
         setReferences();
         setListeners();
+
+
+        adapterCourse = new ArrayAdapter(this, R.layout.list_item, itemsCourse);
+        et_course.setAdapter(adapterCourse);
+
+        et_course.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String item = adapterView.getItemAtPosition(position).toString();
+                course = item;
+            }
+        });
+
+        adapterYear = new ArrayAdapter(this, R.layout.list_item, itemsYear);
+        et_year.setAdapter(adapterYear);
+
+        et_course.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String item = adapterView.getItemAtPosition(position).toString();
+                year = item;
+            }
+        });
     }
 
     private void setListeners() {
