@@ -1,18 +1,14 @@
 package com.example.notificationapp.view.activities;
 
-import static android.content.ContentValues.TAG;
 import static android.widget.Toast.makeText;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.notificationapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -54,8 +50,7 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
+                            Log.d("Hello", "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             user.getIdToken(true).addOnSuccessListener(result -> {
                                 String idToken = result.getToken();
@@ -65,7 +60,7 @@ public class SignupActivity extends AppCompatActivity {
                                 goToLogin();
                             });
                         } else
-                            makeText(SignupActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            makeText(SignupActivity.this, "Registration failed.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

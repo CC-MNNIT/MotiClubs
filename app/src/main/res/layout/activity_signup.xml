@@ -26,7 +26,6 @@ tools:context=".view.activities.SignupActivity">
             android:id="@+id/signup_btn"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:enabled="false"
             android:text="sign_up"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
