@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <item
+            android:id="@+id/home"
+            android:icon="@drawable/home"
+            android:title="Home" />
+        <item
+            android:id="@+id/notifications"
+            android:icon="@drawable/notification"
+            android:title="Notifications" />
+        <item
+            android:id="@+id/admin_panel"
+            android:icon="@drawable/admin_panel"
+            android:title="Admin Panel" />
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/about_us"
+            android:icon="@drawable/about_us"
+            android:title="About us" />
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/help"
+            android:title="Help" />
+    </group>
+</menu>
