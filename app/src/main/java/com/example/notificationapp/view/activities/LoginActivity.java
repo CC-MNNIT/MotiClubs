@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                             user.getIdToken(true).addOnSuccessListener(result -> {
                                 String idToken = result.getToken();
                                 preferences.edit().putString(Constants.TOKEN, idToken).apply();
-                                makeText(LoginActivity.this, "Registration Successful.", Toast.LENGTH_SHORT).show();
+                                makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
                                 goToHome();
                             });
                         } else {
@@ -78,6 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         et_password = findViewById(R.id.password);
         mAuth = FirebaseAuth.getInstance();
         preferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+        login_btn = findViewById(R.id.login_btn);
     }
 
     private void retry(String message) {
