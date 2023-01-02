@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
     TextInputEditText et_email, et_password;
     private FirebaseAuth mAuth;
+    TextView signUp;
     Button login_btn;
     private SharedPreferences preferences;
 
@@ -35,6 +37,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         setReferences();
         setListeners();
+
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
+                finish();
+            }
+        });
     }
 
     private void setListeners() {
@@ -79,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         preferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
         login_btn = findViewById(R.id.login_btn);
+        signUp = findViewById(R.id.signUp);
     }
 
     private void retry(String message) {

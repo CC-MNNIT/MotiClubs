@@ -11,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,12 +40,13 @@ import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
     TextInputEditText et_email, et_password, et_name, et_mobile, et_regno;
+    TextView login;
     AutoCompleteTextView et_year, et_course;
     String course, year;
     Button signup_btn;
     ConstraintLayout parent;
     ArrayAdapter adapterCourse, adapterYear;
-    List<String> itemsCourse = listOf("B. Tech", "M. Tech", "MBA", "MCA", "PhD");
+    List<String> itemsCourse = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD");
     List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
     private FirebaseAuth mAuth;
     private final String TAG = "HELLO";
@@ -77,6 +80,14 @@ public class SignupActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 String item = adapterView.getItemAtPosition(position).toString();
                 year = item;
+            }
+        });
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                finish();
             }
         });
     }
@@ -150,6 +161,7 @@ public class SignupActivity extends AppCompatActivity {
         et_regno = findViewById(R.id.et_reg_no);
         signup_btn = findViewById(R.id.signup_btn);
         parent = findViewById(R.id.parent);
+        login = findViewById(R.id.login);
     }
 
     private boolean validate() {
