@@ -1,4 +1,4 @@
-package com.example.notificationapp.modules;
+package com.example.notificationapp.data.network.model;
 
 public class IntroSlide {
     String title;

@@ -12,29 +12,41 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.example.notificationapp.R;
+import com.example.notificationapp.data.network.api.RetrofitAccessObject;
+import com.example.notificationapp.data.network.model.UserModel;
+import com.example.notificationapp.data.network.model.UserResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
     TextInputEditText et_email, et_password, et_name, et_mobile, et_regno;
     AutoCompleteTextView et_year, et_course;
     String course, year;
     Button signup_btn;
+    ConstraintLayout parent;
     ArrayAdapter adapterCourse, adapterYear;
-    List<String> itemsCourse = listOf("B. Tech", "M. Tech", "MBA", "MCA", "PhD" );
+    List<String> itemsCourse = listOf("B. Tech", "M. Tech", "MBA", "MCA", "PhD");
     List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
     private FirebaseAuth mAuth;
+    private final String TAG = "HELLO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +93,12 @@ public class SignupActivity extends AppCompatActivity {
     private void signUpUser() {
         String emailText = et_email.getText().toString();
         String passwordText = et_password.getText().toString();
+        String mobileText = et_mobile.getText().toString();
+        String nameText = et_name.getText().toString();
+        String regNoText = et_regno.getText().toString();
+        String courseText = et_course.getText().toString();
+        String yearText = et_year.getText().toString();
+
         if (!validate()) return;
 
         mAuth.createUserWithEmailAndPassword(emailText, passwordText)
@@ -88,17 +106,36 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d("Hello", "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             user.getIdToken(true).addOnSuccessListener(result -> {
                                 String idToken = result.getToken();
-                                //TODO
+                                UserModel userModel = new UserModel();
+                                userModel.setEmail(emailText);
+                                userModel.setName(nameText);
+                                userModel.setCourse(courseText);
+                                userModel.setGraduationYear(yearText);
+                                userModel.setPersonalEmail(emailText);
+                                userModel.setPhoneNumber(mobileText);
+                                userModel.setRegistrationNumber(regNoText);
 
-                                makeText(SignupActivity.this, "Registration Successful.", Toast.LENGTH_SHORT).show();
-                                goToLogin();
+                                RetrofitAccessObject.getRetrofitAccessObject().saveUser(idToken, userModel).enqueue(new Callback<UserResponse>() {
+                                    @Override
+                                    public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                                        if (response.body() != null) {
+                                            makeText(SignupActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+                                            goToLogin();
+                                        }
+                                    }
+                                    @Override
+                                    public void onFailure(Call<UserResponse> call, Throwable t) {
+                                        retry(call.toString());
+                                        signup_btn.setEnabled(true);
+                                    }
+                                });
                             });
-                        } else
-                            makeText(SignupActivity.this, "Registration failed.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            makeText(SignupActivity.this, "Some Error occured", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
@@ -112,6 +149,7 @@ public class SignupActivity extends AppCompatActivity {
         et_name = findViewById(R.id.et_username);
         et_regno = findViewById(R.id.et_reg_no);
         signup_btn = findViewById(R.id.signup_btn);
+        parent = findViewById(R.id.parent);
     }
 
     private boolean validate() {
@@ -150,5 +188,9 @@ public class SignupActivity extends AppCompatActivity {
         finish();
     }
 
+    private void retry(String message) {
+        Snackbar.make(parent, message, Snackbar.LENGTH_LONG).show();
+        signup_btn.setEnabled(true);
+    }
 
 }

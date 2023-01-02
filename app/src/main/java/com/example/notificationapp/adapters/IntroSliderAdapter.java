@@ -1,17 +1,14 @@
 package com.example.notificationapp.adapters;
 
-import static com.example.notificationapp.R.id.textTitle;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notificationapp.R;
-import com.example.notificationapp.modules.IntroSlide;
+import com.example.notificationapp.data.network.model.IntroSlide;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
