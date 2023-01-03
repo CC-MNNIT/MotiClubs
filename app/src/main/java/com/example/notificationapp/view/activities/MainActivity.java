@@ -1,11 +1,15 @@
 package com.example.notificationapp.view.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -14,6 +18,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.notificationapp.R;
+import com.example.notificationapp.utils.Constants;
 import com.example.notificationapp.view.fragments.AboutUsFragment;
 import com.example.notificationapp.view.fragments.AdminPanelFragment;
 import com.example.notificationapp.view.fragments.HelpFragment;
@@ -21,6 +26,7 @@ import com.example.notificationapp.view.fragments.HomeFragment;
 import com.example.notificationapp.view.fragments.NotificationsFragemnt;
 import com.example.notificationapp.view.fragments.ProfileFragment;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
@@ -64,6 +70,16 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.admin_panel:
                     {
                         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AdminPanelFragment()).commit();
+                        break;
+                    }
+                    case R.id.profile_section:
+                    {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+                        break;
+                    }
+                    case R.id.logout:
+                    {
+                        logout();
                         break;
                     }
                     case R.id.about_us:
@@ -115,6 +131,14 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
         }else
         super.onBackPressed();
+    }
+
+    public void logout(){
+        SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
+        preferences.edit().clear().apply();
+        FirebaseAuth.getInstance().signOut();
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(i);
     }
 
 }

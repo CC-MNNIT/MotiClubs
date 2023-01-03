@@ -24,13 +24,15 @@
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_margin="9dp"
+                android:layout_marginStart="9dp"
+                android:layout_marginTop="9dp"
+                android:layout_marginEnd="9dp"
+                android:layout_marginBottom="9dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/circle"
                 android:padding="3dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/profile_icon" />
-
         </RelativeLayout>
 
         <TextView
@@ -41,19 +43,16 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15sp"
             android:fontFamily="sans-serif-light"
-            android:text="Yash A Kabra"
             android:textColor="@color/white"
             android:textSize="32sp" />
 
-
         <TextView
-            android:id="@+id/tv_address"
+            android:id="@+id/tv_regNo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_name"
             android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif"
-            android:text="20204237"
             android:textAllCaps="true"
             android:textColor="@color/address"
             android:textSize="14sp" />
@@ -98,10 +97,10 @@
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/name_tv1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="Yash A Kabra"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -126,10 +125,10 @@
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/email_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="yash.20204237@mnnit.ac.in"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -155,10 +154,10 @@
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/mobile_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="7300915379"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -184,10 +183,10 @@
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/year_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="2024"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -213,10 +212,10 @@
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/course_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:text="B.Tech"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 

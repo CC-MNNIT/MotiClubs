@@ -18,4 +18,7 @@ public interface Api {
 
     @GET("/clubs")
     Call<List<ClubModel>> getClubs(@Header("Authorization") String auth);
+
+    @GET("/user")
+    Call<UserResponse> getUserData(@Header("Authorization") String auth);
 }

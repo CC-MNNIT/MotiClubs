@@ -14,6 +14,10 @@
             android:id="@+id/admin_panel"
             android:icon="@drawable/admin_panel"
             android:title="Admin Panel" />
+        <item
+            android:id="@+id/profile_section"
+            android:icon="@drawable/admin_panel"
+            android:title="Profile Section" />
     </group>
 
     <item android:title="Communicate">
@@ -27,6 +31,10 @@
                     android:id="@+id/help"
                     android:icon="@drawable/help"
                     android:title="Help" />
+                <item
+                    android:id="@+id/logout"
+                    android:icon="@drawable/help"
+                    android:title="Logout" />
             </group>
         </menu>
     </item>
