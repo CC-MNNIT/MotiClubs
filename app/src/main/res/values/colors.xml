@@ -10,4 +10,5 @@
 
     <color name="main_color">#246EE9</color>
     <color name="helper_text_color">#A60606</color>
+    <color name="light_blue">#ADD8E6</color>
 </resources>
