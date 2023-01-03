@@ -28,7 +28,9 @@
     <color name="contentTextColor">#020000</color>
     <color name="bottomNavigationBackground">#F7F7F7</color>
 
-
+    <color name="profileBackground">#fff</color>
+    <color name="blackTextColor">#000</color>
+    <color name="profileEditTextColor">#707070</color>
 
     <!--    color items-->
     <color name="color1">#F1755B</color>
@@ -55,6 +57,16 @@
     <color name="option2">#A919DD</color>
     <color name="option3">#E34B4A</color>
     <color name="option4">#FF8033</color>
+
+    <color name="address">#2F7092</color>
+    <color name="followers">#0D5D98</color>
+    <color name="headings">#3797CF</color>
+    <color name="solidCircle">#AAFFFFFF</color>
+    <color name="circleBorder">#50FFFFFF</color>
+    <color name="gradEnd">#67EFC8</color>
+    <color name="gradStart">#63C9FF</color>
+    <color name="followersBg">#65DCE5</color>
+    <color name="followingBg">#49BEFF</color>
 
     <color name="colorPrimaryText">@android:color/white</color>
 </resources>
