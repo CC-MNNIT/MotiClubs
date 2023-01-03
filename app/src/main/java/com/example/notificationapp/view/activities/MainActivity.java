@@ -3,6 +3,9 @@ package com.example.notificationapp.view.activities;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -16,13 +19,16 @@ import com.example.notificationapp.view.fragments.AdminPanelFragment;
 import com.example.notificationapp.view.fragments.HelpFragment;
 import com.example.notificationapp.view.fragments.HomeFragment;
 import com.example.notificationapp.view.fragments.NotificationsFragemnt;
+import com.example.notificationapp.view.fragments.ProfileFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     ActionBarDrawerToggle drawerToggle;
-
+    View headerView;
+    ImageView profileImage, editIcon;
+    TextView userName, userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +81,23 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        editIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }
+        });
     }
 
     private void setReferences() {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        headerView = navigationView.getHeaderView(0);
+        profileImage = headerView.findViewById(R.id.profilepic);
+        userEmail = headerView.findViewById(R.id.useremail);
+        userName = headerView.findViewById(R.id.username);
+        editIcon = headerView.findViewById(R.id.btnedit);
     }
 
     @Override
