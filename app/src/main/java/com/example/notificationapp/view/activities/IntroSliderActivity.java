@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.example.notificationapp.R;
 import com.example.notificationapp.adapters.IntroSliderAdapter;
+import com.example.notificationapp.data.network.model.ClubModel;
 import com.example.notificationapp.data.network.model.IntroSlide;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class IntroSliderActivity extends AppCompatActivity {
     Button next_btn;
     List<IntroSlide> introSlides = new ArrayList<IntroSlide>();
     IntroSlide introSlide;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

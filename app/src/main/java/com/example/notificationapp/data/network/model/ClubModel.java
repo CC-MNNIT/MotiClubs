@@ -1,11 +1,30 @@
 package com.example.notificationapp.data.network.model;
 
-public class ClubModel {
-    String name, description;
+import java.util.List;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-    public ClubModel(String name, String description) {
-        this.name = name;
-        this.description = description;
+public class ClubModel {
+
+    @SerializedName("_id")
+    @Expose
+    private String id;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("description")
+    @Expose
+    private String description;
+    @SerializedName("admins")
+    @Expose
+    private List<String> admins = null;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -23,4 +42,13 @@ public class ClubModel {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public List<String> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<String> admins) {
+        this.admins = admins;
+    }
+
 }
