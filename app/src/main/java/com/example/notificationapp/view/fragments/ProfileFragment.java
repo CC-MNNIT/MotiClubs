@@ -1,5 +1,6 @@
 package com.example.notificationapp.view.fragments;
 
+import static android.app.Activity.RESULT_OK;
 import static android.opengl.ETC1.encodeImage;
 
 import android.app.Activity;
@@ -13,7 +14,9 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Base64;
@@ -29,6 +32,9 @@ import com.example.notificationapp.data.network.model.UserResponse;
 import com.example.notificationapp.utils.Constants;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -40,6 +46,26 @@ public class ProfileFragment extends Fragment {
     UserResponse user;
     TextView email_tv,year_tv,regno_tv,name_tv1,name_tv,course_tv,mobile_tv;
     ImageView edit_img,profilePic;
+
+    ActivityResultLauncher<Void> launcher = registerForActivityResult(new Contract(), new ActivityResultCallback<Uri>() {
+        @Override
+        public void onActivityResult(Uri result) {
+            Log.d("Hello: ", "encodedImage");
+            if (result == null) {
+                return;
+            }
+            try {
+                InputStream imageStream = requireContext().getContentResolver().openInputStream(result);
+                Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                profilePic.setImageBitmap(selectedImage);
+                String encodedImage = encodeImage(selectedImage);
+                Log.d("Hello: ", encodedImage);
+                updateProfilePicture(encodedImage);
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+    });
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,41 +82,32 @@ public class ProfileFragment extends Fragment {
         edit_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImagePicker.with(getActivity())
-                        .crop()	    			//Crop image(Optional), Check Customization for more option
-                        .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                        .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
-                        .start();
-                Log.d("Hello: ", "encodedImage");
-
+                launcher.launch(null);
             }
         });
     }
 
-    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    Log.d("Hello: ", "encodedImage");
+    private class Contract extends ActivityResultContract<Void, Uri> {
 
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Uri imageUri = data.getData();
-                        try {
-                            InputStream imageStream = getContext().getContentResolver().openInputStream(imageUri);
-                            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                            profilePic.setImageBitmap(selectedImage);
-                            String encodedImage = encodeImage(selectedImage);
-                            Log.d("Hello: ", encodedImage);
-                            updateProfilePicture(encodedImage);
-                        } catch (Exception ex){
+        @NonNull
+        @NotNull
+        @Override
+        public Intent createIntent(@NonNull @NotNull Context context, Void v) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            return intent;
+        }
 
-                        }
-
-                    }
-                }
-            });
+        @Override
+        public Uri parseResult(int resultCode, @Nullable Intent intent) {
+            if (resultCode != RESULT_OK)
+                return null;
+            if (intent == null)
+                return null;
+            return intent.getData();
+        }
+    }
 
     private void updateProfilePicture(String encodedImage) {
         SharedPreferences preferences = requireContext().getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
