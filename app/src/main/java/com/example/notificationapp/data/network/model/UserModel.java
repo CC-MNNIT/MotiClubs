@@ -9,6 +9,7 @@ public class UserModel {
     private String email;
     private String personalEmail;
     private String phoneNumber;
+    private String avatar;
 
     public String getName() {
         return name;
@@ -64,5 +65,13 @@ public class UserModel {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String email) {
+        this.avatar = avatar;
     }
 }

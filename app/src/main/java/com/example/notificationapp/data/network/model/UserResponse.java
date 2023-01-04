@@ -23,6 +23,11 @@ public class UserResponse {
     @SerializedName("personalEmail")
     @Expose
     private String personalEmail;
+
+    @SerializedName("avatar")
+    @Expose
+    private String avatar;
+
     @SerializedName("phoneNumber")
     @Expose
     private String phoneNumber;
@@ -92,5 +97,13 @@ public class UserResponse {
 
     public void setAdmin(List<String> admin) {
         this.admin = admin;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String email) {
+        this.avatar = avatar;
     }
 }
