@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "1045826490900-ffnbh8db8g375h6to2g5aflqrnef322s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.notificationapp",
+            "certificate_hash": "d33c0c49a4b6bf3dceda5530ec6d3dd00449ca77"
+          }
+        },
+        {
           "client_id": "1045826490900-da31rrpie3dcgavm69g4nncjv31lotqc.apps.googleusercontent.com",
           "client_type": 3
         }

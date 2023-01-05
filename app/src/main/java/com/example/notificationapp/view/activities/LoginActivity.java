@@ -24,6 +24,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity {
     TextInputEditText et_email, et_password;
     private FirebaseAuth mAuth;
@@ -68,17 +70,26 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            user.getIdToken(true).addOnSuccessListener(result -> {
-                                String idToken = result.getToken();
-                                preferences.edit().putString(Constants.TOKEN, idToken).apply();
-                                makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
-                                goToHome();
-                            });
-                        } else {
+                            if (Objects.requireNonNull(user).isEmailVerified()) {
+                                user.getIdToken(true).addOnSuccessListener(result -> {
+                                    String idToken = result.getToken();
+                                    preferences.edit().putString(Constants.TOKEN, idToken).apply();
+                                    makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
+                                    goToHome();
+                                });
+                            }
+                            else {
+                                mAuth.signOut();
+                                makeText(getApplicationContext(), "Please Verify Your Email.", Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+                        else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                         }
+
                     }
                 });
     }
