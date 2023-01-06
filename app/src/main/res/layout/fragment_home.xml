@@ -3,71 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.fragments.HomeFragment">
 
-    <RelativeLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/clubRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_margin="15dp"
-            android:minHeight="200dp"
-            app:cardBackgroundColor="#FF402D"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="@dimen/card_maincourse_elevation"
-            app:cardPreventCornerOverlap="false">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_margin="15dp"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CC Club"
-                    android:textColor="@color/black"
-                    android:textSize="35sp"
-                    android:textStyle="bold" />
-
-<!--                <ProgressBar-->
-<!--                    style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"-->
-<!--                    android:layout_width="150dp"-->
-<!--                    android:layout_height="5dp"-->
-<!--                    android:layout_marginTop="15dp"-->
-<!--                    android:progress="60"-->
-<!--                    android:progressDrawable="@drawable/progress_drawable" />-->
-
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="15dp"-->
-<!--                    android:text="60% Complete"-->
-<!--                    android:textColor="@color/whiteBodyColor"-->
-<!--                    android:textSize="13sp"-->
-<!--                    android:textStyle="bold" />-->
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            android:elevation="@dimen/card_image_elevation"
-            android:src="@drawable/header_image" />
-    </RelativeLayout>
-
+        tools:listitem="@layout/club_list_item"
+        />
 
 </FrameLayout>
