@@ -42,7 +42,6 @@ public class SignUpActivity extends AppCompatActivity {
     private String mCourse, mYear;
     private Button mSignUpBtn;
     private ConstraintLayout mParent;
-    private ArrayAdapter adapterCourse, adapterYear;
     private final List<String> itemsCourse = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD");
     private final List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
 
@@ -59,20 +58,18 @@ public class SignUpActivity extends AppCompatActivity {
         setListeners();
 
 
-        adapterCourse = new ArrayAdapter(this, R.layout.list_item, itemsCourse);
+        ArrayAdapter<String> adapterCourse = new ArrayAdapter<>(this, R.layout.list_item, itemsCourse);
         mATVCourse.setAdapter(adapterCourse);
 
         mATVCourse.setOnItemClickListener((adapterView, view, position, id) -> {
-            String item = adapterView.getItemAtPosition(position).toString();
-            mCourse = item;
+            mCourse = adapterView.getItemAtPosition(position).toString();
         });
 
-        adapterYear = new ArrayAdapter(this, R.layout.list_item, itemsYear);
+        ArrayAdapter<Integer> adapterYear = new ArrayAdapter<>(this, R.layout.list_item, itemsYear);
         mATVYear.setAdapter(adapterYear);
 
         mATVCourse.setOnItemClickListener((adapterView, view, position, id) -> {
-            String item = adapterView.getItemAtPosition(position).toString();
-            mYear = item;
+            mYear = adapterView.getItemAtPosition(position).toString();
         });
 
         mLoginTV.setOnClickListener(view -> {
