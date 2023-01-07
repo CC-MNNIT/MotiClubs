@@ -8,7 +8,4 @@ public class Constants {
     public static final String CLUB_NAME = "club_name";
     public static final String CLUB_ID = "club_id";
     public static final String CLUB_DESC = "club_desc";
-
-
-
 }

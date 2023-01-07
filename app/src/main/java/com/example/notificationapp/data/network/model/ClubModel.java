@@ -1,20 +1,24 @@
 package com.example.notificationapp.data.network.model;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class ClubModel {
 
     @SerializedName("_id")
     @Expose
     private String id;
+
     @SerializedName("name")
     @Expose
     private String name;
+
     @SerializedName("description")
     @Expose
     private String description;
+
     @SerializedName("admins")
     @Expose
     private List<String> admins = null;

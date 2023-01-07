@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notificationapp.R;
@@ -13,27 +14,9 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
 
-//public class IntroSliderAdapter
-//        extends RecyclerView.Adapter<IntroSliderAdapter.IntroSliderViewHolder>(){
-//        private List<IntroSlide> introSlides;
-//        IntroSlider
-//        public class IntroSliderViewHolder {
-//
-//            TextView textTitle = (TextView)findViewById(R.id.textTitle);
-//            TextView textDescription = (TextView)findViewById(R.id.textDescription);
-//            ShapeableImageView imageIcon = (ShapeableImageView)findViewById(androidx.appcompat.R.id.imageSlideIcon);
-//            void bind(IntroSlide introSlide) {
-//                textTitle.setText(introSlide.getTitle());
-//                textDescription.setText(introSlide.getDescription());
-//                imageIcon.setImageResource(introSlide.getIcon());
-//            }
-//        }
-//
-//}
-
 public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.ViewHolder> {
 
-    private List<IntroSlide> introSlides;
+    private final List<IntroSlide> introSlides;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -48,18 +31,20 @@ public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.
             super(view);
             // Define click listener for the ViewHolder's View
             //TextView textTitle = (TextView)findViewById(R.id.textTitle);
-            textDescription = (TextView)view.findViewById(R.id.textDescription);
-            imageIcon = (ShapeableImageView)view.findViewById(R.id.imageSlideIcon);
+            textDescription = (TextView) view.findViewById(R.id.textDescription);
+            imageIcon = (ShapeableImageView) view.findViewById(R.id.imageSlideIcon);
             textTitle = (TextView) view.findViewById(R.id.textTitle);
         }
 
         public TextView getTextTitle() {
             return textTitle;
         }
+
         public TextView getTextDescription() {
             return textDescription;
         }
-        public ShapeableImageView getImageIcon(){
+
+        public ShapeableImageView getImageIcon() {
             return imageIcon;
         }
     }
@@ -68,13 +53,14 @@ public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.
      * Initialize the dataset of the Adapter
      *
      * @param dataSet String[] containing the data to populate views to be used
-     * by RecyclerView
+     *                by RecyclerView
      */
     public IntroSliderAdapter(List<IntroSlide> dataSet) {
         introSlides = dataSet;
     }
 
     // Create new views (invoked by the layout manager)
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
@@ -87,7 +73,6 @@ public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         viewHolder.getTextTitle().setText(introSlides.get(position).getTitle().toString());

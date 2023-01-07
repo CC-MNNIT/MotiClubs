@@ -6,8 +6,6 @@ import static com.google.android.gms.common.util.CollectionUtils.listOf;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -26,7 +24,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -38,6 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
+
     TextInputEditText et_email, et_password, et_name, et_mobile, et_regno;
     TextView login;
     AutoCompleteTextView et_year, et_course;
@@ -63,41 +61,27 @@ public class SignupActivity extends AppCompatActivity {
         adapterCourse = new ArrayAdapter(this, R.layout.list_item, itemsCourse);
         et_course.setAdapter(adapterCourse);
 
-        et_course.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                String item = adapterView.getItemAtPosition(position).toString();
-                course = item;
-            }
+        et_course.setOnItemClickListener((adapterView, view, position, id) -> {
+            String item = adapterView.getItemAtPosition(position).toString();
+            course = item;
         });
 
         adapterYear = new ArrayAdapter(this, R.layout.list_item, itemsYear);
         et_year.setAdapter(adapterYear);
 
-        et_course.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                String item = adapterView.getItemAtPosition(position).toString();
-                year = item;
-            }
+        et_course.setOnItemClickListener((adapterView, view, position, id) -> {
+            String item = adapterView.getItemAtPosition(position).toString();
+            year = item;
         });
 
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                finish();
-            }
+        login.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            finish();
         });
     }
 
     private void setListeners() {
-        signup_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signUpUser();
-            }
-        });
+        signup_btn.setOnClickListener(view -> signUpUser());
     }
 
     private void signUpUser() {
@@ -112,52 +96,50 @@ public class SignupActivity extends AppCompatActivity {
         if (!validate()) return;
 
         mAuth.createUserWithEmailAndPassword(emailText, passwordText)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
 
-                            user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "Email sent.");
-                                        user.getIdToken(true).addOnSuccessListener(result -> {
-                                            String idToken = result.getToken();
-                                            UserModel userModel = new UserModel();
-                                            userModel.setEmail(emailText);
-                                            userModel.setName(nameText);
-                                            userModel.setCourse(courseText);
-                                            userModel.setGraduationYear(yearText);
-                                            userModel.setPersonalEmail(emailText);
-                                            userModel.setPhoneNumber(mobileText);
-                                            userModel.setRegistrationNumber(regNoText);
+                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "Email sent.");
+                                    user.getIdToken(true).addOnSuccessListener(result -> {
+                                        String idToken = result.getToken();
+                                        UserModel userModel = new UserModel();
+                                        userModel.setEmail(emailText);
+                                        userModel.setName(nameText);
+                                        userModel.setCourse(courseText);
+                                        userModel.setGraduationYear(yearText);
+                                        userModel.setPersonalEmail(emailText);
+                                        userModel.setPhoneNumber(mobileText);
+                                        userModel.setRegistrationNumber(regNoText);
 
-                                            RetrofitAccessObject.getRetrofitAccessObject().saveUser(idToken, userModel).enqueue(new Callback<UserResponse>() {
-                                                @Override
-                                                public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                                                    if (response.body() != null) {
-                                                        makeText(SignupActivity.this,
-                                                                "Registered Successfully, Please Verify Your Account and login!",
-                                                                Toast.LENGTH_SHORT).show();
-                                                        goToLogin();
-                                                    }
+                                        RetrofitAccessObject.getRetrofitAccessObject().saveUser(idToken, userModel).enqueue(new Callback<UserResponse>() {
+                                            @Override
+                                            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                                                if (response.body() != null) {
+                                                    makeText(SignupActivity.this,
+                                                            "Registered Successfully, Please Verify Your Account and login!",
+                                                            Toast.LENGTH_SHORT).show();
+                                                    goToLogin();
                                                 }
-                                                @Override
-                                                public void onFailure(Call<UserResponse> call, Throwable t) {
-                                                    retry(call.toString());
-                                                    signup_btn.setEnabled(true);
-                                                }
-                                            });
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<UserResponse> call, Throwable t) {
+                                                retry(call.toString());
+                                                signup_btn.setEnabled(true);
+                                            }
                                         });
-                                    }
+                                    });
                                 }
-                            });
+                            }
+                        });
 
-                        } else {
-                            makeText(SignupActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        makeText(SignupActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -204,7 +186,7 @@ public class SignupActivity extends AppCompatActivity {
         }
         String s = emailText;
         String compare = "@mnnit.ac.in";
-        int j = compare.length()-1;
+        int j = compare.length() - 1;
         boolean check = false;
         int n = emailText.length() - 1;
 
@@ -212,20 +194,20 @@ public class SignupActivity extends AppCompatActivity {
 
         //helperTextForEmail.text = "Please enter the valid e-mail address"
 
-        while (n >=0 && j >= 0){
+        while (n >= 0 && j >= 0) {
 
-            if(s.charAt(n) != compare.charAt(j)){
+            if (s.charAt(n) != compare.charAt(j)) {
                 break;
             }
 
-            n--; j--;
+            n--;
+            j--;
         }
-        if(j == -1 && compare.length() < s.length()){
+        if (j == -1 && compare.length() < s.length()) {
             check = true;
             //helperTextForEmail.text = "Valid Email entered!"
-        }
-        else  {
-            Log.d(TAG,"Invalid");
+        } else {
+            Log.d(TAG, "Invalid");
             makeText(getApplicationContext(), "Please Enter G-Suite ID.", Toast.LENGTH_LONG).show();
         }
         return check;

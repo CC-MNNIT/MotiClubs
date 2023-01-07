@@ -58,16 +58,12 @@ public class IntroSliderActivity extends AppCompatActivity {
         introSliderViewPager.setAdapter(introSliderAdapter);
 
         next_btn = (Button) findViewById(R.id.next_btn);
-        next_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(introSliderViewPager.getCurrentItem() + 1 < introSliderAdapter.getItemCount()) {
-                    introSliderViewPager.setCurrentItem(introSliderViewPager.getCurrentItem() + 1);
-                }
-                else {
-                    startActivity(new Intent(getApplicationContext(), SignupActivity.class));
-                    finish();
-                }
+        next_btn.setOnClickListener(view -> {
+            if (introSliderViewPager.getCurrentItem() + 1 < introSliderAdapter.getItemCount()) {
+                introSliderViewPager.setCurrentItem(introSliderViewPager.getCurrentItem() + 1);
+            } else {
+                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
+                finish();
             }
         });
     }

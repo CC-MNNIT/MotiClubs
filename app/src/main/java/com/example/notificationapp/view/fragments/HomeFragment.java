@@ -54,15 +54,14 @@ public class HomeFragment extends Fragment {
                             clubs = response.body();
                             clubListAdapter = new ClubListAdapter(clubs, requireContext());
                             clubRecyclerView.setAdapter(clubListAdapter);
-                            Log.d("Hello1",clubs.toArray().toString());
+                            Log.d("Hello1", clubs.toArray().toString());
                         }
                     }
+
                     @Override
                     public void onFailure(Call<List<ClubModel>> call, Throwable t) {
 
                     }
                 });
     }
-
-
 }

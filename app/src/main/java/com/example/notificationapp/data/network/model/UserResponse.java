@@ -1,25 +1,32 @@
 package com.example.notificationapp.data.network.model;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class UserResponse {
+
     @SerializedName("name")
     @Expose
     private String name;
+
     @SerializedName("registrationNumber")
     @Expose
     private String registrationNumber;
+
     @SerializedName("graduationYear")
     @Expose
     private String graduationYear;
+
     @SerializedName("course")
     @Expose
     private String course;
+
     @SerializedName("email")
     @Expose
     private String email;
+
     @SerializedName("personalEmail")
     @Expose
     private String personalEmail;
@@ -31,6 +38,7 @@ public class UserResponse {
     @SerializedName("phoneNumber")
     @Expose
     private String phoneNumber;
+
     @SerializedName("admin")
     @Expose
     private List<String> admin = null;

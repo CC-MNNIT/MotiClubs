@@ -21,7 +21,7 @@ public class Repository {
                 if (response.code() == 200) {
                     try {
                         if (response.body() == null) throw new Exception("Unqualified response");
-                        if (response.isSuccessful() && response.body()!=null ) {
+                        if (response.isSuccessful() && response.body() != null) {
 //                            userResponse = response.body();
                         }
                     } catch (Exception exception) {
@@ -37,6 +37,6 @@ public class Repository {
             public void onFailure(Call<UserResponse> call, Throwable t) {
             }
         });
-return null;
+        return null;
     }
 }
