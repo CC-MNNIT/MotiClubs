@@ -7,25 +7,25 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.R
+import com.example.notificationapp.databinding.ActivitySplashScreenBinding
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 
 class SplashScreenActivity : AppCompatActivity() {
 
     private lateinit var mAuth: FirebaseAuth
+    private lateinit var binding: ActivitySplashScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash_screen)
+        binding = ActivitySplashScreenBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.hide()
 
         mAuth = FirebaseAuth.getInstance()
 
-        val text = findViewById<TextView>(R.id.text)
-        val image = findViewById<ShapeableImageView>(androidx.appcompat.R.id.image)
-
-        image.animate().translationY(-1600f).setDuration(1000).startDelay = 3000
-        text.animate().translationY(1400f).setDuration(1000).startDelay = 3000
+        binding.image.animate().translationY(-1600f).setDuration(1000).startDelay = 3000
+        binding.text.animate().translationY(1400f).setDuration(1000).startDelay = 3000
 
         val handler = Handler(mainLooper)
         handler.postDelayed({

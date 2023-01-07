@@ -1,20 +1,18 @@
 package com.example.notificationapp.view.activities
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.notificationapp.R
+import com.example.notificationapp.databinding.ActivityClubBinding
 import com.example.notificationapp.utils.Constants
 
 class ClubActivity : AppCompatActivity() {
 
-    private lateinit var mClubNameTV: TextView
-    private lateinit var mClubDescTV: TextView
+    private lateinit var binding: ActivityClubBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_club)
-        setReferences()
+        binding = ActivityClubBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setListener()
         setValues()
     }
@@ -24,13 +22,9 @@ class ClubActivity : AppCompatActivity() {
         val clubDesc = intent.getStringExtra(Constants.CLUB_DESC)
         val clubID = intent.getStringExtra(Constants.CLUB_ID)
 
-        mClubNameTV.text = clubName
-        mClubDescTV.text = clubDesc
+        binding.clubName.text = clubName
+        binding.descTv.text = clubDesc
     }
 
     private fun setListener() {}
-    private fun setReferences() {
-        mClubNameTV = findViewById(R.id.club_name)
-        mClubDescTV = findViewById(R.id.desc_tv)
-    }
 }

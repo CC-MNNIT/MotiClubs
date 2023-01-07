@@ -4,17 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.notificationapp.R
 import com.example.notificationapp.data.network.UserModel
 import com.example.notificationapp.data.network.UserResponse
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
+import com.example.notificationapp.databinding.ActivitySignupBinding
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -28,17 +29,7 @@ class SignUpActivity : AppCompatActivity() {
         private const val TAG = "SignUpActivity"
     }
 
-    private lateinit var mInputEmail: TextInputEditText
-    private lateinit var mInputPassword: TextInputEditText
-    private lateinit var mInputName: TextInputEditText
-    private lateinit var mInputMobile: TextInputEditText
-    private lateinit var mInputRegNo: TextInputEditText
-
-    private lateinit var mLoginTV: TextView
-    private lateinit var mATVYear: AutoCompleteTextView
-    private lateinit var mATVCourse: AutoCompleteTextView
-    private lateinit var mSignUpBtn: Button
-    private lateinit var mParent: ConstraintLayout
+    private lateinit var binding: ActivitySignupBinding
 
     private lateinit var mAuth: FirebaseAuth
 
@@ -49,41 +40,41 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_signup)
+        binding = ActivitySignupBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.hide()
 
         mAuth = FirebaseAuth.getInstance()
-        setReferences()
         setListeners()
 
         val adapterCourse = ArrayAdapter(this, R.layout.list_item, itemsCourse)
-        mATVCourse.setAdapter(adapterCourse)
-        mATVCourse.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, id: Long ->
+        binding.etCourse.setAdapter(adapterCourse)
+        binding.etCourse.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, id: Long ->
             mCourse = adapterView.getItemAtPosition(position).toString()
         }
         val adapterYear = ArrayAdapter(this, R.layout.list_item, itemsYear)
-        mATVYear.setAdapter(adapterYear)
-        mATVCourse.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, id: Long ->
+        binding.etGradYear.setAdapter(adapterYear)
+        binding.etGradYear.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, id: Long ->
             mYear = adapterView.getItemAtPosition(position).toString()
         }
-        mLoginTV.setOnClickListener {
+        binding.login.setOnClickListener {
             startActivity(Intent(applicationContext, LoginActivity::class.java))
             finish()
         }
     }
 
     private fun setListeners() {
-        mSignUpBtn.setOnClickListener { signUpUser() }
+        binding.signupBtn.setOnClickListener { signUpUser() }
     }
 
     private fun signUpUser() {
-        val emailText = mInputEmail.text?.toString() ?: ""
-        val passwordText = mInputPassword.text?.toString() ?: ""
-        val mobileText = mInputMobile.text?.toString() ?: ""
-        val nameText = mInputName.text?.toString() ?: ""
-        val regNoText = mInputRegNo.text?.toString() ?: ""
-        val courseText = mATVCourse.text?.toString() ?: ""
-        val yearText = mATVYear.text.toString()
+        val emailText = binding.etEmail.text?.toString() ?: ""
+        val passwordText = binding.etPassword.text?.toString() ?: ""
+        val mobileText = binding.etMobile.text?.toString() ?: ""
+        val nameText = binding.etUsername.text?.toString() ?: ""
+        val regNoText = binding.etRegNo.text?.toString() ?: ""
+        val courseText = binding.etCourse.text?.toString() ?: ""
+        val yearText = binding.etGradYear.text.toString()
         if (!validate()) return
 
         mAuth.createUserWithEmailAndPassword(emailText, passwordText)
@@ -118,7 +109,7 @@ class SignUpActivity : AppCompatActivity() {
 
                                     override fun onFailure(call: Call<UserResponse?>, t: Throwable) {
                                         retry(call.toString())
-                                        mSignUpBtn.isEnabled = true
+                                        binding.signupBtn.isEnabled = true
                                     }
                                 })
                         }
@@ -127,43 +118,30 @@ class SignUpActivity : AppCompatActivity() {
             }
     }
 
-    private fun setReferences() {
-        mInputEmail = findViewById(R.id.et_email)
-        mInputPassword = findViewById(R.id.et_password)
-        mATVYear = findViewById(R.id.et_grad_year)
-        mATVCourse = findViewById(R.id.et_course)
-        mInputMobile = findViewById(R.id.et_mobile)
-        mInputName = findViewById(R.id.et_username)
-        mInputRegNo = findViewById(R.id.et_reg_no)
-        mSignUpBtn = findViewById(R.id.signup_btn)
-        mParent = findViewById(R.id.parent)
-        mLoginTV = findViewById(R.id.login)
-    }
-
     private fun validate(): Boolean {
-        val emailText = mInputEmail.text?.toString() ?: ""
-        val passwordText = mInputPassword.text?.toString() ?: ""
-        val mobileText = mInputMobile.text?.toString() ?: ""
-        val nameText = mInputName.text?.toString() ?: ""
-        val regNoText = mInputRegNo.text?.toString() ?: ""
+        val emailText = binding.etEmail.text?.toString() ?: ""
+        val passwordText = binding.etPassword.text?.toString() ?: ""
+        val mobileText = binding.etMobile.text?.toString() ?: ""
+        val nameText = binding.etUsername.text?.toString() ?: ""
+        val regNoText = binding.etRegNo.text?.toString() ?: ""
         if (emailText == "") {
-            mInputEmail.requestFocus()
+            binding.etEmail.requestFocus()
             return false
         }
         if (passwordText == "") {
-            mInputPassword.requestFocus()
+            binding.etPassword.requestFocus()
             return false
         }
         if (nameText == "") {
-            mInputName.requestFocus()
+            binding.etUsername.requestFocus()
             return false
         }
         if (mobileText == "") {
-            mInputMobile.requestFocus()
+            binding.etMobile.requestFocus()
             return false
         }
         if (regNoText == "") {
-            mInputRegNo.requestFocus()
+            binding.etRegNo.requestFocus()
             return false
         }
         val compare = "@mnnit.ac.in"
@@ -197,7 +175,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun retry(message: String) {
-        Snackbar.make(mParent, message, Snackbar.LENGTH_LONG).show()
-        mSignUpBtn.isEnabled = true
+        Snackbar.make(binding.parent, message, Snackbar.LENGTH_LONG).show()
+        binding.signupBtn.isEnabled = true
     }
 }

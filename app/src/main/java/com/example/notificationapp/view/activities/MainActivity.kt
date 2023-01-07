@@ -8,17 +8,14 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import com.example.notificationapp.R
+import com.example.notificationapp.databinding.ActivityMainBinding
 import com.example.notificationapp.utils.Constants
 import com.example.notificationapp.view.fragments.*
-import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mDrawerLayout: DrawerLayout
-    private lateinit var mNavigationView: NavigationView
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
 
     private lateinit var mProfileImage: ImageView
@@ -27,23 +24,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mUserNameTV: TextView
     private lateinit var mUserEmailTV: TextView
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setReferences()
         setListeners()
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment()).commit()
     }
 
     private fun setListeners() {
-        mDrawerToggle = ActionBarDrawerToggle(this, mDrawerLayout, R.string.open, R.string.close)
-        mDrawerLayout.addDrawerListener(mDrawerToggle)
+        mDrawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.open, R.string.close)
+        binding.drawerLayout.addDrawerListener(mDrawerToggle)
         mDrawerToggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        mNavigationView.bringToFront()
-        mNavigationView.setCheckedItem(R.id.home)
+        binding.navView.bringToFront()
+        binding.navView.setCheckedItem(R.id.home)
 
-        mNavigationView.setNavigationItemSelectedListener { item: MenuItem ->
+        binding.navView.setNavigationItemSelectedListener { item: MenuItem ->
             if (item.itemId == R.id.logout) {
                 logout()
                 return@setNavigationItemSelectedListener true
@@ -58,21 +58,18 @@ class MainActivity : AppCompatActivity() {
                     else -> HomeFragment()
                 }
             ).commit()
-            mDrawerLayout.closeDrawer(GravityCompat.START)
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
         mEditIcon.setOnClickListener {
             supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ProfileFragment()).commit()
-            mDrawerLayout.closeDrawer(GravityCompat.START)
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
     }
 
     private fun setReferences() {
-        mDrawerLayout = findViewById(R.id.drawer_layout)
-        mNavigationView = findViewById(R.id.nav_view)
-
-        val mHeaderView = mNavigationView.getHeaderView(0)
-        mProfileImage = mHeaderView.findViewById(R.id.profilepic)
+        val mHeaderView = binding.navView.getHeaderView(0)
+        mProfileImage = mHeaderView.findViewById(R.id.profile_pic)
         mUserEmailTV = mHeaderView.findViewById(R.id.useremail)
         mUserNameTV = mHeaderView.findViewById(R.id.username)
         mEditIcon = mHeaderView.findViewById(R.id.btnedit)
@@ -85,8 +82,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawer(GravityCompat.START)
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
             return
         }
         super.onBackPressed()

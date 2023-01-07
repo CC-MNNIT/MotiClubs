@@ -1,38 +1,33 @@
 package com.example.notificationapp.view.fragments
 
-import com.example.notificationapp.data.network.api.RetrofitAccessObject
-import androidx.recyclerview.widget.RecyclerView
-import android.view.ViewGroup
-import com.example.notificationapp.R
-import android.os.Bundle
-import android.view.LayoutInflater
-import com.example.notificationapp.data.adapters.ClubListAdapter
-import android.annotation.SuppressLint
-import androidx.recyclerview.widget.GridLayoutManager
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.notificationapp.data.adapters.ClubListAdapter
 import com.example.notificationapp.data.network.ClubModel
+import com.example.notificationapp.data.network.api.RetrofitAccessObject
+import com.example.notificationapp.databinding.FragmentHomeBinding
 import com.example.notificationapp.utils.Constants
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.ArrayList
 
 class HomeFragment : Fragment() {
 
     private var clubs: List<ClubModel> = ArrayList()
-    private lateinit var clubRecyclerView: RecyclerView
     private lateinit var clubListAdapter: ClubListAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
-        clubRecyclerView = root.findViewById(R.id.clubRecycler)
-        clubRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+    private lateinit var _binding: FragmentHomeBinding
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val root = _binding.root
+        _binding.clubRecycler.layoutManager = GridLayoutManager(requireContext(), 2)
         //clubRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
         getClubsList()
         return root
@@ -47,7 +42,7 @@ class HomeFragment : Fragment() {
                     if (response.isSuccessful && response.body() != null) {
                         clubs = response.body()!!
                         clubListAdapter = ClubListAdapter(clubs, requireContext())
-                        clubRecyclerView.adapter = clubListAdapter
+                        _binding.clubRecycler.adapter = clubListAdapter
                         Log.d("Hello1", clubs.toTypedArray().toString())
                     }
                 }

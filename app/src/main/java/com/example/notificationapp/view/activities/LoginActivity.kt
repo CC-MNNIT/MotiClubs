@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.R
+import com.example.notificationapp.databinding.ActivityLoginBinding
 import com.example.notificationapp.utils.Constants
 import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
@@ -21,32 +22,33 @@ import java.util.*
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var mInputEmail: TextInputEditText
-    private lateinit var mInputPassword: TextInputEditText
-    private lateinit var mSignUpTV: TextView
-    private lateinit var mLoginBtn: Button
+    private lateinit var binding: ActivityLoginBinding
 
     private lateinit var mAuth: FirebaseAuth
     private lateinit var mPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-        setReferences()
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        mAuth = FirebaseAuth.getInstance()
+        mPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE)
+
         setListeners()
-        mSignUpTV.setOnClickListener {
+        binding.signUpText.setOnClickListener {
             startActivity(Intent(applicationContext, SignUpActivity::class.java))
             finish()
         }
     }
 
     private fun setListeners() {
-        mLoginBtn.setOnClickListener { logInUser() }
+        binding.loginBtn.setOnClickListener { logInUser() }
     }
 
     private fun logInUser() {
-        val email = mInputEmail.text.toString()
-        val password = mInputPassword.text.toString()
+        val email = binding.etEmail.text.toString()
+        val password = binding.password.text.toString()
         if (!validate()) return
 
         mAuth.signInWithEmailAndPassword(email, password)
@@ -78,20 +80,6 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    private fun setReferences() {
-        mInputEmail = findViewById(R.id.et_email)
-        mInputPassword = findViewById(R.id.password)
-        mAuth = FirebaseAuth.getInstance()
-        mPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE)
-        mLoginBtn = findViewById(R.id.login_btn)
-        mSignUpTV = findViewById(R.id.signUp)
-    }
-
-    private fun retry(message: String) {
-        mLoginBtn.isEnabled = true
-        mPreferences.edit().clear().apply()
-    }
-
     private fun goToHome() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
@@ -99,14 +87,14 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun validate(): Boolean {
-        val emailText = mInputEmail.text?.toString() ?: ""
-        val passwordText = mInputPassword.text?.toString() ?: ""
+        val emailText = binding.etEmail.text?.toString() ?: ""
+        val passwordText = binding.password.text?.toString() ?: ""
         if (emailText == "") {
-            mInputEmail.requestFocus()
+            binding.etEmail.requestFocus()
             return false
         }
         if (passwordText == "") {
-            mInputPassword.requestFocus()
+            binding.password.requestFocus()
             return false
         }
         return true
