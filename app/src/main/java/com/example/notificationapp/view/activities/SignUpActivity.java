@@ -1,7 +1,6 @@
 package com.example.notificationapp.view.activities;
 
 import static android.widget.Toast.makeText;
-import static com.google.android.gms.common.util.CollectionUtils.listOf;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,8 +42,8 @@ public class SignUpActivity extends AppCompatActivity {
     private String mCourse, mYear;
     private Button mSignUpBtn;
     private ConstraintLayout mParent;
-    private final List<String> itemsCourse = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD");
-    private final List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
+    private final List<String> itemsCourse = Arrays.asList("B.Tech", "M.Tech", "MBA", "MCA", "PhD");
+    private final List<Integer> itemsYear = Arrays.asList(2023, 2024, 2025, 2026);
 
     private FirebaseAuth mAuth;
     private static final String TAG = "SignUpActivity";
