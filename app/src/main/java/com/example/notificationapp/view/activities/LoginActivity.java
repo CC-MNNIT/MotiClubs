@@ -7,20 +7,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.notificationapp.R;
 import com.example.notificationapp.utils.Constants;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -28,11 +23,11 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
-    TextInputEditText et_email, et_password;
+    private TextInputEditText mInputEmail, mInputPassword;
     private FirebaseAuth mAuth;
-    TextView signUp;
-    Button login_btn;
-    private SharedPreferences preferences;
+    private TextView mSignUpTV;
+    private Button mLoginBtn;
+    private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,20 +36,21 @@ public class LoginActivity extends AppCompatActivity {
         setReferences();
         setListeners();
 
-        signUp.setOnClickListener(view -> {
-            startActivity(new Intent(getApplicationContext(), SignupActivity.class));
+        mSignUpTV.setOnClickListener(view -> {
+            startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
             finish();
         });
     }
 
     private void setListeners() {
-        login_btn.setOnClickListener(view -> logInUser());
+        mLoginBtn.setOnClickListener(view -> logInUser());
     }
 
     private void logInUser() {
-        String email = et_email.getText().toString();
-        String password = et_password.getText().toString();
+        String email = mInputEmail.getText().toString();
+        String password = mInputPassword.getText().toString();
         if (!validate()) return;
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -64,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (Objects.requireNonNull(user).isEmailVerified()) {
                             user.getIdToken(true).addOnSuccessListener(result -> {
                                 String idToken = result.getToken();
-                                preferences.edit().putString(Constants.TOKEN, idToken).apply();
+                                mPreferences.edit().putString(Constants.TOKEN, idToken).apply();
                                 makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
                                 goToHome();
                             });
@@ -83,17 +79,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setReferences() {
-        et_email = findViewById(R.id.et_email);
-        et_password = findViewById(R.id.password);
+        mInputEmail = findViewById(R.id.et_email);
+        mInputPassword = findViewById(R.id.password);
         mAuth = FirebaseAuth.getInstance();
-        preferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
-        login_btn = findViewById(R.id.login_btn);
-        signUp = findViewById(R.id.signUp);
+        mPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+        mLoginBtn = findViewById(R.id.login_btn);
+        mSignUpTV = findViewById(R.id.signUp);
     }
 
     private void retry(String message) {
-        login_btn.setEnabled(true);
-        preferences.edit().clear().apply();
+        mLoginBtn.setEnabled(true);
+        mPreferences.edit().clear().apply();
     }
 
     private void goToHome() {
@@ -103,15 +99,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean validate() {
-        String emailText = et_email.getText().toString();
-        String passwordText = et_password.getText().toString();
+        String emailText = mInputEmail.getText().toString();
+        String passwordText = mInputPassword.getText().toString();
 
         if (emailText.equals("")) {
-            et_email.requestFocus();
+            mInputEmail.requestFocus();
             return false;
         }
         if (passwordText.equals("")) {
-            et_password.requestFocus();
+            mInputPassword.requestFocus();
             return false;
         }
         return true;

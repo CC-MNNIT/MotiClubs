@@ -1,17 +1,15 @@
 package com.example.notificationapp.view.activities;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-
 import com.example.notificationapp.R;
 import com.example.notificationapp.adapters.IntroSliderAdapter;
-import com.example.notificationapp.data.network.model.ClubModel;
 import com.example.notificationapp.data.network.model.IntroSlide;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +18,9 @@ import java.util.Objects;
 public class IntroSliderActivity extends AppCompatActivity {
 
     // Initializing required variables
-    IntroSliderAdapter introSliderAdapter;
-    ViewPager2 introSliderViewPager;
-    Button next_btn;
-    List<IntroSlide> introSlides = new ArrayList<IntroSlide>();
-    IntroSlide introSlide;
+    private IntroSliderAdapter mIntroSliderAdapter;
+    private ViewPager2 mIntroSliderViewPager;
+    private final List<IntroSlide> mIntroSlidesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,35 +30,35 @@ public class IntroSliderActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         // adding data to intro slider data set
-        introSlides.add(new IntroSlide(
+        mIntroSlidesList.add(new IntroSlide(
                 "welcome",
                 "welcome",
                 R.drawable.campus
         ));
-        introSlides.add(new IntroSlide(
+        mIntroSlidesList.add(new IntroSlide(
                 "welcome",
                 "welcome",
                 R.drawable.campus
         ));
-        introSlides.add(new IntroSlide(
+        mIntroSlidesList.add(new IntroSlide(
                 "welcome",
                 "welcome",
                 R.drawable.campus
         ));
 
         // creating adapter object
-        introSliderAdapter = new IntroSliderAdapter(introSlides);
+        mIntroSliderAdapter = new IntroSliderAdapter(mIntroSlidesList);
 
         // setting adapter to the view
-        introSliderViewPager = (ViewPager2) findViewById(R.id.introSliderViewPager);
-        introSliderViewPager.setAdapter(introSliderAdapter);
+        mIntroSliderViewPager = (ViewPager2) findViewById(R.id.introSliderViewPager);
+        mIntroSliderViewPager.setAdapter(mIntroSliderAdapter);
 
-        next_btn = (Button) findViewById(R.id.next_btn);
-        next_btn.setOnClickListener(view -> {
-            if (introSliderViewPager.getCurrentItem() + 1 < introSliderAdapter.getItemCount()) {
-                introSliderViewPager.setCurrentItem(introSliderViewPager.getCurrentItem() + 1);
+        MaterialButton mNextBtn = findViewById(R.id.next_btn);
+        mNextBtn.setOnClickListener(view -> {
+            if (mIntroSliderViewPager.getCurrentItem() + 1 < mIntroSliderAdapter.getItemCount()) {
+                mIntroSliderViewPager.setCurrentItem(mIntroSliderViewPager.getCurrentItem() + 1);
             } else {
-                startActivity(new Intent(getApplicationContext(), SignupActivity.class));
+                startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
                 finish();
             }
         });

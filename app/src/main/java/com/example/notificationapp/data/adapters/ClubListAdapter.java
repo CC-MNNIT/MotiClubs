@@ -19,12 +19,12 @@ import java.util.List;
 
 public class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapter.CustomVH> {
 
-    private final Context context;
-    private final List<ClubModel> clubs;
+    private final Context mContext;
+    private final List<ClubModel> mClubs;
 
     public ClubListAdapter(List<ClubModel> clubs, Context context) {
-        this.clubs = clubs;
-        this.context = context;
+        this.mClubs = clubs;
+        this.mContext = context;
     }
 
     @NonNull
@@ -35,12 +35,12 @@ public class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapter.Custom
 
     @Override
     public void onBindViewHolder(@NonNull CustomVH holder, int position) {
-        holder.setView(clubs.get(position));
+        holder.setView(mClubs.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return clubs.size();
+        return mClubs.size();
     }
 
     public class CustomVH extends RecyclerView.ViewHolder {
@@ -52,11 +52,11 @@ public class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapter.Custom
             name = itemView.findViewById(R.id.club_name);
             description = itemView.findViewById(R.id.textDescription);
             itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(context, ClubActivity.class);
-                intent.putExtra(Constants.CLUB_NAME, clubs.get(getAdapterPosition()).getName());
-                intent.putExtra(Constants.CLUB_ID, clubs.get(getAdapterPosition()).getId());
-                intent.putExtra(Constants.CLUB_DESC, clubs.get(getAdapterPosition()).getDescription());
-                context.startActivity(intent);
+                Intent intent = new Intent(mContext, ClubActivity.class);
+                intent.putExtra(Constants.CLUB_NAME, mClubs.get(getAdapterPosition()).getName());
+                intent.putExtra(Constants.CLUB_ID, mClubs.get(getAdapterPosition()).getId());
+                intent.putExtra(Constants.CLUB_DESC, mClubs.get(getAdapterPosition()).getDescription());
+                mContext.startActivity(intent);
             });
         }
 

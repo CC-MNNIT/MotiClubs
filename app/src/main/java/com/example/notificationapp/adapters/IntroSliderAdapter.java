@@ -16,7 +16,7 @@ import java.util.List;
 
 public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.ViewHolder> {
 
-    private final List<IntroSlide> introSlides;
+    private final List<IntroSlide> mIntroSlides;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -56,7 +56,7 @@ public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.
      *                by RecyclerView
      */
     public IntroSliderAdapter(List<IntroSlide> dataSet) {
-        introSlides = dataSet;
+        mIntroSlides = dataSet;
     }
 
     // Create new views (invoked by the layout manager)
@@ -75,14 +75,14 @@ public class IntroSliderAdapter extends RecyclerView.Adapter<IntroSliderAdapter.
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.getTextTitle().setText(introSlides.get(position).getTitle().toString());
-        viewHolder.getTextDescription().setText(introSlides.get(position).getDescription().toString());
-        viewHolder.getImageIcon().setImageResource(introSlides.get(position).getIcon());
+        viewHolder.getTextTitle().setText(mIntroSlides.get(position).getTitle());
+        viewHolder.getTextDescription().setText(mIntroSlides.get(position).getDescription());
+        viewHolder.getImageIcon().setImageResource(mIntroSlides.get(position).getIcon());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return introSlides.size();
+        return mIntroSlides.size();
     }
 }

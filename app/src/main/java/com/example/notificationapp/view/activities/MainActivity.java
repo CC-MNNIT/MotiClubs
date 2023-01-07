@@ -29,12 +29,11 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    ActionBarDrawerToggle drawerToggle;
-    View headerView;
-    ImageView profileImage, editIcon;
-    TextView userName, userEmail;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private ImageView mProfileImage, mEditIcon;
+    private TextView mUserNameTV, mUserEmailTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +45,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
-        drawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open, R.string.close);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        navigationView.bringToFront();
-        navigationView.setCheckedItem(R.id.home);
-        navigationView.setNavigationItemSelectedListener(item -> {
+        mNavigationView.bringToFront();
+        mNavigationView.setCheckedItem(R.id.home);
+        mNavigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 //TODO
                 case R.id.home: {
@@ -84,28 +83,28 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
-            drawerLayout.closeDrawer(GravityCompat.START);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
-        editIcon.setOnClickListener(view -> {
+        mEditIcon.setOnClickListener(view -> {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-            drawerLayout.closeDrawer(GravityCompat.START);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         });
     }
 
     private void setReferences() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        headerView = navigationView.getHeaderView(0);
-        profileImage = headerView.findViewById(R.id.profilepic);
-        userEmail = headerView.findViewById(R.id.useremail);
-        userName = headerView.findViewById(R.id.username);
-        editIcon = headerView.findViewById(R.id.btnedit);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mNavigationView = findViewById(R.id.nav_view);
+        View mHeaderView = mNavigationView.getHeaderView(0);
+        mProfileImage = mHeaderView.findViewById(R.id.profilepic);
+        mUserEmailTV = mHeaderView.findViewById(R.id.useremail);
+        mUserNameTV = mHeaderView.findViewById(R.id.username);
+        mEditIcon = mHeaderView.findViewById(R.id.btnedit);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -114,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SuspiciousIndentation")
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
         super.onBackPressed();

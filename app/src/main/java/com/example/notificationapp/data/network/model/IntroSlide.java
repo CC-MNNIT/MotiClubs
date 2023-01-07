@@ -1,8 +1,8 @@
 package com.example.notificationapp.data.network.model;
 
 public class IntroSlide {
-    String title;
-    String description;
+
+    String title, description;
     int icon;
 
     public IntroSlide(String title, String description, int icon) {
@@ -11,7 +11,8 @@ public class IntroSlide {
         this.icon = icon;
     }
 
-    public IntroSlide(){}
+    public IntroSlide() {
+    }
 
     public String getTitle() {
         return title;

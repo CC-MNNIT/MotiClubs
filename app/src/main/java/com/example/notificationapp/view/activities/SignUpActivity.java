@@ -34,19 +34,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
-    TextInputEditText et_email, et_password, et_name, et_mobile, et_regno;
-    TextView login;
-    AutoCompleteTextView et_year, et_course;
-    String course, year;
-    Button signup_btn;
-    ConstraintLayout parent;
-    ArrayAdapter adapterCourse, adapterYear;
-    List<String> itemsCourse = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD");
-    List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
+    private TextInputEditText mInputEmail, mInputPassword, mInputName, mInputMobile, mInputRegNo;
+    private TextView mLoginTV;
+    private AutoCompleteTextView mATVYear, mATVCourse;
+    private String mCourse, mYear;
+    private Button mSignUpBtn;
+    private ConstraintLayout mParent;
+    private ArrayAdapter adapterCourse, adapterYear;
+    private final List<String> itemsCourse = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD");
+    private final List<Integer> itemsYear = listOf(2023, 2024, 2025, 2026);
+
     private FirebaseAuth mAuth;
-    private final String TAG = "HELLO";
+    private static final String TAG = "SignUpActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,39 +60,39 @@ public class SignupActivity extends AppCompatActivity {
 
 
         adapterCourse = new ArrayAdapter(this, R.layout.list_item, itemsCourse);
-        et_course.setAdapter(adapterCourse);
+        mATVCourse.setAdapter(adapterCourse);
 
-        et_course.setOnItemClickListener((adapterView, view, position, id) -> {
+        mATVCourse.setOnItemClickListener((adapterView, view, position, id) -> {
             String item = adapterView.getItemAtPosition(position).toString();
-            course = item;
+            mCourse = item;
         });
 
         adapterYear = new ArrayAdapter(this, R.layout.list_item, itemsYear);
-        et_year.setAdapter(adapterYear);
+        mATVYear.setAdapter(adapterYear);
 
-        et_course.setOnItemClickListener((adapterView, view, position, id) -> {
+        mATVCourse.setOnItemClickListener((adapterView, view, position, id) -> {
             String item = adapterView.getItemAtPosition(position).toString();
-            year = item;
+            mYear = item;
         });
 
-        login.setOnClickListener(view -> {
+        mLoginTV.setOnClickListener(view -> {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             finish();
         });
     }
 
     private void setListeners() {
-        signup_btn.setOnClickListener(view -> signUpUser());
+        mSignUpBtn.setOnClickListener(view -> signUpUser());
     }
 
     private void signUpUser() {
-        String emailText = et_email.getText().toString();
-        String passwordText = et_password.getText().toString();
-        String mobileText = et_mobile.getText().toString();
-        String nameText = et_name.getText().toString();
-        String regNoText = et_regno.getText().toString();
-        String courseText = et_course.getText().toString();
-        String yearText = et_year.getText().toString();
+        String emailText = mInputEmail.getText().toString();
+        String passwordText = mInputPassword.getText().toString();
+        String mobileText = mInputMobile.getText().toString();
+        String nameText = mInputName.getText().toString();
+        String regNoText = mInputRegNo.getText().toString();
+        String courseText = mATVCourse.getText().toString();
+        String yearText = mATVYear.getText().toString();
 
         if (!validate()) return;
 
@@ -120,7 +121,7 @@ public class SignupActivity extends AppCompatActivity {
                                             @Override
                                             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                                                 if (response.body() != null) {
-                                                    makeText(SignupActivity.this,
+                                                    makeText(SignUpActivity.this,
                                                             "Registered Successfully, Please Verify Your Account and login!",
                                                             Toast.LENGTH_SHORT).show();
                                                     goToLogin();
@@ -130,7 +131,7 @@ public class SignupActivity extends AppCompatActivity {
                                             @Override
                                             public void onFailure(Call<UserResponse> call, Throwable t) {
                                                 retry(call.toString());
-                                                signup_btn.setEnabled(true);
+                                                mSignUpBtn.setEnabled(true);
                                             }
                                         });
                                     });
@@ -139,49 +140,49 @@ public class SignupActivity extends AppCompatActivity {
                         });
 
                     } else {
-                        makeText(SignupActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                        makeText(SignUpActivity.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void setReferences() {
-        et_email = findViewById(R.id.et_email);
-        et_password = findViewById(R.id.et_password);
-        et_year = findViewById(R.id.et_grad_year);
-        et_course = findViewById(R.id.et_course);
-        et_mobile = findViewById(R.id.et_mobile);
-        et_name = findViewById(R.id.et_username);
-        et_regno = findViewById(R.id.et_reg_no);
-        signup_btn = findViewById(R.id.signup_btn);
-        parent = findViewById(R.id.parent);
-        login = findViewById(R.id.login);
+        mInputEmail = findViewById(R.id.et_email);
+        mInputPassword = findViewById(R.id.et_password);
+        mATVYear = findViewById(R.id.et_grad_year);
+        mATVCourse = findViewById(R.id.et_course);
+        mInputMobile = findViewById(R.id.et_mobile);
+        mInputName = findViewById(R.id.et_username);
+        mInputRegNo = findViewById(R.id.et_reg_no);
+        mSignUpBtn = findViewById(R.id.signup_btn);
+        mParent = findViewById(R.id.parent);
+        mLoginTV = findViewById(R.id.login);
     }
 
     private boolean validate() {
-        String emailText = et_email.getText().toString();
-        String passwordText = et_password.getText().toString();
-        String mobileText = et_mobile.getText().toString();
-        String nameText = et_name.getText().toString();
-        String regNoText = et_regno.getText().toString();
+        String emailText = mInputEmail.getText().toString();
+        String passwordText = mInputPassword.getText().toString();
+        String mobileText = mInputMobile.getText().toString();
+        String nameText = mInputName.getText().toString();
+        String regNoText = mInputRegNo.getText().toString();
 
         if (emailText.equals("")) {
-            et_email.requestFocus();
+            mInputEmail.requestFocus();
             return false;
         }
         if (passwordText.equals("")) {
-            et_password.requestFocus();
+            mInputPassword.requestFocus();
             return false;
         }
         if (nameText.equals("")) {
-            et_name.requestFocus();
+            mInputName.requestFocus();
             return false;
         }
         if (mobileText.equals("")) {
-            et_mobile.requestFocus();
+            mInputMobile.requestFocus();
             return false;
         }
         if (regNoText.equals("")) {
-            et_regno.requestFocus();
+            mInputRegNo.requestFocus();
             return false;
         }
         String s = emailText;
@@ -220,8 +221,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void retry(String message) {
-        Snackbar.make(parent, message, Snackbar.LENGTH_LONG).show();
-        signup_btn.setEnabled(true);
+        Snackbar.make(mParent, message, Snackbar.LENGTH_LONG).show();
+        mSignUpBtn.setEnabled(true);
     }
-
 }

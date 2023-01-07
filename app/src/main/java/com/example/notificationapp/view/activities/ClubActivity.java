@@ -10,8 +10,7 @@ import com.example.notificationapp.utils.Constants;
 
 public class ClubActivity extends AppCompatActivity {
 
-    private TextView club_name, club_desc;
-    String club_name_val, club_desc_val, club_id_val;
+    private TextView mClubNameTV, mClubDescTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +23,11 @@ public class ClubActivity extends AppCompatActivity {
     }
 
     private void setValues() {
-        club_name_val = getIntent().getStringExtra(Constants.CLUB_NAME);
-        club_desc_val = getIntent().getStringExtra(Constants.CLUB_DESC);
-        club_id_val = getIntent().getStringExtra(Constants.CLUB_ID);
-        club_name.setText(club_name_val);
-        club_desc.setText(club_desc_val);
+        String clubName = getIntent().getStringExtra(Constants.CLUB_NAME),
+                clubDesc = getIntent().getStringExtra(Constants.CLUB_DESC),
+                clubID = getIntent().getStringExtra(Constants.CLUB_ID);
+        mClubNameTV.setText(clubName);
+        mClubDescTV.setText(clubDesc);
     }
 
     private void setListener() {
@@ -36,7 +35,7 @@ public class ClubActivity extends AppCompatActivity {
     }
 
     private void setReferences() {
-        club_name = findViewById(R.id.club_name);
-        club_desc = findViewById(R.id.desc_tv);
+        mClubNameTV = findViewById(R.id.club_name);
+        mClubDescTV = findViewById(R.id.desc_tv);
     }
 }

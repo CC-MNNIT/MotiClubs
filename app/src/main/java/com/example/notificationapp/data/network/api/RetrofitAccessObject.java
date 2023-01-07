@@ -9,13 +9,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitAccessObject {
 
-    private static Api api;
+    private static Api mApi;
 
     private RetrofitAccessObject() {
     }
 
     public static Api getRetrofitAccessObject() {
-        if (api == null) {
+        if (mApi == null) {
             Gson gson = new GsonBuilder()
                     .setLenient()
                     .create();
@@ -23,8 +23,8 @@ public class RetrofitAccessObject {
                     .baseUrl(Constants.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
-            api = retrofit.create(Api.class);
+            mApi = retrofit.create(Api.class);
         }
-        return api;
+        return mApi;
     }
 }
