@@ -9,7 +9,6 @@
         android:id="@+id/clubRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/club_list_item"
-        />
+        tools:listitem="@layout/club_list_item" />
 
 </FrameLayout>
