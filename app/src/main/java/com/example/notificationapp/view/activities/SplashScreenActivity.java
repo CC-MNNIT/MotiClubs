@@ -1,12 +1,11 @@
 package com.example.notificationapp.view.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.notificationapp.R;
 import com.google.android.material.imageview.ShapeableImageView;
