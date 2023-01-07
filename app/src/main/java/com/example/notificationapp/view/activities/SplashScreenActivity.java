@@ -1,9 +1,12 @@
 package com.example.notificationapp.view.activities;
 
+import static android.widget.Toast.makeText;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,8 +31,14 @@ private FirebaseAuth mAuth;
             @Override
             public void run() {
                 if(mAuth.getCurrentUser() != null) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
+                    if (mAuth.getCurrentUser().isEmailVerified()) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                    else {
+                        mAuth.signOut();
+                        makeText(getApplicationContext(), "Please Verify Your Email.", Toast.LENGTH_LONG).show();
+                    }
                 }else{
                     Intent intent = new Intent(getApplicationContext(), IntroSliderActivity.class);
                     startActivity(intent);
