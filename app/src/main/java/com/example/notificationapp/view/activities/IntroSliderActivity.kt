@@ -2,15 +2,11 @@ package com.example.notificationapp.view.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.viewpager2.widget.ViewPager2
 import com.example.notificationapp.R
 import com.example.notificationapp.adapters.IntroSliderAdapter
 import com.example.notificationapp.data.network.IntroSlide
 import com.example.notificationapp.databinding.ActivityIntroSliderBinding
-import com.google.android.material.button.MaterialButton
-import java.util.*
 
 class IntroSliderActivity : AppCompatActivity() {
 
@@ -55,8 +51,7 @@ class IntroSliderActivity : AppCompatActivity() {
 
         // setting adapter to the view
         binding.introSliderViewPager.adapter = mIntroSliderAdapter
-        val mNextBtn = findViewById<MaterialButton>(R.id.next_btn)
-        mNextBtn.setOnClickListener {
+        binding.nextBtn.setOnClickListener {
             if (binding.introSliderViewPager.currentItem + 1 < mIntroSliderAdapter.itemCount) {
                 binding.introSliderViewPager.currentItem++
             } else {
