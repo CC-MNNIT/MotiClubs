@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.notificationapp.Constants
 import com.example.notificationapp.data.adapters.ClubListAdapter
 import com.example.notificationapp.data.network.ClubModel
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.example.notificationapp.databinding.FragmentHomeBinding
-import com.example.notificationapp.utils.Constants
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

@@ -15,10 +15,10 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
+import com.example.notificationapp.Constants
 import com.example.notificationapp.data.network.UserResponse
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.example.notificationapp.databinding.FragmentProfileBinding
-import com.example.notificationapp.utils.Constants
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

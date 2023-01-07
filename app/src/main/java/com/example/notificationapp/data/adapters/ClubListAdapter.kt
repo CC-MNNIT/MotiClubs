@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.notificationapp.Constants
 import com.example.notificationapp.R
 import com.example.notificationapp.data.adapters.ClubListAdapter.CustomVH
 import com.example.notificationapp.data.network.ClubModel
-import com.example.notificationapp.utils.Constants
 import com.example.notificationapp.view.activities.ClubActivity
 
 class ClubListAdapter(private val mClubs: List<ClubModel>, private val mContext: Context) : RecyclerView.Adapter<CustomVH>() {

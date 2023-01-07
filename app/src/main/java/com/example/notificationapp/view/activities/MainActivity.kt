@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import com.example.notificationapp.Constants
 import com.example.notificationapp.R
 import com.example.notificationapp.databinding.ActivityMainBinding
-import com.example.notificationapp.utils.Constants
 import com.example.notificationapp.view.fragments.*
 import com.google.firebase.auth.FirebaseAuth
 

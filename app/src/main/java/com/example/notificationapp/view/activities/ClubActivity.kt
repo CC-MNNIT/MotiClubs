@@ -2,8 +2,8 @@ package com.example.notificationapp.view.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.notificationapp.Constants
 import com.example.notificationapp.databinding.ActivityClubBinding
-import com.example.notificationapp.utils.Constants
 
 class ClubActivity : AppCompatActivity() {
 
