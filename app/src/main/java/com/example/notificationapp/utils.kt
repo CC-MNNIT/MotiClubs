@@ -10,3 +10,4 @@ object Constants {
     const val CLUB_DESC = "club_desc"
 }
 
+fun String.isNotValidDomain(): Boolean = !"^([^\\s]+)@mnnit.ac.in$".toRegex().containsMatchIn(this)

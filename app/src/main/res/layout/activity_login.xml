@@ -142,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="12dp"
-                android:hint="@string/email_address"
+                android:hint="@string/g_suite_id"
                 app:endIconMode="clear_text"
                 app:helperText="@string/helper_text"
                 app:helperTextTextColor="@color/helper_text_color"

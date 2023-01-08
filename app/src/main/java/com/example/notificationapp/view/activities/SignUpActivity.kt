@@ -14,6 +14,7 @@ import com.example.notificationapp.data.network.UserModel
 import com.example.notificationapp.data.network.UserResponse
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.example.notificationapp.databinding.ActivitySignupBinding
+import com.example.notificationapp.isNotValidDomain
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
@@ -49,12 +50,12 @@ class SignUpActivity : AppCompatActivity() {
 
         val adapterCourse = ArrayAdapter(this, R.layout.list_item, itemsCourse)
         binding.etCourse.setAdapter(adapterCourse)
-        binding.etCourse.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, id: Long ->
+        binding.etCourse.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, _: Long ->
             mCourse = adapterView.getItemAtPosition(position).toString()
         }
         val adapterYear = ArrayAdapter(this, R.layout.list_item, itemsYear)
         binding.etGradYear.setAdapter(adapterYear)
-        binding.etGradYear.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, id: Long ->
+        binding.etGradYear.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, _: Long ->
             mYear = adapterView.getItemAtPosition(position).toString()
         }
         binding.login.setOnClickListener {
@@ -70,12 +71,12 @@ class SignUpActivity : AppCompatActivity() {
     private fun signUpUser() {
         val emailText = binding.etEmail.text?.toString() ?: ""
         val passwordText = binding.etPassword.text?.toString() ?: ""
+        val regNoText = binding.etRegNo.text?.toString() ?: ""
         val mobileText = binding.etMobile.text?.toString() ?: ""
         val nameText = binding.etUsername.text?.toString() ?: ""
-        val regNoText = binding.etRegNo.text?.toString() ?: ""
         val courseText = binding.etCourse.text?.toString() ?: ""
-        val yearText = binding.etGradYear.text.toString()
-        if (!validate()) return
+        val yearText = binding.etGradYear.text?.toString() ?: ""
+        if (!validate(emailText, passwordText, regNoText, mobileText, nameText, courseText, yearText)) return
 
         mAuth.createUserWithEmailAndPassword(emailText, passwordText)
             .addOnCompleteListener(this) { createUserTask: Task<AuthResult?> ->
@@ -118,54 +119,56 @@ class SignUpActivity : AppCompatActivity() {
             }
     }
 
-    private fun validate(): Boolean {
-        val emailText = binding.etEmail.text?.toString() ?: ""
-        val passwordText = binding.etPassword.text?.toString() ?: ""
-        val mobileText = binding.etMobile.text?.toString() ?: ""
-        val nameText = binding.etUsername.text?.toString() ?: ""
-        val regNoText = binding.etRegNo.text?.toString() ?: ""
-        if (emailText == "") {
+    private fun validate(
+        emailText: String,
+        passwordText: String,
+        regNoText: String,
+        mobileText: String,
+        nameText: String,
+        courseText: String,
+        yearText: String
+    ): Boolean {
+        if (emailText.isEmpty()) {
             binding.etEmail.requestFocus()
             return false
         }
-        if (passwordText == "") {
-            binding.etPassword.requestFocus()
+        if (emailText.isNotValidDomain()) {
+            Toast.makeText(this, "Please use G-Suite ID", Toast.LENGTH_SHORT).show()
+            binding.etEmail.requestFocus()
             return false
         }
-        if (nameText == "") {
-            binding.etUsername.requestFocus()
-            return false
-        }
-        if (mobileText == "") {
-            binding.etMobile.requestFocus()
-            return false
-        }
-        if (regNoText == "") {
+
+        if (regNoText.isEmpty()) {
             binding.etRegNo.requestFocus()
             return false
         }
-        val compare = "@mnnit.ac.in"
-        var j = compare.length - 1
-        var check = false
-        var n = emailText.length - 1
-        check = false
+        if (!"^\\d{8}$".toRegex().containsMatchIn(regNoText)) {
+            Toast.makeText(this, "Invalid registration number", Toast.LENGTH_SHORT).show()
+            binding.etRegNo.requestFocus()
+            return false
+        }
 
-        //helperTextForEmail.text = "Please enter the valid e-mail address"
-        while (n >= 0 && j >= 0) {
-            if (emailText[n] != compare[j]) {
-                break
-            }
-            n--
-            j--
+        if (passwordText.isEmpty()) {
+            binding.etPassword.requestFocus()
+            return false
         }
-        if (j == -1 && compare.length < emailText.length) {
-            check = true
-            //helperTextForEmail.text = "Valid Email entered!"
-        } else {
-            Log.d(TAG, "Invalid")
-            Toast.makeText(applicationContext, "Please Enter G-Suite ID.", Toast.LENGTH_LONG).show()
+        if (courseText.isEmpty()) {
+            binding.etCourse.requestFocus()
+            return false
         }
-        return check
+        if (yearText.isEmpty()) {
+            binding.etGradYear.requestFocus()
+            return false
+        }
+        if (nameText.isEmpty()) {
+            binding.etUsername.requestFocus()
+            return false
+        }
+        if (mobileText.isEmpty()) {
+            binding.etMobile.requestFocus()
+            return false
+        }
+        return true
     }
 
     private fun goToLogin() {

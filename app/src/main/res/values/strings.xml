@@ -7,7 +7,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sign_up">Sign Up</string>
-    <string name="email_address">Email Address</string>
+    <string name="g_suite_id">G-Suite ID</string>
     <string name="graduation_year">Graduation Year</string>
     <string name="year">Year</string>
     <string name="course">Course</string>

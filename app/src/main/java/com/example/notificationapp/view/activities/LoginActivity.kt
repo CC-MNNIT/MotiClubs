@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.Constants
 import com.example.notificationapp.databinding.ActivityLoginBinding
+import com.example.notificationapp.isNotValidDomain
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
@@ -40,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
     private fun logInUser() {
         val email = binding.etEmail.text.toString()
         val password = binding.password.text.toString()
-        if (!validate()) return
+        if (!validate(email, password)) return
 
         mAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -77,14 +78,17 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun validate(): Boolean {
-        val emailText = binding.etEmail.text?.toString() ?: ""
-        val passwordText = binding.password.text?.toString() ?: ""
-        if (emailText == "") {
+    private fun validate(emailText: String, passwordText: String): Boolean {
+        if (emailText.isEmpty()) {
             binding.etEmail.requestFocus()
             return false
         }
-        if (passwordText == "") {
+        if (emailText.isNotValidDomain()) {
+            Toast.makeText(this, "Please use G-Suite ID", Toast.LENGTH_SHORT).show()
+            binding.etEmail.requestFocus()
+            return false
+        }
+        if (passwordText.isEmpty()) {
             binding.password.requestFocus()
             return false
         }
