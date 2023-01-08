@@ -142,4 +142,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setNavDrawer(){
+        if(user != null && user!!.admin.isNotEmpty()){
+            binding.navView.menu.findItem(R.id.admin_panel).setVisible(true)
+        }else{
+            binding.navView.menu.findItem(R.id.admin_panel).setVisible(false)
+
+        }
+    }
 }
