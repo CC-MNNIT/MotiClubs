@@ -77,3 +77,9 @@ data class UserResponse(
     @Expose
     var admin: List<String>,
 )
+
+data class ProfilePicResponse(
+    @SerializedName("avatar")
+    @Expose
+    var avatar: String
+)

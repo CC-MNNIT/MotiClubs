@@ -1,18 +1,26 @@
 package com.example.notificationapp.view.activities
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.example.notificationapp.Constants
 import com.example.notificationapp.R
+import com.example.notificationapp.data.network.UserResponse
+import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.example.notificationapp.databinding.ActivityMainBinding
 import com.example.notificationapp.view.fragments.*
 import com.google.firebase.auth.FirebaseAuth
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,18 +33,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mUserEmailTV: TextView
 
     private lateinit var binding: ActivityMainBinding
+    private var user: UserResponse? = null
+    private lateinit var preferences : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        preferences = getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        getUserData()
+        updateToken()
+        setNavDrawer()
         setReferences()
         setListeners()
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment())
+            .commit()
+
     }
 
+
     private fun setListeners() {
-        mDrawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.open, R.string.close)
+        mDrawerToggle =
+            ActionBarDrawerToggle(this, binding.drawerLayout, R.string.open, R.string.close)
         binding.drawerLayout.addDrawerListener(mDrawerToggle)
         mDrawerToggle.syncState()
         binding.navView.bringToFront()
@@ -66,7 +84,8 @@ class MainActivity : AppCompatActivity() {
             true
         }
         mEditIcon.setOnClickListener {
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ProfileFragment()).commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ProfileFragment()).commit()
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
     }
@@ -98,4 +117,22 @@ class MainActivity : AppCompatActivity() {
         FirebaseAuth.getInstance().signOut()
         startActivity(Intent(this@MainActivity, LoginActivity::class.java))
     }
+    private fun getUserData() {
+
+        RetrofitAccessObject.getRetrofitAccessObject()
+            .getUserData(preferences.getString(Constants.TOKEN, ""))
+            .enqueue(object : Callback<UserResponse?> {
+                override fun onResponse(
+                    call: Call<UserResponse?>,
+                    response: Response<UserResponse?>
+                ) {
+                    if (response.isSuccessful && response.body() != null) {
+                        user = response.body()!!
+                    }
+                }
+                override fun onFailure(call: Call<UserResponse?>, t: Throwable) {}
+            })
+    }
+
+
 }

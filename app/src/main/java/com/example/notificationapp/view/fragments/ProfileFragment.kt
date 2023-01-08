@@ -8,17 +8,21 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
 import com.example.notificationapp.Constants
+import com.example.notificationapp.data.network.ProfilePicResponse
 import com.example.notificationapp.data.network.UserResponse
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.example.notificationapp.databinding.FragmentProfileBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,27 +35,28 @@ class ProfileFragment : Fragment() {
     }
 
     private var user: UserResponse? = null
-
     private lateinit var binding: FragmentProfileBinding
+    private lateinit var mAuth: FirebaseAuth
+    private var launcher =
+        registerForActivityResult<Void?, Uri>(Contract(), ActivityResultCallback { result ->
+            if (result == null) {
+                return@ActivityResultCallback
+            }
+            try {
+                val selectedImage = compressAsyncBitmap(result)
+                binding.profilePic.setImageBitmap(selectedImage)
+                val encodedImage = encodeImage(selectedImage)
+                updateProfilePicture(encodedImage)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        })
 
-    private var launcher = registerForActivityResult<Void?, Uri>(Contract(), ActivityResultCallback { result ->
-        Log.d(TAG, "encodedImage")
-        if (result == null) {
-            return@ActivityResultCallback
-        }
-        try {
-            val imageStream = requireContext().contentResolver.openInputStream(result)
-            val selectedImage = BitmapFactory.decodeStream(imageStream)
-            binding.profilePic.setImageBitmap(selectedImage)
-            val encodedImage = encodeImage(selectedImage)
-            Log.d(TAG, encodedImage)
-            updateProfilePicture(encodedImage)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
-    })
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root = binding.root
         getUserData()
@@ -77,12 +82,48 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateProfilePicture(encodedImage: String) {
-        val preferences = requireContext().getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        Toast.makeText(context, "Saving", Toast.LENGTH_SHORT).show()
+        var storage = Firebase.storage
+        val storageRef = storage.reference
+        var date = mAuth.currentUser?.uid.toString()
+        var filename = date
+        val profilePicRef = storageRef.child("$filename.png")
+
+        var uploadTask = profilePicRef.putBytes(encodedImage.toByteArray())
+        uploadTask.addOnFailureListener {
+            Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show()
+
+        }.addOnSuccessListener { taskSnapshot ->
+            val preferences = requireContext().getSharedPreferences(
+                Constants.SHARED_PREFERENCE,
+                Context.MODE_PRIVATE
+            )
+
+            RetrofitAccessObject.getRetrofitAccessObject().updateProfilePic(
+                preferences.getString(Constants.TOKEN, ""),
+                storageRef.toString()
+            )
+                .enqueue(object : Callback<ProfilePicResponse?> {
+                    override fun onResponse(
+                        call: Call<ProfilePicResponse?>,
+                        response: Response<ProfilePicResponse?>
+                    ) {
+                        if (response.isSuccessful && response.body() != null) {
+                            user!!.avatar = response.body()!!.avatar
+                            setProfileValues()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ProfilePicResponse?>, t: Throwable) {
+                    }
+                }
+                )
+        }
     }
 
-    private fun encodeImage(bm: Bitmap): String {
+    private fun encodeImage(bm: Bitmap?): String {
         val baos = ByteArrayOutputStream()
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        bm?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val b = baos.toByteArray()
         return Base64.encodeToString(b, Base64.DEFAULT)
     }
@@ -93,12 +134,17 @@ class ProfileFragment : Fragment() {
     }
 
     private fun getUserData() {
-        val preferences = requireContext().getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
-        RetrofitAccessObject.getRetrofitAccessObject().getUserData(preferences.getString(Constants.TOKEN, ""))
+        val preferences =
+            requireContext().getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        RetrofitAccessObject.getRetrofitAccessObject()
+            .getUserData(preferences.getString(Constants.TOKEN, ""))
             .enqueue(object : Callback<UserResponse?> {
-                override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
+                override fun onResponse(
+                    call: Call<UserResponse?>,
+                    response: Response<UserResponse?>
+                ) {
                     if (response.isSuccessful && response.body() != null) {
-                        user = response.body()
+                        user = response.body()!!
                         setProfileValues()
                     }
                 }
@@ -116,10 +162,34 @@ class ProfileFragment : Fragment() {
         binding.tvRegNo.text = user!!.registrationNumber
         binding.yearTv.text = user!!.graduationYear
         binding.courseTv.text = user!!.course
+        Toast.makeText(context, "picture is started settted", Toast.LENGTH_SHORT).show()
 
-        if (user!!.avatar.isNotEmpty()) {
-            val bm = decodeImage(user!!.avatar)
-            binding.profilePic.setImageBitmap(bm)
+//        if (user!!.avatar?.isNotEmpty() == true) {
+//            Toast.makeText(context,"picture is settted",Toast.LENGTH_SHORT).show()
+//            val bm = decodeImage(user!!.avatar)
+//            binding.profilePic.setImageBitmap(bm)
+//        }
+    }
+
+    //    fun compressBitmap(uri : Uri): Bitmap? = CoroutineScope.launch { compressAsyncBitmap(uri) }
+    private fun compressAsyncBitmap(uri: Uri): Bitmap? {
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        val ins = requireContext().contentResolver.openInputStream(uri)
+        BitmapFactory.decodeStream(ins, null, options)
+        ins?.close()
+
+        var scale = 1
+        while (options.outWidth / scale / 2 >= 100 && options.outHeight / scale / 2 >= 100) {
+            scale *= 2
         }
+
+        val finalOptions = BitmapFactory.Options()
+        finalOptions.inSampleSize = scale
+
+        val inputStream = requireContext().contentResolver.openInputStream(uri)
+        val out = BitmapFactory.decodeStream(inputStream, null, finalOptions)
+        inputStream?.close()
+        return out
     }
 }
