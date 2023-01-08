@@ -134,5 +134,12 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    private fun updateToken(){
+        FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.addOnSuccessListener {result ->
+            var idToken = result.token
+            Toast.makeText(this,"updated token",Toast.LENGTH_SHORT).show()
+            preferences.edit().putString(Constants.TOKEN, idToken).apply()
+        }
+    }
 
 }
