@@ -10,7 +10,7 @@
         android:orientation="vertical">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profilepic"
+            android:id="@+id/profile_pic"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_gravity="center_horizontal"
@@ -21,29 +21,26 @@
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profilepic"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="18dp"
             android:text="User Name"
             android:textColor="@color/black"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/useremail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/username"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Useremail@email.com"
             android:textColor="@color/black"
-            android:textSize="13dp" />
+            android:textSize="13sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1.5dp"
-            android:layout_below="@+id/useremail"
             android:layout_marginHorizontal="5dp"
             android:layout_marginTop="15dp"
             android:background="@color/black" />
@@ -54,9 +51,10 @@
         android:id="@+id/btnedit"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_alignParentRight="true"
-        android:clickable="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/profile_edit_icon" />
 
 </RelativeLayout>
