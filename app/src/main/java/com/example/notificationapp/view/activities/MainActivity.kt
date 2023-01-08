@@ -39,10 +39,14 @@ class MainActivity : AppCompatActivity() {
         mDrawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.open, R.string.close)
         binding.drawerLayout.addDrawerListener(mDrawerToggle)
         mDrawerToggle.syncState()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.navView.bringToFront()
         binding.navView.setCheckedItem(R.id.home)
 
+        binding.toolbar.setNavigationOnClickListener {
+            if (!binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                binding.drawerLayout.openDrawer(GravityCompat.START)
+            }
+        }
         binding.navView.setNavigationItemSelectedListener { item: MenuItem ->
             if (item.itemId == R.id.logout) {
                 logout()
@@ -90,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logout() {
-        getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE).edit().clear().apply();
+        getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE).edit().clear().apply()
         FirebaseAuth.getInstance().signOut()
         startActivity(Intent(this@MainActivity, LoginActivity::class.java))
     }
