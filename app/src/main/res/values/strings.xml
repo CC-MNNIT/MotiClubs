@@ -19,4 +19,6 @@
     <string name="already_a_user_click_here">Already a User? Click here!</string>
     <string name="sign_in">Sign In</string>
     <string name="not_yet_registered_click_here">Not yet Registered? Click Here!</string>
+    <string name="mnnit_clubs">MNNIT Clubs</string>
+    <string name="subscribe">Subscribe</string>
 </resources>

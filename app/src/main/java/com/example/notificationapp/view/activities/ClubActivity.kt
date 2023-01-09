@@ -3,6 +3,7 @@ package com.example.notificationapp.view.activities
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.Constants
+import com.example.notificationapp.R
 import com.example.notificationapp.databinding.ActivityClubBinding
 
 class ClubActivity : AppCompatActivity() {
@@ -13,6 +14,7 @@ class ClubActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClubBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.postCardView.setBackgroundResource(R.drawable.shape_white_club);
         setListener()
         setValues()
     }

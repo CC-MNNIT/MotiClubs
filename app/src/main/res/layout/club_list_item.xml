@@ -38,6 +38,7 @@
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/nunito_bold"
                 android:text="CC Club"
+                android:maxLines="2"
                 android:textAlignment="center"
                 android:textColor="@color/black" />
 
@@ -49,6 +50,7 @@
                 android:fontFamily="@font/bariol_bold"
                 android:text="It is a awesome club."
                 android:textAlignment="center"
+                android:maxLines="2"
                 android:textColor="@color/black"
                 android:textSize="12sp" />
 
