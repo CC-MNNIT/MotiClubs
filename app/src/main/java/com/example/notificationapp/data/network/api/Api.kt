@@ -1,9 +1,6 @@
 package com.example.notificationapp.data.network.api
 
-import com.example.notificationapp.data.network.ClubModel
-import com.example.notificationapp.data.network.ProfilePicResponse
-import com.example.notificationapp.data.network.UserModel
-import com.example.notificationapp.data.network.UserResponse
+import com.example.notificationapp.data.network.*
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -19,4 +16,11 @@ interface Api {
 
     @PUT("/user/avatar")
     fun updateProfilePic(@Header("Authorization") auth: String?, @Body avatar: String): Call<ProfilePicResponse?>
+
+    @POST("/posts/{club}")
+    fun postMessage(
+        @Header("Authorization") auth: String?,
+        @Path("club") clubID: String,
+        @Body body: PostModel
+    ): Call<PostResponse?>
 }

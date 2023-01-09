@@ -83,3 +83,23 @@ data class ProfilePicResponse(
     @Expose
     var avatar: String
 )
+
+data class PostResponse(
+    @SerializedName("message")
+    @Expose
+    var message: String,
+
+    @SerializedName("time")
+    @Expose
+    var time: Long,
+
+    @SerializedName("club")
+    @Expose
+    var club: String,
+
+    @SerializedName("adminEmail")
+    @Expose
+    var adminEmail: String,
+)
+
+data class PostModel(var message: String)
