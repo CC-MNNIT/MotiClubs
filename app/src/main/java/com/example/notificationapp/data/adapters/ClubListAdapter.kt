@@ -35,9 +35,9 @@ class ClubListAdapter(private val mClubs: List<ClubModel>, private val mContext:
             description.text = clubModel.description
             background.setOnClickListener {
                 val intent = Intent(mContext, ClubActivity::class.java)
-                intent.putExtra(Constants.CLUB_NAME, mClubs[adapterPosition].name)
-                intent.putExtra(Constants.CLUB_ID, mClubs[adapterPosition].id)
-                intent.putExtra(Constants.CLUB_DESC, mClubs[adapterPosition].description)
+                intent.putExtra(Constants.CLUB_NAME, clubModel.name)
+                intent.putExtra(Constants.CLUB_ID, clubModel.id)
+                intent.putExtra(Constants.CLUB_DESC, clubModel.description)
                 mContext.startActivity(intent)
             }
         }

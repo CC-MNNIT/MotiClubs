@@ -31,12 +31,23 @@ interface Api {
     fun getClubPosts(
         @Header("Authorization") auth: String?,
         @Path("club") clubID: String,
-    ) : Call<List<PostResponse>?>
+    ): Call<List<PostResponse>?>
 
     @GET("/user/{email}")
     fun getAdminDetails(
         @Header("Authorization") auth: String?,
         @Path("email") email: String,
-    ) : Call<AdminResponse?>
+    ): Call<AdminResponse?>
 
+    @PUT("/user/subscribe")
+    fun subscribeToClub(
+        @Header("Authorization") auth: String?,
+        @Body club: ClubSubscriptionModel
+    ): Call<ClubSubscriptionModel?>
+
+    @PUT("/user/unsubscribe")
+    fun unsubscribeToClub(
+        @Header("Authorization") auth: String?,
+        @Body club: ClubSubscriptionModel
+    ): Call<ClubSubscriptionModel?>
 }

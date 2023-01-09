@@ -18,18 +18,15 @@ object UserInstance {
 
     private var mInstance: UserResponse? = null
 
-    fun setUserInstance(user: UserResponse) {
-        if (mInstance != null) return
-        mInstance = user
-    }
-
     fun isAdmin(): Boolean = mInstance?.admin?.isNotEmpty() ?: false
 
     fun isAdminOf(clubID: String): Boolean = mInstance?.admin?.contains(clubID) ?: false
 
+    fun isSubscribedTo(clubID: String): Boolean = mInstance?.subscribed?.contains(clubID) ?: false
+
     fun refreshUserSession(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         updateAuthToken(user, ctx, {
-            initInstance(ctx, {
+            fetchUserInstance(ctx, {
                 updateFCMToken(ctx)
                 onDone()
             }, onFail)
@@ -53,7 +50,7 @@ object UserInstance {
         }
     }
 
-    private fun initInstance(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
+    fun fetchUserInstance(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         RetrofitAccessObject.getRetrofitAccessObject().getUserData(getAuthToken(ctx))
             .enqueue(object : Callback<UserResponse?> {
                 override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
@@ -63,7 +60,7 @@ object UserInstance {
                         onFail()
                         return
                     }
-                    Log.d(TAG, "onResponse: init_instance: success")
+                    Log.d(TAG, "onResponse: init_instance: success $user")
                     mInstance = user
                     onDone()
                 }

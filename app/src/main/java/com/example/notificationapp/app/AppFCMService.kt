@@ -1,6 +1,7 @@
 package com.example.notificationapp.app
 
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -13,7 +14,6 @@ class AppFCMService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
-        super.onNewToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

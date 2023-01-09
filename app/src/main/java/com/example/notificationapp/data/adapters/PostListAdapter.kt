@@ -2,6 +2,7 @@ package com.example.notificationapp.data.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -21,7 +22,12 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PostListAdapter(private val mPosts: List<PostResponse>, private val mContext: Context, ) : RecyclerView.Adapter<PostListAdapter.CustomVH>() {
+class PostListAdapter(private val mPosts: List<PostResponse>, private val mContext: Context) :
+    RecyclerView.Adapter<PostListAdapter.CustomVH>() {
+
+    companion object {
+        private const val TAG = "PostListAdapter"
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         CustomVH(View.inflate(parent.context, R.layout.post_list_item, null))
@@ -41,14 +47,15 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
         private val dateTime: AppCompatTextView = itemView.findViewById(R.id.post_time)
 
         fun bindView(postResponse: PostResponse) {
+            Log.d(TAG, "bindView: $postResponse")
             description.text = postResponse.message
-            dateTime.text =  convertLongToTime(postResponse.time)
+            dateTime.text = convertLongToTime(postResponse.time)
 
-            var adminResponse : AdminResponse? = null
+            var adminResponse: AdminResponse? = null
             val preferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
 
             RetrofitAccessObject.getRetrofitAccessObject()
-                .getAdminDetails(preferences.getString(Constants.TOKEN, ""),postResponse.adminEmail)
+                .getAdminDetails(preferences.getString(Constants.TOKEN, ""), postResponse.adminEmail)
                 .enqueue(object : Callback<AdminResponse?> {
                     override fun onResponse(
                         call: Call<AdminResponse?>,
@@ -60,6 +67,7 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
 //                            Picasso.get().load(adminResponse!!.avatar).placeholder(R.drawable.ic_person).into(profilePic)
 //                        }
                     }
+
                     override fun onFailure(call: Call<AdminResponse?>, t: Throwable) {
                     }
                 })
@@ -72,6 +80,7 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
             }
         }
     }
+
     fun convertLongToTime(time: Long): String {
         val date = Date(time)
         val format = SimpleDateFormat("yyyy.MM.dd HH:mm")

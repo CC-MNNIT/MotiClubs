@@ -76,6 +76,10 @@ data class UserResponse(
     @SerializedName("admin")
     @Expose
     var admin: List<String>,
+
+    @SerializedName("subscribed")
+    @Expose
+    var subscribed: List<String>,
 )
 
 data class ProfilePicResponse(
@@ -105,19 +109,19 @@ data class PostResponse(
 data class AdminResponse(
     @SerializedName("name")
     @Expose
-    var name: String? = null,
+    var name: String,
 
     @SerializedName("personalEmail")
     @Expose
-    var personalEmail: String? = null,
+    var personalEmail: String,
 
     @SerializedName("phoneNumber")
     @Expose
-    var phoneNumber: String? = null,
+    var phoneNumber: String,
 
     @SerializedName("avatar")
     @Expose
-    var avatar: String? = null
+    var avatar: String
 )
 
 data class PostModel(var message: String)
@@ -126,4 +130,10 @@ data class FCMToken(
     @SerializedName("token")
     @Expose
     var token: String
+)
+
+data class ClubSubscriptionModel(
+    @SerializedName("club")
+    @Expose
+    var club: String
 )
