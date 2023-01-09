@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -44,10 +43,10 @@ class ProfileFragment : Fragment() {
                 return@ActivityResultCallback
             }
             try {
-                val selectedImage = compressAsyncBitmap(result)
-                binding.profilePic.setImageBitmap(selectedImage)
-                val encodedImage = encodeImage(selectedImage)
-                updateProfilePicture(encodedImage)
+//                val selectedImage = compressAsyncBitmap(result)
+//                binding.profilePic.setImageBitmap(selectedImage)
+                Log.d(TAG, "calling updateUserProfile")
+                updateProfilePicture(result)
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
@@ -82,22 +81,26 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun updateProfilePicture(encodedImage: String) {
+    private fun updateProfilePicture(imageUri: Uri) {
         val preferences = requireContext().getSharedPreferences(
             Constants.SHARED_PREFERENCE,
             Context.MODE_PRIVATE
         )
+
+        Log.d(TAG, "updateUserProfile function started")
+
         var storage = Firebase.storage
         val storageRef = storage.reference
         val profilePicRef =
             storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
                 .child(FirebaseAuth.getInstance().currentUser!!.uid)
 
-        var uploadTask = profilePicRef.putBytes(encodedImage.toByteArray())
+        var uploadTask = profilePicRef.putFile(imageUri)
 
         val urlTask = uploadTask.continueWithTask { task ->
             if (!task.isSuccessful) {
                 task.exception?.let {
+                    Log.d(TAG, "not success$it")
                     throw it
                 }
             }
@@ -106,6 +109,8 @@ class ProfileFragment : Fragment() {
             if (task.isSuccessful) {
                 val downloadUri = task.result
                 Log.d(TAG, downloadUri.toString())
+                Log.d(TAG, "started retrofit .........")
+
                 RetrofitAccessObject.getRetrofitAccessObject().updateProfilePic(
                     preferences.getString(Constants.TOKEN, ""),
                     downloadUri.toString()
@@ -118,31 +123,36 @@ class ProfileFragment : Fragment() {
                             if (response.isSuccessful && response.body() != null) {
                                 user!!.avatar = response.body()!!.avatar
                                 Toast.makeText(context, "Saved on mongoDB", Toast.LENGTH_SHORT).show()
-//                                setProfileValues()
+                                Log.d(TAG, "saved on mongodb")
+                                setProfileValues()
+                            }else{
+                                Log.d(TAG, response.code().toString())
                             }
                         }
                         override fun onFailure(call: Call<ProfilePicResponse?>, t: Throwable) {
+                            Log.d(TAG, "retrofit failed")
+                            Toast.makeText(context, "failed retrofit", Toast.LENGTH_SHORT).show()
                         }
                     }
                     )
-
             } else {
                 Toast.makeText(context, "Saved but still error", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "saved but still error")
             }
         }
     }
 
-    private fun encodeImage(bm: Bitmap?): String {
-        val baos = ByteArrayOutputStream()
-        bm?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val b = baos.toByteArray()
-        return Base64.encodeToString(b, Base64.DEFAULT)
-    }
+//    private fun encodeImage(bm: Bitmap?): String {
+//        val baos = ByteArrayOutputStream()
+//        bm?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+//        val b = baos.toByteArray()
+//        return Base64.encodeToString(b, Base64.DEFAULT)
+//    }
 
-    private fun decodeImage(imageString: String?): Bitmap {
-        val imageBytes = Base64.decode(imageString, Base64.DEFAULT)
-        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-    }
+//    private fun decodeImage(imageString: String?): Bitmap {
+//        val imageBytes = Base64.decode(imageString, Base64.DEFAULT)
+//        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//    }
 
     private fun getUserData() {
         val preferences =
