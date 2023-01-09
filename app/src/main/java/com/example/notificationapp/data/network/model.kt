@@ -102,6 +102,24 @@ data class PostResponse(
     var adminEmail: String,
 )
 
+data class AdminResponse(
+    @SerializedName("name")
+    @Expose
+    var name: String? = null,
+
+    @SerializedName("personalEmail")
+    @Expose
+    var personalEmail: String? = null,
+
+    @SerializedName("phoneNumber")
+    @Expose
+    var phoneNumber: String? = null,
+
+    @SerializedName("avatar")
+    @Expose
+    var avatar: String? = null
+)
+
 data class PostModel(var message: String)
 
 data class FCMToken(

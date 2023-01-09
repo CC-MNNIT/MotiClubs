@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".view.fragments.HomeFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -14,8 +14,8 @@
         <FrameLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_percent="0.35"
+            android:layout_height="wrap_content"
+            app:layout_constraintHeight_percent="0.65"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -49,7 +49,7 @@
             android:layout_marginHorizontal="25dp"
             android:layout_weight="0.67"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 
 

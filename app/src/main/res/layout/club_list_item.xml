@@ -29,6 +29,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/circle"
                 android:scaleType="centerInside"
+                android:elevation="3dp"
                 android:src="@drawable/profile_icon" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -52,7 +53,7 @@
                 android:textAlignment="center"
                 android:maxLines="2"
                 android:textColor="@color/black"
-                android:textSize="12sp" />
+                android:textSize="12sp"/>
 
         </LinearLayout>
 

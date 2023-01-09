@@ -26,4 +26,17 @@ interface Api {
         @Path("club") clubID: String,
         @Body body: PostModel
     ): Call<PostResponse?>
+
+    @GET("/posts/{club}")
+    fun getClubPosts(
+        @Header("Authorization") auth: String?,
+        @Path("club") clubID: String,
+    ) : Call<List<PostResponse>?>
+
+    @GET("/user/{email}")
+    fun getAdminDetails(
+        @Header("Authorization") auth: String?,
+        @Path("email") email: String,
+    ) : Call<AdminResponse?>
+
 }
