@@ -113,7 +113,7 @@ class ProfileFragment : Fragment() {
 
                 RetrofitAccessObject.getRetrofitAccessObject().updateProfilePic(
                     preferences.getString(Constants.TOKEN, ""),
-                    downloadUri.toString()
+                    ProfilePicResponse(downloadUri.toString())
                 )
                     .enqueue(object : Callback<ProfilePicResponse?> {
                         override fun onResponse(

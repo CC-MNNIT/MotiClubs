@@ -15,7 +15,7 @@ interface Api {
     fun getUserData(@Header("Authorization") auth: String?): Call<UserResponse?>
 
     @POST("/user/avatar")
-    fun updateProfilePic(@Header("Authorization") auth: String?, @Body avatar: String): Call<ProfilePicResponse?>
+    fun updateProfilePic(@Header("Authorization") auth: String?, @Body avatar: ProfilePicResponse): Call<ProfilePicResponse?>
 
     @POST("/posts/{club}")
     fun postMessage(
