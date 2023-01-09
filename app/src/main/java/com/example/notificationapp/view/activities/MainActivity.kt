@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
@@ -42,15 +43,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         preferences = getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
         getUserData()
+        Log.d("Test2", user.toString())
         updateToken()
-        handleAdminPanelVisibility()
         setReferences()
         setListeners()
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment())
             .commit()
 
     }
-
 
     private fun setListeners() {
         mDrawerToggle =
@@ -117,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         FirebaseAuth.getInstance().signOut()
         startActivity(Intent(this@MainActivity, LoginActivity::class.java))
     }
+
     private fun getUserData() {
 
         RetrofitAccessObject.getRetrofitAccessObject()
@@ -127,7 +128,10 @@ class MainActivity : AppCompatActivity() {
                     response: Response<UserResponse?>
                 ) {
                     if (response.isSuccessful && response.body() != null) {
-                        user = response.body()!!
+                        user = response.body()
+                        Log.d("Test1", user.toString())
+                        handleAdminPanelVisibility()
+
                     }
                 }
                 override fun onFailure(call: Call<UserResponse?>, t: Throwable) {}
@@ -137,7 +141,6 @@ class MainActivity : AppCompatActivity() {
     private fun updateToken(){
         FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.addOnSuccessListener {result ->
             var idToken = result.token
-            Toast.makeText(this,"updated token",Toast.LENGTH_SHORT).show()
             preferences.edit().putString(Constants.TOKEN, idToken).apply()
         }
     }
@@ -146,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         if(user != null && user!!.admin.isNotEmpty()){
             binding.navView.menu.findItem(R.id.admin_panel).setVisible(true)
         }else{
+            if(user?.admin?.isEmpty()  == null)
             binding.navView.menu.findItem(R.id.admin_panel).setVisible(false)
 
         }

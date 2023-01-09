@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -82,43 +83,54 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateProfilePicture(encodedImage: String) {
-        Toast.makeText(context, "Saving", Toast.LENGTH_SHORT).show()
+        val preferences = requireContext().getSharedPreferences(
+            Constants.SHARED_PREFERENCE,
+            Context.MODE_PRIVATE
+        )
         var storage = Firebase.storage
         val storageRef = storage.reference
-        var date = mAuth.currentUser?.uid.toString()
-        var filename = date
-        val profilePicRef = storageRef.child("$filename.png")
+        val profilePicRef =
+            storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
+                .child(FirebaseAuth.getInstance().currentUser!!.uid)
 
         var uploadTask = profilePicRef.putBytes(encodedImage.toByteArray())
-        uploadTask.addOnFailureListener {
-            Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show()
 
-        }.addOnSuccessListener { taskSnapshot ->
-            val preferences = requireContext().getSharedPreferences(
-                Constants.SHARED_PREFERENCE,
-                Context.MODE_PRIVATE
-            )
+        val urlTask = uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            profilePicRef.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                Log.d(TAG, downloadUri.toString())
+                RetrofitAccessObject.getRetrofitAccessObject().updateProfilePic(
+                    preferences.getString(Constants.TOKEN, ""),
+                    storageRef.toString()
+                )
+                    .enqueue(object : Callback<ProfilePicResponse?> {
+                        override fun onResponse(
+                            call: Call<ProfilePicResponse?>,
+                            response: Response<ProfilePicResponse?>
+                        ) {
+                            if (response.isSuccessful && response.body() != null) {
+                                user!!.avatar = response.body()!!.avatar
+                                setProfileValues()
+                            }
+                        }
 
-            RetrofitAccessObject.getRetrofitAccessObject().updateProfilePic(
-                preferences.getString(Constants.TOKEN, ""),
-                storageRef.toString()
-            )
-                .enqueue(object : Callback<ProfilePicResponse?> {
-                    override fun onResponse(
-                        call: Call<ProfilePicResponse?>,
-                        response: Response<ProfilePicResponse?>
-                    ) {
-                        if (response.isSuccessful && response.body() != null) {
-                            user!!.avatar = response.body()!!.avatar
-                            setProfileValues()
+                        override fun onFailure(call: Call<ProfilePicResponse?>, t: Throwable) {
                         }
                     }
+                    )
 
-                    override fun onFailure(call: Call<ProfilePicResponse?>, t: Throwable) {
-                    }
-                }
-                )
+            } else {
+                Toast.makeText(context, "Saved but still error", Toast.LENGTH_SHORT).show()
+            }
         }
+
     }
 
     private fun encodeImage(bm: Bitmap?): String {
@@ -162,12 +174,9 @@ class ProfileFragment : Fragment() {
         binding.tvRegNo.text = user!!.registrationNumber
         binding.yearTv.text = user!!.graduationYear
         binding.courseTv.text = user!!.course
-        Toast.makeText(context, "picture is started settted", Toast.LENGTH_SHORT).show()
 
 //        if (user!!.avatar?.isNotEmpty() == true) {
-//            Toast.makeText(context,"picture is settted",Toast.LENGTH_SHORT).show()
-//            val bm = decodeImage(user!!.avatar)
-//            binding.profilePic.setImageBitmap(bm)
+//            //
 //        }
     }
 
