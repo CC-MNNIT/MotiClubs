@@ -17,7 +17,7 @@ object UserInstance {
     private var mInstance: UserResponse? = null
 
     fun setUserInstance(user: UserResponse) {
-        mInstance ?: return
+        if (mInstance != null) return
         mInstance = user
     }
 
@@ -25,7 +25,13 @@ object UserInstance {
 
     fun isAdminOf(clubID: String): Boolean = mInstance?.admin?.contains(clubID) ?: false
 
-    fun initInstance(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
+    fun refreshUserSession(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
+        updateAuthToken(user, ctx, {
+            initInstance(ctx, onDone, onFail)
+        }, onFail)
+    }
+
+    private fun initInstance(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         RetrofitAccessObject.getRetrofitAccessObject().getUserData(getAuthToken(ctx))
             .enqueue(object : Callback<UserResponse?> {
                 override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
@@ -36,7 +42,7 @@ object UserInstance {
                         return
                     }
                     Log.d(TAG, "onResponse: init_instance: success")
-                    setUserInstance(user)
+                    mInstance = user
                     onDone()
                 }
 
@@ -44,7 +50,7 @@ object UserInstance {
             })
     }
 
-    fun updateAuthToken(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
+    private fun updateAuthToken(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         user.getIdToken(true).addOnSuccessListener {
             val token = it.token
             if (token == null) {

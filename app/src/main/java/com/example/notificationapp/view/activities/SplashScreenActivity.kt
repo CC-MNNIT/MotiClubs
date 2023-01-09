@@ -29,12 +29,15 @@ class SplashScreenActivity : AppCompatActivity() {
 
         if (user != null) {
             if (user.isEmailVerified) {
-                UserInstance.updateAuthToken(user, applicationContext, {
-                    UserInstance.initInstance(this, {
-                        startActivity(Intent(applicationContext, MainActivity::class.java))
-                        finish()
-                    }) { refreshErr() }
-                }) { refreshErr() }
+                UserInstance.refreshUserSession(user, applicationContext, {
+                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    finish()
+                }) {
+                    mAuth.signOut()
+                    Toast.makeText(this, "Error: Refresh login session", Toast.LENGTH_LONG).show()
+                    startActivity(Intent(applicationContext, LoginActivity::class.java))
+                    finish()
+                }
             } else {
                 mAuth.signOut()
                 Toast.makeText(applicationContext, "Please Verify Your Email.", Toast.LENGTH_LONG).show()
@@ -43,12 +46,5 @@ class SplashScreenActivity : AppCompatActivity() {
             startActivity(Intent(applicationContext, IntroSliderActivity::class.java))
             finish()
         }
-    }
-
-    private fun refreshErr() {
-        mAuth.signOut()
-        Toast.makeText(this, "Error: Refresh login session", Toast.LENGTH_LONG).show()
-        startActivity(Intent(applicationContext, LoginActivity::class.java))
-        finish()
     }
 }

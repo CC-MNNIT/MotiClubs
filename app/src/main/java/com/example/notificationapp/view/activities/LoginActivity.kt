@@ -12,7 +12,6 @@ import com.example.notificationapp.app.UserInstance
 import com.example.notificationapp.databinding.ActivityLoginBinding
 import com.example.notificationapp.isNotValidDomain
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 
 class LoginActivity : AppCompatActivity() {
 
@@ -57,7 +56,13 @@ class LoginActivity : AppCompatActivity() {
                         return@addOnCompleteListener
                     }
                     if (user.isEmailVerified) {
-                        handleUser(user)
+                        UserInstance.refreshUserSession(user, this, {
+                            Toast.makeText(this@LoginActivity, "Login Successful.", Toast.LENGTH_SHORT).show()
+                            goToHome()
+                        }) {
+                            Toast.makeText(this@LoginActivity, "Error: Could not init session", Toast.LENGTH_SHORT).show()
+                            mAuth.signOut()
+                        }
                     } else {
                         mAuth.signOut()
                         Toast.makeText(applicationContext, "Please Verify Your Email.", Toast.LENGTH_LONG).show()
@@ -68,21 +73,6 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this@LoginActivity, task.exception?.message ?: "Null", Toast.LENGTH_SHORT).show()
                 }
             }
-    }
-
-    private fun handleUser(user: FirebaseUser) {
-        UserInstance.updateAuthToken(user, this, {
-            UserInstance.initInstance(this, {
-                Toast.makeText(this@LoginActivity, "Login Successful.", Toast.LENGTH_SHORT).show()
-                goToHome()
-            }) {
-                Toast.makeText(this@LoginActivity, "Error: Could not init session", Toast.LENGTH_SHORT).show()
-                mAuth.signOut()
-            }
-        }) {
-            Toast.makeText(this@LoginActivity, "Error: Could not init token", Toast.LENGTH_SHORT).show()
-            mAuth.signOut()
-        }
     }
 
     private fun goToHome() {
