@@ -3,9 +3,11 @@ package com.example.notificationapp.app
 import android.content.Context
 import android.util.Log
 import com.example.notificationapp.Constants
+import com.example.notificationapp.data.network.FCMToken
 import com.example.notificationapp.data.network.UserResponse
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,8 +29,28 @@ object UserInstance {
 
     fun refreshUserSession(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         updateAuthToken(user, ctx, {
-            initInstance(ctx, onDone, onFail)
+            initInstance(ctx, {
+                updateFCMToken(ctx)
+                onDone()
+            }, onFail)
         }, onFail)
+    }
+
+    private fun updateFCMToken(ctx: Context) {
+        FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener {
+            FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                RetrofitAccessObject.getRetrofitAccessObject().setFCMToken(getAuthToken(ctx), FCMToken(token))
+                    .enqueue(object : Callback<FCMToken?> {
+                        override fun onResponse(call: Call<FCMToken?>, response: Response<FCMToken?>) {
+                            if (response.isSuccessful && response.body() != null) {
+                                Log.d(TAG, "onResponse: token success")
+                            }
+                        }
+
+                        override fun onFailure(call: Call<FCMToken?>, t: Throwable) {}
+                    })
+            }
+        }
     }
 
     private fun initInstance(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
