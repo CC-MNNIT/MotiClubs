@@ -108,7 +108,7 @@ class ProfileFragment : Fragment() {
                 Log.d(TAG, downloadUri.toString())
                 RetrofitAccessObject.getRetrofitAccessObject().updateProfilePic(
                     preferences.getString(Constants.TOKEN, ""),
-                    storageRef.toString()
+                    downloadUri.toString()
                 )
                     .enqueue(object : Callback<ProfilePicResponse?> {
                         override fun onResponse(
@@ -117,10 +117,10 @@ class ProfileFragment : Fragment() {
                         ) {
                             if (response.isSuccessful && response.body() != null) {
                                 user!!.avatar = response.body()!!.avatar
-                                setProfileValues()
+                                Toast.makeText(context, "Saved on mongoDB", Toast.LENGTH_SHORT).show()
+//                                setProfileValues()
                             }
                         }
-
                         override fun onFailure(call: Call<ProfilePicResponse?>, t: Throwable) {
                         }
                     }
@@ -130,7 +130,6 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(context, "Saved but still error", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     private fun encodeImage(bm: Bitmap?): String {
