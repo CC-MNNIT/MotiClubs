@@ -4,9 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notificationapp.Constants
 import com.example.notificationapp.R
 import com.example.notificationapp.data.adapters.ClubListAdapter
+import com.example.notificationapp.data.adapters.PostListAdapter
 import com.example.notificationapp.data.network.ClubModel
 import com.example.notificationapp.data.network.PostResponse
 import com.example.notificationapp.data.network.api.RetrofitAccessObject
@@ -18,12 +20,14 @@ import retrofit2.Response
 class ClubActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityClubBinding
+    private lateinit var postListAdapter: PostListAdapter
     private var posts: List<PostResponse> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityClubBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.postCardView.setBackgroundResource(R.drawable.shape_white_club);
+        binding.postCardView.setBackgroundResource(R.drawable.shape_white_club)
+        binding.clubPostRecyclerView.layoutManager = LinearLayoutManager(this)
         setListener()
         setValues()
     }
@@ -38,7 +42,8 @@ class ClubActivity : AppCompatActivity() {
                     response: Response<List<PostResponse>?>
                 ) {
                     posts = response.body()!!
-
+                    postListAdapter = PostListAdapter(posts, this@ClubActivity)
+                    binding.clubPostRecyclerView.adapter = postListAdapter
                 }
 
                 override fun onFailure(call: Call<List<PostResponse>?>, t: Throwable) {
