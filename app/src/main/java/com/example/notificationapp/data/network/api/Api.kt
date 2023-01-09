@@ -17,6 +17,9 @@ interface Api {
     @POST("/user/avatar")
     fun updateProfilePic(@Header("Authorization") auth: String?, @Body avatar: ProfilePicResponse): Call<ProfilePicResponse?>
 
+    @POST("/user/fcmtoken")
+    fun setFCMToken(@Header("Authorization") auth: String?, @Body token: FCMToken): Call<FCMToken?>
+
     @POST("/posts/{club}")
     fun postMessage(
         @Header("Authorization") auth: String?,

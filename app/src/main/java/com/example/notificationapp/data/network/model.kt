@@ -103,3 +103,9 @@ data class PostResponse(
 )
 
 data class PostModel(var message: String)
+
+data class FCMToken(
+    @SerializedName("token")
+    @Expose
+    var token: String
+)
