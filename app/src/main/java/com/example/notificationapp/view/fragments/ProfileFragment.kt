@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import com.example.notificationapp.app.UserInstance
 import com.example.notificationapp.data.network.API
 import com.example.notificationapp.databinding.FragmentProfileBinding
+import com.example.notificationapp.view.activities.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -25,7 +26,7 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import java.io.ByteArrayOutputStream
 
-class ProfileFragment : Fragment() {
+class ProfileFragment(private val mainActivity: MainActivity) : Fragment() {
 
     companion object {
         private const val TAG = "ProfileFragment"
@@ -124,10 +125,11 @@ class ProfileFragment : Fragment() {
         if (avatar.isEmpty()) return
 
         Picasso.get().load(avatar).networkPolicy(NetworkPolicy.OFFLINE).into(binding.profilePic, object : com.squareup.picasso.Callback {
-            override fun onSuccess() {}
+            override fun onSuccess() = mainActivity.setValues()
 
             override fun onError(e: java.lang.Exception?) {
                 Picasso.get().load(avatar).into(binding.profilePic)
+                mainActivity.setValues()
             }
         })
     }

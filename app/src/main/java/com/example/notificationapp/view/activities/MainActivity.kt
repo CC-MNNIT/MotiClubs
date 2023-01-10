@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment()).commit()
     }
 
-    private fun setValues() {
+    fun setValues() {
         mUserNameTV.text = UserInstance.getName()
         mUserEmailTV.text = UserInstance.getEmail()
 
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.fragment_container, when (item.itemId) {
                     R.id.notifications -> NotificationsFragment()
                     R.id.admin_panel -> AdminPanelFragment()
-                    R.id.profile_section -> ProfileFragment()
+                    R.id.profile_section -> ProfileFragment(this)
                     R.id.about_us -> AboutUsFragment()
                     R.id.help -> HelpFragment()
                     else -> HomeFragment()
