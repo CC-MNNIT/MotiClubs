@@ -23,6 +23,8 @@ class ClubActivity : AppCompatActivity() {
     private lateinit var postListAdapter: PostListAdapter
 
     private lateinit var mClubID: String
+    private lateinit var club_name: String
+
     private var mClubSubscribed: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +40,7 @@ class ClubActivity : AppCompatActivity() {
         binding.fab.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra(Constants.CLUB_ID, mClubID)
+            intent.putExtra(Constants.CLUB_NAME,club_name)
             startActivity(intent)
             finish()
         }
@@ -61,6 +64,9 @@ class ClubActivity : AppCompatActivity() {
         }
         setListener()
         mClubID = clubID
+        if(clubName != null) {
+            club_name = clubName
+        }
         mClubSubscribed = UserInstance.isSubscribedTo(clubID)
         getClubPosts(clubID)
 

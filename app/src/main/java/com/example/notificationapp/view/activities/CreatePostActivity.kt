@@ -34,6 +34,8 @@ class CreatePostActivity : AppCompatActivity() {
 
     private fun setValues() {
         val clubID = intent.getStringExtra(Constants.CLUB_ID)
+        val clubName = intent.getStringExtra(Constants.CLUB_NAME)
+        binding.clubName.text = clubName
         if (clubID == null) {
             Toast.makeText(this, "Error: Club ID NULL", Toast.LENGTH_SHORT).show()
             finish()
