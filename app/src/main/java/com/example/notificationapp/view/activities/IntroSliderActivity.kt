@@ -55,7 +55,7 @@ class IntroSliderActivity : AppCompatActivity() {
             if (binding.introSliderViewPager.currentItem + 1 < mIntroSliderAdapter.itemCount) {
                 binding.introSliderViewPager.currentItem++
             } else {
-                startActivity(Intent(applicationContext, SignUpActivity::class.java))
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
                 finish()
             }
         }
