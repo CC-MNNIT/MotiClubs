@@ -8,76 +8,66 @@
         android:id="@+id/item_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_margin="8dp"
         android:backgroundTint="@color/white"
         android:clickable="true"
         android:focusable="true"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="2dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
         app:strokeColor="@color/slate_300"
         app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/admin_profile_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/profile_icon" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight=".3"
-                android:orientation="vertical"
-                android:padding="6dp">
+                android:orientation="vertical">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/admin_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/nunito_bold"
                     android:text="Amit Kumar"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/post_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:fontFamily="@font/bariol_bold"
+                    android:maxLines="2"
+                    android:text="10:00 AM, 10th Jan"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/tertiary_text_dark"
+                    android:textSize="12sp" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/textDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
                     android:fontFamily="@font/bariol_bold"
                     android:maxLines="2"
                     android:text="It is a awesome club."
                     android:textColor="@color/black"
-                    android:textSize="12sp" />
+                    android:textSize="14sp" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/admin_profile_pic"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/circle"
-                    android:elevation="3dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/profile_icon" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/post_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="12dp"
-                    android:fontFamily="@font/bariol_bold"
-                    android:maxLines="2"
-                    android:text="10:00 PM/ 10-Jan-2022"
-                    android:textAlignment="center"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
             </LinearLayout>
 
         </LinearLayout>

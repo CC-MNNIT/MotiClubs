@@ -113,9 +113,6 @@ class ProfileFragment : Fragment() {
 
     private fun setProfileValues() {
         binding.emailTv.text = UserInstance.getEmail()
-        Log.d(TAG, "setProfileValues: ${UserInstance.getName()}")
-        Log.d(TAG, "setProfileValues: ${UserInstance.getEmail()}")
-        Log.d(TAG, "setProfileValues: ${UserInstance.getAvatar()}")
         binding.tvName.text = UserInstance.getName()
         binding.nameTv1.text = UserInstance.getName()
         binding.mobileTv.text = UserInstance.getPhoneNumber()

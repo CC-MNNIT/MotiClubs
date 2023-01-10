@@ -1,7 +1,6 @@
 package com.example.notificationapp.data.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -14,15 +13,10 @@ import com.example.notificationapp.data.network.PostResponse
 import com.google.android.material.card.MaterialCardView
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
-import java.text.SimpleDateFormat
 import java.util.*
 
 class PostListAdapter(private val mPosts: List<PostResponse>, private val mContext: Context) :
     RecyclerView.Adapter<PostListAdapter.CustomVH>() {
-
-    companion object {
-        private const val TAG = "PostListAdapter"
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         CustomVH(View.inflate(parent.context, R.layout.post_list_item, null))
@@ -33,6 +27,11 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
 
     override fun getItemCount(): Int = mPosts.size
 
+    private val mMonthsList: List<String> = listOf(
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+        "Aug", "Sep", "Oct", "Nov", "Dec"
+    )
+
     inner class CustomVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val name: AppCompatTextView = itemView.findViewById(R.id.admin_name)
@@ -42,9 +41,8 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
         private val dateTime: AppCompatTextView = itemView.findViewById(R.id.post_time)
 
         fun bindView(postResponse: PostResponse) {
-            Log.d(TAG, "bindView: $postResponse")
             description.text = postResponse.message
-            dateTime.text = convertLongToTime(postResponse.time)
+            dateTime.text = getTime(postResponse.time)
 
             API.getUserDetails(UserInstance.getAuthToken(mContext), postResponse.adminEmail, {
                 name.text = it.name
@@ -57,19 +55,25 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
                     }
                 })
             }) {}
-//            background.setOnClickListener {
+            background.setOnClickListener {
 //                val intent = Intent(mContext, ClubActivity::class.java)
 ////                intent.putExtra(Constants.CLUB_NAME, mPosts[adapterPosition].name)
 ////                intent.putExtra(Constants.CLUB_ID, mPosts[adapterPosition].id)
 ////                intent.putExtra(Constants.CLUB_DESC, mClubs[adapterPosition].description)
 //                mContext.startActivity(intent)
-//            }
+            }
         }
     }
 
-    fun convertLongToTime(time: Long): String {
-        val date = Date(time)
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-        return format.format(date)
+    fun getTime(time: Long): String {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = time
+        return "${calendar.get(Calendar.HOUR)}:${calendar.get(Calendar.MINUTE)} ${
+            if (calendar.get(Calendar.AM_PM) == Calendar.AM) {
+                "AM"
+            } else {
+                "PM"
+            }
+        }, " + "${calendar.get(Calendar.DAY_OF_MONTH)} ${mMonthsList[calendar.get(Calendar.MONTH)]}"
     }
 }
