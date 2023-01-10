@@ -1,15 +1,18 @@
 package com.example.notificationapp.data.adapters
 
 import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.notificationapp.Constants
 import com.example.notificationapp.R
 import com.example.notificationapp.app.UserInstance
 import com.example.notificationapp.data.network.API
 import com.example.notificationapp.data.network.PostResponse
+import com.example.notificationapp.view.activities.PostActivity
 import com.google.android.material.card.MaterialCardView
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
@@ -39,14 +42,15 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
         private val background: MaterialCardView = itemView.findViewById(R.id.item_background)
         private val profilePic: ImageView = itemView.findViewById(R.id.admin_profile_pic)
         private val dateTime: AppCompatTextView = itemView.findViewById(R.id.post_time)
+        lateinit var avatarUrl : String
 
         fun bindView(postResponse: PostResponse) {
             description.text = postResponse.message
             dateTime.text = getTime(postResponse.time)
-
             API.getUserDetails(UserInstance.getAuthToken(mContext), postResponse.adminEmail, {
                 name.text = it.name
                 if (it.avatar.isEmpty()) return@getUserDetails
+                avatarUrl = it.avatar
                 Picasso.get().load(it.avatar).networkPolicy(NetworkPolicy.OFFLINE).into(profilePic, object : com.squareup.picasso.Callback {
                     override fun onSuccess() {}
 
@@ -56,11 +60,12 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
                 })
             }) {}
             background.setOnClickListener {
-//                val intent = Intent(mContext, ClubActivity::class.java)
-////                intent.putExtra(Constants.CLUB_NAME, mPosts[adapterPosition].name)
-////                intent.putExtra(Constants.CLUB_ID, mPosts[adapterPosition].id)
-////                intent.putExtra(Constants.CLUB_DESC, mClubs[adapterPosition].description)
-//                mContext.startActivity(intent)
+                val intent = Intent(mContext, PostActivity::class.java)
+                intent.putExtra(Constants.ADMIN_NAME, name.text)
+                intent.putExtra(Constants.TIME, dateTime.text)
+                intent.putExtra(Constants.MESSAGE, description.text)
+                intent.putExtra(Constants.AVATAR, avatarUrl)
+                mContext.startActivity(intent)
             }
         }
     }
