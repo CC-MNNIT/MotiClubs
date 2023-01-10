@@ -41,6 +41,8 @@ class SplashScreenActivity : AppCompatActivity() {
             } else {
                 mAuth.signOut()
                 Toast.makeText(applicationContext, "Please Verify Your Email.", Toast.LENGTH_LONG).show()
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
             }
         } else {
             startActivity(Intent(applicationContext, IntroSliderActivity::class.java))
