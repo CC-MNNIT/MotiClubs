@@ -29,12 +29,12 @@ class ClubActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityClubBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.fab.isVisible = UserInstance.isAdmin()
-        binding.postCardView.setBackgroundResource(R.drawable.shape_white_club)
-        binding.clubPostRecyclerView.layoutManager = LinearLayoutManager(this)
         setValues()
 
+        binding.postCardView.setBackgroundResource(R.drawable.shape_white_club)
+        binding.clubPostRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.fab.isVisible = UserInstance.isAdmin()
         binding.fab.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             intent.putExtra(Constants.CLUB_ID, mClubID)
@@ -65,7 +65,7 @@ class ClubActivity : AppCompatActivity() {
         getClubPosts(clubID)
 
         binding.clubName.text = clubName
-        binding.descTv.text = clubDesc
+        binding.clubDesc.text = clubDesc
 
         binding.subscribeBtn.text =
             getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
