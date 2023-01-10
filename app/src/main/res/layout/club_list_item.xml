@@ -8,12 +8,11 @@
         android:id="@+id/item_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="16dp"
+        android:layout_margin="8dp"
         android:backgroundTint="@color/white"
         android:clickable="true"
         android:focusable="true"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="2dp"
+        app:cardCornerRadius="16dp"
         app:strokeColor="@color/slate_300"
         app:strokeWidth="1dp">
 
@@ -23,13 +22,11 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_pic"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/circle"
-                android:scaleType="centerInside"
-                android:elevation="3dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
                 android:src="@drawable/profile_icon" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -38,8 +35,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/nunito_bold"
-                android:text="CC Club"
                 android:maxLines="2"
+                android:text="CC Club"
                 android:textAlignment="center"
                 android:textColor="@color/black" />
 
@@ -49,11 +46,11 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:fontFamily="@font/bariol_bold"
+                android:maxLines="2"
                 android:text="It is a awesome club."
                 android:textAlignment="center"
-                android:maxLines="2"
                 android:textColor="@color/black"
-                android:textSize="12sp"/>
+                android:textSize="12sp" />
 
         </LinearLayout>
 

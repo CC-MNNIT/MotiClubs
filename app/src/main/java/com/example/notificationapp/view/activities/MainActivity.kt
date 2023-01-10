@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         binding.navView.bringToFront()
         binding.navView.setCheckedItem(R.id.home)
 
-        binding.toolbar.setNavigationOnClickListener {
+        binding.menuBtn.setOnClickListener {
             if (!binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 binding.drawerLayout.openDrawer(GravityCompat.START)
             }
