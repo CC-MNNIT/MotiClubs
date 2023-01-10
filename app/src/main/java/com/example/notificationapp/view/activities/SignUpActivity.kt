@@ -10,9 +10,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.R
+import com.example.notificationapp.data.network.API
 import com.example.notificationapp.data.network.UserModel
-import com.example.notificationapp.data.network.UserResponse
-import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.example.notificationapp.databinding.ActivitySignupBinding
 import com.example.notificationapp.isNotValidDomain
 import com.google.android.gms.tasks.Task
@@ -20,9 +19,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -78,6 +74,7 @@ class SignUpActivity : AppCompatActivity() {
         val yearText = binding.etGradYear.text?.toString() ?: ""
         if (!validate(emailText, passwordText, regNoText, mobileText, nameText, courseText, yearText)) return
 
+        binding.signupBtn.isEnabled = false
         mAuth.createUserWithEmailAndPassword(emailText, passwordText)
             .addOnCompleteListener(this) { createUserTask: Task<AuthResult?> ->
                 if (!createUserTask.isSuccessful) {
@@ -95,24 +92,14 @@ class SignUpActivity : AppCompatActivity() {
                         user.getIdToken(true).addOnSuccessListener { result: GetTokenResult ->
                             val idToken = result.token
                             val userModel = UserModel(nameText, regNoText, yearText, courseText, emailText, emailText, mobileText)
-                            RetrofitAccessObject.getRetrofitAccessObject().saveUser(idToken, userModel)
-                                .enqueue(object : Callback<UserResponse?> {
-                                    override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
-                                        if (response.body() != null) {
-                                            Toast.makeText(
-                                                this@SignUpActivity,
-                                                "Registered Successfully, Please Verify Your Account and login!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            goToLogin()
-                                        }
-                                    }
-
-                                    override fun onFailure(call: Call<UserResponse?>, t: Throwable) {
-                                        retry(call.toString())
-                                        binding.signupBtn.isEnabled = true
-                                    }
-                                })
+                            API.saveUser(idToken, userModel, {
+                                Toast.makeText(
+                                    this@SignUpActivity,
+                                    "Registered Successfully, Please Verify Your Account and login!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                goToLogin()
+                            }) { retry("$it: Error Signing Up") }
                         }
                     }
                 }

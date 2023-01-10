@@ -3,20 +3,27 @@ package com.example.notificationapp.app
 import android.content.Context
 import android.util.Log
 import com.example.notificationapp.Constants
-import com.example.notificationapp.data.network.FCMToken
+import com.example.notificationapp.data.network.API
 import com.example.notificationapp.data.network.UserResponse
-import com.example.notificationapp.data.network.api.RetrofitAccessObject
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessaging
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 object UserInstance {
 
     private const val TAG = "UserInstance"
 
     private var mInstance: UserResponse? = null
+
+    fun getName() = mInstance?.name ?: ""
+    fun getEmail() = mInstance?.email ?: ""
+    fun getPhoneNumber() = mInstance?.phoneNumber ?: ""
+    fun getRegNo() = mInstance?.registrationNumber ?: ""
+    fun getGradYear() = mInstance?.graduationYear ?: ""
+    fun getCourse() = mInstance?.course ?: ""
+    fun getAvatar() = mInstance?.avatar ?: ""
+    fun setAvatar(url: String) {
+        mInstance?.avatar = url
+    }
 
     fun isAdmin(): Boolean = mInstance?.admin?.isNotEmpty() ?: false
 
@@ -36,37 +43,18 @@ object UserInstance {
     private fun updateFCMToken(ctx: Context) {
         FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener {
             FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-                RetrofitAccessObject.getRetrofitAccessObject().setFCMToken(getAuthToken(ctx), FCMToken(token))
-                    .enqueue(object : Callback<FCMToken?> {
-                        override fun onResponse(call: Call<FCMToken?>, response: Response<FCMToken?>) {
-                            if (response.isSuccessful && response.body() != null) {
-                                Log.d(TAG, "onResponse: token success")
-                            }
-                        }
-
-                        override fun onFailure(call: Call<FCMToken?>, t: Throwable) {}
-                    })
+                API.setFCMToken(getAuthToken(ctx), token, {
+                    Log.d(TAG, "onResponse: token success")
+                }) {}
             }
         }
     }
 
     fun fetchUserInstance(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
-        RetrofitAccessObject.getRetrofitAccessObject().getUserData(getAuthToken(ctx))
-            .enqueue(object : Callback<UserResponse?> {
-                override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
-                    val user = response.body()
-                    if (!response.isSuccessful || user == null) {
-                        Log.d(TAG, "onResponse: init_instance: err: ${response.code()}")
-                        onFail()
-                        return
-                    }
-                    Log.d(TAG, "onResponse: init_instance: success $user")
-                    mInstance = user
-                    onDone()
-                }
-
-                override fun onFailure(call: Call<UserResponse?>, t: Throwable) {}
-            })
+        API.getUserData(getAuthToken(ctx), {
+            mInstance = it
+            onDone()
+        }) { onFail() }
     }
 
     private fun updateAuthToken(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {

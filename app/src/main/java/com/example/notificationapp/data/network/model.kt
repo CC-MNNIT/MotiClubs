@@ -106,7 +106,7 @@ data class PostResponse(
     var adminEmail: String,
 )
 
-data class AdminResponse(
+data class UserDetailResponse(
     @SerializedName("name")
     @Expose
     var name: String,

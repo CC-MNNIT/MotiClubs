@@ -8,9 +8,6 @@ interface Api {
     @POST("/user")
     fun saveUser(@Header("Authorization") auth: String?, @Body userModel: UserModel?): Call<UserResponse?>
 
-    @GET("/clubs")
-    fun getClubs(@Header("Authorization") auth: String?): Call<List<ClubModel>?>
-
     @GET("/user")
     fun getUserData(@Header("Authorization") auth: String?): Call<UserResponse?>
 
@@ -20,24 +17,11 @@ interface Api {
     @POST("/user/fcmtoken")
     fun setFCMToken(@Header("Authorization") auth: String?, @Body token: FCMToken): Call<FCMToken?>
 
-    @POST("/posts/{club}")
-    fun sendPost(
-        @Header("Authorization") auth: String?,
-        @Path("club") clubID: String?,
-        @Body postModel: PostModel
-    ): Call<PostResponse?>
-
-    @GET("/posts/{club}")
-    fun getClubPosts(
-        @Header("Authorization") auth: String?,
-        @Path("club") clubID: String,
-    ): Call<List<PostResponse>?>
-
     @GET("/user/{email}")
-    fun getAdminDetails(
+    fun getUserDetails(
         @Header("Authorization") auth: String?,
         @Path("email") email: String,
-    ): Call<AdminResponse?>
+    ): Call<UserDetailResponse?>
 
     @PUT("/user/subscribe")
     fun subscribeToClub(
@@ -50,4 +34,20 @@ interface Api {
         @Header("Authorization") auth: String?,
         @Body club: ClubSubscriptionModel
     ): Call<ClubSubscriptionModel?>
+
+    @GET("/clubs")
+    fun getClubs(@Header("Authorization") auth: String?): Call<List<ClubModel>?>
+
+    @GET("/posts/{club}")
+    fun getClubPosts(
+        @Header("Authorization") auth: String?,
+        @Path("club") clubID: String,
+    ): Call<List<PostResponse>?>
+
+    @POST("/posts/{club}")
+    fun sendPost(
+        @Header("Authorization") auth: String?,
+        @Path("club") clubID: String?,
+        @Body postModel: PostModel
+    ): Call<PostResponse?>
 }
