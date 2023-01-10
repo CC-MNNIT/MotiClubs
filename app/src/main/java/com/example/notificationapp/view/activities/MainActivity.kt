@@ -3,7 +3,6 @@ package com.example.notificationapp.view.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -14,14 +13,15 @@ import com.example.notificationapp.app.UserInstance
 import com.example.notificationapp.databinding.ActivityMainBinding
 import com.example.notificationapp.view.fragments.*
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Callback
+import com.squareup.picasso.NetworkPolicy
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
-
-    private lateinit var mProfileImage: ImageView
-    private lateinit var mEditIcon: ImageView
-
+    private lateinit var mProfileImage: CircleImageView
     private lateinit var mUserNameTV: TextView
     private lateinit var mUserEmailTV: TextView
 
@@ -31,11 +31,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         setReferences()
         setListeners()
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment())
-            .commit()
+        setValues()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment()).commit()
+    }
 
+    private fun setValues() {
+        mUserNameTV.text = UserInstance.getName()
+        mUserEmailTV.text = UserInstance.getEmail()
+
+        val avatar = UserInstance.getAvatar()
+        if (avatar.isEmpty()) return
+        Picasso.get().load(avatar).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.profile_icon)
+            .into(mProfileImage, object : Callback {
+                override fun onSuccess() {}
+
+                override fun onError(e: Exception?) {
+                    Picasso.get().load(avatar).placeholder(R.drawable.profile_icon).into(mProfileImage)
+                }
+            })
     }
 
     private fun setListeners() {
@@ -69,11 +85,6 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-        mEditIcon.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileFragment()).commit()
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        }
     }
 
     private fun setReferences() {
@@ -81,9 +92,8 @@ class MainActivity : AppCompatActivity() {
 
         val mHeaderView = binding.navView.getHeaderView(0)
         mProfileImage = mHeaderView.findViewById(R.id.profile_pic)
-        mUserEmailTV = mHeaderView.findViewById(R.id.useremail)
-        mUserNameTV = mHeaderView.findViewById(R.id.username)
-        mEditIcon = mHeaderView.findViewById(R.id.btnedit)
+        mUserEmailTV = mHeaderView.findViewById(R.id.header_email)
+        mUserNameTV = mHeaderView.findViewById(R.id.header_name)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
