@@ -86,22 +86,22 @@ class SignUpActivity : AppCompatActivity() {
                     Toast.makeText(this@SignUpActivity, "Error: User null despite sign up", Toast.LENGTH_SHORT).show()
                     return@addOnCompleteListener
                 }
-                user.sendEmailVerification().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Email sent.")
-                        user.getIdToken(true).addOnSuccessListener { result: GetTokenResult ->
-                            val idToken = result.token
-                            val userModel = UserModel(nameText, regNoText, yearText, courseText, emailText, emailText, mobileText)
-                            API.saveUser(idToken, userModel, {
+                user.getIdToken(true).addOnSuccessListener { result: GetTokenResult ->
+                    val idToken = result.token
+                    val userModel = UserModel(nameText, regNoText, yearText, courseText, emailText, emailText, mobileText)
+                    API.saveUser(idToken, userModel, {
+                        user.sendEmailVerification().addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d(TAG, "Email sent.")
                                 Toast.makeText(
                                     this@SignUpActivity,
                                     "Registered Successfully, Please Verify Your Account and login!",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 goToLogin()
-                            }) { retry("$it: Error Signing Up") }
+                            }
                         }
-                    }
+                    }) { retry("$it: Error Signing Up") }
                 }
             }
     }
