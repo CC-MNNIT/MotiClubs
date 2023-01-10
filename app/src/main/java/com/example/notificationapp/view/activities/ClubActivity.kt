@@ -1,8 +1,10 @@
 package com.example.notificationapp.view.activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,9 +39,14 @@ class ClubActivity : AppCompatActivity() {
 
         binding.postCardView.setBackgroundResource(R.drawable.shape_white_club)
         binding.clubPostRecyclerView.layoutManager = LinearLayoutManager(this)
-
         setValues()
-        setListener()
+
+        binding.fab.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this, CreatePostActivity::class.java)
+            intent.putExtra(Constants.CLUB_ID, mClubID)
+            startActivity(intent)
+            finish()
+        })
     }
 
     private fun getClubPosts(clubID: String) {
@@ -73,6 +80,7 @@ class ClubActivity : AppCompatActivity() {
             finish()
             return
         }
+        setListener()
         mClubID = clubID
         mClubSubscribed = UserInstance.isSubscribedTo(clubID)
         getClubPosts(clubID)
@@ -87,6 +95,8 @@ class ClubActivity : AppCompatActivity() {
         binding.subscribeBtn.setOnClickListener {
             if (mClubSubscribed) unsubscribe() else subscribe()
         }
+
+
     }
 
     private fun subscribe() {
@@ -126,4 +136,5 @@ class ClubActivity : AppCompatActivity() {
                 override fun onFailure(call: Call<ClubSubscriptionModel?>, t: Throwable) {}
             })
     }
+
 }

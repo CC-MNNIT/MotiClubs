@@ -21,10 +21,10 @@ interface Api {
     fun setFCMToken(@Header("Authorization") auth: String?, @Body token: FCMToken): Call<FCMToken?>
 
     @POST("/posts/{club}")
-    fun postMessage(
+    fun sendPost(
         @Header("Authorization") auth: String?,
-        @Path("club") clubID: String,
-        @Body body: PostModel
+        @Path("club") clubID: String?,
+        @Body postModel: PostModel
     ): Call<PostResponse?>
 
     @GET("/posts/{club}")
