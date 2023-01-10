@@ -34,26 +34,46 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="bottom"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:padding="16dp">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/club_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito_bold"
-                    android:text="@string/action_cancel"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="24sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/club_desc"
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/club_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito_bold"
+                        android:text="@string/action_cancel"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="24sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/club_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito_bold"
+                        android:text="@string/action_cancel"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/subscribeBtn"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito_bold"
-                    android:text="@string/action_cancel"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="12sp" />
+                    android:layout_height="40dp"
+                    android:layout_gravity="bottom"
+                    android:backgroundTint="@color/red"
+                    android:fontFamily="@font/nunito_semibold"
+                    android:hapticFeedbackEnabled="true"
+                    android:text="@string/subscribe"
+                    android:textColor="@color/white" />
 
             </LinearLayout>
 
@@ -97,17 +117,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/subscribeBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/red"
-                    android:fontFamily="@font/nunito_semibold"
-                    android:hapticFeedbackEnabled="true"
-                    android:text="@string/subscribe"
-                    android:textColor="@color/white" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/event_timeline_tv"
