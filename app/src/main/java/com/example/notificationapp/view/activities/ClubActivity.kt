@@ -3,7 +3,6 @@ package com.example.notificationapp.view.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -88,7 +87,8 @@ class ClubActivity : AppCompatActivity() {
         binding.clubName.text = clubName
         binding.descTv.text = clubDesc
 
-        binding.subscribeBtn.text = getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
+        binding.subscribeBtn.text =
+            getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
     }
 
     private fun setListener() {
@@ -100,17 +100,26 @@ class ClubActivity : AppCompatActivity() {
     }
 
     private fun subscribe() {
-        RetrofitAccessObject.getRetrofitAccessObject().subscribeToClub(UserInstance.getAuthToken(this), ClubSubscriptionModel(mClubID))
+        RetrofitAccessObject.getRetrofitAccessObject()
+            .subscribeToClub(UserInstance.getAuthToken(this), ClubSubscriptionModel(mClubID))
             .enqueue(object : Callback<ClubSubscriptionModel?> {
-                override fun onResponse(call: Call<ClubSubscriptionModel?>, response: Response<ClubSubscriptionModel?>) {
+                override fun onResponse(
+                    call: Call<ClubSubscriptionModel?>,
+                    response: Response<ClubSubscriptionModel?>
+                ) {
                     val body = response.body()
                     if (!response.isSuccessful || body == null) {
-                        Toast.makeText(this@ClubActivity, "${response.code()} Could not subscribe. Please try again", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            this@ClubActivity,
+                            "${response.code()} Could not subscribe. Please try again",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                         return
                     }
                     mClubSubscribed = true
-                    binding.subscribeBtn.text = getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
+                    binding.subscribeBtn.text =
+                        getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
                     UserInstance.fetchUserInstance(this@ClubActivity, {}) {}
                 }
 
@@ -119,17 +128,26 @@ class ClubActivity : AppCompatActivity() {
     }
 
     private fun unsubscribe() {
-        RetrofitAccessObject.getRetrofitAccessObject().unsubscribeToClub(UserInstance.getAuthToken(this), ClubSubscriptionModel(mClubID))
+        RetrofitAccessObject.getRetrofitAccessObject()
+            .unsubscribeToClub(UserInstance.getAuthToken(this), ClubSubscriptionModel(mClubID))
             .enqueue(object : Callback<ClubSubscriptionModel?> {
-                override fun onResponse(call: Call<ClubSubscriptionModel?>, response: Response<ClubSubscriptionModel?>) {
+                override fun onResponse(
+                    call: Call<ClubSubscriptionModel?>,
+                    response: Response<ClubSubscriptionModel?>
+                ) {
                     val body = response.body()
                     if (!response.isSuccessful || body == null) {
-                        Toast.makeText(this@ClubActivity, "${response.code()} Could not unsubscribe. Please try again", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            this@ClubActivity,
+                            "${response.code()} Could not unsubscribe. Please try again",
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                         return
                     }
                     mClubSubscribed = false
-                    binding.subscribeBtn.text = getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
+                    binding.subscribeBtn.text =
+                        getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
                     UserInstance.fetchUserInstance(this@ClubActivity, {}) {}
                 }
 
