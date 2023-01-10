@@ -68,6 +68,7 @@
         android:fontFamily="@font/nunito_semibold"
         android:text="Hi! I am Amit Kumar."
         android:textColor="@color/black"
+        android:autoLink="web"
         android:textSize="14sp" />
 
 

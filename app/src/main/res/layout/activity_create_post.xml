@@ -2,36 +2,77 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    >
-    <com.google.android.material.textview.MaterialTextView
+    android:gravity="center_horizontal">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/item_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Write Your post here -"
-        android:layout_marginTop="15dp"
-        android:textSize="20sp"
-        android:textStyle="bold"
-android:layout_marginLeft="15dp"/>
+        android:layout_margin="10dp"
+        android:backgroundTint="@color/white"
+        app:strokeColor="@color/slate_300"
+        app:cardCornerRadius="5dp"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/adminProfilePic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/profile_icon" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/club_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:fontFamily="@font/nunito_bold"
+                    android:text="Robotics Club"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tvMessage"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="10dp"
+        app:hintAnimationEnabled="true"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
+        app:boxStrokeColor="@color/black"
+        app:boxStrokeWidth="1dp"
+        android:textColorHint="@color/black"
         android:hint="Message"
+        app:hintTextColor="@color/black"
         >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="200dp"
+            android:minHeight="100dp"
+            android:maxHeight="500dp"
+            android:layout_margin="@dimen/card_margin"
             android:backgroundTint="@color/white"
-            android:fontFamily="@font/nunito_bold"
+            android:fontFamily="@font/nunito_semibold"
             android:textAlignment="viewStart"
             />
 
