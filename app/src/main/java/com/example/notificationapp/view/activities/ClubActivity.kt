@@ -82,6 +82,7 @@ class ClubActivity : AppCompatActivity() {
             mClubSubscribed = true
             binding.subscribeBtn.text =
                 getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
+            Toast.makeText(this, "Successfully Subscribed", Toast.LENGTH_SHORT).show()
             UserInstance.fetchUserInstance(this@ClubActivity, {}) {}
         }) { Toast.makeText(this, "$it: Could not subscribe. Please try again", Toast.LENGTH_SHORT).show() }
     }
@@ -91,6 +92,7 @@ class ClubActivity : AppCompatActivity() {
             mClubSubscribed = false
             binding.subscribeBtn.text =
                 getString(if (mClubSubscribed) R.string.unsubscribe else R.string.subscribe)
+            Toast.makeText(this, "Successfully Unsubscribed", Toast.LENGTH_SHORT).show()
             UserInstance.fetchUserInstance(this@ClubActivity, {}) {}
         }) { Toast.makeText(this, "$it: Could not unsubscribe. Please try again", Toast.LENGTH_SHORT).show() }
     }
