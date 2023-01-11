@@ -12,18 +12,17 @@ import com.example.notificationapp.api.API
 import com.example.notificationapp.api.PostResponse
 import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
+import com.example.notificationapp.app.toTimeString
 import com.example.notificationapp.view.activities.PostActivity
 import com.google.android.material.card.MaterialCardView
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
-import java.util.*
 
 class PostListAdapter(
     private val mClubName: String,
     private val mPosts: List<PostResponse>,
     private val mContext: Context
-) :
-    RecyclerView.Adapter<PostListAdapter.CustomVH>() {
+) : RecyclerView.Adapter<PostListAdapter.CustomVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         CustomVH(View.inflate(parent.context, R.layout.post_list_item, null))
@@ -33,11 +32,6 @@ class PostListAdapter(
     }
 
     override fun getItemCount(): Int = mPosts.size
-
-    private val mMonthsList: List<String> = listOf(
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-        "Aug", "Sep", "Oct", "Nov", "Dec"
-    )
 
     inner class CustomVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -51,7 +45,7 @@ class PostListAdapter(
 
         fun bindView(postResponse: PostResponse) {
             description.text = postResponse.message
-            dateTime.text = getTime(postResponse.time)
+            dateTime.text = postResponse.time.toTimeString()
             API.getUserDetails(UserInstance.getAuthToken(mContext), postResponse.adminEmail, {
                 name.text = it.name
                 if (it.avatar.isEmpty()) return@getUserDetails
@@ -74,23 +68,5 @@ class PostListAdapter(
                 })
             }
         }
-    }
-
-    private fun getTime(time: Long): String {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = time
-        return "${formatInt(calendar.get(Calendar.HOUR))}:${formatInt(calendar.get(Calendar.MINUTE))} ${
-            if (calendar.get(Calendar.AM_PM) == Calendar.AM) {
-                "AM"
-            } else {
-                "PM"
-            }
-        }, " + "${calendar.get(Calendar.DAY_OF_MONTH)} ${mMonthsList[calendar.get(Calendar.MONTH)]}"
-    }
-
-    private fun formatInt(num: Int): String = if (num < 10) {
-        "0$num"
-    } else {
-        "$num"
     }
 }
