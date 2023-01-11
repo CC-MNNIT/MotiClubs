@@ -13,8 +13,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:backgroundTint="@color/white"
-        app:strokeColor="@color/slate_300"
         app:cardCornerRadius="5dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/slate_300"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -40,7 +41,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/nunito_bold"
-                    android:text="Amit Kumar"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -51,25 +51,31 @@
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/bariol_bold"
                     android:maxLines="2"
-                    android:text="10:00 AM, 10th Jan"
                     android:textAlignment="center"
                     android:textColor="@android:color/tertiary_text_dark"
                     android:textSize="12sp" />
             </LinearLayout>
 
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:paddingHorizontal="10dp"
-        android:fontFamily="@font/nunito_semibold"
-        android:text="Hi! I am Amit Kumar."
-        android:textColor="@color/black"
-        android:autoLink="web"
-        android:textSize="14sp" />
 
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:autoLink="all"
+            android:fontFamily="@font/nunito_semibold"
+            android:paddingHorizontal="10dp"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:textSize="14sp" />
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
