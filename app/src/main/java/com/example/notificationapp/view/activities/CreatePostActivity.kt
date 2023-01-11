@@ -24,7 +24,11 @@ class CreatePostActivity : AppCompatActivity() {
 
     private fun setListener() {
         binding.sendPost.setOnClickListener {
-            val message: String = binding.etMessage.text.toString()
+            val message: String = binding.etMessage.text?.toString() ?: ""
+            if (message.isEmpty()) {
+                Toast.makeText(this, "Can't post empty message", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             API.sendPost(UserInstance.getAuthToken(this), mClubID, message, {
                 Toast.makeText(this, "Post Sent", Toast.LENGTH_SHORT).show()
                 finish()
