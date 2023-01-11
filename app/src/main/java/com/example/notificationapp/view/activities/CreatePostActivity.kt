@@ -8,19 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import com.example.notificationapp.R
 import com.example.notificationapp.api.API
 import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
+import com.example.notificationapp.app.getMkdFormatter
 import com.example.notificationapp.databinding.ActivityCreatePostBinding
 import io.noties.markwon.Markwon
 import io.noties.markwon.editor.MarkwonEditor
 import io.noties.markwon.editor.MarkwonEditorTextWatcher
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
-import io.noties.markwon.linkify.LinkifyPlugin
 
 class CreatePostActivity : AppCompatActivity() {
 
@@ -52,7 +48,7 @@ class CreatePostActivity : AppCompatActivity() {
             }) { Toast.makeText(this, "$it: Unable to post", Toast.LENGTH_SHORT).show() }
         }
 
-        binding.etMessage.addTextChangedListener { MarkwonEditorTextWatcher.withProcess(mkdEditor) }
+        binding.etMessage.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(mkdEditor))
 
         binding.previewChip.setOnCheckedChangeListener { _, isChecked ->
             val focus = currentFocus
@@ -75,12 +71,7 @@ class CreatePostActivity : AppCompatActivity() {
     }
 
     private fun setValues() {
-        mkd = Markwon.builder(this)
-            .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(MarkwonInlineParserPlugin.create())
-            .usePlugin(LinkifyPlugin.create())
-            .usePlugin(TablePlugin.create(this))
-            .build()
+        mkd = getMkdFormatter()
         mkdEditor = MarkwonEditor.create(mkd)
 
         val clubID = intent.getStringExtra(Constants.CLUB_ID)

@@ -89,7 +89,7 @@ class AppFCMService : FirebaseMessagingService() {
     ) {
         val notificationHandler = Notification.Builder(applicationContext)
             .setContentTitle("$adminName posted in $clubName")
-            .setContentText(message)
+            .setContentText(getMkdFormatter().toMarkdown(message))
             .setColor(ContextCompat.getColor(applicationContext, R.color.main_color))
             .setSmallIcon(R.drawable.notification)
             .setStyle(Notification.BigTextStyle())
@@ -129,7 +129,7 @@ class AppFCMService : FirebaseMessagingService() {
 
         val notificationHandler = NotificationCompat.Builder(applicationContext, clubID)
             .setContentTitle("$adminName posted in $clubName")
-            .setContentText(message)
+            .setContentText(getMkdFormatter().toMarkdown(message))
             .setColorized(true)
             .setColor(ContextCompat.getColor(applicationContext, R.color.main_color))
             .setSmallIcon(R.drawable.notification)

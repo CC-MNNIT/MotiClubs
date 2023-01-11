@@ -12,6 +12,7 @@ import com.example.notificationapp.api.API
 import com.example.notificationapp.api.PostResponse
 import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
+import com.example.notificationapp.app.getMkdFormatter
 import com.example.notificationapp.app.toTimeString
 import com.example.notificationapp.view.activities.PostActivity
 import com.google.android.material.card.MaterialCardView
@@ -44,7 +45,7 @@ class PostListAdapter(
         private var avatarUrl: String = ""
 
         fun bindView(postResponse: PostResponse) {
-            description.text = postResponse.message
+            mContext.getMkdFormatter().setMarkdown(description, postResponse.message)
             dateTime.text = postResponse.time.toTimeString()
             API.getUserDetails(UserInstance.getAuthToken(mContext), postResponse.adminEmail, {
                 name.text = it.name
@@ -62,7 +63,7 @@ class PostListAdapter(
                 mContext.startActivity(Intent(mContext, PostActivity::class.java).apply {
                     putExtra(Constants.ADMIN_NAME, name.text)
                     putExtra(Constants.TIME, dateTime.text)
-                    putExtra(Constants.MESSAGE, description.text)
+                    putExtra(Constants.MESSAGE, postResponse.message)
                     putExtra(Constants.AVATAR, avatarUrl)
                     putExtra(Constants.CLUB_NAME, mClubName)
                 })

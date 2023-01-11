@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.R
 import com.example.notificationapp.app.Constants
+import com.example.notificationapp.app.getMkdFormatter
 import com.example.notificationapp.databinding.ActivityPostBinding
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
@@ -25,7 +26,7 @@ class PostActivity : AppCompatActivity() {
         binding.toolbar.title = intent.getStringExtra(Constants.CLUB_NAME) ?: "Club"
         binding.postTime.text = intent.getStringExtra(Constants.TIME) ?: "NA"
         binding.adminName.text = intent.getStringExtra(Constants.ADMIN_NAME) ?: "NA"
-        binding.message.text = intent.getStringExtra(Constants.MESSAGE) ?: "NA"
+        getMkdFormatter().setMarkdown(binding.message, intent.getStringExtra(Constants.MESSAGE) ?: "NA")
 
         val adminAvatar = intent.getStringExtra(Constants.AVATAR) ?: "NA"
         if (adminAvatar.isEmpty()) return
