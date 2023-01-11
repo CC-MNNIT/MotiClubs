@@ -126,7 +126,8 @@ data class UserDetailResponse(
     var avatar: String
 )
 
-data class PostModel(var message: String)
+data class PostModel(var message: String, var club: String)
+data class UpdatePostModel(var message: String)
 
 data class FCMToken(
     @SerializedName("token")

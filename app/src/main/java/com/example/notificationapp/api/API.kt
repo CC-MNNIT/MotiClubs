@@ -3,6 +3,7 @@ package com.example.notificationapp.api
 import com.example.notificationapp.app.Constants
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -68,18 +69,30 @@ object API {
         @GET("/clubs")
         fun getClubs(@Header("Authorization") auth: String?): Call<List<ClubModel>?>
 
-        @GET("/posts/{club}")
+        @GET("/posts")
         fun getClubPosts(
             @Header("Authorization") auth: String?,
-            @Path("club") clubID: String,
+            @Query("club") clubID: String,
         ): Call<List<PostResponse>?>
 
-        @POST("/posts/{club}")
+        @POST("/posts")
         fun sendPost(
             @Header("Authorization") auth: String?,
-            @Path("club") clubID: String?,
             @Body postModel: PostModel
         ): Call<PostResponse?>
+
+        @PUT("/posts/{post}")
+        fun updatePost(
+            @Header("Authorization") auth: String?,
+            @Path("post") postID: String,
+            @Body postModel: UpdatePostModel
+        ): Call<ResponseBody>
+
+        @DELETE("/posts/{post}")
+        fun deletePost(
+            @Header("Authorization") auth: String?,
+            @Path("post") postID: String
+        ): Call<ResponseBody>
     }
 
     fun saveUser(
@@ -259,7 +272,7 @@ object API {
         auth: String?, clubID: String, message: String,
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
-        getRetrofitAccessObject().sendPost(auth, clubID, PostModel(message))
+        getRetrofitAccessObject().sendPost(auth, PostModel(message, clubID))
             .enqueue(object : Callback<PostResponse?> {
                 override fun onResponse(call: Call<PostResponse?>, response: Response<PostResponse?>) {
                     val body = response.body()
@@ -272,5 +285,40 @@ object API {
 
                 override fun onFailure(call: Call<PostResponse?>, t: Throwable) = onFailure(-1)
             })
+    }
+
+    fun updatePost(
+        auth: String?, postID: String, message: String,
+        onResponse: () -> Unit, onFailure: (code: Int) -> Unit
+    ) {
+        getRetrofitAccessObject().updatePost(auth, postID, UpdatePostModel(message))
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (!response.isSuccessful) {
+                        onFailure(response.code())
+                        return
+                    }
+                    onResponse()
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
+            })
+    }
+
+    fun deletePost(
+        auth: String?, postID: String,
+        onResponse: () -> Unit, onFailure: (code: Int) -> Unit
+    ) {
+        getRetrofitAccessObject().deletePost(auth, postID).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (!response.isSuccessful) {
+                    onFailure(response.code())
+                    return
+                }
+                onResponse()
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
+        })
     }
 }
