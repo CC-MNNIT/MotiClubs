@@ -13,6 +13,7 @@
         android:clickable="true"
         android:focusable="true"
         app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
         app:strokeColor="@color/slate_300"
         app:strokeWidth="1dp">
 
@@ -36,7 +37,6 @@
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/nunito_bold"
                 android:maxLines="2"
-                android:text="CC Club"
                 android:textAlignment="center"
                 android:textColor="@color/black" />
 
@@ -47,7 +47,6 @@
                 android:layout_margin="12dp"
                 android:fontFamily="@font/bariol_bold"
                 android:maxLines="2"
-                android:text="It is a awesome club."
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="12sp" />
