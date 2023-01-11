@@ -34,5 +34,5 @@ fun Long.toTimeString(): String {
     val month = calendar.get(Calendar.MONTH)
 
     return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
-            "${if (amPm == Calendar.AM) "AM" else "PM"}, ${mMonthsList[calendar.get(Calendar.MONTH)]}"
+            "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
 }
