@@ -3,7 +3,9 @@ package com.example.notificationapp.app
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -14,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.notificationapp.R
+import com.example.notificationapp.view.activities.PostActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -49,6 +52,7 @@ class AppFCMService : FirebaseMessagingService() {
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
+        val time = data["time"]!!.toLong().toTimeString()
 
         val adminEmail = data["adminEmail"] ?: ""
         val appUserEmail = user.email ?: ""
@@ -57,10 +61,21 @@ class AppFCMService : FirebaseMessagingService() {
             return
         }
 
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext, 0,
+            Intent(applicationContext, PostActivity::class.java).apply {
+                putExtra(Constants.ADMIN_NAME, adminName)
+                putExtra(Constants.TIME, time)
+                putExtra(Constants.MESSAGE, message)
+                putExtra(Constants.AVATAR, url)
+                putExtra(Constants.CLUB_NAME, clubName)
+            }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            postNotificationCompat(notificationManager, clubID, clubName, adminName, message, url)
+            postNotificationCompat(notificationManager, clubID, clubName, adminName, message, url, pendingIntent)
         } else {
-            postNotificationLegacy(adminName, clubName, message, url, notificationManager)
+            postNotificationLegacy(adminName, clubName, message, url, pendingIntent, notificationManager)
         }
     }
 
@@ -69,6 +84,7 @@ class AppFCMService : FirebaseMessagingService() {
         clubName: String,
         message: String,
         url: String,
+        pendingIntent: PendingIntent,
         notificationManager: NotificationManager
     ) {
         val notificationHandler = Notification.Builder(applicationContext)
@@ -78,6 +94,7 @@ class AppFCMService : FirebaseMessagingService() {
             .setSmallIcon(R.drawable.notification)
             .setStyle(Notification.BigTextStyle())
             .setPriority(Notification.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
 
         Picasso.get().load(url).into(object : Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
@@ -101,7 +118,8 @@ class AppFCMService : FirebaseMessagingService() {
         clubName: String,
         adminName: String,
         message: String,
-        url: String
+        url: String,
+        pendingIntent: PendingIntent
     ) {
         notificationManager.createNotificationChannel(NotificationChannel(clubID, clubName, NotificationManager.IMPORTANCE_HIGH).apply {
             lightColor = Color.BLUE
@@ -117,6 +135,7 @@ class AppFCMService : FirebaseMessagingService() {
             .setSmallIcon(R.drawable.notification)
             .setStyle(NotificationCompat.BigTextStyle())
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
 
         Picasso.get().load(url).into(object : Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
