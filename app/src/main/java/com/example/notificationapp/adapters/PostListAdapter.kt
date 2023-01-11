@@ -1,4 +1,4 @@
-package com.example.notificationapp.data.adapters
+package com.example.notificationapp.adapters
 
 import android.content.Context
 import android.content.Intent
@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.notificationapp.Constants
 import com.example.notificationapp.R
+import com.example.notificationapp.api.API
+import com.example.notificationapp.api.PostResponse
+import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
-import com.example.notificationapp.data.network.API
-import com.example.notificationapp.data.network.PostResponse
 import com.example.notificationapp.view.activities.PostActivity
 import com.google.android.material.card.MaterialCardView
 import com.squareup.picasso.NetworkPolicy
@@ -42,7 +42,7 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
         private val background: MaterialCardView = itemView.findViewById(R.id.item_background)
         private val profilePic: ImageView = itemView.findViewById(R.id.admin_profile_pic)
         private val dateTime: AppCompatTextView = itemView.findViewById(R.id.post_time)
-        lateinit var avatarUrl : String
+        lateinit var avatarUrl: String
 
         fun bindView(postResponse: PostResponse) {
             description.text = postResponse.message

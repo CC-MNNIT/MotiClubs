@@ -3,9 +3,9 @@ package com.example.notificationapp.view.activities
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.notificationapp.Constants
+import com.example.notificationapp.api.API
+import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
-import com.example.notificationapp.data.network.API
 import com.example.notificationapp.databinding.ActivityCreatePostBinding
 
 class CreatePostActivity : AppCompatActivity() {
@@ -17,7 +17,7 @@ class CreatePostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCreatePostBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.hide()
+
         setValues()
         setListener()
     }

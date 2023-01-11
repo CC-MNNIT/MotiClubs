@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import com.example.notificationapp.Constants
 import com.example.notificationapp.R
+import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
 import com.example.notificationapp.databinding.ActivityMainBinding
 import com.example.notificationapp.view.fragments.*
@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setReferences()
-        setListeners()
         setValues()
+        setListeners()
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment()).commit()
     }
 

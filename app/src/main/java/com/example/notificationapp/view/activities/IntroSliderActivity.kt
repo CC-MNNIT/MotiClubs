@@ -5,14 +5,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.R
 import com.example.notificationapp.adapters.IntroSliderAdapter
-import com.example.notificationapp.data.network.IntroSlide
+import com.example.notificationapp.api.IntroSlide
 import com.example.notificationapp.databinding.ActivityIntroSliderBinding
 
 class IntroSliderActivity : AppCompatActivity() {
-
-    // Initializing required variables
-    private lateinit var mIntroSliderAdapter: IntroSliderAdapter
-    private val mIntroSlidesList: MutableList<IntroSlide> = ArrayList()
 
     private lateinit var binding: ActivityIntroSliderBinding
 
@@ -20,25 +16,18 @@ class IntroSliderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityIntroSliderBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        // hiding action bar
-        supportActionBar?.hide()
 
-        // adding data to intro slider data set
-        mIntroSlidesList.add(
+        val slideList = listOf(
             IntroSlide(
                 "welcome",
                 "welcome",
                 R.drawable.campus
-            )
-        )
-        mIntroSlidesList.add(
+            ),
             IntroSlide(
                 "welcome",
                 "welcome",
                 R.drawable.campus
-            )
-        )
-        mIntroSlidesList.add(
+            ),
             IntroSlide(
                 "welcome",
                 "welcome",
@@ -47,12 +36,12 @@ class IntroSliderActivity : AppCompatActivity() {
         )
 
         // creating adapter object
-        mIntroSliderAdapter = IntroSliderAdapter(mIntroSlidesList)
+        val sliderAdapter = IntroSliderAdapter(slideList)
 
         // setting adapter to the view
-        binding.introSliderViewPager.adapter = mIntroSliderAdapter
+        binding.introSliderViewPager.adapter = sliderAdapter
         binding.nextBtn.setOnClickListener {
-            if (binding.introSliderViewPager.currentItem + 1 < mIntroSliderAdapter.itemCount) {
+            if (binding.introSliderViewPager.currentItem + 1 < sliderAdapter.itemCount) {
                 binding.introSliderViewPager.currentItem++
             } else {
                 startActivity(Intent(applicationContext, LoginActivity::class.java))

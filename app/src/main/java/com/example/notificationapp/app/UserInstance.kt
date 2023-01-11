@@ -2,9 +2,8 @@ package com.example.notificationapp.app
 
 import android.content.Context
 import android.util.Log
-import com.example.notificationapp.Constants
-import com.example.notificationapp.data.network.API
-import com.example.notificationapp.data.network.UserResponse
+import com.example.notificationapp.api.API
+import com.example.notificationapp.api.UserResponse
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -26,8 +25,6 @@ object UserInstance {
     }
 
     fun isAdmin(): Boolean = mInstance?.admin?.isNotEmpty() ?: false
-
-    fun isAdminOf(clubID: String): Boolean = mInstance?.admin?.contains(clubID) ?: false
 
     fun isSubscribedTo(clubID: String): Boolean = mInstance?.subscribed?.contains(clubID) ?: false
 

@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.notificationapp.app.UserInstance
-import com.example.notificationapp.data.adapters.ClubListAdapter
-import com.example.notificationapp.data.network.API
-import com.example.notificationapp.data.network.ClubModel
+import com.example.notificationapp.adapters.ClubListAdapter
+import com.example.notificationapp.api.API
+import com.example.notificationapp.api.ClubModel
 import com.example.notificationapp.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -33,6 +34,6 @@ class HomeFragment : Fragment() {
             clubs = it
             clubListAdapter = ClubListAdapter(clubs, requireContext())
             _binding.clubRecycler.adapter = clubListAdapter
-        }) {}
+        }) { Toast.makeText(requireContext(), "$it: Could not get clubs", Toast.LENGTH_SHORT).show() }
     }
 }

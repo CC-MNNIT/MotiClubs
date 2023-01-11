@@ -16,7 +16,7 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
 import com.example.notificationapp.app.UserInstance
-import com.example.notificationapp.data.network.API
+import com.example.notificationapp.api.API
 import com.example.notificationapp.databinding.FragmentProfileBinding
 import com.example.notificationapp.view.activities.MainActivity
 import com.google.firebase.auth.FirebaseAuth

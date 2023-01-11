@@ -1,8 +1,8 @@
-package com.example.notificationapp
+package com.example.notificationapp.app
 
 object Constants {
-    const val ADMIN_NAME= "admin_name"
-    const val TIME= "time"
+    const val ADMIN_NAME = "admin_name"
+    const val TIME = "time"
     const val MESSAGE = "message"
     const val AVATAR = "avatar"
     const val SHARED_PREFERENCE = "com.example.notificationapp"

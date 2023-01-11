@@ -6,24 +6,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.notificationapp.Constants
 import com.example.notificationapp.R
+import com.example.notificationapp.adapters.PostListAdapter
+import com.example.notificationapp.api.API
+import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
-import com.example.notificationapp.data.adapters.PostListAdapter
-import com.example.notificationapp.data.network.API
 import com.example.notificationapp.databinding.ActivityClubBinding
 
 class ClubActivity : AppCompatActivity() {
-
-    companion object {
-        private const val TAG = "ClubActivity"
-    }
 
     private lateinit var binding: ActivityClubBinding
     private lateinit var postListAdapter: PostListAdapter
 
     private lateinit var mClubID: String
-    private lateinit var club_name: String
+    private lateinit var mClubName: String
 
     private var mClubSubscribed: Boolean = false
 
@@ -32,18 +28,10 @@ class ClubActivity : AppCompatActivity() {
         binding = ActivityClubBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setValues()
+        setListener()
 
         binding.postCardView.setBackgroundResource(R.drawable.shape_white_club)
         binding.clubPostRecyclerView.layoutManager = LinearLayoutManager(this)
-        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        binding.fab.isVisible = UserInstance.isAdmin()
-        binding.fab.setOnClickListener {
-            val intent = Intent(this, CreatePostActivity::class.java)
-            intent.putExtra(Constants.CLUB_ID, mClubID)
-            intent.putExtra(Constants.CLUB_NAME,club_name)
-            startActivity(intent)
-            finish()
-        }
     }
 
     private fun getClubPosts(clubID: String) {
@@ -62,11 +50,9 @@ class ClubActivity : AppCompatActivity() {
             finish()
             return
         }
-        setListener()
         mClubID = clubID
-        if(clubName != null) {
-            club_name = clubName
-        }
+        if (clubName != null) mClubName = clubName
+
         mClubSubscribed = UserInstance.isSubscribedTo(clubID)
         getClubPosts(clubID)
 
@@ -81,6 +67,15 @@ class ClubActivity : AppCompatActivity() {
         binding.subscribeBtn.setOnClickListener {
             if (mClubSubscribed) unsubscribe() else subscribe()
         }
+        binding.fab.setOnClickListener {
+            startActivity(Intent(this, CreatePostActivity::class.java).apply {
+                putExtra(Constants.CLUB_ID, mClubID)
+                putExtra(Constants.CLUB_NAME, mClubName)
+            })
+            finish()
+        }
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.fab.isVisible = UserInstance.isAdmin()
     }
 
     private fun subscribe() {

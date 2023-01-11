@@ -1,4 +1,4 @@
-package com.example.notificationapp.data.adapters
+package com.example.notificationapp.adapters
 
 import android.content.Context
 import android.content.Intent
@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.notificationapp.Constants
 import com.example.notificationapp.R
-import com.example.notificationapp.data.adapters.ClubListAdapter.CustomVH
-import com.example.notificationapp.data.network.ClubModel
+import com.example.notificationapp.adapters.ClubListAdapter.CustomVH
+import com.example.notificationapp.api.ClubModel
+import com.example.notificationapp.app.Constants
 import com.example.notificationapp.view.activities.ClubActivity
 import com.google.android.material.card.MaterialCardView
 

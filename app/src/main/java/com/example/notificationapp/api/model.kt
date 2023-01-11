@@ -1,4 +1,4 @@
-package com.example.notificationapp.data.network
+package com.example.notificationapp.api
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -25,9 +25,7 @@ data class IntroSlide(
     var title: String,
     var description: String,
     var icon: Int
-) {
-    constructor() : this("", "", 0)
-}
+)
 
 data class UserModel(
     var name: String,

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notificationapp.R
-import com.example.notificationapp.data.network.IntroSlide
+import com.example.notificationapp.api.IntroSlide
 import com.google.android.material.imageview.ShapeableImageView
 
 /**

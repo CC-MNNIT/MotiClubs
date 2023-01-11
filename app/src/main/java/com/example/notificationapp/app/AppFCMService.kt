@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.notificationapp.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.squareup.picasso.Picasso
@@ -37,16 +38,24 @@ class AppFCMService : FirebaseMessagingService() {
         val user = FirebaseAuth.getInstance().currentUser
         user ?: return
         Log.d(TAG, "onMessageReceived")
-        Handler(mainLooper).post { postNotificationLegacy(message.data) }
+
+        Handler(mainLooper).post { postNotification(user, message.data) }
     }
 
-    private fun postNotificationLegacy(data: Map<String, String>) {
+    private fun postNotification(user: FirebaseUser, data: Map<String, String>) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
         val clubID = data["club"] ?: ""
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
+
+        val adminEmail = data["adminEmail"] ?: ""
+        val appUserEmail = user.email ?: ""
+        if (adminEmail == appUserEmail) {
+            Log.d(TAG, "postNotification: post sender and receiver same")
+            return
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             postNotificationCompat(notificationManager, clubID, clubName, adminName, message, url)

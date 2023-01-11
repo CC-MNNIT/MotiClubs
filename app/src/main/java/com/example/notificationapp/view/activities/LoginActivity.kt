@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.notificationapp.Constants
+import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
+import com.example.notificationapp.app.isNotValidDomain
 import com.example.notificationapp.databinding.ActivityLoginBinding
-import com.example.notificationapp.isNotValidDomain
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {

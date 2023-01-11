@@ -3,17 +3,14 @@ package com.example.notificationapp.view.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.notificationapp.R
-import com.example.notificationapp.data.network.API
-import com.example.notificationapp.data.network.UserModel
+import com.example.notificationapp.api.API
+import com.example.notificationapp.api.UserModel
+import com.example.notificationapp.app.isNotValidDomain
 import com.example.notificationapp.databinding.ActivitySignupBinding
-import com.example.notificationapp.isNotValidDomain
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.AuthResult
@@ -39,29 +36,26 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.hide()
 
         mAuth = FirebaseAuth.getInstance()
-        setListeners()
 
-        val adapterCourse = ArrayAdapter(this, R.layout.list_item, itemsCourse)
-        binding.etCourse.setAdapter(adapterCourse)
-        binding.etCourse.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, _: Long ->
-            mCourse = adapterView.getItemAtPosition(position).toString()
-        }
-        val adapterYear = ArrayAdapter(this, R.layout.list_item, itemsYear)
-        binding.etGradYear.setAdapter(adapterYear)
-        binding.etGradYear.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>, _: View?, position: Int, _: Long ->
-            mYear = adapterView.getItemAtPosition(position).toString()
-        }
-        binding.login.setOnClickListener {
-            startActivity(Intent(applicationContext, LoginActivity::class.java))
-            finish()
-        }
+        binding.etCourse.setAdapter(ArrayAdapter(this, R.layout.list_item, itemsCourse))
+        binding.etGradYear.setAdapter(ArrayAdapter(this, R.layout.list_item, itemsYear))
+        setListeners()
     }
 
     private fun setListeners() {
         binding.signupBtn.setOnClickListener { signUpUser() }
+        binding.login.setOnClickListener {
+            startActivity(Intent(applicationContext, LoginActivity::class.java))
+            finish()
+        }
+        binding.etGradYear.setOnItemClickListener { adapterView, _, position: Int, _ ->
+            mYear = adapterView.getItemAtPosition(position).toString()
+        }
+        binding.etCourse.setOnItemClickListener { parent, _, position, _ ->
+            mCourse = parent.getItemAtPosition(position).toString()
+        }
     }
 
     private fun signUpUser() {
