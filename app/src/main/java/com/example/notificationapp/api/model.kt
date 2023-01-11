@@ -87,6 +87,10 @@ data class ProfilePicResponse(
 )
 
 data class PostResponse(
+    @SerializedName("_id")
+    @Expose
+    var id: String,
+
     @SerializedName("message")
     @Expose
     var message: String,
