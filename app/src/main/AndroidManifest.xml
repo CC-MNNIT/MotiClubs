@@ -25,7 +25,8 @@
         </activity>
         <activity
             android:name=".view.activities.CreatePostActivity"
-            android:exported="false">
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -66,7 +67,7 @@
         <activity
             android:name=".view.activities.LoginActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
