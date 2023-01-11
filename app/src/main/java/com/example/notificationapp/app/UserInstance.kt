@@ -31,18 +31,18 @@ object UserInstance {
     fun refreshUserSession(user: FirebaseUser, ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         updateAuthToken(user, ctx, {
             fetchUserInstance(ctx, {
-                updateFCMToken(ctx)
                 onDone()
             }, onFail)
         }, onFail)
     }
 
-    private fun updateFCMToken(ctx: Context) {
+    fun updateFCMToken(ctx: Context, onDone: () -> Unit, onFail: () -> Unit) {
         FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener {
             FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
                 API.setFCMToken(getAuthToken(ctx), token, {
                     Log.d(TAG, "onResponse: token success")
-                }) {}
+                    onDone()
+                }) { onFail() }
             }
         }
     }

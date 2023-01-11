@@ -57,8 +57,13 @@ class LoginActivity : AppCompatActivity() {
                     }
                     if (user.isEmailVerified) {
                         UserInstance.refreshUserSession(user, this, {
-                            Toast.makeText(this@LoginActivity, "Login Successful.", Toast.LENGTH_SHORT).show()
-                            goToHome()
+                            UserInstance.updateFCMToken(this@LoginActivity, {
+                                Toast.makeText(this@LoginActivity, "Login Successful.", Toast.LENGTH_SHORT).show()
+                                goToHome()
+                            }) {
+                                Toast.makeText(this@LoginActivity, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
+                                mAuth.signOut()
+                            }
                         }) {
                             Toast.makeText(this@LoginActivity, "Error: Could not init session", Toast.LENGTH_SHORT).show()
                             mAuth.signOut()
