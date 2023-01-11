@@ -18,7 +18,11 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import java.util.*
 
-class PostListAdapter(private val mPosts: List<PostResponse>, private val mContext: Context) :
+class PostListAdapter(
+    private val mClubName: String,
+    private val mPosts: List<PostResponse>,
+    private val mContext: Context
+) :
     RecyclerView.Adapter<PostListAdapter.CustomVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -42,7 +46,8 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
         private val background: MaterialCardView = itemView.findViewById(R.id.item_background)
         private val profilePic: ImageView = itemView.findViewById(R.id.admin_profile_pic)
         private val dateTime: AppCompatTextView = itemView.findViewById(R.id.post_time)
-        lateinit var avatarUrl: String
+
+        private var avatarUrl: String = ""
 
         fun bindView(postResponse: PostResponse) {
             description.text = postResponse.message
@@ -50,35 +55,42 @@ class PostListAdapter(private val mPosts: List<PostResponse>, private val mConte
             API.getUserDetails(UserInstance.getAuthToken(mContext), postResponse.adminEmail, {
                 name.text = it.name
                 if (it.avatar.isEmpty()) return@getUserDetails
+
                 avatarUrl = it.avatar
                 Picasso.get().load(it.avatar).networkPolicy(NetworkPolicy.OFFLINE).into(profilePic, object : com.squareup.picasso.Callback {
                     override fun onSuccess() {}
-
                     override fun onError(e: Exception?) {
                         Picasso.get().load(it.avatar).into(profilePic)
                     }
                 })
             }) {}
             background.setOnClickListener {
-                val intent = Intent(mContext, PostActivity::class.java)
-                intent.putExtra(Constants.ADMIN_NAME, name.text)
-                intent.putExtra(Constants.TIME, dateTime.text)
-                intent.putExtra(Constants.MESSAGE, description.text)
-                intent.putExtra(Constants.AVATAR, avatarUrl)
-                mContext.startActivity(intent)
+                mContext.startActivity(Intent(mContext, PostActivity::class.java).apply {
+                    putExtra(Constants.ADMIN_NAME, name.text)
+                    putExtra(Constants.TIME, dateTime.text)
+                    putExtra(Constants.MESSAGE, description.text)
+                    putExtra(Constants.AVATAR, avatarUrl)
+                    putExtra(Constants.CLUB_NAME, mClubName)
+                })
             }
         }
     }
 
-    fun getTime(time: Long): String {
+    private fun getTime(time: Long): String {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = time
-        return "${calendar.get(Calendar.HOUR)}:${calendar.get(Calendar.MINUTE)} ${
+        return "${formatInt(calendar.get(Calendar.HOUR))}:${formatInt(calendar.get(Calendar.MINUTE))} ${
             if (calendar.get(Calendar.AM_PM) == Calendar.AM) {
                 "AM"
             } else {
                 "PM"
             }
         }, " + "${calendar.get(Calendar.DAY_OF_MONTH)} ${mMonthsList[calendar.get(Calendar.MONTH)]}"
+    }
+
+    private fun formatInt(num: Int): String = if (num < 10) {
+        "0$num"
+    } else {
+        "$num"
     }
 }

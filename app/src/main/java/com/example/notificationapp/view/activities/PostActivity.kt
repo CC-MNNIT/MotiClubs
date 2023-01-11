@@ -17,9 +17,12 @@ class PostActivity : AppCompatActivity() {
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setValues()
+
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
     private fun setValues() {
+        binding.toolbar.title = intent.getStringExtra(Constants.CLUB_NAME) ?: "Club"
         binding.postTime.text = intent.getStringExtra(Constants.TIME) ?: "NA"
         binding.adminName.text = intent.getStringExtra(Constants.ADMIN_NAME) ?: "NA"
         binding.message.text = intent.getStringExtra(Constants.MESSAGE) ?: "NA"

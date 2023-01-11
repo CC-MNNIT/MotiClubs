@@ -7,6 +7,15 @@
     android:orientation="vertical"
     tools:context=".view.activities.PostActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/main_color"
+        app:layout_collapseMode="pin"
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+        app:titleTextColor="@color/white" />
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/item_background"
         android:layout_width="match_parent"
