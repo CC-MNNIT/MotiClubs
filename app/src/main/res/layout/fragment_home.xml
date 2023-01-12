@@ -27,6 +27,24 @@
             android:text="@string/mnnit_clubs"
             android:textColor="@color/white"
             android:textSize="30sp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/profile_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="24dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="2dp"
+                android:src="@drawable/profile_icon" />
+
+        </com.google.android.material.card.MaterialCardView>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.recyclerview.widget.RecyclerView
