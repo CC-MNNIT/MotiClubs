@@ -52,6 +52,7 @@ class AppFCMService : FirebaseMessagingService() {
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
+        val updated = (data["updated"]?.toInt() ?: 0) == 1
         val time = data["time"]!!.toLong().toTimeString()
 
         val adminEmail = data["adminEmail"] ?: ""
@@ -73,9 +74,9 @@ class AppFCMService : FirebaseMessagingService() {
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            postNotificationCompat(notificationManager, clubID, clubName, adminName, message, url, pendingIntent)
+            postNotificationCompat(notificationManager, clubID, clubName, adminName, message, url, updated, pendingIntent)
         } else {
-            postNotificationLegacy(adminName, clubName, message, url, pendingIntent, notificationManager)
+            postNotificationLegacy(adminName, clubName, message, url, updated, pendingIntent, notificationManager)
         }
     }
 
@@ -84,11 +85,12 @@ class AppFCMService : FirebaseMessagingService() {
         clubName: String,
         message: String,
         url: String,
+        updated: Boolean,
         pendingIntent: PendingIntent,
         notificationManager: NotificationManager
     ) {
         val notificationHandler = Notification.Builder(applicationContext)
-            .setContentTitle("$adminName posted in $clubName")
+            .setContentTitle("$adminName ${if (updated) "updated" else "posted"} in $clubName")
             .setContentText(getMkdFormatter().toMarkdown(message))
             .setColor(ContextCompat.getColor(applicationContext, R.color.main_color))
             .setSmallIcon(R.drawable.notification)
@@ -119,6 +121,7 @@ class AppFCMService : FirebaseMessagingService() {
         adminName: String,
         message: String,
         url: String,
+        updated: Boolean,
         pendingIntent: PendingIntent
     ) {
         notificationManager.createNotificationChannel(NotificationChannel(clubID, clubName, NotificationManager.IMPORTANCE_HIGH).apply {
@@ -128,7 +131,7 @@ class AppFCMService : FirebaseMessagingService() {
         })
 
         val notificationHandler = NotificationCompat.Builder(applicationContext, clubID)
-            .setContentTitle("$adminName posted in $clubName")
+            .setContentTitle("$adminName ${if (updated) "updated" else "posted"} in $clubName")
             .setContentText(getMkdFormatter().toMarkdown(message))
             .setColorized(true)
             .setColor(ContextCompat.getColor(applicationContext, R.color.main_color))
