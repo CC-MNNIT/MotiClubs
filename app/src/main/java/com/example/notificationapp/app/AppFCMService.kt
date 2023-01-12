@@ -104,13 +104,10 @@ class AppFCMService : FirebaseMessagingService() {
                 Log.d(TAG, "postNotification: loaded profile icon")
             }
 
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-            }
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
         })
-        notificationManager.notify(0, notificationHandler.build())
+        notificationManager.notify((System.currentTimeMillis() / 6000).toInt(), notificationHandler.build())
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -146,12 +143,9 @@ class AppFCMService : FirebaseMessagingService() {
                 Log.d(TAG, "postNotification: loaded profile icon")
             }
 
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-            }
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
         })
-        notificationManager.notify(0, notificationHandler.build())
+        notificationManager.notify((System.currentTimeMillis() / 6000).toInt(), notificationHandler.build())
     }
 }
