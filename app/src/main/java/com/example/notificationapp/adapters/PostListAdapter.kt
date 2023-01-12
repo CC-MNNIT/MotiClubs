@@ -5,7 +5,9 @@ import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.notificationapp.R
 import com.example.notificationapp.api.API
@@ -14,13 +16,16 @@ import com.example.notificationapp.app.Constants
 import com.example.notificationapp.app.UserInstance
 import com.example.notificationapp.app.getMkdFormatter
 import com.example.notificationapp.app.toTimeString
+import com.example.notificationapp.view.activities.CreatePostActivity
 import com.example.notificationapp.view.activities.PostActivity
 import com.google.android.material.card.MaterialCardView
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 
 class PostListAdapter(
     private val mClubName: String,
+    private val mClubID: String,
     private val mPosts: List<PostResponse>,
     private val mContext: Context
 ) : RecyclerView.Adapter<PostListAdapter.CustomVH>() {
@@ -41,6 +46,10 @@ class PostListAdapter(
         private val background: MaterialCardView = itemView.findViewById(R.id.item_background)
         private val profilePic: ImageView = itemView.findViewById(R.id.admin_profile_pic)
         private val dateTime: AppCompatTextView = itemView.findViewById(R.id.post_time)
+
+        private val editLayout: LinearLayout = itemView.findViewById(R.id.edit_layout)
+        private val updateBtn: MaterialCardView = itemView.findViewById(R.id.update_btn)
+        private val deleteBtn: MaterialCardView = itemView.findViewById(R.id.delete_btn)
 
         private var avatarUrl: String = ""
 
@@ -67,6 +76,20 @@ class PostListAdapter(
                     putExtra(Constants.AVATAR, avatarUrl)
                     putExtra(Constants.CLUB_NAME, mClubName)
                 })
+            }
+            editLayout.isVisible = FirebaseAuth.getInstance().currentUser!!.email!! == postResponse.adminEmail
+
+            updateBtn.setOnClickListener {
+                mContext.startActivity(Intent(mContext, CreatePostActivity::class.java).apply {
+                    putExtra(Constants.MESSAGE, postResponse.message)
+                    putExtra(Constants.EDIT_MODE, true)
+                    putExtra(Constants.POST_ID, postResponse.id)
+                    putExtra(Constants.CLUB_ID, mClubID)
+                    putExtra(Constants.CLUB_NAME, mClubName)
+                })
+            }
+            deleteBtn.setOnClickListener {
+
             }
         }
     }

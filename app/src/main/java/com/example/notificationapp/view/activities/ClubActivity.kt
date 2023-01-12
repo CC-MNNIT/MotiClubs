@@ -36,7 +36,7 @@ class ClubActivity : AppCompatActivity() {
 
     private fun getClubPosts(clubID: String) {
         API.getClubPosts(UserInstance.getAuthToken(this), clubID, {
-            postListAdapter = PostListAdapter(mClubName, it, this@ClubActivity)
+            postListAdapter = PostListAdapter(mClubName, mClubID, it, this@ClubActivity)
             binding.clubPostRecyclerView.adapter = postListAdapter
         }) { Toast.makeText(this, "$it: Unable to fetch posts", Toast.LENGTH_SHORT).show() }
     }

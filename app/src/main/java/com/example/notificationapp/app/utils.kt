@@ -20,6 +20,8 @@ object Constants {
     const val CLUB_NAME = "club_name"
     const val CLUB_ID = "club_id"
     const val CLUB_DESC = "club_desc"
+    const val EDIT_MODE = "edit_mode"
+    const val POST_ID = "post_id"
 }
 
 fun String.isNotValidDomain(): Boolean = !"^([^\\s]+)@mnnit.ac.in$".toRegex().containsMatchIn(this)

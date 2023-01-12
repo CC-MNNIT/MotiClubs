@@ -3,6 +3,7 @@ package com.example.notificationapp.view.activities
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.Editable
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,9 @@ class CreatePostActivity : AppCompatActivity() {
     private lateinit var mkdEditor: MarkwonEditor
     private lateinit var mkd: Markwon
 
+    private var mEditMode = false
+    private var mPostID = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreatePostBinding.inflate(layoutInflater)
@@ -42,10 +46,23 @@ class CreatePostActivity : AppCompatActivity() {
                 Toast.makeText(this, "Can't post empty message", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            API.sendPost(UserInstance.getAuthToken(this), mClubID, message, {
-                Toast.makeText(this, "Post Sent", Toast.LENGTH_SHORT).show()
-                finish()
-            }) { Toast.makeText(this, "$it: Unable to post", Toast.LENGTH_SHORT).show() }
+
+            if (mEditMode) {
+                if (mPostID.isEmpty()) {
+                    Toast.makeText(this, "Error: Post ID empty", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                API.updatePost(UserInstance.getAuthToken(this), mPostID, message, {
+                    Toast.makeText(this, "Post Updated", Toast.LENGTH_SHORT).show()
+                    finish()
+                }) { Toast.makeText(this, "$it: Unable to post", Toast.LENGTH_SHORT).show() }
+            } else {
+                API.sendPost(UserInstance.getAuthToken(this), mClubID, message, {
+                    Toast.makeText(this, "Post Sent", Toast.LENGTH_SHORT).show()
+                    finish()
+                }) { Toast.makeText(this, "$it: Unable to post", Toast.LENGTH_SHORT).show() }
+            }
         }
 
         binding.etMessage.addTextChangedListener(MarkwonEditorTextWatcher.withProcess(mkdEditor))
@@ -83,5 +100,16 @@ class CreatePostActivity : AppCompatActivity() {
             return
         }
         mClubID = clubID
+
+        mEditMode = intent.getBooleanExtra(Constants.EDIT_MODE, false)
+        if (!mEditMode) return
+
+        mPostID = intent.getStringExtra(Constants.POST_ID) ?: ""
+        if (mPostID.isEmpty()) {
+            Toast.makeText(this, "Error: Post ID empty", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+        binding.etMessage.text = Editable.Factory.getInstance()
+            .newEditable(intent.getStringExtra(Constants.MESSAGE) ?: "")
     }
 }
