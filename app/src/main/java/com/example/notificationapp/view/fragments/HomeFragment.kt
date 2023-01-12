@@ -45,7 +45,7 @@ class HomeFragment(private val mainActivity: MainActivity) : Fragment() {
         }) { Toast.makeText(requireContext(), "$it: Could not get clubs", Toast.LENGTH_SHORT).show() }
     }
 
-    fun setValues() {
+    private fun setValues() {
         val avatar = UserInstance.getAvatar()
         if (avatar.isNotEmpty()) {
             Picasso.get().load(avatar).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.profile_icon)

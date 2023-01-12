@@ -25,7 +25,7 @@ import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import java.io.ByteArrayOutputStream
 
-class ProfileFragment(private val homeFragment: HomeFragment) : Fragment() {
+class ProfileFragment : Fragment() {
 
     companion object {
         private const val TAG = "ProfileFragment"
@@ -125,10 +125,9 @@ class ProfileFragment(private val homeFragment: HomeFragment) : Fragment() {
         if (avatar.isEmpty()) return
 
         Picasso.get().load(avatar).networkPolicy(NetworkPolicy.OFFLINE).into(binding.profilePic, object : com.squareup.picasso.Callback {
-            override fun onSuccess() = homeFragment.setValues()
+            override fun onSuccess() {}
             override fun onError(e: java.lang.Exception?) {
                 Picasso.get().load(avatar).into(binding.profilePic)
-                homeFragment.setValues()
             }
         })
     }

@@ -2,7 +2,6 @@ package com.example.notificationapp.view.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import com.example.notificationapp.R
 import com.example.notificationapp.databinding.ActivityMainBinding
 import com.example.notificationapp.view.fragments.HelpFragment
@@ -12,26 +11,23 @@ import com.example.notificationapp.view.fragments.ProfileFragment
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mFragmentsList: List<Fragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val homeFragment = HomeFragment(this)
-        mFragmentsList = listOf(homeFragment, ProfileFragment(homeFragment), HelpFragment())
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mFragmentsList[0]).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, HomeFragment(this)).commit()
         setListeners()
     }
 
     private fun setListeners() {
-        binding.navView.setOnItemSelectedListener { it ->
+        binding.navView.setOnItemSelectedListener {
             supportFragmentManager.beginTransaction().replace(
                 R.id.fragment_container, when (it.itemId) {
-                    R.id.profile_section -> mFragmentsList[1]
-                    R.id.help -> mFragmentsList[2]
-                    else -> mFragmentsList[0]
+                    R.id.profile_section -> ProfileFragment()
+                    R.id.help -> HelpFragment()
+                    else -> HomeFragment(this)
                 }
             ).commit()
             true
@@ -40,6 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     fun goToProfilePage() {
         binding.navView.selectedItemId = R.id.profile_section
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, mFragmentsList[1]).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ProfileFragment()).commit()
     }
 }
