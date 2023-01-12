@@ -1,6 +1,7 @@
 package com.example.notificationapp.view.activities
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
@@ -55,6 +56,9 @@ class CreatePostActivity : AppCompatActivity() {
 
                 API.updatePost(UserInstance.getAuthToken(this), mPostID, message, {
                     Toast.makeText(this, "Post Updated", Toast.LENGTH_SHORT).show()
+                    startActivity(
+                        Intent(this, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
                     finish()
                 }) { Toast.makeText(this, "$it: Unable to post", Toast.LENGTH_SHORT).show() }
             } else {

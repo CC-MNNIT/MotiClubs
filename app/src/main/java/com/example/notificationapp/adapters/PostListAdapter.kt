@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,7 @@ import com.example.notificationapp.app.toTimeString
 import com.example.notificationapp.view.activities.CreatePostActivity
 import com.example.notificationapp.view.activities.PostActivity
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
@@ -26,7 +28,7 @@ import com.squareup.picasso.Picasso
 class PostListAdapter(
     private val mClubName: String,
     private val mClubID: String,
-    private val mPosts: List<PostResponse>,
+    private var mPosts: List<PostResponse>,
     private val mContext: Context
 ) : RecyclerView.Adapter<PostListAdapter.CustomVH>() {
 
@@ -35,6 +37,11 @@ class PostListAdapter(
 
     override fun onBindViewHolder(holder: CustomVH, position: Int) {
         holder.bindView(mPosts[position])
+    }
+
+    private fun updatePosts(posts: List<PostResponse>) {
+        mPosts = posts
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = mPosts.size
@@ -89,7 +96,20 @@ class PostListAdapter(
                 })
             }
             deleteBtn.setOnClickListener {
-
+                MaterialAlertDialogBuilder(mContext)
+                    .setMessage("Are you sure you want to delete this post ?")
+                    .setPositiveButton("Delete") { d, _ ->
+                        API.deletePost(UserInstance.getAuthToken(mContext), postResponse.id, {
+                            Toast.makeText(mContext, "Deleted", Toast.LENGTH_SHORT).show()
+                            d.dismiss()
+                            API.getClubPosts(UserInstance.getAuthToken(mContext), mClubID, { updatePosts(it) }) {}
+                        }) {
+                            Toast.makeText(mContext, "$it: Couldn't delete post", Toast.LENGTH_SHORT).show()
+                            d.dismiss()
+                        }
+                    }
+                    .setNegativeButton("Cancel") { d, _ -> d.dismiss() }
+                    .show()
             }
         }
     }
