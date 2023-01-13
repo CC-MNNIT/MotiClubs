@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MotiClubs" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MotiClubs" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/backGroundColor</item>
+        <item name="android:navigationBarColor">@color/backGroundColor</item>
+    </style>
 </resources>
