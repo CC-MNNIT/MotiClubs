@@ -51,3 +51,16 @@ fun MotiClubsTheme(
         content = content
     )
 }
+
+@Composable
+fun MotiClubsTheme(
+    colorScheme: ColorScheme,
+    content: @Composable () -> Unit
+) {
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        shapes = Shapes(),
+        content = content
+    )
+}
