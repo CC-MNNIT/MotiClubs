@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs
+package com.mnnit.moticlubs.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,6 +17,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.ui.screens.LoginScreen
+import com.mnnit.moticlubs.ui.screens.MainScreen
+import com.mnnit.moticlubs.ui.screens.SignupScreen
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,9 +31,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen.value }
 
+        viewModel.setAuthListener(this)
+
         setContent {
             viewModel.userPresent.value = FirebaseAuth.getInstance().currentUser != null
-//            viewModel.removeSplash()
+            when (viewModel.userPresent.value) {
+                true -> {
+                    viewModel.appScreenMode.value = AppScreenMode.MAIN
+                    viewModel.mainScreenMode.value = MainScreenMode.HOME
+                }
+                else -> {
+                    viewModel.appScreenMode.value = AppScreenMode.LOGIN
+                    viewModel.mainScreenMode.value = MainScreenMode.INVALID
+                }
+            }
 
             MotiClubsTheme(
                 if (isSystemInDarkTheme()) {
@@ -46,26 +59,20 @@ class MainActivity : ComponentActivity() {
                     val systemUiController = rememberSystemUiController()
                     systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.background)
 
-                    AnimatedVisibility(visible = !viewModel.userPresent.value) {
+                    AnimatedVisibility(
+                        visible = viewModel.appScreenMode.value == AppScreenMode.LOGIN
+                                && viewModel.mainScreenMode.value == MainScreenMode.INVALID
+                    ) {
                         LoginScreen(context = this@MainActivity, appViewModel = viewModel)
+                    }
+                    AnimatedVisibility(
+                        visible = viewModel.appScreenMode.value == AppScreenMode.MAIN
+                                && viewModel.mainScreenMode.value == MainScreenMode.HOME
+                    ) {
+                        MainScreen(context = this@MainActivity, appViewModel = viewModel)
                     }
                 }
             }
-
-//            MotiClubsTheme(
-//                if (isSystemInDarkTheme()) {
-//                    dynamicDarkColorScheme(this)
-//                } else dynamicLightColorScheme(this)
-//            ) {
-//                // A surface container using the 'background' color from the theme
-//                Surface(modifier = Modifier.fillMaxSize()) {
-//                    val systemUiController = rememberSystemUiController()
-//                    systemUiController.setSystemBarsColor(
-//                        color = MaterialTheme.colorScheme.background
-//                    )
-//                    Text(text = "Hello Android !")
-//                }
-//            }
         }
     }
 }

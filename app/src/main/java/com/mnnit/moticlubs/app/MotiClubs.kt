@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs
+package com.mnnit.moticlubs.app
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

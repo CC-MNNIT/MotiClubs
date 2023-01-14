@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -24,13 +25,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.mnnit.moticlubs.AppViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
+import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.ui.activity.AppScreenMode
+import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.activity.MainScreenMode
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,13 +45,20 @@ class LoginScreenViewModel @Inject constructor() : ViewModel() {
     val isPasswordVisible = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
     val isPasswordInvalid
-        get() = password.value.isNotEmpty() && password.value.length <= 6
+        get() = password.value.isNotEmpty() && password.value.length < 6
 
     val isLoginButtonEnabled
         get() = !isLoading.value
                 && !isPasswordInvalid
                 && password.value.isNotEmpty()
                 && emailID.value.isNotEmpty()
+
+    fun resetState() {
+        emailID.value = ""
+        password.value = ""
+        isPasswordVisible.value = false
+        isLoading.value = false
+    }
 }
 
 @Composable
@@ -143,12 +153,8 @@ fun LoginScreen(
                     Button(
                         onClick = {
                             keyboardController?.hide()
-
                             viewModel.isLoading.value = true
-                            viewModel.viewModelScope.launch {
-                                delay(5000)
-                                viewModel.isLoading.value = false
-                            }
+                            login(context, viewModel, appViewModel)
                         },
                         enabled = viewModel.isLoginButtonEnabled
                     ) {
@@ -167,4 +173,57 @@ fun LoginScreen(
             }
         }
     }
+}
+
+private fun login(
+    context: Context,
+    viewModel: LoginScreenViewModel,
+    appViewModel: AppViewModel
+) {
+    val auth = FirebaseAuth.getInstance()
+    auth.signInWithEmailAndPassword("${viewModel.emailID.value}@mnnit.ac.in", viewModel.password.value)
+        .addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                viewModel.isLoading.value = false
+                Toast.makeText(context, task.exception?.message ?: "Login failure", Toast.LENGTH_SHORT).show()
+                return@addOnCompleteListener
+            }
+
+            val user = auth.currentUser
+            if (user == null) {
+                viewModel.isLoading.value = false
+                Toast.makeText(context, "Error: Could not login", Toast.LENGTH_SHORT).show()
+                auth.signOut()
+                return@addOnCompleteListener
+            }
+
+            if (user.isEmailVerified) {
+                user.getIdToken(false).addOnSuccessListener {
+                    val token = it.token
+                    if (token == null) {
+                        auth.signOut()
+                        viewModel.isLoading.value = false
+                        Toast.makeText(context, "Error: Couldn't init session", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+                    appViewModel.setAuthToken(context, token)
+                    FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
+                        API.setFCMToken(token, fcm, {
+                            viewModel.resetState()
+                            appViewModel.appScreenMode.value = AppScreenMode.MAIN
+                            appViewModel.mainScreenMode.value = MainScreenMode.HOME
+                        }) {
+                            auth.signOut()
+                            viewModel.isLoading.value = false
+                            Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
+                            return@setFCMToken
+                        }
+                    }
+                }
+            } else {
+                auth.signOut()
+                viewModel.isLoading.value = false
+                Toast.makeText(context, "Please verify your email", Toast.LENGTH_SHORT).show()
+            }
+        }
 }
