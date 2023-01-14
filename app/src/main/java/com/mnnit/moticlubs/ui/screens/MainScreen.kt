@@ -22,6 +22,7 @@ import com.mnnit.moticlubs.ui.activity.AppScreenMode
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.activity.MainScreenMode
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -37,11 +38,7 @@ fun MainScreen(
     viewModel: MainScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    MotiClubsTheme(
-        if (isSystemInDarkTheme()) {
-            dynamicDarkColorScheme(context)
-        } else dynamicLightColorScheme(context)
-    ) {
+    MotiClubsTheme(getColorScheme(context = context)) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
