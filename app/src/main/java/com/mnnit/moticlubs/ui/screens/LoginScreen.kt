@@ -4,10 +4,13 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -29,10 +32,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.getDomainMail
 import com.mnnit.moticlubs.ui.activity.AppScreenMode
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.activity.MainScreenMode
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -45,7 +50,7 @@ class LoginScreenViewModel @Inject constructor() : ViewModel() {
     val isPasswordVisible = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
     val isPasswordInvalid
-        get() = password.value.isNotEmpty() && password.value.length < 6
+        get() = password.value.isNotEmpty() && password.value.length <= 6
 
     val isLoginButtonEnabled
         get() = !isLoading.value
@@ -68,23 +73,22 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    MotiClubsTheme(
-        if (isSystemInDarkTheme()) {
-            dynamicDarkColorScheme(context)
-        } else dynamicLightColorScheme(context)
-    ) {
+    val scrollState = rememberScrollState()
+    val colorScheme = getColorScheme(context = context)
+    MotiClubsTheme(colorScheme) {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .animateContentSize()
+                .verticalScroll(scrollState),
+            color = colorScheme.background
         ) {
             val systemUiController = rememberSystemUiController()
-            systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.background)
+            systemUiController.setSystemBarsColor(color = colorScheme.background)
 
             Column(
                 modifier = Modifier
                     .padding(top = 120.dp, start = 16.dp, end = 16.dp)
-                    .animateContentSize()
             ) {
                 Text(text = "Log in", fontSize = 32.sp)
 
@@ -144,11 +148,36 @@ fun LoginScreen(
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
                 )
 
+                TextButton(
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.isLoading.value = true
+                        FirebaseAuth.getInstance().sendPasswordResetEmail(viewModel.emailID.value.getDomainMail())
+                            .addOnCompleteListener { task ->
+                                viewModel.isLoading.value = false
+                                if (task.isSuccessful) {
+                                    Toast.makeText(context, "Email sent", Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    Toast.makeText(context, "Could not send reset password mail", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .align(Alignment.End),
+                    enabled = !viewModel.isLoading.value && viewModel.emailID.value.isNotEmpty()
+                ) {
+                    Text(text = "Forgot password", color = colorScheme.error, fontSize = 14.sp)
+                }
+
                 AnimatedVisibility(
                     visible = !viewModel.isLoading.value,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 16.dp),
+                    enter = fadeIn(), exit = fadeOut()
                 ) {
                     Button(
                         onClick = {
@@ -166,9 +195,24 @@ fun LoginScreen(
                     visible = viewModel.isLoading.value,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(top = 16.dp)
+                        .padding(top = 16.dp),
+                    enter = fadeIn(), exit = fadeOut()
                 ) {
                     CircularProgressIndicator()
+                }
+
+                TextButton(
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.resetState()
+                        appViewModel.appScreenMode.value = AppScreenMode.SIGNUP
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .align(Alignment.CenterHorizontally),
+                    enabled = !viewModel.isLoading.value
+                ) {
+                    Text(text = "New user ? Sign up", color = colorScheme.primary, fontSize = 14.sp)
                 }
             }
         }
@@ -181,7 +225,7 @@ private fun login(
     appViewModel: AppViewModel
 ) {
     val auth = FirebaseAuth.getInstance()
-    auth.signInWithEmailAndPassword("${viewModel.emailID.value}@mnnit.ac.in", viewModel.password.value)
+    auth.signInWithEmailAndPassword(viewModel.emailID.value.getDomainMail(), viewModel.password.value)
         .addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 viewModel.isLoading.value = false

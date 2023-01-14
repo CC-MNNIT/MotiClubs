@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +22,7 @@ import com.mnnit.moticlubs.ui.screens.LoginScreen
 import com.mnnit.moticlubs.ui.screens.MainScreen
 import com.mnnit.moticlubs.ui.screens.SignupScreen
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,11 +49,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MotiClubsTheme(
-                if (isSystemInDarkTheme()) {
-                    dynamicDarkColorScheme(this)
-                } else dynamicLightColorScheme(this)
-            ) {
+            MotiClubsTheme(getColorScheme(context = this)) {
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -61,13 +60,22 @@ class MainActivity : ComponentActivity() {
 
                     AnimatedVisibility(
                         visible = viewModel.appScreenMode.value == AppScreenMode.LOGIN
-                                && viewModel.mainScreenMode.value == MainScreenMode.INVALID
+                                && viewModel.mainScreenMode.value == MainScreenMode.INVALID,
+                        enter = fadeIn(), exit = fadeOut()
                     ) {
                         LoginScreen(context = this@MainActivity, appViewModel = viewModel)
                     }
                     AnimatedVisibility(
+                        visible = viewModel.appScreenMode.value == AppScreenMode.SIGNUP
+                                && viewModel.mainScreenMode.value == MainScreenMode.INVALID,
+                        enter = fadeIn(), exit = fadeOut()
+                    ) {
+                        SignupScreen(context = this@MainActivity, appViewModel = viewModel)
+                    }
+                    AnimatedVisibility(
                         visible = viewModel.appScreenMode.value == AppScreenMode.MAIN
-                                && viewModel.mainScreenMode.value == MainScreenMode.HOME
+                                && viewModel.mainScreenMode.value == MainScreenMode.HOME,
+                        enter = fadeIn(), exit = fadeOut()
                     ) {
                         MainScreen(context = this@MainActivity, appViewModel = viewModel)
                     }

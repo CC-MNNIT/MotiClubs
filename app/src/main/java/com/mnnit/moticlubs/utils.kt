@@ -15,3 +15,5 @@ object Constants {
     const val EDIT_MODE = "edit_mode"
     const val POST_ID = "post_id"
 }
+
+fun String.getDomainMail(): String = "$this@mnnit.ac.in"

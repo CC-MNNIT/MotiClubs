@@ -1,16 +1,11 @@
 package com.mnnit.moticlubs.ui.theme
 
-import android.app.Activity
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.ViewCompat
 
 private val DarkColorPalette = darkColorScheme(
     background = Cultured,
@@ -37,6 +32,15 @@ private val LightColorPalette = lightColorScheme(
     tertiaryContainer = MaximumYellowRed,
     onTertiaryContainer = OxfordBlue
 )
+
+@Composable
+fun getColorScheme(context: Context) =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else {
+        if (isSystemInDarkTheme()) DarkColorPalette else LightColorPalette
+    }
+
 
 @Composable
 fun MotiClubsTheme(
