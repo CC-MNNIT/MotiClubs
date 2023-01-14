@@ -58,7 +58,7 @@ class SignUpScreenViewModel @Inject constructor() : ViewModel() {
     val isPasswordInvalid
         get() = password.value.isNotEmpty() && password.value.length <= 6
 
-    val isLoginButtonEnabled
+    val isSignUpButtonEnabled
         get() = !isLoading.value
                 && !isPasswordInvalid
                 && password.value.isNotEmpty()
@@ -259,7 +259,7 @@ fun SignupScreen(
                             viewModel.isLoading.value = true
                             signUpUser(context, viewModel, appViewModel)
                         },
-                        enabled = viewModel.isLoginButtonEnabled
+                        enabled = viewModel.isSignUpButtonEnabled
                     ) {
                         Text(text = "Sign up", fontSize = 14.sp)
                     }

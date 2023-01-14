@@ -25,7 +25,6 @@ class AppViewModel @Inject constructor() : ViewModel() {
     val userPresent = mutableStateOf(false)
 
     val appScreenMode = mutableStateOf(AppScreenMode.LOGIN)
-    val mainScreenMode = mutableStateOf(MainScreenMode.INVALID)
 
     fun getAuthToken(context: Context) =
         context.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
@@ -54,8 +53,4 @@ class AppViewModel @Inject constructor() : ViewModel() {
 
 enum class AppScreenMode {
     LOGIN, SIGNUP, MAIN
-}
-
-enum class MainScreenMode {
-    INVALID, HOME, PROFILE, CONTACT
 }

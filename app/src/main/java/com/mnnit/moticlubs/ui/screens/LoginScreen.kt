@@ -35,7 +35,6 @@ import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.getDomainMail
 import com.mnnit.moticlubs.ui.activity.AppScreenMode
 import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.activity.MainScreenMode
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -255,7 +254,6 @@ private fun login(
                         API.setFCMToken(token, fcm, {
                             viewModel.resetState()
                             appViewModel.appScreenMode.value = AppScreenMode.MAIN
-                            appViewModel.mainScreenMode.value = MainScreenMode.HOME
                         }) {
                             auth.signOut()
                             viewModel.isLoading.value = false

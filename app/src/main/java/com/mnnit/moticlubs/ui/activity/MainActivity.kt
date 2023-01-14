@@ -39,14 +39,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             viewModel.userPresent.value = FirebaseAuth.getInstance().currentUser != null
             when (viewModel.userPresent.value) {
-                true -> {
-                    viewModel.appScreenMode.value = AppScreenMode.MAIN
-                    viewModel.mainScreenMode.value = MainScreenMode.HOME
-                }
-                else -> {
-                    viewModel.appScreenMode.value = AppScreenMode.LOGIN
-                    viewModel.mainScreenMode.value = MainScreenMode.INVALID
-                }
+                true -> viewModel.appScreenMode.value = AppScreenMode.MAIN
+                else -> viewModel.appScreenMode.value = AppScreenMode.LOGIN
             }
 
             MotiClubsTheme(getColorScheme(context = this)) {
@@ -59,22 +53,19 @@ class MainActivity : ComponentActivity() {
                     systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.background)
 
                     AnimatedVisibility(
-                        visible = viewModel.appScreenMode.value == AppScreenMode.LOGIN
-                                && viewModel.mainScreenMode.value == MainScreenMode.INVALID,
+                        visible = viewModel.appScreenMode.value == AppScreenMode.LOGIN,
                         enter = fadeIn(), exit = fadeOut()
                     ) {
                         LoginScreen(context = this@MainActivity, appViewModel = viewModel)
                     }
                     AnimatedVisibility(
-                        visible = viewModel.appScreenMode.value == AppScreenMode.SIGNUP
-                                && viewModel.mainScreenMode.value == MainScreenMode.INVALID,
+                        visible = viewModel.appScreenMode.value == AppScreenMode.SIGNUP,
                         enter = fadeIn(), exit = fadeOut()
                     ) {
                         SignupScreen(context = this@MainActivity, appViewModel = viewModel)
                     }
                     AnimatedVisibility(
-                        visible = viewModel.appScreenMode.value == AppScreenMode.MAIN
-                                && viewModel.mainScreenMode.value == MainScreenMode.HOME,
+                        visible = viewModel.appScreenMode.value == AppScreenMode.MAIN,
                         enter = fadeIn(), exit = fadeOut()
                     ) {
                         MainScreen(context = this@MainActivity, appViewModel = viewModel)
