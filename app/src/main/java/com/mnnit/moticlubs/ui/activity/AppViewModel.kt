@@ -48,7 +48,11 @@ class AppViewModel @Inject constructor(private val application: Application) : V
         regNo.value = user.registrationNumber
         course.value = user.course
         avatar.value = user.avatar
+
+        adminList.clear()
         user.admin.forEach { adminList.add(it) }
+
+        subscribedList.clear()
         user.subscribed.forEach { subscribedList.add(it) }
     }
 
