@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -67,13 +68,13 @@ class LoginScreenViewModel @Inject constructor() : ViewModel() {
 
 @Composable
 fun LoginScreen(
-    context: Context,
     appViewModel: AppViewModel,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
-    val colorScheme = getColorScheme(context = context)
+    val colorScheme = getColorScheme()
+    val context = LocalContext.current
     MotiClubsTheme(colorScheme) {
         Surface(
             modifier = Modifier
@@ -252,13 +253,19 @@ private fun login(
                     appViewModel.setAuthToken(context, token)
                     FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
                         API.setFCMToken(token, fcm, {
-                            viewModel.resetState()
-                            appViewModel.appScreenMode.value = AppScreenMode.MAIN
+                            API.getUserData(token, { userRes ->
+                                viewModel.resetState()
+                                appViewModel.setUser(userRes)
+                                appViewModel.appScreenMode.value = AppScreenMode.MAIN
+                            }) {
+                                auth.signOut()
+                                viewModel.isLoading.value = false
+                                Toast.makeText(context, "Error: Couldn't load user", Toast.LENGTH_SHORT).show()
+                            }
                         }) {
                             auth.signOut()
                             viewModel.isLoading.value = false
                             Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
-                            return@setFCMToken
                         }
                     }
                 }

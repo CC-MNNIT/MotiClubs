@@ -14,8 +14,8 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun ContactUsScreen(context: Context) {
-    MotiClubsTheme(getColorScheme(context = context)) {
+fun ContactUsScreen() {
+    MotiClubsTheme(getColorScheme()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

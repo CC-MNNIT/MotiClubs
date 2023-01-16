@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,11 +46,10 @@ enum class MainScreenMode {
 
 @Composable
 fun MainScreen(
-    context: Context,
     appViewModel: AppViewModel,
     viewModel: MainScreenViewModel = hiltViewModel()
 ) {
-    MotiClubsTheme(getColorScheme(context = context)) {
+    MotiClubsTheme(getColorScheme()) {
         val systemUiController = rememberSystemUiController()
         systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.background)
 
@@ -61,7 +61,7 @@ fun MainScreen(
                     enter = fadeIn(), exit = fadeOut(),
                     modifier = Modifier.padding(it)
                 ) {
-                    HomeScreen(context = context)
+                    HomeScreen(appViewModel)
                 }
 
                 AnimatedVisibility(
@@ -69,7 +69,7 @@ fun MainScreen(
                     enter = fadeIn(), exit = fadeOut(),
                     modifier = Modifier.padding(it)
                 ) {
-                    ProfileScreen(context = context)
+                    ProfileScreen()
                 }
 
                 AnimatedVisibility(
@@ -77,7 +77,7 @@ fun MainScreen(
                     enter = fadeIn(), exit = fadeOut(),
                     modifier = Modifier.padding(it)
                 ) {
-                    ContactUsScreen(context = context)
+                    ContactUsScreen()
                 }
             },
             bottomBar = { BottomBar(viewModel = viewModel) }

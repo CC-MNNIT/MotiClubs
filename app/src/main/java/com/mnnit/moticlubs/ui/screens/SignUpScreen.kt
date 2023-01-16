@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -85,13 +86,13 @@ class SignUpScreenViewModel @Inject constructor() : ViewModel() {
 
 @Composable
 fun SignupScreen(
-    context: Context,
     appViewModel: AppViewModel,
     viewModel: SignUpScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
-    val colorScheme = getColorScheme(context = context)
+    val colorScheme = getColorScheme()
+    val context = LocalContext.current
 
     MotiClubsTheme(colorScheme) {
         Surface(

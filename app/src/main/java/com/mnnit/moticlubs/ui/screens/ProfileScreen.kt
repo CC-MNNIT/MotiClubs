@@ -17,8 +17,8 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun ProfileScreen(context: Context) {
-    MotiClubsTheme(getColorScheme(context = context)) {
+fun ProfileScreen() {
+    MotiClubsTheme(getColorScheme()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

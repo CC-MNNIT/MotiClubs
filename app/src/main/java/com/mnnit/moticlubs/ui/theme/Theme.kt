@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorPalette = darkColorScheme(
     background = Cultured,
@@ -34,9 +35,11 @@ private val LightColorPalette = lightColorScheme(
 )
 
 @Composable
-fun getColorScheme(context: Context) =
+fun getColorScheme() =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        if (isSystemInDarkTheme()) dynamicDarkColorScheme(LocalContext.current) else dynamicLightColorScheme(
+            LocalContext.current
+        )
     } else {
         if (isSystemInDarkTheme()) DarkColorPalette else LightColorPalette
     }
