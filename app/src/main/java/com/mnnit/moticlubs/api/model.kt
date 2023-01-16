@@ -30,10 +30,8 @@ data class IntroSlide(
 data class UserModel(
     var name: String,
     var registrationNumber: String,
-    var graduationYear: String,
     var course: String,
     var email: String,
-    var personalEmail: String,
     var phoneNumber: String,
     var avatar: String = ""
 )
@@ -47,10 +45,6 @@ data class UserResponse(
     @Expose
     var registrationNumber: String,
 
-    @SerializedName("graduationYear")
-    @Expose
-    var graduationYear: String,
-
     @SerializedName("course")
     @Expose
     var course: String,
@@ -58,10 +52,6 @@ data class UserResponse(
     @SerializedName("email")
     @Expose
     var email: String,
-
-    @SerializedName("personalEmail")
-    @Expose
-    var personalEmail: String,
 
     @SerializedName("avatar")
     @Expose

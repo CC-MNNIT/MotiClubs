@@ -129,7 +129,10 @@ fun SignupScreen(
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     value = viewModel.phoneNumber.value,
-                    onValueChange = { viewModel.phoneNumber.value = it.substring(0, kotlin.math.min(10, it.length)) },
+                    onValueChange = {
+                        viewModel.phoneNumber.value =
+                            it.substring(0, kotlin.math.min(10, it.length))
+                    },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Phone No") },
                     enabled = !viewModel.isLoading.value,
@@ -153,7 +156,9 @@ fun SignupScreen(
                             .fillMaxWidth(0.5f)
                             .padding(end = 8.dp),
                         value = viewModel.regNo.value,
-                        onValueChange = { viewModel.regNo.value = it.substring(0, kotlin.math.min(8, it.length)) },
+                        onValueChange = {
+                            viewModel.regNo.value = it.substring(0, kotlin.math.min(8, it.length))
+                        },
                         shape = RoundedCornerShape(24.dp),
                         label = { Text(text = "Reg No") },
                         enabled = !viewModel.isLoading.value,
@@ -161,9 +166,11 @@ fun SignupScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     )
 
-                    ExposedDropdownMenuBox(expanded = viewModel.dropDownExpanded.value, onExpandedChange = {
-                        viewModel.dropDownExpanded.value = !viewModel.dropDownExpanded.value
-                    }) {
+                    ExposedDropdownMenuBox(
+                        expanded = viewModel.dropDownExpanded.value,
+                        onExpandedChange = {
+                            viewModel.dropDownExpanded.value = !viewModel.dropDownExpanded.value
+                        }) {
                         OutlinedTextField(
                             value = viewModel.selectedCourse.value,
                             onValueChange = { },
@@ -182,10 +189,12 @@ fun SignupScreen(
                             onDismissRequest = { viewModel.dropDownExpanded.value = false }
                         ) {
                             viewModel.courseList.forEach { option ->
-                                DropdownMenuItem(text = { Text(text = option, fontSize = 13.sp) }, onClick = {
-                                    viewModel.selectedCourse.value = option
-                                    viewModel.dropDownExpanded.value = false
-                                })
+                                DropdownMenuItem(
+                                    text = { Text(text = option, fontSize = 13.sp) },
+                                    onClick = {
+                                        viewModel.selectedCourse.value = option
+                                        viewModel.dropDownExpanded.value = false
+                                    })
                             }
                         }
                     }
@@ -287,34 +296,51 @@ fun SignupScreen(
                         .align(Alignment.CenterHorizontally),
                     enabled = !viewModel.isLoading.value
                 ) {
-                    Text(text = "Already a user ? Login", color = colorScheme.primary, fontSize = 14.sp)
+                    Text(
+                        text = "Already a user ? Login",
+                        color = colorScheme.primary,
+                        fontSize = 14.sp
+                    )
                 }
             }
         }
     }
 }
 
-private fun signUpUser(context: Context, viewModel: SignUpScreenViewModel, appViewModel: AppViewModel) {
+private fun signUpUser(
+    context: Context,
+    viewModel: SignUpScreenViewModel,
+    appViewModel: AppViewModel
+) {
     val auth = FirebaseAuth.getInstance()
-    auth.createUserWithEmailAndPassword("${viewModel.emailID.value}@mnnit.ac.in", viewModel.password.value)
+    auth.createUserWithEmailAndPassword(
+        "${viewModel.emailID.value}@mnnit.ac.in",
+        viewModel.password.value
+    )
         .addOnCompleteListener { createUserTask ->
             if (!createUserTask.isSuccessful) {
                 viewModel.isLoading.value = false
-                Toast.makeText(context, createUserTask.exception?.message ?: "NULL", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    createUserTask.exception?.message ?: "NULL",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@addOnCompleteListener
             }
             val user = auth.currentUser
             if (user == null) {
                 viewModel.isLoading.value = false
-                Toast.makeText(context, "Error: User null despite sign up", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error: User null despite sign up", Toast.LENGTH_SHORT)
+                    .show()
                 return@addOnCompleteListener
             }
             user.getIdToken(false).addOnSuccessListener { result ->
                 val token = result.token ?: ""
                 val userModel = UserModel(
-                    viewModel.name.value, viewModel.regNo.value,
-                    "2024", viewModel.selectedCourse.value,
-                    viewModel.emailID.value.getDomainMail(), viewModel.emailID.value.getDomainMail(),
+                    viewModel.name.value,
+                    viewModel.regNo.value,
+                    viewModel.selectedCourse.value,
+                    viewModel.emailID.value.getDomainMail(),
                     viewModel.phoneNumber.value
                 )
                 API.saveUser(token, userModel, {
@@ -322,7 +348,11 @@ private fun signUpUser(context: Context, viewModel: SignUpScreenViewModel, appVi
                         if (task.isSuccessful) {
                             auth.signOut()
                             viewModel.resetState()
-                            Toast.makeText(context, "Please verify email to continue", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Please verify email to continue",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             appViewModel.appScreenMode.value = AppScreenMode.LOGIN
                         }
                     }
