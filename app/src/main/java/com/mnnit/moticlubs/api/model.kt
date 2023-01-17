@@ -16,6 +16,10 @@ data class ClubModel(
     @Expose
     var description: String,
 
+    @SerializedName("avatar")
+    @Expose
+    var avatar: String,
+
     @SerializedName("admins")
     @Expose
     var admins: List<String>
