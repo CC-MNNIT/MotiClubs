@@ -68,8 +68,19 @@ fun MainScreen(
             },
             floatingActionButton = {
                 ExtendedFloatingActionButton(
-                    text = { Text(text = "Contact Us", fontSize = 15.sp, textAlign = TextAlign.Center) },
-                    icon = { Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "") },
+                    text = {
+                        Text(
+                            text = "Contact Us",
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Outlined.HelpOutline,
+                            contentDescription = ""
+                        )
+                    },
                     onClick = { /*TODO*/ },
                     shape = RoundedCornerShape(24.dp)
                 )

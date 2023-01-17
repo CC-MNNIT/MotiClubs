@@ -1,6 +1,8 @@
 package com.mnnit.moticlubs.ui.activity
 
+import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -32,5 +34,21 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.R
 
 class ClubActivity : ComponentActivity() {
+    private val viewModel: AppViewModel by viewModels()
+    lateinit var clubId : String
+    lateinit var clubName : String
+    lateinit var clubDescription : String
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setValues()
+
+
+
+    }
+
+    private fun setValues() {
+        clubId = intent.getStringExtra()
+    }
 
 }
