@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.ui.activity.AppScreenMode
 import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.activity.ClubActivity
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,6 +53,8 @@ fun HomeScreen(appViewModel: AppViewModel, viewModel: HomeScreenViewModel = hilt
         viewModel.setClubsList(it)
     }) {}
 
+    val context = LocalContext.current
+
     MotiClubsTheme(getColorScheme()) {
         Surface(modifier = Modifier.fillMaxHeight()) {
             Column(
@@ -71,7 +75,11 @@ fun HomeScreen(appViewModel: AppViewModel, viewModel: HomeScreenViewModel = hilt
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 16.dp), onClick = { /*TODO*/ },
+                                .padding(bottom = 16.dp), onClick = {
+                                context.startActivity(Intent(context, ClubActivity::class.java).apply {
+                                    putExtra(Constants.CLUB, viewModel.clubsList[idx])
+                                })
+                            },
                             shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp)
                         ) {
                             Row(modifier = Modifier.padding(16.dp)) {

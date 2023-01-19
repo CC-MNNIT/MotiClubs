@@ -1,50 +1,45 @@
 package com.mnnit.moticlubs.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
+import android.content.Context
+import androidx.compose.foundation.*
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FlipToBack
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import com.mnnit.moticlubs.Constants
+import com.example.compose.jetchat.conversation.UserInput
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.api.API
-import com.mnnit.moticlubs.api.PostResponse
-import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.theme.Blue
-import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.api.*
+import com.mnnit.moticlubs.getAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
+
 
 @HiltViewModel
 class ClubScreenViewModel @Inject constructor() : ViewModel() {
@@ -57,151 +52,154 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-private val headerHeight = 250.dp
-private val toolbarHeight = 56.dp
-
-private val paddingMedium = 16.dp
-
-private val titlePaddingStart = 16.dp
-private val titlePaddingEnd = 72.dp
-
-private const val titleFontScaleStart = 1f
-private const val titleFontScaleEnd = 0.66f
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClubScreen(
-    appViewModel: AppViewModel,
-    viewModel: ClubScreenViewModel = hiltViewModel(),
-    clubId: String,
-    clubName: String,
-    clubDescription: String
+    clubScreenViewModel: ClubScreenViewModel = hiltViewModel(),
+    clubModel: ClubModel,
+    modifier: Modifier
 ) {
-    API.getClubPosts(appViewModel.getAuthToken(LocalContext.current), clubID = clubId, {
-        viewModel.setPostsList(it)
+    val context = LocalContext.current
+    API.getClubPosts(context.getAuthToken(), clubID = clubModel.id, {
+        clubScreenViewModel.setPostsList(it)
     }) {}
 
-    MotiClubsTheme(getColorScheme()) {
-        androidx.compose.material3.Surface(modifier = Modifier.fillMaxHeight()) {
-            Surface(
-                modifier = Modifier
+    val scrollState = rememberLazyListState()
+    val topBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
+    val scope = rememberCoroutineScope()
+
+    androidx.compose.material3.Surface(modifier = modifier) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
-                parrallexEffectClubPage(clubName, clubId, clubDescription, viewModel, appViewModel)
-            }
-        }
-    }
-}
-
-@Composable
-fun parrallexEffectClubPage(
-    clubName: String,
-    clubId: String,
-    clubDescription: String,
-    viewModel: ClubScreenViewModel,
-    appViewModel: AppViewModel
-) {
-    val scroll: ScrollState = rememberScrollState(0)
-    val headerHeightPx = with(LocalDensity.current) { headerHeight.toPx() }
-    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.toPx() }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Header(scroll, headerHeightPx, clubName, clubDescription)
-        Body(scroll, viewModel, appViewModel)
-        Toolbar(scroll, headerHeightPx, toolbarHeightPx)
-        Title(scroll, headerHeightPx, toolbarHeightPx)
-    }
-}
-
-@Composable
-private fun Header(
-    scroll: ScrollState,
-    headerHeightPx: Float,
-    clubName: String,
-    clubDescription: String
-) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .height(headerHeight)
-        .graphicsLayer {
-            translationY = -scroll.value.toFloat() / 2f // Parallax effect
-            alpha = (-1f / headerHeightPx) * scroll.value + 1
-        }
-        .background(color = Blue)
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color(0xAA000000)),
-                        startY = 3 * headerHeightPx / 4 // Gradient applied to wrap the title only
-                    )
+                Messages(
+                    posts = clubScreenViewModel.postsList,
+//                    navigateToProfile = navigateToProfile,
+                    modifier = Modifier.weight(1f),
+                    scrollState = scrollState,
+                    context = context
                 )
-        ) {
-            androidx.compose.material3.Text(text = clubName, fontSize = 16.sp)
-            androidx.compose.material3.Text(
-                text = clubDescription,
-                fontSize = 14.sp,
-                modifier = Modifier.fillMaxWidth(0.6f)
+
+                UserInput(
+//                    onMessageSent = { content ->
+//                        uiState.addMessage(
+//                            Message(authorMe, content, timeNow)
+//                        )
+//                    },
+                    resetScroll = {
+                        scope.launch {
+                            scrollState.scrollToItem(0)
+                        }
+                    },
+                    // Use navigationBarsPadding() imePadding() and , to move the input panel above both the
+                    // navigation bar, and on-screen keyboard (IME)
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .imePadding(),
+                )
+            }
+            // Channel name bar floats above the messages
+            ChannelNameBar(
+                clubName = clubModel.name,
+                clubDesc = clubModel.description,
+//                onNavIconPressed = onNavIconPressed,
+                scrollBehavior = scrollBehavior,
             )
         }
     }
 }
 
 @Composable
-private fun Body(scroll: ScrollState, viewModel: ClubScreenViewModel, appViewModel: AppViewModel) {
-    LazyColumn(
-        modifier = Modifier
-            .padding(top = 16.dp)
-            .fillMaxHeight()
-    ) {
-        items(viewModel.postsList.size) { idx ->
-            androidx.compose.material3.Card(
+fun ChannelNameBar(
+    clubName: String,
+    clubDesc: String,
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+//    onNavIconPressed: () -> Unit = { }
+) {
+
+    JetchatAppBar(
+        modifier = modifier,
+        scrollBehavior = scrollBehavior,
+//        onNavIconPressed = onNavIconPressed,
+        title = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Channel name
+                androidx.compose.material3.Text(
+                    text = clubName,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                // Number of members
+                androidx.compose.material3.Text(
+                    text = clubDesc,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        actions = {
+            // Search icon
+            androidx.compose.material3.Icon(
+                imageVector = Icons.Outlined.Search,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp), onClick = { /*TODO*/ },
-                shape = RoundedCornerShape(15.dp), elevation = CardDefaults.cardElevation(0.dp)
-            ) {
-                Row(modifier = Modifier.padding(16.dp)) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(appViewModel.avatar.value)
-                                .diskCachePolicy(CachePolicy.ENABLED)
-                                .diskCacheKey(Constants.AVATAR)
-                                .placeholder(R.drawable.outline_account_circle_24)
-                                .build()
-                        ),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(48.dp)
-                            .align(Alignment.CenterVertically)
+//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
+                    .padding(horizontal = 12.dp, vertical = 16.dp)
+                    .height(24.dp), contentDescription = ""
+            )
+            // Info icon
+            androidx.compose.material3.Icon(
+                imageVector = Icons.Outlined.Info,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
+                    .padding(horizontal = 12.dp, vertical = 16.dp)
+                    .height(24.dp),
+                contentDescription = ""
+            )
+        }
+    )
+}
+
+const val ConversationTestTag = "ConversationTestTag"
+
+@Composable
+fun Messages(
+    posts: List<PostResponse>,
+//    navigateToProfile: (String) -> Unit,
+    scrollState: LazyListState,
+    modifier: Modifier = Modifier,
+    context: Context
+) {
+    val scope = rememberCoroutineScope()
+    Box(modifier = modifier) {
+        LazyColumn(
+            reverseLayout = true,
+            state = scrollState,
+            contentPadding =
+            WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues(),
+            modifier = Modifier
+                .testTag(ConversationTestTag)
+                .fillMaxSize()
+                .padding(horizontal = 10.dp)
+        ) {
+            for (index in posts.indices) {
+                val post = posts[index]
+                var name: String = ""
+                API.getUserDetails(context.getAuthToken(), post.adminEmail, {
+                    name = it.name
+                }) {}
+
+                item {
+                    Message(
+//                        onAuthorClick = { name -> navigateToProfile(name) },
+                        post = post,
+                        name = name
                     )
-
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .fillMaxWidth(0.9f)
-                    ) {
-                        androidx.compose.material3.Text(text = "Amit Kumar", fontSize = 16.sp)
-                        androidx.compose.material3.Text(
-                            text = viewModel.postsList[idx].time.toString(),
-                            fontSize = 12.sp
-                        )
-                        androidx.compose.material3.Text(
-                            text = viewModel.postsList[idx].message,
-                            fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(0.8f)
-                        )
-                    }
-
-                    androidx.compose.material3.BadgedBox(badge = {
-                        androidx.compose.material3.Badge { androidx.compose.material3.Text(text = "10") }
-                    }, modifier = Modifier.align(Alignment.CenterVertically)) {}
                 }
             }
         }
@@ -209,116 +207,162 @@ private fun Body(scroll: ScrollState, viewModel: ClubScreenViewModel, appViewMod
 }
 
 @Composable
-private fun Toolbar(scroll: ScrollState, headerHeightPx: Float, toolbarHeightPx: Float) {
-    val toolbarBottom = headerHeightPx - toolbarHeightPx
-    val showToolbar by remember {
-        derivedStateOf {
-            scroll.value >= toolbarBottom
+fun Message(
+//    onAuthorClick: (String) -> Unit,
+    post: PostResponse,
+    name: String
+) {
+
+    val borderColor = MaterialTheme.colorScheme.tertiary
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp), onClick = {/* TODO */ },
+        shape = ChatBubbleShape, elevation = CardDefaults.cardElevation(1.dp)
+    ) {
+        Row() {
+            Image(
+                modifier = Modifier
+//                .clickable(onClick = { onAuthorClick(msg.author) })
+                    .padding(horizontal = 16.dp)
+                    .size(42.dp)
+                    .border(1.5.dp, borderColor, CircleShape)
+                    .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
+                    .clip(CircleShape)
+                    .align(Alignment.Top),
+                painter = painterResource(id = R.drawable.someone_else),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+            )
+            AuthorAndTextMessage(
+                post = post,
+                name = name,
+//            authorClicked = onAuthorClick,
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .weight(1f)
+            )
         }
     }
+}
 
-    AnimatedVisibility(
-        visible = showToolbar,
-        enter = fadeIn(animationSpec = tween(300)),
-        exit = fadeOut(animationSpec = tween(300))
-    ) {
-        TopAppBar(
-            modifier = Modifier.background(
-                brush = Brush.horizontalGradient(
-                    listOf(Color(0xff026586), Color(0xff032C45))
-                )
-            ),
-            navigationIcon = {
-                IconButton(
-                    onClick = {},
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FlipToBack,
-                        contentDescription = "",
-                        tint = Color.White
-                    )
-                }
-            },
-            title = {},
-            backgroundColor = Color.Transparent,
-            elevation = 0.dp
+@Composable
+fun AuthorAndTextMessage(
+    post: PostResponse,
+    name: String,
+//    authorClicked: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        AuthorNameTimestamp(post, name)
+//        Spacer(modifier = Modifier.height(2.dp))
+        ChatItemBubble(post)
+        Spacer(
+            modifier = Modifier
+                .height(5.dp)
+                .background(color = Color.White)
         )
     }
 }
 
 @Composable
-private fun Title(
-    scroll: ScrollState,
-    headerHeightPx: Float,
-    toolbarHeightPx: Float
-) {
-    var titleHeightPx by remember { mutableStateOf(0f) }
-    var titleWidthPx by remember { mutableStateOf(0f) }
+private fun AuthorNameTimestamp(post: PostResponse, name: String) {
+    Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier
+                .alignBy(LastBaseline)
+                .paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
+            fontSize = 15.sp,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = post.time.toTimeString(),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.alignBy(LastBaseline),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 10.sp
 
-    Text(
-        text = "Club Posts",
-        fontSize = 30.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier
-            .graphicsLayer {
-                val collapseRange: Float = (headerHeightPx - toolbarHeightPx)
-                val collapseFraction: Float = (scroll.value / collapseRange).coerceIn(0f, 1f)
-
-                val scaleXY = lerp(
-                    titleFontScaleStart.dp,
-                    titleFontScaleEnd.dp,
-                    collapseFraction
-                )
-
-                val titleExtraStartPadding = titleWidthPx.toDp() * (1 - scaleXY.value) / 2f
-
-                val titleYFirstInterpolatedPoint = lerp(
-                    headerHeight - titleHeightPx.toDp() - paddingMedium,
-                    headerHeight / 2,
-                    collapseFraction
-                )
-
-                val titleXFirstInterpolatedPoint = lerp(
-                    titlePaddingStart,
-                    (titlePaddingEnd - titleExtraStartPadding) * 5 / 4,
-                    collapseFraction
-                )
-
-                val titleYSecondInterpolatedPoint = lerp(
-                    headerHeight / 2,
-                    toolbarHeight / 2 - titleHeightPx.toDp() / 2,
-                    collapseFraction
-                )
-
-                val titleXSecondInterpolatedPoint = lerp(
-                    (titlePaddingEnd - titleExtraStartPadding) * 5 / 4,
-                    titlePaddingEnd - titleExtraStartPadding,
-                    collapseFraction
-                )
-
-                val titleY = lerp(
-                    titleYFirstInterpolatedPoint,
-                    titleYSecondInterpolatedPoint,
-                    collapseFraction
-                )
-
-                val titleX = lerp(
-                    titleXFirstInterpolatedPoint,
-                    titleXSecondInterpolatedPoint,
-                    collapseFraction
-                )
-
-                translationY = titleY.toPx()
-                translationX = titleX.toPx()
-                scaleX = scaleXY.value
-                scaleY = scaleXY.value
-            }
-            .onGloballyPositioned {
-                titleHeightPx = it.size.height.toFloat()
-                titleWidthPx = it.size.width.toFloat()
-            }
-    )
+        )
+    }
 }
+
+private val ChatBubbleShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
+
+@Composable
+fun ChatItemBubble(
+    post: PostResponse,
+//    authorClicked: (String) -> Unit
+) {
+
+    val backgroundBubbleColor =
+        MaterialTheme.colorScheme.surfaceVariant
+
+    Column(Modifier.padding(16.dp)) {
+        androidx.compose.material3.Surface(
+            color = backgroundBubbleColor
+        ) {
+            ClickableMessage(
+                post = post,
+//                authorClicked = authorClicked
+            )
+        }
+    }
+}
+
+private val mMonthsList: List<String> = listOf(
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+    "Aug", "Sep", "Oct", "Nov", "Dec"
+)
+
+fun Long.toTimeString(): String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+
+    val hour = calendar.get(Calendar.HOUR)
+    val min = calendar.get(Calendar.MINUTE)
+    val amPm = calendar.get(Calendar.AM_PM)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+    val month = calendar.get(Calendar.MONTH)
+
+    return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
+            "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
+}
+
+@Composable
+fun ClickableMessage(
+    post: PostResponse,
+//    authorClicked: (String) -> Unit
+) {
+    Text(text = post.message)
+    /*
+    val uriHandler = LocalUriHandler.current
+
+    val styledMessage = messageFormatter(
+        text = post.message,
+        primary = isUserMe
+    )
+
+    ClickableText(
+        text = styledMessage,
+        style = MaterialTheme.typography.bodyLarge.copy(color = androidx.compose.material3.LocalContentColor.current),
+        modifier = Modifier.padding(16.dp),
+        onClick = {
+            styledMessage
+                .getStringAnnotations(start = it, end = it)
+                .firstOrNull()
+                ?.let { annotation ->
+                    when (annotation.tag) {
+                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
+                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
+                        else -> Unit
+                    }
+                }
+        }
+    )
+
+     */
+}
+
+private fun ScrollState.atBottom(): Boolean = value == 0

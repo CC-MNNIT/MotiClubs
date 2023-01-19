@@ -1,8 +1,11 @@
 package com.mnnit.moticlubs.api
 
+import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class ClubModel(
     @SerializedName("_id")
     @Expose
@@ -23,7 +26,7 @@ data class ClubModel(
     @SerializedName("admins")
     @Expose
     var admins: List<String>
-)
+) : Parcelable
 
 data class IntroSlide(
     var title: String,
