@@ -172,7 +172,7 @@ fun ChannelNameBar(
                 modifier = Modifier
 //                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
                     .align(Alignment.CenterVertically)
-                    .height(56.dp), contentDescription = ""
+                    .height(64.dp), contentDescription = ""
             )
             // Info icon
             Icon(
@@ -181,7 +181,7 @@ fun ChannelNameBar(
 //                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
                     .align(Alignment.CenterVertically)
                     .padding(start = 16.dp)
-                    .height(56.dp),
+                    .height(64.dp),
                 contentDescription = ""
             )
         }
