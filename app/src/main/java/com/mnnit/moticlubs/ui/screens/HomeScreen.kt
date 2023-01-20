@@ -173,8 +173,6 @@ fun ProfileIcon(
     appViewModel: AppViewModel, modifier: Modifier,
     onNavigateProfile: () -> Unit
 ) {
-    val context = LocalContext.current
-
     Image(
         painter = if (appViewModel.avatar.value.isEmpty()) {
             rememberVectorPainter(image = Icons.Outlined.AccountCircle)
@@ -191,9 +189,6 @@ fun ProfileIcon(
         modifier = modifier
             .clip(CircleShape)
             .size(48.dp)
-            .clickable {
-                appViewModel.logoutUser(context)
-                onNavigateProfile()
-            }
+            .clickable { onNavigateProfile() }
     )
 }

@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
         ViewCompat.getWindowInsetsController(window.decorView)?.isAppearanceLightNavigationBars = true
 
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, windowInsets ->
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             viewModel.paddingValues.value = PaddingValues(
                 start = insets.left.pxToDp(this),
@@ -143,7 +143,11 @@ class MainActivity : ComponentActivity() {
 
                         // PROFILE
                         composable(AppNavigation.PROFILE) {
-                            ProfileScreen(viewModel)
+                            ProfileScreen(viewModel, onNavigationLogout = {
+                                navController.navigate(AppNavigation.LOGIN) {
+                                    popUpTo(AppNavigation.HOME) { inclusive = true }
+                                }
+                            })
                         }
 
                         // CONTACT US
