@@ -80,4 +80,6 @@ object AppNavigation {
     const val SIGN_UP = "sign_up"
     const val HOME = "home"
     const val CLUB_PAGE = "club_page"
+    const val PROFILE = "profile"
+    const val CONTACT_US = "contact_us"
 }

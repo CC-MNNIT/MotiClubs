@@ -1,7 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -55,7 +54,6 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class ClubScreenViewModel @Inject constructor() : ViewModel() {
@@ -228,9 +226,6 @@ fun Message(
             .padding(bottom = 16.dp),
         shape = ChatBubbleShape, elevation = CardDefaults.cardElevation(0.dp)
     ) {
-
-        Log.d("TAG", "Message: ${admin.personalEmail} = ${admin.avatar}")
-
         Row(modifier = Modifier.padding(16.dp)) {
             Image(
                 modifier = Modifier

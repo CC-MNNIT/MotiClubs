@@ -2,6 +2,7 @@
 
 package com.mnnit.moticlubs.ui.screens
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -45,38 +46,40 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
 
     val clubsList = mutableStateListOf<ClubModel>()
 
-    fun setClubsList(list: List<ClubModel>) {
-        clubsList.clear()
-        list.forEach { clubsList.add(it) }
+    fun setClubsList(context: Context, appViewModel: AppViewModel) {
+        API.getClubs(context.getAuthToken(), { list ->
+            clubsList.clear()
+            appViewModel.adminInfoMap.clear()
+
+            list.forEach { model ->
+                clubsList.add(model)
+                model.admins.forEach { email ->
+                    if (!appViewModel.adminInfoMap.containsKey(email)) {
+                        Log.d("TAG", "HomeScreen: Fetching $email")
+                        appViewModel.adminInfoMap[email] = UserDetailResponse()
+
+                        appViewModel.viewModelScope.launch {
+                            API.getUserDetails(context.getAuthToken(), email, { adminRes ->
+                                appViewModel.adminInfoMap[email] = adminRes
+                            }) {}
+                        }
+                    }
+                }
+            }
+        }) {}
     }
 }
 
 @Composable
 fun HomeScreen(
     appViewModel: AppViewModel,
-    onNavigateLogOut: () -> Unit,
     onNavigatePostItemClick: (club: ClubModel) -> Unit,
+    onNavigateContactUs: () -> Unit,
+    onNavigateProfile: () -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    API.getClubs(context.getAuthToken(), {
-        viewModel.setClubsList(it)
-
-        it.forEach { model ->
-            model.admins.forEach { email ->
-                if (!appViewModel.adminInfoMap.containsKey(email)) {
-                    Log.d("TAG", "HomeScreen: Fetching $email")
-                    appViewModel.adminInfoMap[email] = UserDetailResponse()
-
-                    appViewModel.viewModelScope.launch {
-                        API.getUserDetails(context.getAuthToken(), email, { adminRes ->
-                            appViewModel.adminInfoMap[email] = adminRes
-                        }) {}
-                    }
-                }
-            }
-        }
-    }) {}
+    viewModel.setClubsList(context, appViewModel)
 
     MotiClubsTheme(getColorScheme()) {
         Scaffold(
@@ -95,7 +98,7 @@ fun HomeScreen(
                     ProfileIcon(
                         appViewModel = appViewModel,
                         modifier = Modifier.align(Alignment.End),
-                        onNavigateLogOut
+                        onNavigateProfile
                     )
 
                     Log.d("TAG", "HomeScreen: m padding = ${appViewModel.paddingValues.value}")
@@ -153,7 +156,7 @@ fun HomeScreen(
                 ExtendedFloatingActionButton(
                     text = { Text(text = "Contact Us", fontSize = 15.sp, textAlign = TextAlign.Center) },
                     icon = { Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "") },
-                    onClick = { /*TODO*/ },
+                    onClick = { onNavigateContactUs() },
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.padding(
                         bottom = appViewModel.paddingValues.value.bottom(),
@@ -168,7 +171,7 @@ fun HomeScreen(
 @Composable
 fun ProfileIcon(
     appViewModel: AppViewModel, modifier: Modifier,
-    onNavigateLogOut: () -> Unit
+    onNavigateProfile: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -190,7 +193,7 @@ fun ProfileIcon(
             .size(48.dp)
             .clickable {
                 appViewModel.logoutUser(context)
-                onNavigateLogOut()
+                onNavigateProfile()
             }
     )
 }

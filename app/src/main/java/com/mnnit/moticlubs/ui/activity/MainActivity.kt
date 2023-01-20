@@ -1,10 +1,7 @@
 package com.mnnit.moticlubs.ui.activity
 
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
-import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -12,19 +9,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,11 +30,7 @@ import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.end
 import com.mnnit.moticlubs.pxToDp
 import com.mnnit.moticlubs.start
-import com.mnnit.moticlubs.top
-import com.mnnit.moticlubs.ui.screens.ClubScreen
-import com.mnnit.moticlubs.ui.screens.HomeScreen
-import com.mnnit.moticlubs.ui.screens.LoginScreen
-import com.mnnit.moticlubs.ui.screens.SignupScreen
+import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,18 +54,6 @@ class MainActivity : ComponentActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            window.decorView.updatePadding(
-//                left = insets.left,
-//                bottom = insets.bottom,
-//                right = insets.right,
-//                top = insets.top
-//            )
-//            paddingValues.value = PaddingValues(
-//                start = insets.left.dp,
-//                top = insets.top.dp,
-//                end = insets.right.dp,
-//                bottom = insets.bottom.dp
-//            )
             viewModel.paddingValues.value = PaddingValues(
                 start = insets.left.pxToDp(this),
                 top = insets.top.pxToDp(this),
@@ -133,9 +112,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(AppNavigation.SIGN_UP)
                             }, {
                                 navController.navigate(AppNavigation.HOME) {
-                                    popUpTo(AppNavigation.LOGIN) {
-                                        inclusive = true
-                                    }
+                                    popUpTo(AppNavigation.LOGIN) { inclusive = true }
                                 }
                             })
                         }
@@ -149,21 +126,29 @@ class MainActivity : ComponentActivity() {
 
                         // HOME
                         composable(AppNavigation.HOME) {
-                            HomeScreen(appViewModel = viewModel, onNavigateLogOut = {
-                                navController.navigate(AppNavigation.LOGIN) {
-                                    popUpTo(AppNavigation.HOME) {
-                                        inclusive = true
-                                    }
-                                }
-                            }, onNavigatePostItemClick = {
-                                localClubModel = it
-                                navController.navigate(AppNavigation.CLUB_PAGE)
-                            })
+                            HomeScreen(
+                                appViewModel = viewModel,
+                                onNavigatePostItemClick = {
+                                    localClubModel = it
+                                    navController.navigate(AppNavigation.CLUB_PAGE)
+                                },
+                                onNavigateContactUs = { navController.navigate(AppNavigation.CONTACT_US) },
+                                onNavigateProfile = { navController.navigate(AppNavigation.PROFILE) })
                         }
 
                         // CLUB PAGE
                         composable(AppNavigation.CLUB_PAGE) {
                             ClubScreen(clubModel = localClubModel, appViewModel = viewModel)
+                        }
+
+                        // PROFILE
+                        composable(AppNavigation.PROFILE) {
+                            ProfileScreen(viewModel)
+                        }
+
+                        // CONTACT US
+                        composable(AppNavigation.CONTACT_US) {
+                            ContactUsScreen()
                         }
                     }
                 }
