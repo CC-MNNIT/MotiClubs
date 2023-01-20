@@ -14,6 +14,9 @@ import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +39,7 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 @Composable
 fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
+    val showDialog = remember { mutableStateOf(false) }
 
     MotiClubsTheme(getColorScheme()) {
         Surface(
@@ -61,8 +64,7 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
 
                 Button(
                     onClick = {
-                        appViewModel.logoutUser(context)
-                        onNavigationLogout()
+                        showDialog.value = true
                     },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
@@ -71,6 +73,10 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                     Icon(painter = rememberVectorPainter(image = Icons.Rounded.Logout), contentDescription = "")
                     Text(text = "Logout", fontSize = 14.sp, modifier = Modifier.padding(start = 8.dp))
                 }
+            }
+
+            if (showDialog.value) {
+                ConfirmationDialog(appViewModel, onNavigationLogout, showDialog)
             }
         }
     }
@@ -191,4 +197,36 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
     )
+}
+
+@Composable
+fun ConfirmationDialog(
+    appViewModel: AppViewModel, onNavigationLogout: () -> Unit,
+    showDialog: MutableState<Boolean>
+) {
+    val context = LocalContext.current
+    val colorScheme = getColorScheme()
+
+    AlertDialog(onDismissRequest = {
+        showDialog.value = false
+    }, text = {
+        Text(text = "Are you sure you want to logout ?", fontSize = 16.sp)
+    }, confirmButton = {
+        TextButton(onClick = {
+            appViewModel.logoutUser(context)
+            onNavigationLogout()
+        }) {
+            Text(text = "Logout", fontSize = 14.sp, color = colorScheme.primary)
+        }
+    }, dismissButton = {
+        TextButton(onClick = { showDialog.value = false }) {
+            Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
+        }
+    }, icon = {
+        Icon(
+            painter = rememberVectorPainter(image = Icons.Rounded.Logout),
+            contentDescription = "",
+            modifier = Modifier.size(36.dp)
+        )
+    })
 }
