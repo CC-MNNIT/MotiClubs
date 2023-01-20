@@ -19,6 +19,11 @@ object Constants {
     const val CLUB = "club"
 }
 
+object AppNavigation {
+    const val LOGIN = "login"
+    const val SIGN_UP = "sign_up"
+}
+
 fun String.getDomainMail(): String = "$this@mnnit.ac.in"
 
 fun Context.setAuthToken(token: String) =

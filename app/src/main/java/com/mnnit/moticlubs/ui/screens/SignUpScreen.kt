@@ -35,7 +35,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.UserModel
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.ui.activity.AppScreenMode
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -87,6 +86,7 @@ class SignUpScreenViewModel @Inject constructor() : ViewModel() {
 @Composable
 fun SignupScreen(
     appViewModel: AppViewModel,
+    onNavigateToLogin: () -> Unit,
     viewModel: SignUpScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -267,7 +267,7 @@ fun SignupScreen(
                         onClick = {
                             keyboardController?.hide()
                             viewModel.isLoading.value = true
-                            signUpUser(context, viewModel, appViewModel)
+                            signUpUser(context, viewModel, onNavigateToLogin)
                         },
                         enabled = viewModel.isSignUpButtonEnabled
                     ) {
@@ -289,7 +289,7 @@ fun SignupScreen(
                     onClick = {
                         keyboardController?.hide()
                         viewModel.resetState()
-                        appViewModel.appScreenMode.value = AppScreenMode.LOGIN
+                        onNavigateToLogin()
                     },
                     modifier = Modifier
                         .padding(top = 8.dp)
@@ -310,7 +310,7 @@ fun SignupScreen(
 private fun signUpUser(
     context: Context,
     viewModel: SignUpScreenViewModel,
-    appViewModel: AppViewModel
+    onNavigateToLogin: () -> Unit
 ) {
     val auth = FirebaseAuth.getInstance()
     auth.createUserWithEmailAndPassword(
@@ -353,7 +353,7 @@ private fun signUpUser(
                                 "Please verify email to continue",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            appViewModel.appScreenMode.value = AppScreenMode.LOGIN
+                            onNavigateToLogin()
                         }
                     }
                 }) {

@@ -66,9 +66,6 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     }
 
     init {
-        viewModelScope.launch {
-            showSplashScreen.value = false
-        }
         FirebaseAuth.getInstance().addIdTokenListener { it: InternalTokenResult ->
             Log.d(TAG, "addIdTokenListener: called")
             setAuthToken(application.applicationContext, it.token ?: "")

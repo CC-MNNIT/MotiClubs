@@ -69,6 +69,7 @@ class LoginScreenViewModel @Inject constructor() : ViewModel() {
 @Composable
 fun LoginScreen(
     appViewModel: AppViewModel,
+    onNavigateToSignUp: () -> Unit,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -204,8 +205,8 @@ fun LoginScreen(
                 TextButton(
                     onClick = {
                         keyboardController?.hide()
+                        onNavigateToSignUp()
                         viewModel.resetState()
-                        appViewModel.appScreenMode.value = AppScreenMode.SIGNUP
                     },
                     modifier = Modifier
                         .padding(top = 8.dp)
