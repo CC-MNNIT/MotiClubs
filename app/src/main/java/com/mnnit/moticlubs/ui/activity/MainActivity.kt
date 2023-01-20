@@ -18,8 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
-import com.mnnit.moticlubs.AppNavigation
 import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.ui.screens.HomeScreen
 import com.mnnit.moticlubs.ui.screens.LoginScreen
 import com.mnnit.moticlubs.ui.screens.SignupScreen
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -27,10 +27,10 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EntryActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
 
     companion object {
-        private const val TAG = "EntryActivity"
+        private const val TAG = "MainActivity"
     }
 
     private val viewModel: AppViewModel by viewModels()
@@ -45,7 +45,6 @@ class EntryActivity : ComponentActivity() {
                 API.getUserData(viewModel.getAuthToken(this), {
                     viewModel.setUser(it)
                     viewModel.showSplashScreen.value = false
-                    // TODO: start activity
                     Log.d(TAG, "onCreate: fetched user")
                 }) {
                     viewModel.showSplashScreen.value = false
@@ -69,16 +68,31 @@ class EntryActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(
                         modifier = Modifier, navController = navController,
-                        startDestination = AppNavigation.LOGIN
+                        startDestination = if (user != null) AppNavigation.HOME else AppNavigation.LOGIN
                     ) {
                         composable(AppNavigation.LOGIN) {
                             LoginScreen(appViewModel = viewModel, {
                                 navController.navigate(AppNavigation.SIGN_UP)
+                            }, {
+                                navController.navigate(AppNavigation.HOME) {
+                                    popUpTo(AppNavigation.LOGIN) {
+                                        inclusive = true
+                                    }
+                                }
                             })
                         }
                         composable(AppNavigation.SIGN_UP) {
                             SignupScreen(appViewModel = viewModel, {
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            })
+                        }
+                        composable(AppNavigation.HOME) {
+                            HomeScreen(appViewModel = viewModel, {
+                                navController.navigate(AppNavigation.LOGIN) {
+                                    popUpTo(AppNavigation.HOME) {
+                                        inclusive = true
+                                    }
+                                }
                             })
                         }
                     }

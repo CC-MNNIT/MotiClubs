@@ -3,18 +3,14 @@ package com.mnnit.moticlubs.ui.activity
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.internal.InternalTokenResult
-import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.api.UserResponse
+import com.mnnit.moticlubs.getAuthToken
+import com.mnnit.moticlubs.setAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,9 +21,6 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     }
 
     val showSplashScreen = mutableStateOf(true)
-    val userPresent = mutableStateOf(false)
-
-    val appScreenMode = mutableStateOf(AppScreenMode.INVALID)
 
     val name = mutableStateOf("")
     val email = mutableStateOf("")
@@ -56,24 +49,28 @@ class AppViewModel @Inject constructor(private val application: Application) : V
         user.subscribed.forEach { subscribedList.add(it) }
     }
 
-    fun getAuthToken(context: Context) =
-        context.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
-            .getString(Constants.TOKEN, "")
+    fun getAuthToken(context: Context) = context.getAuthToken()
 
     fun setAuthToken(context: Context, token: String) {
-        context.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
-            .edit().putString(Constants.TOKEN, token).apply()
+        context.setAuthToken(token)
+    }
+
+    fun logoutUser(context: Context) {
+        FirebaseAuth.getInstance().signOut()
+        context.setAuthToken("")
     }
 
     init {
         FirebaseAuth.getInstance().addIdTokenListener { it: InternalTokenResult ->
             Log.d(TAG, "addIdTokenListener: called")
-            setAuthToken(application.applicationContext, it.token ?: "")
+            application.setAuthToken(it.token ?: "")
             Log.d(TAG, "addIdTokenListener: saved")
         }
     }
 }
 
-enum class AppScreenMode {
-    INVALID, LOGIN, SIGNUP, MAIN
+object AppNavigation {
+    const val LOGIN = "login"
+    const val SIGN_UP = "sign_up"
+    const val HOME = "home"
 }

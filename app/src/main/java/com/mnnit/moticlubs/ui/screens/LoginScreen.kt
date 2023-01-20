@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -34,12 +35,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.ui.activity.AppScreenMode
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+
+private const val TAG = "LoginScreen"
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor() : ViewModel() {
@@ -70,6 +72,7 @@ class LoginScreenViewModel @Inject constructor() : ViewModel() {
 fun LoginScreen(
     appViewModel: AppViewModel,
     onNavigateToSignUp: () -> Unit,
+    onNavigateToMain: () -> Unit,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -184,7 +187,7 @@ fun LoginScreen(
                         onClick = {
                             keyboardController?.hide()
                             viewModel.isLoading.value = true
-                            login(context, viewModel, appViewModel)
+                            login(context, viewModel, appViewModel, onNavigateToMain)
                         },
                         enabled = viewModel.isLoginButtonEnabled
                     ) {
@@ -223,7 +226,8 @@ fun LoginScreen(
 private fun login(
     context: Context,
     viewModel: LoginScreenViewModel,
-    appViewModel: AppViewModel
+    appViewModel: AppViewModel,
+    onNavigateToMain: () -> Unit
 ) {
     val auth = FirebaseAuth.getInstance()
     auth.signInWithEmailAndPassword(viewModel.emailID.value.getDomainMail(), viewModel.password.value)
@@ -243,32 +247,23 @@ private fun login(
             }
 
             if (user.isEmailVerified) {
-                user.getIdToken(false).addOnSuccessListener {
-                    val token = it.token
-                    if (token == null) {
-                        auth.signOut()
-                        viewModel.isLoading.value = false
-                        Toast.makeText(context, "Error: Couldn't init session", Toast.LENGTH_SHORT).show()
-                        return@addOnSuccessListener
-                    }
-                    appViewModel.setAuthToken(context, token)
-                    FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
-                        API.setFCMToken(token, fcm, {
-                            API.getUserData(token, { userRes ->
-                                viewModel.resetState()
-                                appViewModel.setUser(userRes)
-                                appViewModel.appScreenMode.value = AppScreenMode.MAIN
-                            }) {
-                                auth.signOut()
-                                viewModel.isLoading.value = false
-                                Toast.makeText(context, "Error: Couldn't load user", Toast.LENGTH_SHORT).show()
-                            }
-                        }) {
+                val authToken = appViewModel.getAuthToken(context)
+                if (authToken.isEmpty()) {
+                    Log.d(TAG, "login: FirebaseIDToken not invoked. Fetching token")
+                    user.getIdToken(false).addOnSuccessListener {
+                        val token = it.token
+                        if (token == null) {
                             auth.signOut()
                             viewModel.isLoading.value = false
-                            Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Error: Couldn't init session", Toast.LENGTH_SHORT).show()
+                            return@addOnSuccessListener
                         }
+                        appViewModel.setAuthToken(context, token)
+                        handleUser(context, auth, token, viewModel, appViewModel, onNavigateToMain)
                     }
+                } else {
+                    Log.d(TAG, "login: FirebaseIDToken invoked")
+                    handleUser(context, auth, authToken, viewModel, appViewModel, onNavigateToMain)
                 }
             } else {
                 auth.signOut()
@@ -276,4 +271,31 @@ private fun login(
                 Toast.makeText(context, "Please verify your email", Toast.LENGTH_SHORT).show()
             }
         }
+}
+
+private fun handleUser(
+    context: Context,
+    auth: FirebaseAuth,
+    token: String,
+    viewModel: LoginScreenViewModel,
+    appViewModel: AppViewModel,
+    onNavigateToMain: () -> Unit
+) {
+    FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
+        API.setFCMToken(token, fcm, {
+            API.getUserData(token, { userRes ->
+                viewModel.resetState()
+                appViewModel.setUser(userRes)
+                onNavigateToMain()
+            }) {
+                auth.signOut()
+                viewModel.isLoading.value = false
+                Toast.makeText(context, "Error: Couldn't load user", Toast.LENGTH_SHORT).show()
+            }
+        }) {
+            auth.signOut()
+            viewModel.isLoading.value = false
+            Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
+        }
+    }
 }

@@ -23,7 +23,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.activity.EntryActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MotiClubs"
             android:windowSoftInputMode="adjustResize">
