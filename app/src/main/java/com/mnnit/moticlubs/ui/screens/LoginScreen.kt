@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.getDomainMail
+import com.mnnit.moticlubs.top
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -84,12 +85,10 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .animateContentSize()
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .padding(top = appViewModel.paddingValues.value.top()),
             color = colorScheme.background
         ) {
-            val systemUiController = rememberSystemUiController()
-            systemUiController.setSystemBarsColor(color = colorScheme.background)
-
             Column(
                 modifier = Modifier
                     .padding(top = 120.dp, start = 16.dp, end = 16.dp)

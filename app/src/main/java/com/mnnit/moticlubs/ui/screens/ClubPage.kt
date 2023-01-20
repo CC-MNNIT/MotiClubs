@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -12,8 +13,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
@@ -24,24 +25,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.compose.jetchat.conversation.UserInput
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.PostResponse
+import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.toTimeString
+import com.mnnit.moticlubs.top
+import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,157 +62,64 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
     val postsList = mutableStateListOf<PostResponse>()
 
-    fun setPostsList(list: List<PostResponse>) {
-        postsList.clear()
-        list.forEach { postsList.add(it) }
+    fun fetchPostsList(context: Context, clubID: String) {
+        API.getClubPosts(context.getAuthToken(), clubID = clubID, { list ->
+            postsList.clear()
+            list.forEach { postsList.add(it) }
+        }) {}
     }
 }
 
 @Composable
 fun ClubScreen(
     clubModel: ClubModel,
+    appViewModel: AppViewModel,
     clubScreenViewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    API.getClubPosts(context.getAuthToken(), clubID = clubModel.id, {
-        clubScreenViewModel.setPostsList(it)
-    }) {}
+    clubScreenViewModel.fetchPostsList(context, clubModel.id)
 
     val scrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
     val scope = rememberCoroutineScope()
 
-    Surface(modifier = Modifier) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-            ) {
-                Messages(
-                    posts = clubScreenViewModel.postsList,
-//                    navigateToProfile = navigateToProfile,
-                    modifier = Modifier.weight(1f),
-                    scrollState = scrollState,
-                    context = context
-                )
+    val colorScheme = getColorScheme()
+    MotiClubsTheme(colorScheme) {
+        Surface(modifier = Modifier, color = colorScheme.background) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
+                ) {
+                    Messages(
+                        posts = clubScreenViewModel.postsList,
+                        modifier = Modifier.weight(1f),
+                        scrollState = scrollState,
+                        appViewModel = appViewModel
+                    )
 
-                UserInput(
-//                    onMessageSent = { content ->
-//                        uiState.addMessage(
-//                            Message(authorMe, content, timeNow)
-//                        )
-//                    },
-                    resetScroll = {
-                        scope.launch {
-                            scrollState.scrollToItem(0)
-                        }
-                    },
-                    // Use navigationBarsPadding() imePadding() and , to move the input panel above both the
-                    // navigation bar, and on-screen keyboard (IME)
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .imePadding(),
-                )
-            }
-            // Channel name bar floats above the messages
-            ChannelNameBar(
-                clubName = clubModel.name,
-                clubDesc = clubModel.description,
-//                onNavIconPressed = onNavIconPressed,
-                scrollBehavior = scrollBehavior,
-            )
-        }
-    }
-}
-
-@Composable
-fun ChannelNameBar(
-    clubName: String,
-    clubDesc: String,
-    modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-//    onNavIconPressed: () -> Unit = { }
-) {
-
-    JetchatAppBar(
-        modifier = modifier,
-        scrollBehavior = scrollBehavior,
-//        onNavIconPressed = onNavIconPressed,
-        title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Channel name
-                androidx.compose.material3.Text(
-                    text = clubName,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                // Number of members
-                androidx.compose.material3.Text(
-                    text = clubDesc,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        },
-        actions = {
-            // Search icon
-            Icon(
-                imageVector = Icons.Outlined.Search,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
-                    .padding(horizontal = 12.dp, vertical = 16.dp)
-                    .height(24.dp), contentDescription = ""
-            )
-            // Info icon
-            Icon(
-                imageVector = Icons.Outlined.Info,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
-                    .padding(horizontal = 12.dp, vertical = 16.dp)
-                    .height(24.dp),
-                contentDescription = ""
-            )
-        }
-    )
-}
-
-const val ConversationTestTag = "ConversationTestTag"
-
-@Composable
-fun Messages(
-    posts: List<PostResponse>,
-//    navigateToProfile: (String) -> Unit,
-    scrollState: LazyListState,
-    modifier: Modifier = Modifier,
-    context: Context
-) {
-//    val scope = rememberCoroutineScope()
-    Box(modifier = modifier) {
-        LazyColumn(
-            reverseLayout = true,
-            state = scrollState,
-            contentPadding =
-            WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues(),
-            modifier = Modifier
-                .testTag(ConversationTestTag)
-                .fillMaxSize()
-                .padding(horizontal = 10.dp)
-        ) {
-            for (index in posts.indices) {
-                val post = posts[index]
-                var name = ""
-                API.getUserDetails(context.getAuthToken(), post.adminEmail, {
-                    name = it.name
-                }) {}
-
-                item {
-                    Message(
-//                        onAuthorClick = { name -> navigateToProfile(name) },
-                        post = post,
-                        name = name
+                    UserInput(
+                        onMessageSent = {
+                        },
+                        resetScroll = {
+                            scope.launch { scrollState.scrollToItem(0) }
+                        },
+                        // Use navigationBarsPadding() imePadding() and , to move the input panel above both the
+                        // navigation bar, and on-screen keyboard (IME)
+                        modifier = Modifier
+                            .padding()
+                            .imePadding(),
+                    )
+                }
+                // Channel name bar floats above the messages
+                Surface(color = colorScheme.background, tonalElevation = 2.dp) {
+                    ChannelNameBar(
+                        appViewModel,
+                        clubName = clubModel.name,
+                        clubDesc = clubModel.description,
+                        modifier = Modifier.padding(top = appViewModel.paddingValues.value.top())
                     )
                 }
             }
@@ -211,39 +128,139 @@ fun Messages(
 }
 
 @Composable
-fun Message(
-//    onAuthorClick: (String) -> Unit,
-    post: PostResponse,
-    name: String
+fun ChannelNameBar(
+    appViewModel: AppViewModel,
+    clubName: String,
+    clubDesc: String,
+    modifier: Modifier = Modifier,
 ) {
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+        Image(
+            painter = rememberVectorPainter(image = Icons.Outlined.AccountCircle),
+            contentDescription = "",
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(64.dp)
+                .padding(16.dp)
+                .align(Alignment.CenterVertically)
+        )
 
+        Column(
+            modifier = Modifier.align(Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Channel name
+            Text(
+                text = clubName,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold,
+            )
+
+            // Number of members
+            Text(
+                text = clubDesc,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Row {
+            // Search icon
+            Icon(
+                imageVector = Icons.Outlined.Search,
+                modifier = Modifier
+//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
+                    .align(Alignment.CenterVertically)
+                    .height(56.dp), contentDescription = ""
+            )
+            // Info icon
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                modifier = Modifier
+//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 16.dp)
+                    .height(56.dp),
+                contentDescription = ""
+            )
+        }
+    }
+}
+
+const val ConversationTestTag = "ConversationTestTag"
+
+@Composable
+fun Messages(
+    posts: List<PostResponse>,
+    scrollState: LazyListState,
+    appViewModel: AppViewModel,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        LazyColumn(
+            reverseLayout = true,
+            state = scrollState,
+            contentPadding = PaddingValues(top = appViewModel.paddingValues.value.top() + 90.dp),
+            modifier = Modifier
+                .testTag(ConversationTestTag)
+                .fillMaxSize()
+                .padding(horizontal = 10.dp)
+        ) {
+            posts.forEach { post ->
+                item {
+                    Message(post = post, admin = appViewModel.adminInfoMap[post.adminEmail] ?: UserDetailResponse())
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Message(
+    post: PostResponse,
+    admin: UserDetailResponse,
+) {
     val borderColor = MaterialTheme.colorScheme.tertiary
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp), onClick = {/* TODO */ },
-        shape = ChatBubbleShape, elevation = CardDefaults.cardElevation(1.dp)
+            .padding(bottom = 16.dp),
+        shape = ChatBubbleShape, elevation = CardDefaults.cardElevation(0.dp)
     ) {
-        Row() {
+
+        Log.d("TAG", "Message: ${admin.personalEmail} = ${admin.avatar}")
+
+        Row(modifier = Modifier.padding(16.dp)) {
             Image(
                 modifier = Modifier
-//                .clickable(onClick = { onAuthorClick(msg.author) })
-                    .padding(horizontal = 16.dp)
                     .size(42.dp)
                     .border(1.5.dp, borderColor, CircleShape)
                     .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                     .clip(CircleShape)
                     .align(Alignment.Top),
-                painter = painterResource(id = R.drawable.someone_else),
+
+                painter = if (admin.avatar.isEmpty()) {
+                    rememberVectorPainter(image = Icons.Outlined.AccountCircle)
+                } else {
+                    rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(admin.avatar)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .diskCacheKey(admin.personalEmail)
+                            .error(R.drawable.outline_account_circle_24)
+                            .placeholder(R.drawable.outline_account_circle_24)
+                            .build()
+                    )
+                },
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
             )
             AuthorAndTextMessage(
                 post = post,
-                name = name,
-//            authorClicked = onAuthorClick,
+                name = admin.name,
                 modifier = Modifier
-                    .padding(end = 16.dp)
+                    .padding(start = 16.dp)
                     .weight(1f)
             )
         }
@@ -254,13 +271,12 @@ fun Message(
 fun AuthorAndTextMessage(
     post: PostResponse,
     name: String,
-//    authorClicked: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         AuthorNameTimestamp(post, name)
 //        Spacer(modifier = Modifier.height(2.dp))
-        ChatItemBubble(post)
+        Column { Text(text = post.message) }
         Spacer(
             modifier = Modifier
                 .height(5.dp)
@@ -275,45 +291,23 @@ private fun AuthorNameTimestamp(post: PostResponse, name: String) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .alignBy(LastBaseline)
                 .paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
-            fontSize = 15.sp,
+            fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = post.time.toTimeString(),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.alignBy(LastBaseline),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 10.sp
-
         )
     }
 }
 
 private val ChatBubbleShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
-
-@Composable
-fun ChatItemBubble(
-    post: PostResponse,
-//    authorClicked: (String) -> Unit
-) {
-
-    val backgroundBubbleColor =
-        MaterialTheme.colorScheme.surfaceVariant
-
-    Column(Modifier.padding(16.dp)) {
-        androidx.compose.material3.Surface(
-            color = backgroundBubbleColor
-        ) {
-            ClickableMessage(
-                post = post,
-//                authorClicked = authorClicked
-            )
-        }
-    }
-}
 
 @Composable
 fun ClickableMessage(

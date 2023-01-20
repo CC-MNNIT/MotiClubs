@@ -101,9 +101,6 @@ fun SignupScreen(
                 .verticalScroll(state = scrollState),
             color = colorScheme.background
         ) {
-            val systemUiController = rememberSystemUiController()
-            systemUiController.setSystemBarsColor(color = colorScheme.background)
-
             Column(
                 modifier = Modifier
                     .padding(top = 120.dp, start = 16.dp, end = 16.dp)

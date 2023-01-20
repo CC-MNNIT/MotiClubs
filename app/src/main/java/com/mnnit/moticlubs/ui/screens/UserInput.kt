@@ -38,21 +38,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Preview
 @Composable
 fun UserInputPreview() {
-    UserInput()
+    UserInput(modifier = Modifier, onMessageSent = {}, resetScroll = {})
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserInput(
+    onMessageSent: () -> Unit,
     modifier: Modifier = Modifier,
     resetScroll: () -> Unit = {},
 ) {
-
-
     var textState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
@@ -76,6 +76,7 @@ fun UserInput(
             UserInputSelector(
 //                onSelectorChange = { currentInputSelector = it },
                 sendMessageEnabled = textState.text.isNotBlank(),
+                onMessageSent
             )
         }
     }
@@ -131,7 +132,7 @@ fun FunctionalityNotAvailablePanel() {
 private fun UserInputSelector(
 //    onSelectorChange: (InputSelector) -> Unit,
     sendMessageEnabled: Boolean,
-//    onMessageSent: () -> Unit,
+    onMessageSent: () -> Unit,
 //    currentInputSelector: InputSelector,
     modifier: Modifier = Modifier
 ) {
@@ -169,10 +170,7 @@ private fun UserInputSelector(
             border = border,
             contentPadding = PaddingValues(0.dp)
         ) {
-            Text(
-                "Send",
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            Text("Send", fontSize = 13.sp)
         }
     }
 }

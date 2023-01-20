@@ -3,10 +3,13 @@ package com.mnnit.moticlubs.ui.activity
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.internal.InternalTokenResult
+import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.api.UserResponse
 import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.setAuthToken
@@ -21,6 +24,7 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     }
 
     val showSplashScreen = mutableStateOf(true)
+    val paddingValues = mutableStateOf(PaddingValues(0.dp))
 
     val name = mutableStateOf("")
     val email = mutableStateOf("")
@@ -30,6 +34,8 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     val avatar = mutableStateOf("")
     val adminList = mutableListOf<String>()
     val subscribedList = mutableListOf<String>()
+
+    val adminInfoMap = mutableMapOf<String, UserDetailResponse>()
 
     val isAdmin
         get() = adminList.isNotEmpty()

@@ -121,7 +121,9 @@ data class UserDetailResponse(
     @SerializedName("avatar")
     @Expose
     var avatar: String
-)
+) {
+    constructor() : this("", "", "", "")
+}
 
 data class PostModel(var message: String, var club: String)
 data class UpdatePostModel(var message: String)
