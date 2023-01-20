@@ -73,4 +73,5 @@ object AppNavigation {
     const val LOGIN = "login"
     const val SIGN_UP = "sign_up"
     const val HOME = "home"
+    const val CLUB_PAGE = "club_page"
 }

@@ -1,7 +1,9 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,13 +11,15 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,11 +37,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.example.compose.jetchat.conversation.UserInput
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.api.*
+import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.api.PostResponse
 import com.mnnit.moticlubs.getAuthToken
+import com.mnnit.moticlubs.toTimeString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 
@@ -52,12 +58,10 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClubScreen(
-    clubScreenViewModel: ClubScreenViewModel = hiltViewModel(),
     clubModel: ClubModel,
-    modifier: Modifier
+    clubScreenViewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     API.getClubPosts(context.getAuthToken(), clubID = clubModel.id, {
@@ -69,7 +73,7 @@ fun ClubScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
     val scope = rememberCoroutineScope()
 
-    androidx.compose.material3.Surface(modifier = modifier) {
+    Surface(modifier = Modifier) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 Modifier
@@ -143,7 +147,7 @@ fun ChannelNameBar(
         },
         actions = {
             // Search icon
-            androidx.compose.material3.Icon(
+            Icon(
                 imageVector = Icons.Outlined.Search,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -152,7 +156,7 @@ fun ChannelNameBar(
                     .height(24.dp), contentDescription = ""
             )
             // Info icon
-            androidx.compose.material3.Icon(
+            Icon(
                 imageVector = Icons.Outlined.Info,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -175,7 +179,7 @@ fun Messages(
     modifier: Modifier = Modifier,
     context: Context
 ) {
-    val scope = rememberCoroutineScope()
+//    val scope = rememberCoroutineScope()
     Box(modifier = modifier) {
         LazyColumn(
             reverseLayout = true,
@@ -189,7 +193,7 @@ fun Messages(
         ) {
             for (index in posts.indices) {
                 val post = posts[index]
-                var name: String = ""
+                var name = ""
                 API.getUserDetails(context.getAuthToken(), post.adminEmail, {
                     name = it.name
                 }) {}
@@ -309,25 +313,6 @@ fun ChatItemBubble(
             )
         }
     }
-}
-
-private val mMonthsList: List<String> = listOf(
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-    "Aug", "Sep", "Oct", "Nov", "Dec"
-)
-
-fun Long.toTimeString(): String {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = this
-
-    val hour = calendar.get(Calendar.HOUR)
-    val min = calendar.get(Calendar.MINUTE)
-    val amPm = calendar.get(Calendar.AM_PM)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-    val month = calendar.get(Calendar.MONTH)
-
-    return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
-            "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
 }
 
 @Composable

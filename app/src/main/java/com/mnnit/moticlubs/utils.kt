@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs
 
 import android.content.Context
+import java.util.*
 
 object Constants {
     const val ADMIN_NAME = "admin_name"
@@ -28,3 +29,22 @@ fun Context.setAuthToken(token: String) =
 fun Context.getAuthToken(): String =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
         .getString(Constants.TOKEN, "") ?: ""
+
+private val mMonthsList: List<String> = listOf(
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+    "Aug", "Sep", "Oct", "Nov", "Dec"
+)
+
+fun Long.toTimeString(): String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+
+    val hour = calendar.get(Calendar.HOUR)
+    val min = calendar.get(Calendar.MINUTE)
+    val amPm = calendar.get(Calendar.AM_PM)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+    val month = calendar.get(Calendar.MONTH)
+
+    return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
+            "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
+}

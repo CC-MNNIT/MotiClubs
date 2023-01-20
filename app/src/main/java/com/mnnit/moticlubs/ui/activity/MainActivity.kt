@@ -19,6 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.ui.screens.ClubScreen
 import com.mnnit.moticlubs.ui.screens.HomeScreen
 import com.mnnit.moticlubs.ui.screens.LoginScreen
 import com.mnnit.moticlubs.ui.screens.SignupScreen
@@ -66,10 +68,13 @@ class MainActivity : ComponentActivity() {
 
                     val localBackPressed = LocalOnBackPressedDispatcherOwner.current
                     val navController = rememberNavController()
+                    var localClubModel = ClubModel("", "", "", "", listOf())
+
                     NavHost(
                         modifier = Modifier, navController = navController,
                         startDestination = if (user != null) AppNavigation.HOME else AppNavigation.LOGIN
                     ) {
+                        // LOGIN
                         composable(AppNavigation.LOGIN) {
                             LoginScreen(appViewModel = viewModel, {
                                 navController.navigate(AppNavigation.SIGN_UP)
@@ -81,20 +86,30 @@ class MainActivity : ComponentActivity() {
                                 }
                             })
                         }
+
+                        // SIGN UP
                         composable(AppNavigation.SIGN_UP) {
                             SignupScreen(appViewModel = viewModel, {
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                             })
                         }
+
+                        // HOME
                         composable(AppNavigation.HOME) {
-                            HomeScreen(appViewModel = viewModel, {
+                            HomeScreen(appViewModel = viewModel, onNavigateLogOut = {
                                 navController.navigate(AppNavigation.LOGIN) {
                                     popUpTo(AppNavigation.HOME) {
                                         inclusive = true
                                     }
                                 }
+                            }, onNavigatePostItemClick = {
+                                localClubModel = it
+                                navController.navigate(AppNavigation.CLUB_PAGE)
                             })
                         }
+
+                        // CLUB PAGE
+                        composable(AppNavigation.CLUB_PAGE) { ClubScreen(clubModel = localClubModel) }
                     }
                 }
             }

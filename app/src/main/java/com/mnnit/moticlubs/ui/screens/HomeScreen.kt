@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,7 +29,6 @@ import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.activity.ClubActivity
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,13 +49,12 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
 fun HomeScreen(
     appViewModel: AppViewModel,
     onNavigateLogOut: () -> Unit,
+    onNavigatePostItemClick: (club: ClubModel) -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     API.getClubs(appViewModel.getAuthToken(LocalContext.current), {
         viewModel.setClubsList(it)
     }) {}
-
-    val context = LocalContext.current
 
     MotiClubsTheme(getColorScheme()) {
         Scaffold(
@@ -92,9 +89,7 @@ fun HomeScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 16.dp), onClick = {
-                                        context.startActivity(Intent(context, ClubActivity::class.java).apply {
-                                            putExtra(Constants.CLUB, viewModel.clubsList[idx])
-                                        })
+                                        onNavigatePostItemClick(viewModel.clubsList[idx])
                                     },
                                     shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp)
                                 ) {
