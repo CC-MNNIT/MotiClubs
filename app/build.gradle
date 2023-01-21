@@ -92,6 +92,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
     implementation 'io.coil-kt:coil-compose:2.2.2'
 
+    implementation 'com.github.jeziellago:compose-markdown:0.3.1'
     implementation "io.noties.markwon:core:4.6.2"
     implementation "io.noties.markwon:editor:4.6.2"
     implementation "io.noties.markwon:ext-tables:4.6.2"
