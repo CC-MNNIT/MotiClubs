@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,7 +28,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -100,19 +100,21 @@ fun ClubScreen(
                         appViewModel = appViewModel
                     )
 
-                    UserInput(
-                        viewModel,
-                        onMessageSent = {
-                        },
-                        resetScroll = {
-                            scope.launch { scrollState.scrollToItem(0) }
-                        },
-                        // Use navigationBarsPadding() imePadding() and , to move the input panel above both the
-                        // navigation bar, and on-screen keyboard (IME)
-                        modifier = Modifier
-                            .padding()
-                            .imePadding(),
-                    )
+                    AnimatedVisibility(visible = viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                        UserInput(
+                            viewModel,
+                            onMessageSent = {
+                            },
+                            resetScroll = {
+                                scope.launch { scrollState.scrollToItem(0) }
+                            },
+                            // Use navigationBarsPadding() imePadding() and , to move the input panel above both the
+                            // navigation bar, and on-screen keyboard (IME)
+                            modifier = Modifier
+                                .padding()
+                                .imePadding(),
+                        )
+                    }
                 }
                 // Channel name bar floats above the messages
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
@@ -185,8 +187,6 @@ fun ChannelNameBar(
     }
 }
 
-const val ConversationTestTag = "ConversationTestTag"
-
 @Composable
 fun Messages(
     posts: List<PostResponse>,
@@ -197,9 +197,8 @@ fun Messages(
     Box(modifier = modifier) {
         LazyColumn(
             state = scrollState,
-            contentPadding = PaddingValues(top = appViewModel.paddingValues.value.top() + 90.dp),
+            contentPadding = PaddingValues(top = appViewModel.paddingValues.value.top() + 90.dp, bottom = 56.dp),
             modifier = Modifier
-                .testTag(ConversationTestTag)
                 .fillMaxSize()
                 .padding(horizontal = 10.dp)
         ) {
@@ -272,9 +271,11 @@ fun AuthorAndTextMessage(
                 color = contentColorFor(backgroundColor = getColorScheme().background)
             )
         }
-        Spacer(modifier = Modifier
-            .height(5.dp)
-            .background(color = Color.White))
+        Spacer(
+            modifier = Modifier
+                .height(5.dp)
+                .background(color = Color.White)
+        )
     }
 }
 
