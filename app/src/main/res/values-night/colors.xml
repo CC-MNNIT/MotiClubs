@@ -8,6 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="backGroundColor">#FF000000</color>
+    <color name="backGroundColor">#FFF9F9FB</color>
     <color name="notificationColor">#FF266EF1</color>
 </resources>

@@ -19,8 +19,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +31,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.UserDetailResponse
@@ -121,13 +122,13 @@ fun HomeScreen(
                                 shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp)
                             ) {
                                 Row(modifier = Modifier.padding(16.dp)) {
-                                    Image(
-                                        painter = rememberVectorPainter(image = Icons.Outlined.AccountCircle),
-                                        contentDescription = "",
+                                    Icon(
                                         modifier = Modifier
                                             .clip(CircleShape)
                                             .size(48.dp)
-                                            .align(Alignment.CenterVertically)
+                                            .align(Alignment.CenterVertically),
+                                        imageVector = Icons.Outlined.AccountCircle,
+                                        contentDescription = ""
                                     )
 
                                     Column(
@@ -175,14 +176,14 @@ fun ProfileIcon(
 ) {
     Image(
         painter = if (appViewModel.avatar.value.isEmpty()) {
-            rememberVectorPainter(image = Icons.Outlined.AccountCircle)
+            painterResource(id = R.drawable.outline_account_circle_24)
         } else {
             rememberAsyncImagePainter(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(appViewModel.avatar.value)
                     .diskCachePolicy(CachePolicy.ENABLED)
                     .diskCacheKey(Constants.AVATAR)
-                    .placeholder(com.mnnit.moticlubs.R.drawable.outline_account_circle_24)
+                    .placeholder(R.drawable.outline_account_circle_24)
                     .build()
             )
         }, contentDescription = "",
