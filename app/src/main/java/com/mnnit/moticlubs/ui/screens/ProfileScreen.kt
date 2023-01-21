@@ -117,6 +117,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
 
 @Composable
 fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+    val colorScheme = getColorScheme()
 
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
@@ -127,6 +128,10 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         enabled = false,
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
+        )
     )
 
     OutlinedTextField(
@@ -147,6 +152,11 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background)
+        )
     )
 
     Row(modifier = Modifier.padding(top = 8.dp)) {
@@ -161,6 +171,10 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             enabled = false,
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+                disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
+            )
         )
 
         OutlinedTextField(
@@ -172,6 +186,10 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             },
             shape = RoundedCornerShape(24.dp),
             enabled = false,
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+                disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
+            )
         )
     }
 
@@ -196,6 +214,11 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             )
         },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledLeadingIconColor = contentColorFor(backgroundColor = colorScheme.background)
+        )
     )
 }
 
