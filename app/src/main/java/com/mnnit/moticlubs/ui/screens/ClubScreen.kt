@@ -2,9 +2,7 @@ package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -19,17 +17,18 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,7 +38,6 @@ import androidx.lifecycle.ViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.example.compose.jetchat.conversation.UserInput
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
@@ -52,6 +50,7 @@ import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -59,6 +58,8 @@ import javax.inject.Inject
 class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
     val postsList = mutableStateListOf<PostResponse>()
+    val selected = mutableStateOf(false)
+    val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf()))
 
     fun fetchPostsList(context: Context, clubID: String) {
         API.getClubPosts(context.getAuthToken(), clubID = clubID, { list ->
@@ -70,12 +71,13 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
 @Composable
 fun ClubScreen(
-    clubModel: ClubModel,
+    _clubModel: ClubModel,
     appViewModel: AppViewModel,
-    clubScreenViewModel: ClubScreenViewModel = hiltViewModel()
+    viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
+    viewModel.clubModel.value = _clubModel
     val context = LocalContext.current
-    clubScreenViewModel.fetchPostsList(context, clubModel.id)
+    viewModel.fetchPostsList(context, viewModel.clubModel.value.id)
 
     val scrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
@@ -92,13 +94,14 @@ fun ClubScreen(
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
                 ) {
                     Messages(
-                        posts = clubScreenViewModel.postsList,
+                        posts = viewModel.postsList,
                         modifier = Modifier.weight(1f),
                         scrollState = scrollState,
                         appViewModel = appViewModel
                     )
 
                     UserInput(
+                        viewModel,
                         onMessageSent = {
                         },
                         resetScroll = {
@@ -114,9 +117,8 @@ fun ClubScreen(
                 // Channel name bar floats above the messages
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
                     ChannelNameBar(
-                        appViewModel,
-                        clubName = clubModel.name,
-                        clubDesc = clubModel.description,
+                        clubName = viewModel.clubModel.value.name,
+                        clubDesc = viewModel.clubModel.value.description,
                         modifier = Modifier.padding(top = appViewModel.paddingValues.value.top())
                     )
                 }
@@ -127,20 +129,19 @@ fun ClubScreen(
 
 @Composable
 fun ChannelNameBar(
-    appViewModel: AppViewModel,
     clubName: String,
     clubDesc: String,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-        Image(
-            painter = rememberVectorPainter(image = Icons.Outlined.AccountCircle),
-            contentDescription = "",
+        Icon(
             modifier = Modifier
                 .clip(CircleShape)
                 .size(64.dp)
                 .padding(16.dp)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
+            imageVector = Icons.Outlined.AccountCircle,
+            contentDescription = ""
         )
 
         Column(
@@ -168,7 +169,6 @@ fun ChannelNameBar(
             Icon(
                 imageVector = Icons.Outlined.Search,
                 modifier = Modifier
-//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
                     .align(Alignment.CenterVertically)
                     .height(64.dp), contentDescription = ""
             )
@@ -176,7 +176,6 @@ fun ChannelNameBar(
             Icon(
                 imageVector = Icons.Outlined.Info,
                 modifier = Modifier
-//                    .clickable(onClick = { functionalityNotAvailablePopupShown = true })
                     .align(Alignment.CenterVertically)
                     .padding(start = 16.dp)
                     .height(64.dp),
@@ -197,7 +196,6 @@ fun Messages(
 ) {
     Box(modifier = modifier) {
         LazyColumn(
-            reverseLayout = true,
             state = scrollState,
             contentPadding = PaddingValues(top = appViewModel.paddingValues.value.top() + 90.dp),
             modifier = Modifier
@@ -219,24 +217,21 @@ fun Message(
     post: PostResponse,
     admin: UserDetailResponse,
 ) {
-    val borderColor = MaterialTheme.colorScheme.tertiary
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
-        shape = ChatBubbleShape, elevation = CardDefaults.cardElevation(0.dp)
+        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp), elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Image(
                 modifier = Modifier
                     .size(42.dp)
-                    .border(1.5.dp, borderColor, CircleShape)
-                    .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                     .clip(CircleShape)
                     .align(Alignment.Top),
 
                 painter = if (admin.avatar.isEmpty()) {
-                    rememberVectorPainter(image = Icons.Outlined.AccountCircle)
+                    painterResource(id = R.drawable.outline_account_circle_24)
                 } else {
                     rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
@@ -271,12 +266,15 @@ fun AuthorAndTextMessage(
     Column(modifier = modifier) {
         AuthorNameTimestamp(post, name)
 //        Spacer(modifier = Modifier.height(2.dp))
-        Column { Text(text = post.message) }
-        Spacer(
-            modifier = Modifier
-                .height(5.dp)
-                .background(color = Color.White)
-        )
+        Column {
+            MarkdownText(
+                markdown = post.message,
+                color = contentColorFor(backgroundColor = getColorScheme().background)
+            )
+        }
+        Spacer(modifier = Modifier
+            .height(5.dp)
+            .background(color = Color.White))
     }
 }
 
@@ -301,42 +299,3 @@ private fun AuthorNameTimestamp(post: PostResponse, name: String) {
         )
     }
 }
-
-private val ChatBubbleShape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
-
-@Composable
-fun ClickableMessage(
-    post: PostResponse,
-//    authorClicked: (String) -> Unit
-) {
-    Text(text = post.message)
-    /*
-    val uriHandler = LocalUriHandler.current
-
-    val styledMessage = messageFormatter(
-        text = post.message,
-        primary = isUserMe
-    )
-
-    ClickableText(
-        text = styledMessage,
-        style = MaterialTheme.typography.bodyLarge.copy(color = androidx.compose.material3.LocalContentColor.current),
-        modifier = Modifier.padding(16.dp),
-        onClick = {
-            styledMessage
-                .getStringAnnotations(start = it, end = it)
-                .firstOrNull()
-                ?.let { annotation ->
-                    when (annotation.tag) {
-                        SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-                        SymbolAnnotationType.PERSON.name -> authorClicked(annotation.item)
-                        else -> Unit
-                    }
-                }
-        }
-    )
-
-     */
-}
-
-private fun ScrollState.atBottom(): Boolean = value == 0
