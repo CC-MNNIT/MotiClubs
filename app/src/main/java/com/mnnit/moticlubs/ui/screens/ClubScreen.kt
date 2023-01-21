@@ -1,21 +1,35 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material.DrawerState
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,29 +37,32 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.PostResponse
 import com.mnnit.moticlubs.api.UserDetailResponse
-import com.mnnit.moticlubs.getAuthToken
-import com.mnnit.moticlubs.toTimeString
-import com.mnnit.moticlubs.top
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -57,15 +74,27 @@ import javax.inject.Inject
 @HiltViewModel
 class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
+    val postMsg = mutableStateOf("")
     val postsList = mutableStateListOf<PostResponse>()
-    val selected = mutableStateOf(false)
     val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf()))
 
-    fun fetchPostsList(context: Context, clubID: String) {
-        API.getClubPosts(context.getAuthToken(), clubID = clubID, { list ->
-            postsList.clear()
-            list.forEach { postsList.add(it) }
-        }) {}
+    val selected = mutableStateOf(false)
+    val bottomSheetScaffoldState = mutableStateOf(
+        BottomSheetScaffoldState(
+            drawerState = DrawerState(initialValue = DrawerValue.Closed),
+            bottomSheetState = BottomSheetState(initialValue = BottomSheetValue.Expanded),
+            snackbarHostState = SnackbarHostState()
+        )
+    )
+    val scrollValue = mutableStateOf(0)
+
+    fun fetchPostsList(context: Context) {
+        viewModelScope.launch {
+            API.getClubPosts(context.getAuthToken(), clubID = clubModel.value.id, { list ->
+                postsList.clear()
+                list.forEach { postsList.add(it) }
+            }) {}
+        }
     }
 }
 
@@ -76,52 +105,226 @@ fun ClubScreen(
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     viewModel.clubModel.value = _clubModel
-    val context = LocalContext.current
-    viewModel.fetchPostsList(context, viewModel.clubModel.value.id)
+    viewModel.bottomSheetScaffoldState.value = BottomSheetScaffoldState(
+        drawerState = DrawerState(initialValue = DrawerValue.Closed),
+        bottomSheetState = BottomSheetState(
+            initialValue = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                BottomSheetValue.Expanded
+            } else {
+                BottomSheetValue.Collapsed
+            }
+        ),
+        snackbarHostState = SnackbarHostState()
+    )
+    viewModel.fetchPostsList(LocalContext.current)
 
-    val scrollState = rememberLazyListState()
+    val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
-    val scope = rememberCoroutineScope()
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        Surface(modifier = Modifier, color = colorScheme.background) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .nestedScroll(scrollBehavior.nestedScrollConnection)
-                ) {
-                    Messages(
-                        posts = viewModel.postsList,
-                        modifier = Modifier.weight(1f),
-                        scrollState = scrollState,
-                        appViewModel = appViewModel
+        Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
+            BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
+                BottomSheetContent(viewModel)
+            }, topBar = {
+                Surface(color = colorScheme.background, tonalElevation = 2.dp) {
+                    ChannelNameBar(
+                        viewModel,
+                        modifier = Modifier.padding(top = appViewModel.paddingValues.value.top())
                     )
-
-                    AnimatedVisibility(visible = viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
-                        UserInput(
-                            viewModel,
-                            onMessageSent = {
-                            },
-                            resetScroll = {
-                                scope.launch { scrollState.scrollToItem(0) }
-                            },
-                            // Use navigationBarsPadding() imePadding() and , to move the input panel above both the
-                            // navigation bar, and on-screen keyboard (IME)
-                            modifier = Modifier
-                                .padding()
-                                .imePadding(),
+                }
+            }, content = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorScheme.background)
+                ) {
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    ) {
+                        Messages(
+                            viewModel = viewModel,
+                            modifier = Modifier.weight(1f),
+                            scrollState = listScrollState,
+                            appViewModel = appViewModel
                         )
                     }
                 }
-                // Channel name bar floats above the messages
-                Surface(color = colorScheme.background, tonalElevation = 2.dp) {
-                    ChannelNameBar(
-                        clubName = viewModel.clubModel.value.name,
-                        clubDesc = viewModel.clubModel.value.description,
-                        modifier = Modifier.padding(top = appViewModel.paddingValues.value.top())
+            }, scaffoldState = viewModel.bottomSheetScaffoldState.value,
+                sheetPeekHeight = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                    204.dp + appViewModel.paddingValues.value.bottom()
+                } else {
+                    0.dp
+                }, sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
+    val scrollState = rememberScrollState()
+    val horizontalScrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
+    val colorScheme = getColorScheme()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Surface(
+        color = colorScheme.background,
+        tonalElevation = 2.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .imePadding()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(
+                    top = 16.dp,
+                    start = 16.dp, end = 16.dp
+                )
+                .imePadding()
+                .fillMaxWidth()
+                .heightIn(0.dp, 480.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(56.dp)
+                    .height(4.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(contentColorFor(backgroundColor = colorScheme.background))
+            ) {
+                Text(text = "", modifier = Modifier.padding(12.dp))
+            }
+
+            Text(
+                text = "Write Post",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scrollState)
+                    .imePadding()
+                    .fillMaxWidth()
+            ) {
+                AnimatedVisibility(
+                    visible = viewModel.selected.value,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(horizontalScrollState)
+                ) {
+                    MarkdownText(
+                        markdown = viewModel.postMsg.value,
+                        color = contentColorFor(backgroundColor = colorScheme.background),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                AnimatedVisibility(visible = !viewModel.selected.value) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged {
+                                if (it.hasFocus) {
+                                    scope.launch {
+                                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                                            viewModel.scrollValue.value = scrollState.value
+                                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand()
+                                        }
+                                    }
+                                }
+                            },
+                        value = viewModel.postMsg.value,
+                        onValueChange = {
+                            val scrollValue = viewModel.scrollValue.value +
+                                    (scrollMultiplierIndex(viewModel.postMsg.value, it) * 53)
+
+                            viewModel.postMsg.value = it
+                            scope.launch {
+                                scrollState.animateScrollTo(scrollValue)
+                            }
+                        },
+                        shape = RoundedCornerShape(24.dp),
+                        label = { Text(text = "Post") },
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+                            disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
+                        )
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .imePadding()
+                        .padding(top = 8.dp, bottom = 8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    FilterChip(
+                        selected = viewModel.selected.value,
+                        onClick = {
+                            viewModel.selected.value = !viewModel.selected.value
+                            if (viewModel.selected.value) {
+                                scope.launch {
+                                    scrollState.animateScrollTo(0)
+                                }
+                            }
+                            keyboardController?.hide()
+                        },
+                        label = {
+                            Text(text = "Preview", fontSize = 14.sp)
+                        }, leadingIcon = {
+                            Icon(
+                                painter = rememberVectorPainter(image = Icons.Rounded.Visibility),
+                                contentDescription = ""
+                            )
+                        }, modifier = Modifier
+                            .imePadding()
+                            .align(Alignment.CenterVertically),
+                        shape = RoundedCornerShape(24.dp)
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    AssistChip(
+                        onClick = { },
+                        label = {
+                            Text(
+                                text = "Send",
+                                fontSize = 14.sp,
+                                color = contentColorFor(
+                                    backgroundColor = if (viewModel.postMsg.value.isNotEmpty()) {
+                                        colorScheme.primary
+                                    } else {
+                                        colorScheme.onSurface.copy(alpha = 0.38f)
+                                    }
+                                )
+                            )
+                        }, leadingIcon = {
+                            Icon(
+                                painter = rememberVectorPainter(image = Icons.Rounded.Send),
+                                contentDescription = "",
+                                tint = contentColorFor(
+                                    backgroundColor = if (viewModel.postMsg.value.isNotEmpty()) {
+                                        colorScheme.primary
+                                    } else {
+                                        colorScheme.onSurface.copy(alpha = 0.38f)
+                                    }
+                                )
+                            )
+                        }, modifier = Modifier
+                            .imePadding()
+                            .align(Alignment.CenterVertically),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
+                        enabled = viewModel.postMsg.value.isNotEmpty()
                     )
                 }
             }
@@ -129,10 +332,34 @@ fun ClubScreen(
     }
 }
 
+private fun scrollMultiplierIndex(prev: String, curr: String): Int {
+    val q: String
+    val p: String
+    if (curr.length > prev.length) {
+        q = prev
+        p = curr
+    } else {
+        q = curr
+        p = prev
+    }
+    var breakLines = 0
+    q.forEachIndexed { index, c ->
+        if (p[index] != c) {
+            for (i in 0..index) {
+                if (p[i] == '\n') breakLines++
+            }
+            return breakLines
+        }
+    }
+    curr.forEach {
+        if (it == '\n') breakLines++
+    }
+    return breakLines
+}
+
 @Composable
 fun ChannelNameBar(
-    clubName: String,
-    clubDesc: String,
+    viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -152,7 +379,7 @@ fun ChannelNameBar(
         ) {
             // Channel name
             Text(
-                text = clubName,
+                text = viewModel.clubModel.value.name,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
@@ -160,7 +387,7 @@ fun ChannelNameBar(
 
             // Number of members
             Text(
-                text = clubDesc,
+                text = viewModel.clubModel.value.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -189,7 +416,7 @@ fun ChannelNameBar(
 
 @Composable
 fun Messages(
-    posts: List<PostResponse>,
+    viewModel: ClubScreenViewModel,
     scrollState: LazyListState,
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
@@ -197,12 +424,20 @@ fun Messages(
     Box(modifier = modifier) {
         LazyColumn(
             state = scrollState,
-            contentPadding = PaddingValues(top = appViewModel.paddingValues.value.top() + 90.dp, bottom = 56.dp),
+            contentPadding = PaddingValues(
+                top = 16.dp,
+                bottom = appViewModel.paddingValues.value.bottom() +
+                        if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                            194.dp
+                        } else {
+                            0.dp
+                        }
+            ),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 10.dp)
         ) {
-            posts.forEach { post ->
+            viewModel.postsList.forEach { post ->
                 item {
                     Message(post = post, admin = appViewModel.adminInfoMap[post.adminEmail] ?: UserDetailResponse())
                 }
@@ -264,11 +499,11 @@ fun AuthorAndTextMessage(
 ) {
     Column(modifier = modifier) {
         AuthorNameTimestamp(post, name)
-//        Spacer(modifier = Modifier.height(2.dp))
         Column {
             MarkdownText(
                 markdown = post.message,
-                color = contentColorFor(backgroundColor = getColorScheme().background)
+                color = contentColorFor(backgroundColor = getColorScheme().background),
+                maxLines = 1
             )
         }
         Spacer(

@@ -138,7 +138,7 @@ class MainActivity : ComponentActivity() {
 
                         // CLUB PAGE
                         composable(AppNavigation.CLUB_PAGE) {
-                            ClubScreen(clubModel = localClubModel, appViewModel = viewModel)
+                            ClubScreen(_clubModel = localClubModel, appViewModel = viewModel)
                         }
 
                         // PROFILE
