@@ -1,5 +1,10 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -27,14 +32,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import java.io.ByteArrayOutputStream
 
 @Composable
 fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
@@ -252,4 +263,41 @@ fun ConfirmationDialog(
             modifier = Modifier.size(36.dp)
         )
     })
+}
+
+private fun updateProfilePicture(imageUri: Uri,appViewModel: AppViewModel) {
+    val storageRef = Firebase.storage.reference
+    val profilePicRef =
+        storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+
+    val bitmap = compressBitmap(imageUri)
+    if (bitmap == null) {
+//        Toast.makeText(requireContext(), "Internal bitmap error", Toast.LENGTH_SHORT).show()
+        return
+    }
+    val boas = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, boas)
+    profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
+        if (!task.isSuccessful) {
+            task.exception?.let {
+//                Log.d(TAG, "not success$it")
+                throw it
+            }
+        }
+        profilePicRef.downloadUrl
+    }.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+//            Log.d(TAG, "updateProfilePicture: got url")
+            val downloadUri = task.result
+            API.updateProfilePic(appViewModel.getAuthToken(context = ), {
+                Toast.makeText(requireContext(), "Profile pic updated", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "saved on mongodb")
+                UserInstance.setAvatar(it.avatar)
+                setProfileValues()
+            }) { Toast.makeText(requireContext(), "$it: Could not update profile pic", Toast.LENGTH_SHORT).show() }
+        } else {
+            Toast.makeText(requireContext(), "DB: Could not update profile pic", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
