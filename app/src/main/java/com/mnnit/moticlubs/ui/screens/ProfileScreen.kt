@@ -4,9 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -34,7 +33,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContentProviderCompat.requireContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -47,24 +45,12 @@ import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import org.jetbrains.annotations.Contract
 import java.io.ByteArrayOutputStream
 
 @Composable
 fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
-    val launcher =
-        registerForActivityResult<Void?, Uri>(Contract(), ActivityResultCallback { result ->
-            if (result == null) {
-                return@ActivityResultCallback
-            }
-            try {
-                updateProfilePicture(result)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        })
 
     MotiClubsTheme(getColorScheme()) {
         Surface(
@@ -109,6 +95,12 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
 
 @Composable
 fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+//            val cropOptions = CropImageContractOptions(uri, CropImageOptions())
+            updateProfilePicture(context, uri!!, appViewModel)
+        }
     Row(modifier = modifier) {
         Image(
             painter = if (appViewModel.avatar.value.isEmpty()) {
@@ -130,8 +122,9 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         )
 
         IconButton(
-            onClick = { launcher.launch(null) }
-            ,
+            onClick = {
+                launcher.launch("image/*")
+            },
             modifier = Modifier
                 .align(Alignment.Bottom)
                 .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
@@ -280,7 +273,7 @@ fun ConfirmationDialog(
     })
 }
 
-private fun updateProfilePicture(context: Context,imageUri: Uri,appViewModel: AppViewModel) {
+private fun updateProfilePicture(context: Context, imageUri: Uri, appViewModel: AppViewModel) {
     val storageRef = Firebase.storage.reference
     val profilePicRef =
         storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
@@ -302,7 +295,7 @@ private fun updateProfilePicture(context: Context,imageUri: Uri,appViewModel: Ap
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
             val downloadUri = task.result
-            API.updateProfilePic(appViewModel.getAuthToken(context = context), downloadUri.toString(),{
+            API.updateProfilePic(appViewModel.getAuthToken(context = context), downloadUri.toString(), {
                 appViewModel.avatar.value = it.avatar
             }) {}
         } else {
@@ -310,7 +303,7 @@ private fun updateProfilePicture(context: Context,imageUri: Uri,appViewModel: Ap
     }
 }
 
-private fun compressBitmap(uri: Uri,context: Context): Bitmap? {
+private fun compressBitmap(uri: Uri, context: Context): Bitmap? {
     val options = BitmapFactory.Options()
     options.inJustDecodeBounds = true
     val ins = context.contentResolver.openInputStream(uri)
