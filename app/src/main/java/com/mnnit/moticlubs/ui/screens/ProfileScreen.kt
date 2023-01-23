@@ -330,8 +330,3 @@ private fun compressBitmap(uri: Uri,context: Context): Bitmap? {
     inputStream?.close()
     return out
 }
-
-
-
-
-
