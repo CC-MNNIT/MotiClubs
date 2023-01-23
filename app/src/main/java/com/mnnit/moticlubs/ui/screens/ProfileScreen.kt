@@ -131,7 +131,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
 
         IconButton(
             onClick = { launcher.launch(null) }
-            },
+            ,
             modifier = Modifier
                 .align(Alignment.Bottom)
                 .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
