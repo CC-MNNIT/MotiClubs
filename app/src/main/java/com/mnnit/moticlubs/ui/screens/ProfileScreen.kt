@@ -2,9 +2,11 @@ package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -45,12 +47,24 @@ import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import org.jetbrains.annotations.Contract
 import java.io.ByteArrayOutputStream
 
 @Composable
 fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
+    val launcher =
+        registerForActivityResult<Void?, Uri>(Contract(), ActivityResultCallback { result ->
+            if (result == null) {
+                return@ActivityResultCallback
+            }
+            try {
+                updateProfilePicture(result)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        })
 
     MotiClubsTheme(getColorScheme()) {
         Surface(
@@ -116,7 +130,8 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         )
 
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { launcher.launch(null) }
+            },
             modifier = Modifier
                 .align(Alignment.Bottom)
                 .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
@@ -265,15 +280,14 @@ fun ConfirmationDialog(
     })
 }
 
-private fun updateProfilePicture(imageUri: Uri,appViewModel: AppViewModel) {
+private fun updateProfilePicture(context: Context,imageUri: Uri,appViewModel: AppViewModel) {
     val storageRef = Firebase.storage.reference
     val profilePicRef =
         storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
 
-    val bitmap = compressBitmap(imageUri)
+    val bitmap = compressBitmap(imageUri, context)
     if (bitmap == null) {
-//        Toast.makeText(requireContext(), "Internal bitmap error", Toast.LENGTH_SHORT).show()
         return
     }
     val boas = ByteArrayOutputStream()
@@ -281,23 +295,43 @@ private fun updateProfilePicture(imageUri: Uri,appViewModel: AppViewModel) {
     profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
         if (!task.isSuccessful) {
             task.exception?.let {
-//                Log.d(TAG, "not success$it")
                 throw it
             }
         }
         profilePicRef.downloadUrl
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
-//            Log.d(TAG, "updateProfilePicture: got url")
             val downloadUri = task.result
-            API.updateProfilePic(appViewModel.getAuthToken(context = ), {
-                Toast.makeText(requireContext(), "Profile pic updated", Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "saved on mongodb")
-                UserInstance.setAvatar(it.avatar)
-                setProfileValues()
-            }) { Toast.makeText(requireContext(), "$it: Could not update profile pic", Toast.LENGTH_SHORT).show() }
+            API.updateProfilePic(appViewModel.getAuthToken(context = context), downloadUri.toString(),{
+                appViewModel.avatar.value = it.avatar
+            }) {}
         } else {
-            Toast.makeText(requireContext(), "DB: Could not update profile pic", Toast.LENGTH_SHORT).show()
         }
     }
 }
+
+private fun compressBitmap(uri: Uri,context: Context): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    val ins = context.contentResolver.openInputStream(uri)
+    BitmapFactory.decodeStream(ins, null, options)
+    ins?.close()
+
+    var scale = 1
+    while (options.outWidth / scale / 2 >= 200 && options.outHeight / scale / 2 >= 200) {
+        scale *= 2
+    }
+
+    val finalOptions = BitmapFactory.Options()
+    finalOptions.inSampleSize = scale
+
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val out = BitmapFactory.decodeStream(inputStream, null, finalOptions)
+    inputStream?.close()
+    return out
+}
+
+
+
+
+
