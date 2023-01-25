@@ -36,6 +36,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -96,11 +99,15 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
 @Composable
 fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-//            val cropOptions = CropImageContractOptions(uri, CropImageOptions())
-            updateProfilePicture(context, uri!!, appViewModel)
+    val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            updateProfilePicture(context, result.uriContent!!, appViewModel)
+        } else { val exception = result.error } }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            val cropOptions = CropImageContractOptions(uri, CropImageOptions())
+            imageCropLauncher.launch(cropOptions)
         }
+
     Row(modifier = modifier) {
         Image(
             painter = if (appViewModel.avatar.value.isEmpty()) {

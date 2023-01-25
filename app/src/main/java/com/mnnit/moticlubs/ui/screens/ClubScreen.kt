@@ -158,7 +158,7 @@ fun ClubScreen(
                     204.dp + appViewModel.paddingValues.value.bottom()
                 } else {
                     0.dp
-                }, sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp)
+                }, sheetBackgroundColor = colorScheme.surfaceColorAtElevation(5.dp)
             )
         }
     }
