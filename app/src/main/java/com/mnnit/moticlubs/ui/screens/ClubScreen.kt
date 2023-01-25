@@ -414,7 +414,7 @@ fun Messages(
             contentPadding = PaddingValues(
                 top = 16.dp,
                 bottom = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
-                    194.dp
+                    72.dp
                 } else {
                     0.dp
                 }

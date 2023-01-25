@@ -51,14 +51,15 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
     fun setClubsList(context: Context, appViewModel: AppViewModel) {
         API.getClubs(context.getAuthToken(), { list ->
             clubsList.clear()
-            appViewModel.adminInfoMap.clear()
+            val hash = HashMap<String, UserDetailResponse>()
 
             list.forEach { model ->
                 clubsList.add(model)
+
                 model.admins.forEach { email ->
-                    if (!appViewModel.adminInfoMap.containsKey(email)) {
+                    if (!hash.containsKey(email)) {
                         Log.d("TAG", "HomeScreen: Fetching $email")
-                        appViewModel.adminInfoMap[email] = UserDetailResponse()
+                        hash[email] = UserDetailResponse()
 
                         appViewModel.viewModelScope.launch {
                             API.getUserDetails(context.getAuthToken(), email, { adminRes ->
