@@ -26,7 +26,9 @@ data class ClubModel(
     @SerializedName("admins")
     @Expose
     var admins: List<String>
-) : Parcelable
+) : Parcelable {
+    constructor() : this("", "", "", "", listOf())
+}
 
 data class IntroSlide(
     var title: String,

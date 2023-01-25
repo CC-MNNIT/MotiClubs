@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.UserModel
@@ -38,6 +37,7 @@ import com.mnnit.moticlubs.getDomainMail
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -95,6 +95,7 @@ fun SignupScreen(
     val context = LocalContext.current
 
     MotiClubsTheme(colorScheme) {
+        SetNavBarsTheme()
         Surface(
             modifier = Modifier
                 .fillMaxSize()

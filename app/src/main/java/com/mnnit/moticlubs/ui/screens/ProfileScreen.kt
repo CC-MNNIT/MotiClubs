@@ -48,6 +48,7 @@ import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import java.io.ByteArrayOutputStream
 
 @Composable
@@ -56,19 +57,16 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val showDialog = remember { mutableStateOf(false) }
 
     MotiClubsTheme(getColorScheme()) {
+        SetNavBarsTheme()
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = appViewModel.paddingValues.value.top(),
-                    start = maxOf(appViewModel.paddingValues.value.start(), 8.dp),
-                    end = maxOf(appViewModel.paddingValues.value.end(), 8.dp)
-                )
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = appViewModel.paddingValues.value.top())
+                    .padding()
                     .verticalScroll(scrollState)
                     .wrapContentHeight(Alignment.Top),
             ) {
@@ -102,11 +100,14 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             updateProfilePicture(context, result.uriContent!!, appViewModel)
-        } else { val exception = result.error } }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            val cropOptions = CropImageContractOptions(uri, CropImageOptions())
-            imageCropLauncher.launch(cropOptions)
+        } else {
+            val exception = result.error
         }
+    }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        val cropOptions = CropImageContractOptions(uri, CropImageOptions())
+        imageCropLauncher.launch(cropOptions)
+    }
 
     Row(modifier = modifier) {
         Image(

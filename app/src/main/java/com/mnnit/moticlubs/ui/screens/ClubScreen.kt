@@ -30,10 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +63,7 @@ import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
@@ -100,22 +98,11 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
 @Composable
 fun ClubScreen(
-    _clubModel: ClubModel,
     appViewModel: AppViewModel,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
-    viewModel.clubModel.value = _clubModel
-    viewModel.bottomSheetScaffoldState.value = BottomSheetScaffoldState(
-        drawerState = DrawerState(initialValue = DrawerValue.Closed),
-        bottomSheetState = BottomSheetState(
-            initialValue = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
-                BottomSheetValue.Expanded
-            } else {
-                BottomSheetValue.Collapsed
-            }
-        ),
-        snackbarHostState = SnackbarHostState()
-    )
+    viewModel.clubModel.value = appViewModel.clubModel.value
+    viewModel.bottomSheetScaffoldState.value = rememberBottomSheetScaffoldState()
     viewModel.fetchPostsList(LocalContext.current)
 
     val listScrollState = rememberLazyListState()
@@ -124,6 +111,7 @@ fun ClubScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
+        SetNavBarsTheme(elevation = 2.dp)
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
                 BottomSheetContent(viewModel)
@@ -131,7 +119,7 @@ fun ClubScreen(
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
                     ChannelNameBar(
                         viewModel,
-                        modifier = Modifier.padding(top = appViewModel.paddingValues.value.top())
+                        modifier = Modifier.padding()
                     )
                 }
             }, content = {
@@ -155,10 +143,10 @@ fun ClubScreen(
                 }
             }, scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
-                    204.dp + appViewModel.paddingValues.value.bottom()
+                    72.dp
                 } else {
                     0.dp
-                }, sheetBackgroundColor = colorScheme.surfaceColorAtElevation(5.dp)
+                }, sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp)
             )
         }
     }
@@ -187,7 +175,6 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                 )
                 .imePadding()
                 .fillMaxWidth()
-                .heightIn(0.dp, 480.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -426,12 +413,11 @@ fun Messages(
             state = scrollState,
             contentPadding = PaddingValues(
                 top = 16.dp,
-                bottom = appViewModel.paddingValues.value.bottom() +
-                        if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
-                            194.dp
-                        } else {
-                            0.dp
-                        }
+                bottom = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                    194.dp
+                } else {
+                    0.dp
+                }
             ),
             modifier = Modifier
                 .fillMaxSize()

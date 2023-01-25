@@ -38,6 +38,7 @@ import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -82,7 +83,9 @@ fun HomeScreen(
     val context = LocalContext.current
     viewModel.setClubsList(context, appViewModel)
 
-    MotiClubsTheme(getColorScheme()) {
+    val colorScheme = getColorScheme()
+    MotiClubsTheme(colorScheme) {
+        SetNavBarsTheme()
         Scaffold(
             modifier = Modifier,
             content = {
@@ -90,11 +93,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .consumeWindowInsets(it)
-                        .padding(
-                            top = appViewModel.paddingValues.value.top() * 2,
-                            start = maxOf(appViewModel.paddingValues.value.start(), 16.dp),
-                            end = maxOf(appViewModel.paddingValues.value.end(), 16.dp)
-                        )
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 ) {
                     ProfileIcon(
                         appViewModel = appViewModel,
@@ -102,15 +101,13 @@ fun HomeScreen(
                         onNavigateProfile
                     )
 
-                    Log.d("TAG", "HomeScreen: m padding = ${appViewModel.paddingValues.value}")
-
                     Text(text = "MNNIT Clubs", fontSize = 28.sp)
 
                     LazyColumn(
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .fillMaxHeight(),
-                        contentPadding = PaddingValues(bottom = appViewModel.paddingValues.value.bottom() + 56.dp)
+                        contentPadding = PaddingValues()
                     ) {
                         items(viewModel.clubsList.size) { idx ->
                             Card(
@@ -160,8 +157,7 @@ fun HomeScreen(
                     onClick = { onNavigateContactUs() },
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.padding(
-                        bottom = appViewModel.paddingValues.value.bottom(),
-                        end = appViewModel.paddingValues.value.end()
+
                     )
                 )
             }

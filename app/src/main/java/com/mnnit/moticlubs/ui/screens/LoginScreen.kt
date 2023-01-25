@@ -34,10 +34,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.top
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -78,14 +78,15 @@ fun LoginScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
+
     val context = LocalContext.current
     MotiClubsTheme(colorScheme) {
+        SetNavBarsTheme()
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .animateContentSize()
-                .verticalScroll(scrollState)
-                .padding(top = appViewModel.paddingValues.value.top()),
+                .verticalScroll(scrollState),
             color = colorScheme.background
         ) {
             Column(

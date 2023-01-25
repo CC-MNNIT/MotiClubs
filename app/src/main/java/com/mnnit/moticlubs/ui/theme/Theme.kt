@@ -1,12 +1,15 @@
 package com.mnnit.moticlubs.ui.theme
 
-import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColorScheme(
     background = Cultured,
@@ -44,6 +47,19 @@ fun getColorScheme() =
         if (isSystemInDarkTheme()) DarkColorPalette else LightColorPalette
     }
 
+@Composable
+fun SetNavBarsTheme(elevation: Dp = 0.dp) {
+    val colorScheme = getColorScheme()
+    val darkTheme = isSystemInDarkTheme()
+    val systemUiController = rememberSystemUiController()
+    DisposableEffect(systemUiController, darkTheme) {
+        systemUiController.setSystemBarsColor(
+            color = if (elevation == 0.dp) colorScheme.background else colorScheme.surfaceColorAtElevation(2.dp),
+            darkIcons = !darkTheme
+        )
+        onDispose { }
+    }
+}
 
 @Composable
 fun MotiClubsTheme(
