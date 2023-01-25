@@ -106,7 +106,10 @@ class MainActivity : ComponentActivity() {
 
                         // CLUB PAGE
                         composable(AppNavigation.CLUB_PAGE) {
-                            ClubScreen(appViewModel = viewModel)
+                            ClubScreen(appViewModel = viewModel, onNavigateToPost = { post ->
+                                viewModel.postModel.value = post
+                                navController.navigate(AppNavigation.POST_PAGE)
+                            })
                         }
 
                         // PROFILE
@@ -121,6 +124,10 @@ class MainActivity : ComponentActivity() {
                         // CONTACT US
                         composable(AppNavigation.CONTACT_US) {
                             ContactUsScreen()
+                        }
+
+                        composable(AppNavigation.POST_PAGE) {
+                            PostScreen(viewModel)
                         }
                     }
                 }

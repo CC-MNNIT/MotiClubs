@@ -1,23 +1,21 @@
 package com.mnnit.moticlubs.ui.screens
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Divider
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -26,41 +24,58 @@ import coil.request.ImageRequest
 import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.PostResponse
-import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.toTimeString
+import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
+import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun PostScreen(
-    postResponse: PostResponse,
-    admin: UserDetailResponse
+    appViewModel: AppViewModel
 ) {
-    MotiClubsTheme(getColorScheme()) {
+    val colorScheme = getColorScheme()
+    MotiClubsTheme(colorScheme) {
+        SetNavBarsTheme()
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(16.dp),
+            color = colorScheme.background
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(getColorScheme().background)) {
-                    AdminProfileIcon(admin = admin)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    AdminNameTimestamp(post = postResponse, name = admin.name)
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+                    shape = RoundedCornerShape(24.dp),
+                    elevation = CardDefaults.cardElevation(0.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        AdminProfileIcon(
+                            appViewModel.adminInfoMap[appViewModel.postModel.value.adminEmail]?.avatar ?: ""
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        AdminNameTimestamp(
+                            post = appViewModel.postModel.value,
+                            name = appViewModel.adminInfoMap[appViewModel.postModel.value.adminEmail]?.name ?: "NA"
+                        )
+                    }
                 }
                 val scroll = rememberScrollState(0)
-                Divider(startIndent = 8.dp, thickness = 1.dp, color = Color.Black)
                 Spacer(modifier = Modifier.height(15.dp))
 
                 MarkdownText(
-                    markdown = postResponse.message,
+                    markdown = appViewModel.postModel.value.message,
                     color = contentColorFor(backgroundColor = getColorScheme().background),
-                    fontSize = 11.sp,
-                    modifier = Modifier.verticalScroll(scroll)
+                    modifier = Modifier
+                        .verticalScroll(scroll)
+                        .padding(8.dp)
                 )
             }
         }
@@ -70,20 +85,22 @@ fun PostScreen(
 
 @Composable
 private fun AdminNameTimestamp(post: PostResponse, name: String) {
-    Column(modifier = Modifier.semantics(mergeDescendants = true) {}) {
+    Column(modifier = Modifier
+        .padding(start = 8.dp)
+        .semantics(mergeDescendants = true) {}) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
-            fontSize = 14.sp,
+            fontSize = 16.sp,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = post.time.toTimeString(),
             style = MaterialTheme.typography.bodySmall,
-            fontSize = 10.sp
+            fontSize = 12.sp
         )
     }
 }
@@ -91,15 +108,15 @@ private fun AdminNameTimestamp(post: PostResponse, name: String) {
 
 @Composable
 fun AdminProfileIcon(
-    admin: UserDetailResponse,
+    avatar: String
 ) {
     Image(
-        painter = if (admin.avatar.isEmpty()) {
+        painter = if (avatar.isEmpty()) {
             painterResource(id = R.drawable.outline_account_circle_24)
         } else {
             rememberAsyncImagePainter(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(admin.avatar)
+                    .data(avatar)
                     .diskCachePolicy(CachePolicy.ENABLED)
                     .diskCacheKey(Constants.AVATAR)
                     .placeholder(R.drawable.outline_account_circle_24)
@@ -108,19 +125,6 @@ fun AdminProfileIcon(
         }, contentDescription = "",
         modifier = Modifier
             .clip(CircleShape)
-            .size(48.dp)
-            .clickable { /* TODO */ }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreViewPostScreen() {
-    PostScreen(
-        postResponse = PostResponse(
-            "1233", "The killer feature of `markdown-it` is very effective support of\n" +
-                    "[syntax plugins](https://www.npmjs.org/browse/keyword/markdown-it-plugin).\n" +
-                    "_Compact style:_\n", 1674582431195, "Hue hue hue", "amit9116260192@gmail.com"
-        ), admin = UserDetailResponse("Amit kumar", "amit9116260192@gmail.com", "9116260192", "")
+            .size(56.dp)
     )
 }

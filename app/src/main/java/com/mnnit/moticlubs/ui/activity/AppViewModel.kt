@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.internal.InternalTokenResult
 import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.api.PostResponse
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.api.UserResponse
 import com.mnnit.moticlubs.getAuthToken
@@ -24,6 +25,7 @@ class AppViewModel @Inject constructor(private val application: Application) : V
 
     val showSplashScreen = mutableStateOf(true)
     val clubModel = mutableStateOf(ClubModel())
+    val postModel = mutableStateOf(PostResponse())
 
     val name = mutableStateOf("")
     val email = mutableStateOf("")
@@ -81,4 +83,5 @@ object AppNavigation {
     const val CLUB_PAGE = "club_page"
     const val PROFILE = "profile"
     const val CONTACT_US = "contact_us"
+    const val POST_PAGE = "post_page"
 }

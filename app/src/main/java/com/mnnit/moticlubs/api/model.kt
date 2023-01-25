@@ -105,7 +105,9 @@ data class PostResponse(
     @SerializedName("adminEmail")
     @Expose
     var adminEmail: String,
-)
+) {
+    constructor() : this("", "", 0, "", "")
+}
 
 data class UserDetailResponse(
     @SerializedName("name")

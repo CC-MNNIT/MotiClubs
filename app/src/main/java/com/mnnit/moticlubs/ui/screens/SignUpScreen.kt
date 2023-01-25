@@ -34,10 +34,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.UserModel
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -85,7 +84,6 @@ class SignUpScreenViewModel @Inject constructor() : ViewModel() {
 
 @Composable
 fun SignupScreen(
-    appViewModel: AppViewModel,
     onNavigateToLogin: () -> Unit,
     viewModel: SignUpScreenViewModel = hiltViewModel()
 ) {

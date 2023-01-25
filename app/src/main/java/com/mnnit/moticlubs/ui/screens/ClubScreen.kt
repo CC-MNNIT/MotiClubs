@@ -62,8 +62,8 @@ import com.mnnit.moticlubs.api.PostResponse
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
@@ -99,6 +99,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 @Composable
 fun ClubScreen(
     appViewModel: AppViewModel,
+    onNavigateToPost: (post: PostResponse) -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     viewModel.clubModel.value = appViewModel.clubModel.value
@@ -137,7 +138,8 @@ fun ClubScreen(
                             viewModel = viewModel,
                             modifier = Modifier.weight(1f),
                             scrollState = listScrollState,
-                            appViewModel = appViewModel
+                            appViewModel = appViewModel,
+                            onNavigateToPost = onNavigateToPost
                         )
                     }
                 }
@@ -406,6 +408,7 @@ fun Messages(
     viewModel: ClubScreenViewModel,
     scrollState: LazyListState,
     appViewModel: AppViewModel,
+    onNavigateToPost: (post: PostResponse) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -425,7 +428,11 @@ fun Messages(
         ) {
             viewModel.postsList.forEach { post ->
                 item {
-                    Message(post = post, admin = appViewModel.adminInfoMap[post.adminEmail] ?: UserDetailResponse())
+                    Message(
+                        post = post,
+                        admin = appViewModel.adminInfoMap[post.adminEmail] ?: UserDetailResponse(),
+                        onNavigateToPost
+                    )
                 }
             }
         }
@@ -436,12 +443,14 @@ fun Messages(
 fun Message(
     post: PostResponse,
     admin: UserDetailResponse,
+    onNavigateToPost: (post: PostResponse) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
-        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp), elevation = CardDefaults.cardElevation(0.dp)
+        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp), elevation = CardDefaults.cardElevation(0.dp),
+        onClick = { onNavigateToPost(post) }
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Image(
