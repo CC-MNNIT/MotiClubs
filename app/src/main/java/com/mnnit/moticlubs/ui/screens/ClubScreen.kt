@@ -426,14 +426,13 @@ fun Messages(
                 .fillMaxSize()
                 .padding(horizontal = 10.dp)
         ) {
-            viewModel.postsList.forEach { post ->
-                item {
-                    Message(
-                        post = post,
-                        admin = appViewModel.adminInfoMap[post.adminEmail] ?: UserDetailResponse(),
-                        onNavigateToPost
-                    )
-                }
+            items(viewModel.postsList.size) { index ->
+                Message(
+                    viewModel,
+                    index,
+                    admin = appViewModel.adminInfoMap[viewModel.postsList[index].adminEmail] ?: UserDetailResponse(),
+                    onNavigateToPost
+                )
             }
         }
     }
@@ -441,7 +440,8 @@ fun Messages(
 
 @Composable
 fun Message(
-    post: PostResponse,
+    viewModel: ClubScreenViewModel,
+    idx: Int,
     admin: UserDetailResponse,
     onNavigateToPost: (post: PostResponse) -> Unit
 ) {
@@ -450,7 +450,7 @@ fun Message(
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp), elevation = CardDefaults.cardElevation(0.dp),
-        onClick = { onNavigateToPost(post) }
+        onClick = { onNavigateToPost(viewModel.postsList[idx]) }
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Image(
@@ -476,7 +476,7 @@ fun Message(
                 contentDescription = null,
             )
             AuthorAndTextMessage(
-                post = post,
+                post = viewModel.postsList[idx],
                 name = admin.name,
                 modifier = Modifier
                     .padding(start = 16.dp)
