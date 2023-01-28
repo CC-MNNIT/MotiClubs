@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
 
                         // SIGN UP
                         composable(AppNavigation.SIGN_UP) {
-                            SignupScreen(appViewModel = viewModel, {
+                            SignupScreen({
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                             })
                         }
