@@ -109,6 +109,9 @@ class MainActivity : ComponentActivity() {
                             ClubScreen(appViewModel = viewModel, onNavigateToPost = { post ->
                                 viewModel.postModel.value = post
                                 navController.navigate(AppNavigation.POST_PAGE)
+                            }, onNavigateToClubDetails = { club ->
+                                viewModel.clubModel.value = club
+                                navController.navigate(AppNavigation.CLUB_DETAIL)
                             })
                         }
 
@@ -126,8 +129,14 @@ class MainActivity : ComponentActivity() {
                             ContactUsScreen()
                         }
 
+                        // CLUB POST
                         composable(AppNavigation.POST_PAGE) {
                             PostScreen(viewModel)
+                        }
+
+                         // CLUB Details
+                        composable(AppNavigation.CLUB_PAGE) {
+                            ClubDetailsScreen()
                         }
                     }
                 }

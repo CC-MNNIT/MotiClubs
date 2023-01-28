@@ -84,4 +84,5 @@ object AppNavigation {
     const val PROFILE = "profile"
     const val CONTACT_US = "contact_us"
     const val POST_PAGE = "post_page"
+    const val CLUB_DETAIL = "club_detail"
 }

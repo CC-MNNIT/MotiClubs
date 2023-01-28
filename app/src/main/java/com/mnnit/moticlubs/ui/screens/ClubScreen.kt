@@ -109,6 +109,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 fun ClubScreen(
     appViewModel: AppViewModel,
     onNavigateToPost: (post: PostResponse) -> Unit,
+    onNavigateToClubDetails : (club : ClubModel) -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     viewModel.clubModel.value = appViewModel.clubModel.value

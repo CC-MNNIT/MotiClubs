@@ -1,4 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
-class ClubDetailsScreen {
+@Composable
+fun ClubDetailsScreen() {
+
 }
