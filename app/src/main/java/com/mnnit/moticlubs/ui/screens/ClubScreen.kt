@@ -3,6 +3,7 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,16 +19,19 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
@@ -41,6 +45,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
@@ -48,6 +53,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,7 +83,9 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val postsList = mutableStateListOf<PostResponse>()
     val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf()))
 
-    val selected = mutableStateOf(false)
+    val isPreviewMode = mutableStateOf(false)
+    val showProgress = mutableStateOf(false)
+    val showDialog = mutableStateOf(false)
     val bottomSheetScaffoldState = mutableStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
@@ -161,6 +170,8 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
     val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     Surface(
         color = colorScheme.background,
@@ -169,6 +180,29 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
             .fillMaxWidth()
             .imePadding()
     ) {
+        if (viewModel.showProgress.value) {
+            Dialog(
+                onDismissRequest = {},
+                DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+            ) {
+                CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = colorScheme.primary)
+            }
+        }
+        if (viewModel.showDialog.value) {
+            PostConfirmationDialog(viewModel = viewModel) {
+                viewModel.isPreviewMode.value = false
+                API.sendPost(context.getAuthToken(), viewModel.clubModel.value.id, viewModel.postMsg.value, {
+                    Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
+                    viewModel.fetchPostsList(context)
+
+                    viewModel.showProgress.value = false
+                    viewModel.postMsg.value = ""
+                    scope.launch {
+                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                    }
+                }) { Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show() }
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(
@@ -203,7 +237,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     .fillMaxWidth()
             ) {
                 AnimatedVisibility(
-                    visible = viewModel.selected.value,
+                    visible = viewModel.isPreviewMode.value,
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(horizontalScrollState)
@@ -215,7 +249,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     )
                 }
 
-                AnimatedVisibility(visible = !viewModel.selected.value) {
+                AnimatedVisibility(visible = !viewModel.isPreviewMode.value) {
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -257,10 +291,10 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     FilterChip(
-                        selected = viewModel.selected.value,
+                        selected = viewModel.isPreviewMode.value,
                         onClick = {
-                            viewModel.selected.value = !viewModel.selected.value
-                            if (viewModel.selected.value) {
+                            viewModel.isPreviewMode.value = !viewModel.isPreviewMode.value
+                            if (viewModel.isPreviewMode.value) {
                                 scope.launch {
                                     scrollState.animateScrollTo(0)
                                 }
@@ -283,7 +317,11 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     Spacer(Modifier.weight(1f))
 
                     AssistChip(
-                        onClick = { },
+                        onClick = {
+                            keyboardController?.hide()
+                            viewModel.showDialog.value = true
+                            focusManager.clearFocus()
+                        },
                         label = {
                             Text(
                                 text = "Send",
@@ -344,6 +382,34 @@ private fun scrollMultiplierIndex(prev: String, curr: String): Int {
         if (it == '\n') breakLines++
     }
     return breakLines
+}
+
+@Composable
+fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
+    val colorScheme = getColorScheme()
+    AlertDialog(onDismissRequest = {
+        viewModel.showDialog.value = false
+    }, text = {
+        Text(text = "Post message in ${viewModel.clubModel.value.name} ?", fontSize = 16.sp)
+    }, confirmButton = {
+        TextButton(onClick = {
+            viewModel.showDialog.value = false
+            viewModel.showProgress.value = true
+            onPost()
+        }) {
+            Text(text = "Post", fontSize = 14.sp, color = colorScheme.primary)
+        }
+    }, dismissButton = {
+        TextButton(onClick = { viewModel.showDialog.value = false }) {
+            Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
+        }
+    }, icon = {
+        Icon(
+            painter = rememberVectorPainter(image = Icons.Outlined.Article),
+            contentDescription = "",
+            modifier = Modifier.size(36.dp)
+        )
+    })
 }
 
 @Composable
