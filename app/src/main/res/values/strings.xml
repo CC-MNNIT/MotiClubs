@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MotiClubs</string>
+    <string name="club_name">Club Name</string>
+    <string name="club_desc">Description</string>
+    <string name="members_cnt">Members</string>
+    <string name="twitter">Twitter</string>
 </resources>
