@@ -135,7 +135,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                          // CLUB Details
-                        composable(AppNavigation.CLUB_PAGE) {
+                        composable(AppNavigation.CLUB_DETAIL) {
                             ClubDetailsScreen()
                         }
                     }

@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.SemanticsActions.OnClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -130,7 +131,8 @@ fun ClubScreen(
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
                     ChannelNameBar(
                         viewModel,
-                        modifier = Modifier.padding()
+                        modifier = Modifier.padding(),
+                        onNavigateToClubDetails = onNavigateToClubDetails
                     )
                 }
             }, content = {
@@ -417,6 +419,7 @@ fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
 fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
+    onNavigateToClubDetails: (club: ClubModel) -> Unit
 ) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
         Icon(
@@ -430,7 +433,7 @@ fun ChannelNameBar(
         )
 
         Column(
-            modifier = Modifier.align(Alignment.CenterVertically),
+            modifier = Modifier.align(Alignment.CenterVertically).clickable(true, onClick = { onNavigateToClubDetails(viewModel.clubModel.value)}),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Channel name

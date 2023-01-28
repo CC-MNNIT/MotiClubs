@@ -128,3 +128,4 @@ fun AdminProfileIcon(
             .size(56.dp)
     )
 }
+

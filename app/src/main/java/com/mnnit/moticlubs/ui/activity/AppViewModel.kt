@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.internal.InternalTokenResult
@@ -35,6 +36,7 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     val avatar = mutableStateOf("")
     val adminList = mutableListOf<String>()
     val subscribedList = mutableListOf<String>()
+
 
     val adminInfoMap = mutableMapOf<String, UserDetailResponse>()
 

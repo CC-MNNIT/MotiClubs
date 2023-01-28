@@ -6,14 +6,11 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.rounded.AddAPhoto
@@ -39,22 +36,24 @@ import coil.request.ImageRequest
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import java.io.ByteArrayOutputStream
 
 @Composable
 fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
+    val loading = remember { mutableStateOf(false) }
 
     MotiClubsTheme(getColorScheme()) {
         SetNavBarsTheme()
@@ -70,8 +69,11 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                     .verticalScroll(scrollState)
                     .wrapContentHeight(Alignment.Top),
             ) {
-                ProfileIcon(appViewModel = appViewModel, modifier = Modifier.align(Alignment.CenterHorizontally))
-
+                ProfileIcon(
+                    appViewModel = appViewModel,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    loading
+                )
                 UserInfo(appViewModel = appViewModel, modifier = Modifier.padding(top = 56.dp))
 
                 Button(
@@ -87,6 +89,10 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                 }
             }
 
+            if (loading.value) {
+                    CircularProgressAnimated()
+            }
+
             if (showDialog.value) {
                 ConfirmationDialog(appViewModel, onNavigationLogout, showDialog)
             }
@@ -95,17 +101,20 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
 }
 
 @Composable
-fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loading: MutableState<Boolean>) {
     val context = LocalContext.current
+
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
-            updateProfilePicture(context, result.uriContent!!, appViewModel)
+
+            updateProfilePicture(context, result.uriContent!!, appViewModel, loading)
         } else {
             val exception = result.error
         }
     }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         val cropOptions = CropImageContractOptions(uri, CropImageOptions())
+        cropOptions.setAspectRatio(1,1)
         imageCropLauncher.launch(cropOptions)
     }
 
@@ -131,6 +140,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
 
         IconButton(
             onClick = {
+                loading.value = true
                 launcher.launch("image/*")
             },
             modifier = Modifier
@@ -281,7 +291,12 @@ fun ConfirmationDialog(
     })
 }
 
-private fun updateProfilePicture(context: Context, imageUri: Uri, appViewModel: AppViewModel) {
+private fun updateProfilePicture(
+    context: Context,
+    imageUri: Uri,
+    appViewModel: AppViewModel,
+    loading: MutableState<Boolean>
+) {
     val storageRef = Firebase.storage.reference
     val profilePicRef =
         storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
@@ -291,6 +306,7 @@ private fun updateProfilePicture(context: Context, imageUri: Uri, appViewModel: 
     if (bitmap == null) {
         return
     }
+
     val boas = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, boas)
     profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
@@ -305,6 +321,7 @@ private fun updateProfilePicture(context: Context, imageUri: Uri, appViewModel: 
             val downloadUri = task.result
             API.updateProfilePic(appViewModel.getAuthToken(context = context), downloadUri.toString(), {
                 appViewModel.avatar.value = it.avatar
+                loading.value = false
             }) {}
         } else {
         }
