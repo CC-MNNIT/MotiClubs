@@ -10,8 +10,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.LastBaseline
@@ -62,7 +60,7 @@ fun PostScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .padding(16.dp)
                     ) {
                         AdminProfileIcon(postNotificationModel.value.adminAvatar)
                         Spacer(modifier = Modifier.width(10.dp))
