@@ -585,6 +585,8 @@ fun Message(
             onNavigateToPost(
                 PostNotificationModel(
                     viewModel.clubModel.value.name,
+                    viewModel.clubModel.value.id,
+                    viewModel.postsList[idx].id,
                     admin.name,
                     admin.avatar,
                     viewModel.postsList[idx].message,
@@ -615,6 +617,17 @@ fun Message(
                     contentDescription = null,
                 )
                 AuthorNameTimestamp(viewModel.postsList[idx], admin.name)
+                Spacer(modifier = Modifier.weight(1f))
+
+                AnimatedVisibility(
+                    visible = LocalContext.current.getUnreadPost(viewModel.clubModel.value.id)
+                        .contains(viewModel.postsList[idx].id),
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(16.dp)
+                ) {
+                    androidx.compose.material3.BadgedBox(badge = { androidx.compose.material3.Badge { } }) {}
+                }
             }
         }
         MarkdownText(

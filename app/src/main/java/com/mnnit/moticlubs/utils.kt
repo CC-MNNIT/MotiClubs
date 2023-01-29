@@ -42,6 +42,18 @@ fun Context.setAuthToken(token: String) =
 fun Context.getAuthToken(): String =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getString(Constants.TOKEN, "") ?: ""
 
+fun Context.postRead(clubID: String, postID: String, read: Boolean = false) {
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
+        .putStringSet(clubID, getUnreadPost(clubID).apply {
+            if (read) remove(postID) else add(postID)
+        }).apply()
+}
+
+fun Context.getUnreadPost(clubID: String) =
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getStringSet(clubID, setOf())
+        ?.toMutableSet()
+        ?: setOf<String>().toMutableSet()
+
 private val mMonthsList: List<String> = listOf(
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 )

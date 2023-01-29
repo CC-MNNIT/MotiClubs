@@ -20,11 +20,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.api.PostNotificationModel
-import com.mnnit.moticlubs.getMkdFormatter
-import com.mnnit.moticlubs.toTimeString
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 
@@ -52,6 +49,7 @@ class AppFCMService : FirebaseMessagingService() {
     private fun postNotification(user: FirebaseUser, data: Map<String, String>) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
+        val postID = data["_id"] ?: ""
         val clubID = data["club"] ?: ""
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
@@ -66,7 +64,11 @@ class AppFCMService : FirebaseMessagingService() {
             return
         }
 
-        val post = PostNotificationModel(clubName, adminName, url, message, time.toLong().toTimeString())
+        val post = PostNotificationModel(
+            clubName,
+            clubID, postID, adminName, url,
+            message, time.toLong().toTimeString()
+        )
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(
                 Intent(
@@ -76,6 +78,8 @@ class AppFCMService : FirebaseMessagingService() {
             )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
+
+        postRead(clubID, postID)
 
         postNotificationCompat(
             notificationManager,

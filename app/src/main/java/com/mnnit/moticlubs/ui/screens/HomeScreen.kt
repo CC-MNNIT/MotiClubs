@@ -4,6 +4,7 @@ package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -138,9 +139,14 @@ fun HomeScreen(
                                         )
                                     }
 
-                                    BadgedBox(badge = {
-                                        Badge { Text(text = "10") }
-                                    }, modifier = Modifier.align(Alignment.CenterVertically)) {}
+                                    AnimatedVisibility(
+                                        visible = context.getUnreadPost(viewModel.clubsList[idx].id).isNotEmpty(),
+                                        modifier = Modifier.align(Alignment.CenterVertically)
+                                    ) {
+                                        BadgedBox(badge = {
+                                            Badge { Text(text = "${context.getUnreadPost(viewModel.clubsList[idx].id).size}") }
+                                        }, modifier = Modifier.align(Alignment.CenterVertically)) {}
+                                    }
                                 }
                             }
                         }

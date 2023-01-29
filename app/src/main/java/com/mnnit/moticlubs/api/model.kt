@@ -37,12 +37,14 @@ data class ClubModel(
 @Parcelize
 data class PostNotificationModel(
     val clubName: String,
+    val clubID: String,
+    val postID: String,
     val adminName: String,
     val adminAvatar: String,
     val message: String,
     val time: String,
 ) : Parcelable {
-    constructor() : this("", "", "", "", "")
+    constructor() : this("", "", "", "", "", "", "")
 }
 
 class PostParamType : NavType<PostNotificationModel>(isNullableAllowed = false) {

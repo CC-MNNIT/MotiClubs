@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.api.PostNotificationModel
+import com.mnnit.moticlubs.postRead
 import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -29,6 +30,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 fun PostScreen(
     postNotificationModel: MutableState<PostNotificationModel>
 ) {
+    LocalContext.current.postRead(postNotificationModel.value.clubID, postNotificationModel.value.postID, true)
     val colorScheme = getColorScheme()
     val scroll = rememberScrollState(0)
 
