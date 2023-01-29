@@ -26,7 +26,6 @@ class AppViewModel @Inject constructor(private val application: Application) : V
 
     val showSplashScreen = mutableStateOf(true)
     val clubModel = mutableStateOf(ClubModel())
-    val postModel = mutableStateOf(PostResponse())
 
     val name = mutableStateOf("")
     val email = mutableStateOf("")

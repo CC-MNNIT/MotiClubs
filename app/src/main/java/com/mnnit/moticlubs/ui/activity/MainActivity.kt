@@ -1,5 +1,7 @@
 package com.mnnit.moticlubs.ui.activity
 
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -12,17 +14,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
+import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.api.PostNotificationModel
+import com.mnnit.moticlubs.api.PostParamType
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,6 +64,7 @@ class MainActivity : ComponentActivity() {
                 viewModel.showSplashScreen.value = false
             }
 
+            val postNotificationModel = remember { mutableStateOf(PostNotificationModel()) }
             val colorScheme = getColorScheme()
             MotiClubsTheme(colorScheme) {
                 Surface(
@@ -107,10 +118,8 @@ class MainActivity : ComponentActivity() {
                         // CLUB PAGE
                         composable(AppNavigation.CLUB_PAGE) {
                             ClubScreen(appViewModel = viewModel, onNavigateToPost = { post ->
-                                viewModel.postModel.value = post
-                                navController.navigate(AppNavigation.POST_PAGE)
-                            }, onNavigateToClubDetails = { club ->
-                                viewModel.clubModel.value = club
+                                navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(Gson().toJson(post))}")
+                            }, onNavigateToClubDetails = {
                                 navController.navigate(AppNavigation.CLUB_DETAIL)
                             })
                         }
@@ -130,13 +139,25 @@ class MainActivity : ComponentActivity() {
                         }
 
                         // CLUB POST
-                        composable(AppNavigation.POST_PAGE) {
-                            PostScreen(viewModel)
+                        composable(
+                            "${AppNavigation.POST_PAGE}/{post}",
+                            arguments = listOf(navArgument("post") { type = PostParamType() }),
+                            deepLinks = listOf(navDeepLink { uriPattern = "${Constants.POST_URL}/post={post}" })
+                        ) {
+                            postNotificationModel.value = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                it.arguments?.getParcelable(
+                                    "post",
+                                    PostNotificationModel::class.java
+                                )
+                            } else {
+                                it.arguments?.getParcelable("post")
+                            } ?: PostNotificationModel()
+                            PostScreen(postNotificationModel)
                         }
 
-                         // CLUB Details
+                        // CLUB Details
                         composable(AppNavigation.CLUB_DETAIL) {
-                            ClubDetailsScreen(viewModel.clubModel.value)
+                            ClubDetailsScreen(viewModel)
                         }
                     }
                 }

@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
+import io.noties.markwon.linkify.LinkifyPlugin
 import java.util.*
 
 object Constants {
@@ -16,6 +21,7 @@ object Constants {
     const val MESSAGE = "message"
     const val AVATAR = "avatar"
     const val SHARED_PREFERENCE = "com.mnnit.moticlubs"
+    const val POST_URL = "app://moticlubs.mnnit.com"
     const val TOKEN = "token"
     const val EMAIL = "email"
     const val BASE_URL = "https://moti-clubs.vercel.app"
@@ -26,6 +32,13 @@ object Constants {
     const val POST_ID = "post_id"
     const val CLUB = "club"
 }
+
+fun Context.getMkdFormatter() = Markwon.builder(this)
+    .usePlugin(StrikethroughPlugin.create())
+    .usePlugin(MarkwonInlineParserPlugin.create())
+    .usePlugin(LinkifyPlugin.create())
+    .usePlugin(TablePlugin.create(this))
+    .build()
 
 fun String.getDomainMail(): String = "$this@mnnit.ac.in"
 

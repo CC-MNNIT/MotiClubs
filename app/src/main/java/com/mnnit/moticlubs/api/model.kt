@@ -1,9 +1,13 @@
 package com.mnnit.moticlubs.api
 
+import android.os.Build
+import android.os.Bundle
 import android.os.Parcelable
+import androidx.navigation.NavType
+import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ClubModel(
@@ -30,11 +34,32 @@ data class ClubModel(
     constructor() : this("", "", "", "", listOf())
 }
 
-data class IntroSlide(
-    var title: String,
-    var description: String,
-    var icon: Int
-)
+@Parcelize
+data class PostNotificationModel(
+    val clubName: String,
+    val adminName: String,
+    val adminAvatar: String,
+    val message: String,
+    val time: String,
+) : Parcelable {
+    constructor() : this("", "", "", "", "")
+}
+
+class PostParamType : NavType<PostNotificationModel>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): PostNotificationModel? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getParcelable(key, PostNotificationModel::class.java)
+        } else {
+            bundle.getParcelable(key)
+        }
+
+    override fun parseValue(value: String): PostNotificationModel =
+        Gson().fromJson(value, PostNotificationModel::class.java)
+
+    override fun put(bundle: Bundle, key: String, value: PostNotificationModel) {
+        bundle.putParcelable(key, value)
+    }
+}
 
 data class UserModel(
     var name: String,

@@ -9,6 +9,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.LastBaseline
@@ -23,9 +26,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.api.PostResponse
-import com.mnnit.moticlubs.toTimeString
-import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.api.PostNotificationModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -33,7 +34,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun PostScreen(
-    appViewModel: AppViewModel
+    postNotificationModel: MutableState<PostNotificationModel>
 ) {
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
@@ -52,18 +53,22 @@ fun PostScreen(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(0.dp),
                 ) {
+                    Text(
+                        postNotificationModel.value.clubName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+                    )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
                     ) {
-                        AdminProfileIcon(
-                            appViewModel.adminInfoMap[appViewModel.postModel.value.adminEmail]?.avatar ?: ""
-                        )
+                        AdminProfileIcon(postNotificationModel.value.adminAvatar)
                         Spacer(modifier = Modifier.width(10.dp))
                         AdminNameTimestamp(
-                            post = appViewModel.postModel.value,
-                            name = appViewModel.adminInfoMap[appViewModel.postModel.value.adminEmail]?.name ?: "NA"
+                            time = postNotificationModel.value.time,
+                            name = postNotificationModel.value.adminName
                         )
                     }
                 }
@@ -71,7 +76,7 @@ fun PostScreen(
                 Spacer(modifier = Modifier.height(15.dp))
 
                 MarkdownText(
-                    markdown = appViewModel.postModel.value.message,
+                    markdown = postNotificationModel.value.message,
                     color = contentColorFor(backgroundColor = getColorScheme().background),
                     modifier = Modifier
                         .verticalScroll(scroll)
@@ -82,23 +87,21 @@ fun PostScreen(
     }
 }
 
-
 @Composable
-private fun AdminNameTimestamp(post: PostResponse, name: String) {
+private fun AdminNameTimestamp(time: String, name: String) {
     Column(modifier = Modifier
         .padding(start = 8.dp)
         .semantics(mergeDescendants = true) {}) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
-            fontSize = 16.sp,
+            fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = post.time.toTimeString(),
+            text = time,
             style = MaterialTheme.typography.bodySmall,
             fontSize = 12.sp
         )

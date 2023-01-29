@@ -48,7 +48,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.SemanticsActions.OnClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -64,10 +63,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.api.API
-import com.mnnit.moticlubs.api.ClubModel
-import com.mnnit.moticlubs.api.PostResponse
-import com.mnnit.moticlubs.api.UserDetailResponse
+import com.mnnit.moticlubs.api.*
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -109,8 +105,8 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 @Composable
 fun ClubScreen(
     appViewModel: AppViewModel,
-    onNavigateToPost: (post: PostResponse) -> Unit,
-    onNavigateToClubDetails : (club : ClubModel) -> Unit,
+    onNavigateToPost: (post: PostNotificationModel) -> Unit,
+    onNavigateToClubDetails: () -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     viewModel.clubModel.value = appViewModel.clubModel.value
@@ -363,15 +359,8 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
 }
 
 private fun scrollMultiplierIndex(prev: String, curr: String): Int {
-    val q: String
-    val p: String
-    if (curr.length > prev.length) {
-        q = prev
-        p = curr
-    } else {
-        q = curr
-        p = prev
-    }
+    val q = if (curr.length > prev.length) prev else curr
+    val p = if (curr.length > prev.length) curr else prev
     var breakLines = 0
     q.forEachIndexed { index, c ->
         if (p[index] != c) {
@@ -419,9 +408,15 @@ fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
 fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: (club: ClubModel) -> Unit
+    onNavigateToClubDetails: () -> Unit
 ) {
-    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(true, onClick = {
+                onNavigateToClubDetails()
+            }), horizontalArrangement = Arrangement.SpaceAround
+    ) {
         Icon(
             modifier = Modifier
                 .clip(CircleShape)
@@ -433,7 +428,7 @@ fun ChannelNameBar(
         )
 
         Column(
-            modifier = Modifier.align(Alignment.CenterVertically).clickable(true, onClick = { onNavigateToClubDetails(viewModel.clubModel.value)}),
+            modifier = Modifier.align(Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Channel name
@@ -478,7 +473,7 @@ fun Messages(
     viewModel: ClubScreenViewModel,
     scrollState: LazyListState,
     appViewModel: AppViewModel,
-    onNavigateToPost: (post: PostResponse) -> Unit,
+    onNavigateToPost: (post: PostNotificationModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -513,14 +508,24 @@ fun Message(
     viewModel: ClubScreenViewModel,
     idx: Int,
     admin: UserDetailResponse,
-    onNavigateToPost: (post: PostResponse) -> Unit
+    onNavigateToPost: (post: PostNotificationModel) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp), elevation = CardDefaults.cardElevation(0.dp),
-        onClick = { onNavigateToPost(viewModel.postsList[idx]) }
+        onClick = {
+            onNavigateToPost(
+                PostNotificationModel(
+                    viewModel.clubModel.value.name,
+                    admin.name,
+                    admin.avatar,
+                    viewModel.postsList[idx].message,
+                    viewModel.postsList[idx].time.toTimeString()
+                )
+            )
+        }
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Image(
