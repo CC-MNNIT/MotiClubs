@@ -14,31 +14,26 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -157,9 +152,7 @@ fun HomeScreen(
                     icon = { Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "") },
                     onClick = { onNavigateContactUs() },
                     shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.padding(
-
-                    )
+                    modifier = Modifier.padding()
                 )
             }
         )
@@ -172,18 +165,7 @@ fun ProfileIcon(
     onNavigateProfile: () -> Unit
 ) {
     Image(
-        painter = if (appViewModel.avatar.value.isEmpty()) {
-            painterResource(id = R.drawable.outline_account_circle_24)
-        } else {
-            rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(appViewModel.avatar.value)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .diskCacheKey(Constants.AVATAR)
-                    .placeholder(R.drawable.outline_account_circle_24)
-                    .build()
-            )
-        }, contentDescription = "",
+        painter = LocalContext.current.getImageUrlPainter(url = appViewModel.avatar.value), contentDescription = "",
         modifier = modifier
             .clip(CircleShape)
             .size(48.dp)

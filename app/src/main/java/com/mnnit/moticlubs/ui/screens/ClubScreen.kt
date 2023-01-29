@@ -47,7 +47,6 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -58,13 +57,10 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.*
 import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -534,19 +530,7 @@ fun Message(
                     .clip(CircleShape)
                     .align(Alignment.Top),
 
-                painter = if (admin.avatar.isEmpty()) {
-                    painterResource(id = R.drawable.outline_account_circle_24)
-                } else {
-                    rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(admin.avatar)
-                            .diskCachePolicy(CachePolicy.ENABLED)
-                            .diskCacheKey(admin.personalEmail)
-                            .error(R.drawable.outline_account_circle_24)
-                            .placeholder(R.drawable.outline_account_circle_24)
-                            .build()
-                    )
-                },
+                painter = LocalContext.current.getImageUrlPainter(url = admin.avatar),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
             )

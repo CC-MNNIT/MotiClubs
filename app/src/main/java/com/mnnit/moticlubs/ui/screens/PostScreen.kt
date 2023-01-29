@@ -14,17 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.PostNotificationModel
+import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -108,22 +103,9 @@ private fun AdminNameTimestamp(time: String, name: String) {
 
 
 @Composable
-fun AdminProfileIcon(
-    avatar: String
-) {
+fun AdminProfileIcon(avatar: String) {
     Image(
-        painter = if (avatar.isEmpty()) {
-            painterResource(id = R.drawable.outline_account_circle_24)
-        } else {
-            rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(avatar)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .diskCacheKey(Constants.AVATAR)
-                    .placeholder(R.drawable.outline_account_circle_24)
-                    .build()
-            )
-        }, contentDescription = "",
+        painter = LocalContext.current.getImageUrlPainter(url = avatar), contentDescription = "",
         modifier = Modifier
             .clip(CircleShape)
             .size(56.dp)

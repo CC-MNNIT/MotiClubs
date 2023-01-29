@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.*
@@ -35,19 +34,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -127,18 +122,8 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
 
     Row(modifier = modifier) {
         Image(
-            painter = if (appViewModel.avatar.value.isEmpty()) {
-                rememberVectorPainter(image = Icons.Outlined.AccountCircle)
-            } else {
-                rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(appViewModel.avatar.value)
-                        .diskCachePolicy(CachePolicy.ENABLED)
-                        .diskCacheKey(Constants.AVATAR)
-                        .placeholder(R.drawable.outline_account_circle_24)
-                        .build()
-                )
-            }, contentDescription = "",
+            painter = LocalContext.current.getImageUrlPainter(url = appViewModel.avatar.value),
+            contentDescription = "",
             modifier = modifier
                 .padding(start = 46.dp)
                 .clip(CircleShape)
@@ -309,9 +294,7 @@ private fun updateProfilePicture(
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
 
     val bitmap = compressBitmap(imageUri, context)
-    if (bitmap == null) {
-        return
-    }
+    bitmap ?: return
 
     val boas = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, boas)

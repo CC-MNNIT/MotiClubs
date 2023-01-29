@@ -28,7 +28,6 @@ import com.mnnit.moticlubs.toTimeString
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 
-
 class AppFCMService : FirebaseMessagingService() {
 
     companion object {

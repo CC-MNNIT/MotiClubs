@@ -1,13 +1,6 @@
 package com.mnnit.moticlubs
 
 import android.content.Context
-import android.util.DisplayMetrics
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
@@ -65,11 +58,3 @@ fun Long.toTimeString(): String {
 
     return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " + "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
 }
-
-fun Int.pxToDp(ctx: Context): Dp =
-    (this / (ctx.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).dp
-
-fun PaddingValues.start(): Dp = this.calculateStartPadding(LayoutDirection.Ltr)
-fun PaddingValues.bottom(): Dp = this.calculateBottomPadding()
-fun PaddingValues.end(): Dp = this.calculateEndPadding(LayoutDirection.Rtl)
-fun PaddingValues.top(): Dp = this.calculateTopPadding()
