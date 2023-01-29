@@ -30,12 +30,12 @@ fun PostScreen(
     postNotificationModel: MutableState<PostNotificationModel>
 ) {
     val colorScheme = getColorScheme()
+    val scroll = rememberScrollState(0)
+
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme()
+        SetNavBarsTheme(2.dp, false)
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             color = colorScheme.background
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -43,7 +43,7 @@ fun PostScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp),
                     elevation = CardDefaults.cardElevation(0.dp),
                 ) {
                     Text(
@@ -65,15 +65,13 @@ fun PostScreen(
                         )
                     }
                 }
-                val scroll = rememberScrollState(0)
-                Spacer(modifier = Modifier.height(15.dp))
 
                 MarkdownText(
                     markdown = postNotificationModel.value.message,
                     color = contentColorFor(backgroundColor = getColorScheme().background),
                     modifier = Modifier
                         .verticalScroll(scroll)
-                        .padding(8.dp)
+                        .padding(16.dp)
                 )
             }
         }
@@ -111,4 +109,3 @@ fun AdminProfileIcon(avatar: String) {
             .size(56.dp)
     )
 }
-

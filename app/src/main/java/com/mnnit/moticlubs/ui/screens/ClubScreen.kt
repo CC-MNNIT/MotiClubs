@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -115,7 +114,7 @@ fun ClubScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp)
+        SetNavBarsTheme(elevation = 2.dp, viewModel.clubModel.value.admins.contains(appViewModel.email.value))
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
                 BottomSheetContent(viewModel)
@@ -506,11 +505,12 @@ fun Message(
     admin: UserDetailResponse,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
 ) {
+    val colorScheme = getColorScheme()
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
-        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp), elevation = CardDefaults.cardElevation(0.dp),
+        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 24.dp), elevation = CardDefaults.cardElevation(0.dp),
         onClick = {
             onNavigateToPost(
                 PostNotificationModel(
@@ -521,71 +521,58 @@ fun Message(
                     viewModel.postsList[idx].time.toTimeString()
                 )
             )
-        }
+        },
+        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Image(
+        Card(
+            elevation = CardDefaults.cardElevation(0.dp),
+            shape = RoundedCornerShape(0.dp),
+            colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+        ) {
+            Row(
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.Top),
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.Top),
 
-                painter = LocalContext.current.getImageUrlPainter(url = admin.avatar),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-            )
-            AuthorAndTextMessage(
-                post = viewModel.postsList[idx],
-                name = admin.name,
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .weight(1f)
-            )
+                    painter = LocalContext.current.getImageUrlPainter(url = admin.avatar),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                )
+                AuthorNameTimestamp(viewModel.postsList[idx], admin.name)
+            }
         }
-    }
-}
-
-@Composable
-fun AuthorAndTextMessage(
-    post: PostResponse,
-    name: String,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        AuthorNameTimestamp(post, name)
-        Column {
-            MarkdownText(
-                markdown = post.message,
-                color = contentColorFor(backgroundColor = getColorScheme().background),
-                maxLines = 1
-            )
-        }
-        Spacer(
-            modifier = Modifier
-                .height(5.dp)
-                .background(color = Color.White)
+        MarkdownText(
+            markdown = viewModel.postsList[idx].message,
+            color = contentColorFor(backgroundColor = getColorScheme().background),
+            maxLines = 4,
+            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp)
         )
     }
 }
 
 @Composable
 private fun AuthorNameTimestamp(post: PostResponse, name: String) {
-    Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
+    Column(modifier = Modifier
+        .padding(start = 16.dp)
+        .semantics(mergeDescendants = true) {}) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier
-                .alignBy(LastBaseline)
-                .paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
+            modifier = Modifier.paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
             fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = post.time.toTimeString(),
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.alignBy(LastBaseline),
-            fontSize = 10.sp
+            fontSize = 12.sp
         )
     }
 }

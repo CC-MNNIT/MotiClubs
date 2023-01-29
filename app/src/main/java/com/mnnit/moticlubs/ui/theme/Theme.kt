@@ -48,13 +48,19 @@ fun getColorScheme() =
     }
 
 @Composable
-fun SetNavBarsTheme(elevation: Dp = 0.dp) {
+fun SetNavBarsTheme(elevation: Dp = 0.dp, setNavBar: Boolean = true) {
     val colorScheme = getColorScheme()
     val darkTheme = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
     DisposableEffect(systemUiController, darkTheme) {
-        systemUiController.setSystemBarsColor(
+        systemUiController.setStatusBarColor(
             color = if (elevation == 0.dp) colorScheme.background else colorScheme.surfaceColorAtElevation(2.dp),
+            darkIcons = !darkTheme
+        )
+        systemUiController.setNavigationBarColor(
+            color = if (elevation == 0.dp || !setNavBar) colorScheme.background else {
+                colorScheme.surfaceColorAtElevation(2.dp)
+            },
             darkIcons = !darkTheme
         )
         onDispose { }

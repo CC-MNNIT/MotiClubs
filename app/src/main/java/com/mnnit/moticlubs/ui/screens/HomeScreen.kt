@@ -112,7 +112,8 @@ fun HomeScreen(
                                     .padding(bottom = 16.dp), onClick = {
                                     onNavigatePostItemClick(viewModel.clubsList[idx])
                                 },
-                                shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp)
+                                shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp),
+                                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
                             ) {
                                 Row(modifier = Modifier.padding(16.dp)) {
                                     Icon(
