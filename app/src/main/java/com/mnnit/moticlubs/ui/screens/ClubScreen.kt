@@ -18,10 +18,8 @@ import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Article
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.*
@@ -78,6 +76,8 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val isPreviewMode = mutableStateOf(false)
     val showProgress = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
+    val showSubsDialog = mutableStateOf(false)
+    val subscribed = mutableStateOf(false)
     val bottomSheetScaffoldState = mutableStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
@@ -107,6 +107,7 @@ fun ClubScreen(
     viewModel.clubModel.value = appViewModel.clubModel.value
     viewModel.bottomSheetScaffoldState.value = rememberBottomSheetScaffoldState()
     viewModel.fetchPostsList(LocalContext.current)
+    viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
 
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
@@ -114,7 +115,7 @@ fun ClubScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp, viewModel.clubModel.value.admins.contains(appViewModel.email.value))
+        SetNavBarsTheme(elevation = 2.dp, viewModel.subscribed.value)
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
                 BottomSheetContent(viewModel)
@@ -122,6 +123,7 @@ fun ClubScreen(
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
                     ChannelNameBar(
                         viewModel,
+                        appViewModel,
                         modifier = Modifier.padding(),
                         onNavigateToClubDetails = onNavigateToClubDetails
                     )
@@ -402,9 +404,17 @@ fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
 @Composable
 fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
+    appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: () -> Unit
 ) {
+    if (viewModel.showSubsDialog.value) {
+        SubscriptionConfirmationDialog(
+            viewModel = viewModel,
+            appViewModel = appViewModel,
+            subscribe = !viewModel.subscribed.value
+        )
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -452,15 +462,75 @@ fun ChannelNameBar(
             )
             // Info icon
             Icon(
-                imageVector = Icons.Outlined.Info,
+                imageVector = if (viewModel.subscribed.value) {
+                    Icons.Rounded.NotificationsActive
+                } else Icons.Outlined.NotificationsOff,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(start = 16.dp)
-                    .height(64.dp),
+                    .height(64.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        viewModel.showSubsDialog.value = true
+                    },
                 contentDescription = ""
             )
         }
     }
+}
+
+@Composable
+fun SubscriptionConfirmationDialog(
+    viewModel: ClubScreenViewModel, appViewModel: AppViewModel,
+    subscribe: Boolean
+) {
+    val colorScheme = getColorScheme()
+    val context = LocalContext.current
+    AlertDialog(onDismissRequest = {
+        viewModel.showSubsDialog.value = false
+    }, text = {
+        Text(text = "Are you sure you want to ${if (subscribe) "subscribe" else "unsubscribe"} ?", fontSize = 16.sp)
+    }, confirmButton = {
+        TextButton(onClick = {
+            viewModel.showSubsDialog.value = false
+            viewModel.showProgress.value = true
+            if (subscribe) {
+                API.subscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
+                    appViewModel.subscribedList.add(viewModel.clubModel.value.id)
+                    viewModel.showProgress.value = false
+                    viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
+                    Toast.makeText(context, "Subscribed", Toast.LENGTH_SHORT).show()
+                }) {
+                    viewModel.showProgress.value = false
+                    Toast.makeText(context, "$it: Error could not process request", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                API.unsubscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
+                    appViewModel.subscribedList.remove(viewModel.clubModel.value.id)
+                    viewModel.showProgress.value = false
+                    viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
+                    Toast.makeText(context, "Unsubscribed", Toast.LENGTH_SHORT).show()
+                }) {
+                    viewModel.showProgress.value = false
+                    Toast.makeText(context, "$it: Error could not process request", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }) {
+            Text(text = if (subscribe) "Subscribe" else "Unsubscribe", fontSize = 14.sp, color = colorScheme.primary)
+        }
+    }, dismissButton = {
+        TextButton(onClick = { viewModel.showSubsDialog.value = false }) {
+            Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
+        }
+    }, icon = {
+        Icon(
+            painter = rememberVectorPainter(
+                image = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff
+            ),
+            contentDescription = "",
+            modifier = Modifier.size(36.dp)
+        )
+    })
 }
 
 @Composable
@@ -551,7 +621,8 @@ fun Message(
             markdown = viewModel.postsList[idx].message,
             color = contentColorFor(backgroundColor = getColorScheme().background),
             maxLines = 4,
-            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp)
+            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp),
+            disableLinkMovementMethod = true
         )
     }
 }
