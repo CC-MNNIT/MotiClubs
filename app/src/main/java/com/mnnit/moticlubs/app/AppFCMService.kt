@@ -135,7 +135,6 @@ class AppFCMService : FirebaseMessagingService() {
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
         })
-        Log.d(TAG, "postNotificationCompat: ID $id")
         notificationManager.notify(id, notificationHandler.build())
     }
 }
