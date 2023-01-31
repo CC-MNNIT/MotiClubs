@@ -66,6 +66,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.api.*
+import com.mnnit.moticlubs.ui.ConfirmationDialog
 import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
@@ -519,30 +520,15 @@ private fun uploadPostPic(
 
 @Composable
 fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
-    val colorScheme = getColorScheme()
-    AlertDialog(onDismissRequest = {
-        viewModel.showDialog.value = false
-    }, text = {
-        Text(text = "Post message in ${viewModel.clubModel.value.name} ?", fontSize = 16.sp)
-    }, confirmButton = {
-        TextButton(onClick = {
-            viewModel.showDialog.value = false
+    ConfirmationDialog(
+        showDialog = viewModel.showDialog,
+        message = "Post message in ${viewModel.clubModel.value.name} ?", positiveBtnText = "Post",
+        imageVector = Icons.Outlined.Article,
+        onPositive = {
             viewModel.showProgress.value = true
             onPost()
-        }) {
-            Text(text = "Post", fontSize = 14.sp, color = colorScheme.primary)
         }
-    }, dismissButton = {
-        TextButton(onClick = { viewModel.showDialog.value = false }) {
-            Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
-        }
-    }, icon = {
-        Icon(
-            painter = rememberVectorPainter(image = Icons.Outlined.Article),
-            contentDescription = "",
-            modifier = Modifier.size(36.dp)
-        )
-    })
+    )
 }
 
 @Composable
@@ -697,15 +683,14 @@ fun SubscriptionConfirmationDialog(
     viewModel: ClubScreenViewModel, appViewModel: AppViewModel,
     subscribe: Boolean
 ) {
-    val colorScheme = getColorScheme()
     val context = LocalContext.current
-    AlertDialog(onDismissRequest = {
-        viewModel.showSubsDialog.value = false
-    }, text = {
-        Text(text = "Are you sure you want to ${if (subscribe) "subscribe" else "unsubscribe"} ?", fontSize = 16.sp)
-    }, confirmButton = {
-        TextButton(onClick = {
-            viewModel.showSubsDialog.value = false
+
+    ConfirmationDialog(
+        showDialog = viewModel.showSubsDialog,
+        message = "Are you sure you want to ${if (subscribe) "subscribe" else "unsubscribe"} ?",
+        positiveBtnText = if (subscribe) "Subscribe" else "Unsubscribe",
+        imageVector = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff,
+        onPositive = {
             viewModel.showProgress.value = true
             if (subscribe) {
                 API.subscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
@@ -728,22 +713,8 @@ fun SubscriptionConfirmationDialog(
                     Toast.makeText(context, "$it: Error could not process request", Toast.LENGTH_SHORT).show()
                 }
             }
-        }) {
-            Text(text = if (subscribe) "Subscribe" else "Unsubscribe", fontSize = 14.sp, color = colorScheme.primary)
         }
-    }, dismissButton = {
-        TextButton(onClick = { viewModel.showSubsDialog.value = false }) {
-            Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
-        }
-    }, icon = {
-        Icon(
-            painter = rememberVectorPainter(
-                image = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff
-            ),
-            contentDescription = "",
-            modifier = Modifier.size(36.dp)
-        )
-    })
+    )
 }
 
 @Composable
@@ -772,6 +743,7 @@ fun Messages(
             items(viewModel.postsList.size) { index ->
                 Message(
                     viewModel,
+                    appViewModel,
                     index,
                     admin = appViewModel.adminInfoMap[viewModel.postsList[index].adminEmail] ?: UserDetailResponse(),
                     onNavigateToPost
@@ -784,6 +756,7 @@ fun Messages(
 @Composable
 fun Message(
     viewModel: ClubScreenViewModel,
+    appViewModel: AppViewModel,
     idx: Int,
     admin: UserDetailResponse,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
@@ -839,6 +812,19 @@ fun Message(
                         .padding(16.dp)
                 ) {
                     BadgedBox(badge = { Badge { } }) {}
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Rounded.Edit, contentDescription = "")
+                    }
+                }
+                AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Rounded.Delete, contentDescription = "")
+                    }
                 }
             }
         }

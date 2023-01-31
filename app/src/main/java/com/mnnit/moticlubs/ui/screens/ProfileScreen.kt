@@ -42,6 +42,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.compressBitmap
+import com.mnnit.moticlubs.ui.ConfirmationDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -54,6 +55,7 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
     val loading = remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     MotiClubsTheme(getColorScheme()) {
         SetNavBarsTheme()
@@ -97,7 +99,16 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                 }
             }
             if (showDialog.value) {
-                ConfirmationDialog(appViewModel, onNavigationLogout, showDialog)
+                ConfirmationDialog(
+                    showDialog = showDialog,
+                    message = "Are you sure you want to logout ?",
+                    positiveBtnText = "Logout",
+                    imageVector = Icons.Rounded.Logout,
+                    onPositive = {
+                        appViewModel.logoutUser(context)
+                        onNavigationLogout()
+                    }
+                )
             }
         }
     }
@@ -248,38 +259,6 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             disabledLeadingIconColor = contentColorFor(backgroundColor = colorScheme.background)
         )
     )
-}
-
-@Composable
-fun ConfirmationDialog(
-    appViewModel: AppViewModel, onNavigationLogout: () -> Unit,
-    showDialog: MutableState<Boolean>
-) {
-    val context = LocalContext.current
-    val colorScheme = getColorScheme()
-
-    AlertDialog(onDismissRequest = {
-        showDialog.value = false
-    }, text = {
-        Text(text = "Are you sure you want to logout ?", fontSize = 16.sp)
-    }, confirmButton = {
-        TextButton(onClick = {
-            appViewModel.logoutUser(context)
-            onNavigationLogout()
-        }) {
-            Text(text = "Logout", fontSize = 14.sp, color = colorScheme.primary)
-        }
-    }, dismissButton = {
-        TextButton(onClick = { showDialog.value = false }) {
-            Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
-        }
-    }, icon = {
-        Icon(
-            painter = rememberVectorPainter(image = Icons.Rounded.Logout),
-            contentDescription = "",
-            modifier = Modifier.size(36.dp)
-        )
-    })
 }
 
 private fun updateProfilePicture(
