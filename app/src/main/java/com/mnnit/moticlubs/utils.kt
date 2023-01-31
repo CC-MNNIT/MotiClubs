@@ -1,6 +1,9 @@
 package com.mnnit.moticlubs
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
@@ -69,4 +72,25 @@ fun Long.toTimeString(): String {
     val month = calendar.get(Calendar.MONTH)
 
     return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " + "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
+}
+
+fun compressBitmap(uri: Uri, context: Context): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    val ins = context.contentResolver.openInputStream(uri)
+    BitmapFactory.decodeStream(ins, null, options)
+    ins?.close()
+
+    var scale = 1
+    while (options.outWidth / scale / 2 >= 200 && options.outHeight / scale / 2 >= 200) {
+        scale *= 2
+    }
+
+    val finalOptions = BitmapFactory.Options()
+    finalOptions.inSampleSize = scale
+
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val out = BitmapFactory.decodeStream(inputStream, null, finalOptions)
+    inputStream?.close()
+    return out
 }

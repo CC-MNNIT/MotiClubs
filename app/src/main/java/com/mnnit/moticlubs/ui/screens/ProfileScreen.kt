@@ -2,8 +2,8 @@ package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -41,6 +41,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.compressBitmap
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -112,6 +113,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
             updateProfilePicture(context, result.uriContent!!, appViewModel, loading)
         } else {
             val exception = result.error
+            Toast.makeText(context, "Error ${exception?.message}", Toast.LENGTH_SHORT).show()
         }
     }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -131,9 +133,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
         )
 
         IconButton(
-            onClick = {
-                launcher.launch("image/*")
-            },
+            onClick = { launcher.launch("image/*") },
             modifier = Modifier
                 .align(Alignment.Bottom)
                 .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
@@ -300,9 +300,8 @@ private fun updateProfilePicture(
     bitmap.compress(Bitmap.CompressFormat.JPEG, 50, boas)
     profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
         if (!task.isSuccessful) {
-            task.exception?.let {
-                throw it
-            }
+            Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            loading.value = false
         }
         profilePicRef.downloadUrl
     }.addOnCompleteListener { task ->
@@ -313,27 +312,8 @@ private fun updateProfilePicture(
                 loading.value = false
             }) {}
         } else {
+            Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            loading.value = false
         }
     }
-}
-
-private fun compressBitmap(uri: Uri, context: Context): Bitmap? {
-    val options = BitmapFactory.Options()
-    options.inJustDecodeBounds = true
-    val ins = context.contentResolver.openInputStream(uri)
-    BitmapFactory.decodeStream(ins, null, options)
-    ins?.close()
-
-    var scale = 1
-    while (options.outWidth / scale / 2 >= 200 && options.outHeight / scale / 2 >= 200) {
-        scale *= 2
-    }
-
-    val finalOptions = BitmapFactory.Options()
-    finalOptions.inSampleSize = scale
-
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val out = BitmapFactory.decodeStream(inputStream, null, finalOptions)
-    inputStream?.close()
-    return out
 }
