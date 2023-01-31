@@ -3,8 +3,12 @@
 package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
-import android.util.Log
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,8 +28,8 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -57,8 +61,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.api.*
+import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -67,6 +75,7 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -78,9 +87,16 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
     val isPreviewMode = mutableStateOf(false)
     val isMemberPost = mutableStateOf(false)
+
+    val inputLinkName = mutableStateOf("")
+    val inputLink = mutableStateOf("")
+    val showLinkDialog = mutableStateOf(false)
+
+    val progressText = mutableStateOf("Loading")
     val showProgress = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
     val showSubsDialog = mutableStateOf(false)
+
     val subscribed = mutableStateOf(false)
     val bottomSheetScaffoldState = mutableStateOf(
         BottomSheetScaffoldState(
@@ -181,13 +197,9 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
             .imePadding()
     ) {
         if (viewModel.showProgress.value) {
-            Dialog(
-                onDismissRequest = {},
-                DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
-            ) {
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = colorScheme.primary)
-            }
+            ProgressDialog(progressMsg = viewModel.progressText.value)
         }
+
         if (viewModel.showDialog.value) {
             PostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
@@ -283,58 +295,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     )
                 }
 
-                AnimatedVisibility(visible = !viewModel.isPreviewMode.value) {
-                    Row(
-                        modifier = Modifier
-                            .imePadding()
-                            .padding(top = 8.dp)
-                            .fillMaxWidth()
-                    ) {
-                        androidx.compose.material3.IconButton(onClick = {
-                            val str = viewModel.postMsg.value.text
-                            val tr = viewModel.postMsg.value.selection
-                            val subStr = str.substring(tr.start, tr.end)
-                            viewModel.postMsg.value = TextFieldValue(
-                                str.replaceRange(tr.start, tr.end, "**$subStr**"),
-                                selection = TextRange(tr.end + 4, tr.end + 4)
-                            )
-                        }) {
-                            Icon(Icons.Rounded.FormatBold, contentDescription = "")
-                        }
-
-                        androidx.compose.material3.IconButton(onClick = {
-                            val str = viewModel.postMsg.value.text
-                            val tr = viewModel.postMsg.value.selection
-                            val subStr = str.substring(tr.start, tr.end)
-                            viewModel.postMsg.value = TextFieldValue(
-                                str.replaceRange(tr.start, tr.end, "_${subStr}_"),
-                                selection = TextRange(tr.end + 2, tr.end + 2)
-                            )
-                        }) {
-                            Icon(Icons.Rounded.FormatItalic, contentDescription = "")
-                        }
-
-                        androidx.compose.material3.IconButton(onClick = {
-                            val str = viewModel.postMsg.value.text
-                            val tr = viewModel.postMsg.value.selection
-                            val subStr = str.substring(tr.start, tr.end)
-                            viewModel.postMsg.value = TextFieldValue(
-                                str.replaceRange(tr.start, tr.end, "~~$subStr~~"),
-                                selection = TextRange(tr.end + 4, tr.end + 4)
-                            )
-                        }) {
-                            Icon(Icons.Rounded.FormatStrikethrough, contentDescription = "")
-                        }
-
-                        androidx.compose.material3.IconButton(onClick = { /*TODO*/ }) {
-                            Icon(Icons.Rounded.InsertPhoto, contentDescription = "")
-                        }
-
-                        androidx.compose.material3.IconButton(onClick = { /*TODO*/ }) {
-                            Icon(Icons.Rounded.InsertLink, contentDescription = "")
-                        }
-                    }
-                }
+                TextFormatter(viewModel = viewModel)
 
                 Row(
                     modifier = Modifier
@@ -453,6 +414,106 @@ private fun scrollMultiplierIndex(prev: String, curr: String): Int {
 }
 
 @Composable
+private fun TextFormatter(viewModel: ClubScreenViewModel) {
+    val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(), onResult = {
+        if (it == null) {
+            Toast.makeText(context, "Image not selected", Toast.LENGTH_SHORT).show()
+            return@rememberLauncherForActivityResult
+        }
+        uploadPostPic(context, it, viewModel) { url ->
+            val post = viewModel.postMsg.value.text
+            val text = "$post${if (post.isNotEmpty() && post.last() != '\n') "\n" else ""}![post_img]($url)"
+            viewModel.postMsg.value = TextFieldValue(text, selection = TextRange(text.length, text.length))
+        }
+    })
+
+    if (viewModel.showLinkDialog.value) {
+        InputLinkDialog(viewModel = viewModel)
+    }
+
+    AnimatedVisibility(visible = !viewModel.isPreviewMode.value) {
+        Row(
+            modifier = Modifier
+                .imePadding()
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        ) {
+            IconButton(onClick = { formatMsg(viewModel, "**") }) {
+                Icon(Icons.Rounded.FormatBold, contentDescription = "")
+            }
+
+            IconButton(onClick = { formatMsg(viewModel, "_") }) {
+                Icon(Icons.Rounded.FormatItalic, contentDescription = "")
+            }
+
+            IconButton(onClick = { formatMsg(viewModel, "~~") }) {
+                Icon(Icons.Rounded.FormatStrikethrough, contentDescription = "")
+            }
+
+            IconButton(onClick = { launcher.launch("image/*") }) {
+                Icon(Icons.Rounded.InsertPhoto, contentDescription = "")
+            }
+
+            IconButton(onClick = { viewModel.showLinkDialog.value = true }) {
+                Icon(Icons.Rounded.InsertLink, contentDescription = "")
+            }
+        }
+    }
+}
+
+private fun formatMsg(viewModel: ClubScreenViewModel, token: String) {
+    val str = viewModel.postMsg.value.text
+    val tr = viewModel.postMsg.value.selection
+    val subStr = str.substring(tr.start, tr.end)
+    if (subStr.isEmpty()) return
+
+    val offset = token.length * 2
+    viewModel.postMsg.value = TextFieldValue(
+        str.replaceRange(tr.start, tr.end, "$token$subStr$token"),
+        selection = TextRange(tr.end + offset, tr.end + offset)
+    )
+}
+
+private fun uploadPostPic(
+    context: Context,
+    imageUri: Uri,
+    viewModel: ClubScreenViewModel,
+    onUploaded: (url: String) -> Unit
+) {
+    viewModel.showProgress.value = true
+    viewModel.progressText.value = "Uploading ..."
+
+    val storageRef = Firebase.storage.reference
+    val profilePicRef =
+        storageRef.child("post_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
+            .child(System.currentTimeMillis().toString())
+
+    val bitmap = compressBitmap(imageUri, context)
+    bitmap ?: return
+
+    val boas = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, boas)
+    profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
+        if (!task.isSuccessful) {
+            Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            viewModel.showProgress.value = false
+        }
+        profilePicRef.downloadUrl
+    }.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val downloadUri = task.result
+            viewModel.showProgress.value = false
+            onUploaded(downloadUri.toString())
+        } else {
+            Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            viewModel.showProgress.value = false
+        }
+    }
+}
+
+@Composable
 fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
     val colorScheme = getColorScheme()
     AlertDialog(onDismissRequest = {
@@ -478,6 +539,72 @@ fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
             modifier = Modifier.size(36.dp)
         )
     })
+}
+
+@Composable
+fun InputLinkDialog(viewModel: ClubScreenViewModel) {
+    val colorScheme = getColorScheme()
+    Dialog(onDismissRequest = { viewModel.showLinkDialog.value = false }, DialogProperties()) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(colorScheme.background)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Link Input",
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.inputLinkName.value,
+                    onValueChange = { viewModel.inputLinkName.value = it },
+                    shape = RoundedCornerShape(24.dp),
+                    label = { Text(text = "Link Name") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.inputLink.value,
+                    onValueChange = { viewModel.inputLink.value = it },
+                    shape = RoundedCornerShape(24.dp),
+                    label = { Text(text = "Link") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+
+                TextButton(
+                    onClick = {
+                        val post = viewModel.postMsg.value.text
+                        val text = "$post${if (post.isNotEmpty() && post.last() != '\n') "\n" else ""}" +
+                                "[${viewModel.inputLinkName.value}](${viewModel.inputLink.value})"
+                        viewModel.postMsg.value = TextFieldValue(text, selection = TextRange(text.length, text.length))
+                        viewModel.showLinkDialog.value = false
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .align(Alignment.CenterHorizontally),
+                    enabled = viewModel.inputLink.value.matches(Patterns.WEB_URL.toRegex())
+                ) {
+                    Text(
+                        text = "Add link",
+                        color = if (viewModel.inputLink.value.matches(Patterns.WEB_URL.toRegex())) {
+                            colorScheme.primary
+                        } else colorScheme.contentColorFor(colorScheme.background),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -690,7 +817,6 @@ fun Message(
                         .size(42.dp)
                         .clip(CircleShape)
                         .align(Alignment.Top),
-
                     painter = LocalContext.current.getImageUrlPainter(url = admin.avatar),
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
