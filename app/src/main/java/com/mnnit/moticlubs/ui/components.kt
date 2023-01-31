@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,12 +22,12 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.squareup.picasso3.NetworkPolicy
 import com.squareup.picasso3.Picasso
@@ -118,6 +117,7 @@ fun ProgressDialog(progressMsg: String) {
                 Text(
                     progressMsg,
                     fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally)

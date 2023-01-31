@@ -93,10 +93,13 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val inputLink = mutableStateOf("")
     val showLinkDialog = mutableStateOf(false)
 
-    val progressText = mutableStateOf("Loading")
+    val progressText = mutableStateOf("Loading ...")
     val showProgress = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
     val showSubsDialog = mutableStateOf(false)
+
+    val showDelPostDialog = mutableStateOf(false)
+    val delPostIdx = mutableStateOf(-1)
 
     val subscribed = mutableStateOf(false)
     val bottomSheetScaffoldState = mutableStateOf(
@@ -133,6 +136,7 @@ fun ClubScreen(
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
+    val context = LocalContext.current
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
@@ -167,6 +171,31 @@ fun ClubScreen(
                             appViewModel = appViewModel,
                             onNavigateToPost = onNavigateToPost
                         )
+
+                        if (viewModel.showDelPostDialog.value) {
+                            ConfirmationDialog(
+                                showDialog = viewModel.showDelPostDialog,
+                                message = "Are you sure you want to delete this post ?",
+                                positiveBtnText = "Delete",
+                                imageVector = Icons.Rounded.Delete,
+                                onPositive = {
+                                    viewModel.progressText.value = "Deleting ..."
+                                    viewModel.showProgress.value = true
+                                    if (viewModel.delPostIdx.value < 0) return@ConfirmationDialog
+                                    API.deletePost(context.getAuthToken(),
+                                        viewModel.postsList[viewModel.delPostIdx.value].id,
+                                        {
+                                            viewModel.showProgress.value = false
+                                            Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show()
+                                            viewModel.fetchPostsList(context)
+                                        }, {
+                                            viewModel.showProgress.value = false
+                                            Toast.makeText(context, "$it: Error deleting post", Toast.LENGTH_SHORT)
+                                                .show()
+                                        })
+                                }
+                            )
+                        }
                     }
                 }
             }, scaffoldState = viewModel.bottomSheetScaffoldState.value,
@@ -204,16 +233,17 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         if (viewModel.showDialog.value) {
             PostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
-                API.sendPost(context.getAuthToken(), viewModel.clubModel.value.id, viewModel.postMsg.value.text, {
-                    Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
-                    viewModel.fetchPostsList(context)
+                API.sendPost(context.getAuthToken(), viewModel.clubModel.value.id,
+                    viewModel.postMsg.value.text.replace("\n", "<br>"), {
+                        Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
+                        viewModel.fetchPostsList(context)
 
-                    viewModel.showProgress.value = false
-                    viewModel.postMsg.value = TextFieldValue("")
-                    scope.launch {
-                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                    }
-                }) { Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show() }
+                        viewModel.showProgress.value = false
+                        viewModel.postMsg.value = TextFieldValue("")
+                        scope.launch {
+                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                        }
+                    }) { Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show() }
             }
         }
         Column(
@@ -256,7 +286,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                         .horizontalScroll(horizontalScrollState)
                 ) {
                     MarkdownText(
-                        markdown = viewModel.postMsg.value.text,
+                        markdown = viewModel.postMsg.value.text.replace("\n", "<br>"),
                         color = contentColorFor(backgroundColor = colorScheme.background),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -525,6 +555,7 @@ fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
         message = "Post message in ${viewModel.clubModel.value.name} ?", positiveBtnText = "Post",
         imageVector = Icons.Outlined.Article,
         onPositive = {
+            viewModel.progressText.value = "Posting ..."
             viewModel.showProgress.value = true
             onPost()
         }
@@ -691,6 +722,7 @@ fun SubscriptionConfirmationDialog(
         positiveBtnText = if (subscribe) "Subscribe" else "Unsubscribe",
         imageVector = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff,
         onPositive = {
+            viewModel.progressText.value = if (subscribe) "Subscribing ..." else "Unsubscribing ..."
             viewModel.showProgress.value = true
             if (subscribe) {
                 API.subscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
@@ -817,12 +849,15 @@ fun Message(
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {}) {
                         Icon(Icons.Rounded.Edit, contentDescription = "")
                     }
                 }
                 AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        viewModel.delPostIdx.value = idx
+                        viewModel.showDelPostDialog.value = true
+                    }) {
                         Icon(Icons.Rounded.Delete, contentDescription = "")
                     }
                 }
