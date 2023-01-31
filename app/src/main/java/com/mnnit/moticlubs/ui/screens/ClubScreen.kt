@@ -424,8 +424,12 @@ private fun TextFormatter(viewModel: ClubScreenViewModel) {
         }
         uploadPostPic(context, it, viewModel) { url ->
             val post = viewModel.postMsg.value.text
-            val text = "$post${if (post.isNotEmpty() && post.last() != '\n') "\n" else ""}![post_img]($url)"
-            viewModel.postMsg.value = TextFieldValue(text, selection = TextRange(text.length, text.length))
+            val selection = viewModel.postMsg.value.selection
+            val urlLink = "\n![post_img]($url)\n"
+            viewModel.postMsg.value = TextFieldValue(
+                post.replaceRange(selection.start, selection.end, urlLink),
+                selection = TextRange(selection.end + urlLink.length, selection.end + urlLink.length)
+            )
         }
     })
 
@@ -583,9 +587,12 @@ fun InputLinkDialog(viewModel: ClubScreenViewModel) {
                 TextButton(
                     onClick = {
                         val post = viewModel.postMsg.value.text
-                        val text = "$post${if (post.isNotEmpty() && post.last() != '\n') "\n" else ""}" +
-                                "[${viewModel.inputLinkName.value}](${viewModel.inputLink.value})"
-                        viewModel.postMsg.value = TextFieldValue(text, selection = TextRange(text.length, text.length))
+                        val selection = viewModel.postMsg.value.selection
+                        val link = "\n[${viewModel.inputLinkName.value}](${viewModel.inputLink.value})\n"
+                        viewModel.postMsg.value = TextFieldValue(
+                            post.replaceRange(selection.start, selection.end, link),
+                            selection = TextRange(selection.end + link.length, selection.end + link.length)
+                        )
                         viewModel.showLinkDialog.value = false
                     },
                     modifier = Modifier
