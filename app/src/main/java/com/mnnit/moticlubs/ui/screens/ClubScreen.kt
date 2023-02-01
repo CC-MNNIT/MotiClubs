@@ -88,7 +88,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
     val postMsg = mutableStateOf(TextFieldValue(""))
     val postsList = mutableStateListOf<PostResponse>()
-    val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf()))
+    val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf(), listOf()))
     val loadingPosts = mutableStateOf(false)
 
     val isPreviewMode = mutableStateOf(false)

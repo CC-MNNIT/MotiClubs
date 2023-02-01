@@ -29,9 +29,13 @@ data class ClubModel(
 
     @SerializedName("admins")
     @Expose
-    var admins: List<String>
+    var admins: List<String>,
+
+    @SerializedName("social")
+    @Expose
+    var socialMedia: List<String>
 ) : Parcelable {
-    constructor() : this("", "", "", "", listOf())
+    constructor() : this("", "", "", "", listOf(), listOf())
 }
 
 @Parcelize
