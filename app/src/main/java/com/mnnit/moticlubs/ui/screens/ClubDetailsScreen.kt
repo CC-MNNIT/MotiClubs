@@ -24,13 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +67,7 @@ class ClubDetailsScreenViewModel @Inject constructor() : ViewModel() {
 
     val isEditButtonEnabled
         get() = !isLoading.value
-                && ((initialClubModel.value.avatar != avatar_url.value) || (initialClubModel.value.description != description.value))
+                && ((initialClubModel.value.avatar != avatar_url.value) || (initialClubModel.value.description != description.value) || (initialClubModel.value.socialMedia != socialMediaUrls))
 }
 
 @Composable
@@ -79,8 +76,11 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
     viewModel.description.value = appViewModel.clubModel.value.description
     viewModel.avatar_url.value = appViewModel.clubModel.value.avatar
     viewModel.socialMediaUrls = appViewModel.clubModel.value.socialMedia.toMutableList()
-    Log.d("ClubDetail:",appViewModel.clubModel.value.toString())
-    Log.d("ClubDetail:",appViewModel.clubModel.value.socialMedia.size.toString())
+    viewModel.faceBookUrl.value = appViewModel.clubModel.value.socialMedia[0]
+    viewModel.instagramUrl.value = appViewModel.clubModel.value.socialMedia[1]
+    viewModel.linkedInUrl.value = appViewModel.clubModel.value.socialMedia[2]
+    viewModel.websiteUrl.value = appViewModel.clubModel.value.socialMedia[3]
+    viewModel.githubUrl.value = appViewModel.clubModel.value.socialMedia[4]
 
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme()
@@ -260,17 +260,8 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
 
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialMediaUrls[0],
-                    onValueChange = { viewModel.socialMediaUrls[0] = it },
-                    shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Instagram URL") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialMediaUrls[1],
-                    onValueChange = { viewModel.socialMediaUrls[1] = it },
+                    value = viewModel.faceBookUrl.value,
+                    onValueChange = { viewModel.faceBookUrl.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Facebook URL") },
                     singleLine = true,
@@ -278,8 +269,17 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialMediaUrls[2],
-                    onValueChange = { viewModel.socialMediaUrls[2] = it },
+                    value = viewModel.instagramUrl.value,
+                    onValueChange = { viewModel.instagramUrl.value= it },
+                    shape = RoundedCornerShape(24.dp),
+                    label = { Text(text = "Instagram URL") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.linkedInUrl.value,
+                    onValueChange = { viewModel.linkedInUrl.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "LinkedIn URL") },
                     singleLine = true,
@@ -287,8 +287,8 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
                 )
                 OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
-                value = viewModel.socialMediaUrls[3],
-                onValueChange = { viewModel.socialMediaUrls[3] = it },
+                value = viewModel.websiteUrl.value,
+                onValueChange = { viewModel.websiteUrl.value = it },
                 shape = RoundedCornerShape(24.dp),
                 label = { Text(text = "Website URL") },
                 singleLine = true,
@@ -297,30 +297,23 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
 
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialMediaUrls[4],
-                    onValueChange = { viewModel.socialMediaUrls[4] = it },
+                    value = viewModel.githubUrl.value,
+                    onValueChange = { viewModel.githubUrl.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Github URL") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
 
-                TextButton(
+                Button(
                     onClick = {
+                        viewModel.socialMediaUrls = mutableListOf(viewModel.faceBookUrl.value,viewModel.instagramUrl.value,viewModel.linkedInUrl.value,viewModel.websiteUrl.value,viewModel.githubUrl.value)
+                        Log.d("dialog",viewModel.socialMediaUrls.toString())
                         viewModel.showLinkDialog.value = false
                     },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .border(0.dp, color = getColorScheme().onSurface, RectangleShape)
-                        .align(Alignment.CenterHorizontally),
                     enabled = true
                 ) {
-                    Text(
-                        text = "Add links",
-                        color = colorScheme.primary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Text(text = "Sign up", fontSize = 14.sp)
                 }
             }
         }
