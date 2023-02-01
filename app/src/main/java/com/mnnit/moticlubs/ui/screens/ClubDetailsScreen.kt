@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,12 +14,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,17 +49,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ClubDetailsScreenViewModel @Inject constructor() : ViewModel() {
-    val clubModel = mutableStateOf(ClubModel())
+    val initialClubModel = mutableStateOf(ClubModel("", "", "", "", listOf(), listOf()))
+    val description = mutableStateOf("")
+    val avatar_url = mutableStateOf("")
 
-//    val isLoading = mutableStateOf(false)
+    val isLoading = mutableStateOf(false)
 
-//    val isEditButtonEnabled
-//        get() = !isLoading.value
+    val isEditButtonEnabled
+        get() = !isLoading.value
+                && ((initialClubModel.value.avatar != avatar_url.value) || (initialClubModel.value.description != description.value))
+
 }
 
 @Composable
-fun ClubDetailsScreen(appViewModel: AppViewModel,viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
-viewModel.clubModel.value = appViewModel.clubModel.value
+fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
+    viewModel.initialClubModel.value = appViewModel.clubModel.value
+    viewModel.description.value = appViewModel.clubModel.value.description
+    viewModel.avatar_url.value = appViewModel.clubModel.value.avatar
+
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme()
 
@@ -78,6 +82,7 @@ viewModel.clubModel.value = appViewModel.clubModel.value
                         text = { Text(text = "Edit", fontSize = 15.sp, textAlign = TextAlign.Center) },
                         icon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = "") },
                         onClick = { },
+                        expanded = !viewModel.isEditButtonEnabled,
                         shape = RoundedCornerShape(24.dp),
                     )
                 },
@@ -113,12 +118,12 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
         if (result.isSuccessful) {
 //            loading.value = true
 //            updateProfilePicture(context, result.uriContent!!, appViewModel, loading)
-            viewModel.clubModel.value.avatar = result.toString()
-
+            viewModel.avatar_url.value = result.uriContent!!.toString()
         } else {
             val exception = result.error
         }
     }
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         val cropOptions = CropImageContractOptions(uri, CropImageOptions())
         cropOptions.setAspectRatio(1, 1)
@@ -127,12 +132,15 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
 
     Row(modifier = modifier) {
         Image(
-            painter = if (viewModel.clubModel.value.avatar.isEmpty() || !viewModel.clubModel.value.avatar.matches(Patterns.WEB_URL.toRegex())) {
+            painter = if (viewModel.avatar_url.value.isEmpty() || !viewModel.avatar_url.value.matches(
+                    Patterns.WEB_URL.toRegex()
+                )
+            ) {
                 rememberVectorPainter(image = Icons.Outlined.AccountCircle)
             } else {
                 rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(viewModel.clubModel.value.avatar)
+                        .data(viewModel.avatar_url.value)
                         .diskCachePolicy(CachePolicy.ENABLED)
                         .diskCacheKey(Constants.AVATAR)
                         .placeholder(R.drawable.outline_account_circle_24)
@@ -162,11 +170,11 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
 fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
     Column(modifier = modifier.verticalScroll(scrollState)) {
-        Text(viewModel.clubModel.value.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+        Text(viewModel.initialClubModel.value.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = viewModel.clubModel.value.description,
-            onValueChange = { viewModel.clubModel.value.description = it },
+            value = viewModel.description.value,
+            onValueChange = { viewModel.description.value = it },
             shape = RoundedCornerShape(24.dp),
             label = { Text(text = "Description") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
