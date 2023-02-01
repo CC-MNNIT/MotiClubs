@@ -105,6 +105,7 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
             Scaffold(
                 modifier = Modifier,
                 floatingActionButton = {
+                    if(isAdmin)
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Edit", fontSize = 15.sp, textAlign = TextAlign.Center) },
                         icon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = "") },
@@ -354,6 +355,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
             onValueChange = { viewModel.description.value = it },
             shape = RoundedCornerShape(24.dp),
             label = { Text(text = "Description") },
+            enabled = isAdmin,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
