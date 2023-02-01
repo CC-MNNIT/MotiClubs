@@ -96,6 +96,13 @@ object API {
             @Header("Authorization") auth: String?,
             @Path("post") postID: String
         ): Call<ResponseBody>
+
+        @PUT("/clubs/{club}")
+        fun updateClub(
+            @Header("Authorization") auth: String?,
+            @Path("club") clubID: String,
+            @Body clubDTO: ClubDTO
+        ) : Call<ResponseBody>
     }
 
     fun saveUser(
@@ -309,7 +316,6 @@ object API {
                     }
                     onResponse()
                 }
-
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
             })
     }
@@ -329,5 +335,23 @@ object API {
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
         })
+    }
+
+    fun updateClub(
+        auth: String?, clubID: String, clubDTO: ClubDTO,
+        onResponse: () -> Unit,onFailure: (code: Int) -> Unit
+    ) {
+        getRetrofitAccessObject().updateClub(auth,clubID,clubDTO)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    if (!response.isSuccessful) {
+                        onFailure(response.code())
+                        return
+                    }
+                    onResponse()
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
+            })
     }
 }

@@ -33,7 +33,7 @@ data class ClubModel(
 
     @SerializedName("socialUrls")
     @Expose
-    var socialMedia: List<String>
+    var socialUrls: List<String>
 
 ) : Parcelable {
     constructor() : this("", "", "", "", listOf(), listOf())
@@ -174,4 +174,10 @@ data class ClubSubscriptionModel(
     @SerializedName("club")
     @Expose
     var club: String
+)
+
+data class ClubDTO(
+    var description: String,
+    var avatar: String,
+    var socialUrls: List<String>
 )
