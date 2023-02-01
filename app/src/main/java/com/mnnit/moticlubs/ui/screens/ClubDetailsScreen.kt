@@ -91,6 +91,7 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
     viewModel.linkedInUrl.value = appViewModel.clubModel.value.socialUrls[2]
     viewModel.websiteUrl.value = appViewModel.clubModel.value.socialUrls[3]
     viewModel.githubUrl.value = appViewModel.clubModel.value.socialUrls[4]
+    val isAdmin = appViewModel.clubModel.value.admins.contains(appViewModel.email.value)
     val context = LocalContext.current
 
     MotiClubsTheme(colorScheme = getColorScheme()) {
@@ -138,7 +139,8 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 36.dp),
-                        context = context
+                        context = context,
+                        isAdmin = isAdmin
                     )
                 }
             }
@@ -223,7 +225,7 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
 }
 
 @Composable
-fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier, context: Context) {
+fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier, context: Context,isAdmin : Boolean) {
     if (viewModel.showLinkDialog.value) {
         InputSocialLinkDialog(viewModel = viewModel)
     }
@@ -232,6 +234,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
     Column(modifier = modifier.verticalScroll(scrollState)) {
 
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            if(viewModel.socialMediaUrls[0].isNotEmpty())
             IconButton(
                 onClick = {
                     val urlIntent = Intent(
@@ -251,6 +254,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
                 )
             }
 
+            if(viewModel.socialMediaUrls[1].isNotEmpty())
             IconButton(
                 onClick = {
                     val urlIntent = Intent(
@@ -270,6 +274,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
                 )
             }
 
+            if(viewModel.socialMediaUrls[2].isNotEmpty())
             IconButton(
                 onClick = {
                     val urlIntent = Intent(
@@ -287,7 +292,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
                 )
             }
 
-
+            if(viewModel.socialMediaUrls[3].isNotEmpty())
             IconButton(
                 onClick = {
                     val urlIntent = Intent(
@@ -307,7 +312,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
                 )
             }
 
-
+            if(viewModel.socialMediaUrls[4].isNotEmpty())
             IconButton(
                 onClick = {
                     val urlIntent = Intent(
@@ -325,6 +330,7 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
                 )
             }
 
+            if(isAdmin)
             IconButton(
                 onClick = {
                     viewModel.showLinkDialog.value = true
@@ -454,7 +460,6 @@ fun updateClubModel(
     clubDTO: ClubDTO,
     context: Context
 ) {
-
     API.updateClub(appViewModel.getAuthToken(context = context), appViewModel.clubModel.value.id, clubDTO = clubDTO, {
         viewModel.socialMediaUrlUpdated.value = false
         viewModel.isEditButtonEnabled = false
@@ -463,13 +468,6 @@ fun updateClubModel(
         appViewModel.clubModel.value.description = clubDTO.description
         appViewModel.clubModel.value.avatar = clubDTO.avatar
         Toast.makeText(context, "Updated Successfully", Toast.LENGTH_SHORT).show()
-        Log.d("ClubDetial:",clubDTO.toString())
-
     }) { Toast.makeText(context, "$it: Error updating club", Toast.LENGTH_SHORT).show() }
 
 }
-
-fun uploadOnFirebase(){
-
-}
-
