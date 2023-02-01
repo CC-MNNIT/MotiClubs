@@ -162,7 +162,9 @@ fun ClubList(viewModel: HomeScreenViewModel, onNavigatePostItemClick: (club: Clu
                         Text(
                             text = viewModel.clubsList[idx].description,
                             fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(0.6f)
+                            modifier = Modifier.fillMaxWidth(0.9f),
+                            softWrap = true,
+                            maxLines = 2
                         )
                     }
 
