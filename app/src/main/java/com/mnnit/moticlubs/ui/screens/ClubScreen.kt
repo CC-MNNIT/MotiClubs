@@ -85,6 +85,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val postMsg = mutableStateOf(TextFieldValue(""))
     val postsList = mutableStateListOf<PostResponse>()
     val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf()))
+    val loadingPosts = mutableStateOf(false)
 
     val isPreviewMode = mutableStateOf(false)
     val isMemberPost = mutableStateOf(false)
@@ -112,11 +113,13 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val scrollValue = mutableStateOf(0)
 
     fun fetchPostsList(context: Context) {
+        loadingPosts.value = true
         viewModelScope.launch {
             API.getClubPosts(context.getAuthToken(), clubID = clubModel.value.id, { list ->
                 postsList.clear()
                 list.forEach { postsList.add(it) }
-            }) {}
+                loadingPosts.value = false
+            }) { loadingPosts.value = false }
         }
     }
 }
@@ -165,7 +168,33 @@ fun ClubScreen(
                             .nestedScroll(scrollBehavior.nestedScrollConnection)
                     ) {
                         AnimatedVisibility(
-                            visible = viewModel.postsList.isNotEmpty(),
+                            visible = viewModel.loadingPosts.value,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            androidx.compose.material3.LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visible = viewModel.postsList.isEmpty() && !viewModel.loadingPosts.value,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)
+                        ) {
+                            Text(
+                                "No posts yet :/",
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(16.dp)
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visible = viewModel.postsList.isNotEmpty() && !viewModel.loadingPosts.value,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Messages(
@@ -174,17 +203,6 @@ fun ClubScreen(
                                 scrollState = listScrollState,
                                 appViewModel = appViewModel,
                                 onNavigateToPost = onNavigateToPost
-                            )
-                        }
-
-                        AnimatedVisibility(
-                            visible = viewModel.postsList.isEmpty(),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            androidx.compose.material3.LinearProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
                             )
                         }
 
