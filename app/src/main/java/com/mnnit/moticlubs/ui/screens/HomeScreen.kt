@@ -100,56 +100,13 @@ fun HomeScreen(
 
                     Text(text = "MNNIT Clubs", fontSize = 28.sp)
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .fillMaxHeight(),
-                        contentPadding = PaddingValues()
-                    ) {
-                        items(viewModel.clubsList.size) { idx ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp), onClick = {
-                                    onNavigatePostItemClick(viewModel.clubsList[idx])
-                                },
-                                shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp),
-                                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
-                            ) {
-                                Row(modifier = Modifier.padding(16.dp)) {
-                                    Icon(
-                                        modifier = Modifier
-                                            .clip(CircleShape)
-                                            .size(48.dp)
-                                            .align(Alignment.CenterVertically),
-                                        imageVector = Icons.Outlined.AccountCircle,
-                                        contentDescription = ""
-                                    )
-
-                                    Column(
-                                        modifier = Modifier
-                                            .padding(start = 8.dp)
-                                            .fillMaxWidth(0.9f)
-                                    ) {
-                                        Text(text = viewModel.clubsList[idx].name, fontSize = 16.sp)
-                                        Text(
-                                            text = viewModel.clubsList[idx].description,
-                                            fontSize = 14.sp,
-                                            modifier = Modifier.fillMaxWidth(0.6f)
-                                        )
-                                    }
-
-                                    AnimatedVisibility(
-                                        visible = context.getUnreadPost(viewModel.clubsList[idx].id).isNotEmpty(),
-                                        modifier = Modifier.align(Alignment.CenterVertically)
-                                    ) {
-                                        BadgedBox(badge = {
-                                            Badge { Text(text = "${context.getUnreadPost(viewModel.clubsList[idx].id).size}") }
-                                        }, modifier = Modifier.align(Alignment.CenterVertically)) {}
-                                    }
-                                }
-                            }
-                        }
+                    AnimatedVisibility(visible = viewModel.clubsList.isNotEmpty(), modifier = Modifier.fillMaxWidth()) {
+                        ClubList(viewModel = viewModel, onNavigatePostItemClick = onNavigatePostItemClick)
+                    }
+                    AnimatedVisibility(visible = viewModel.clubsList.isEmpty(), modifier = Modifier.fillMaxWidth()) {
+                        LinearProgressIndicator(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp))
                     }
                 }
             },
@@ -163,6 +120,63 @@ fun HomeScreen(
                 )
             }
         )
+    }
+}
+
+@Composable
+fun ClubList(viewModel: HomeScreenViewModel, onNavigatePostItemClick: (club: ClubModel) -> Unit) {
+    val colorScheme = getColorScheme()
+    val context = LocalContext.current
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxHeight(),
+        contentPadding = PaddingValues()
+    ) {
+        items(viewModel.clubsList.size) { idx ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp), onClick = {
+                    onNavigatePostItemClick(viewModel.clubsList[idx])
+                },
+                shape = RoundedCornerShape(24.dp), elevation = CardDefaults.cardElevation(0.dp),
+                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
+            ) {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Icon(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .size(48.dp)
+                            .align(Alignment.CenterVertically),
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = ""
+                    )
+
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .fillMaxWidth(0.9f)
+                    ) {
+                        Text(text = viewModel.clubsList[idx].name, fontSize = 16.sp)
+                        Text(
+                            text = viewModel.clubsList[idx].description,
+                            fontSize = 14.sp,
+                            modifier = Modifier.fillMaxWidth(0.6f)
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = context.getUnreadPost(viewModel.clubsList[idx].id).isNotEmpty(),
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        BadgedBox(badge = {
+                            Badge { Text(text = "${context.getUnreadPost(viewModel.clubsList[idx].id).size}") }
+                        }, modifier = Modifier.align(Alignment.CenterVertically)) {}
+                    }
+                }
+            }
+        }
     }
 }
 

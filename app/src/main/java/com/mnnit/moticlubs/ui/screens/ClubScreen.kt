@@ -164,13 +164,29 @@ fun ClubScreen(
                             .fillMaxSize()
                             .nestedScroll(scrollBehavior.nestedScrollConnection)
                     ) {
-                        Messages(
-                            viewModel = viewModel,
-                            modifier = Modifier.weight(1f),
-                            scrollState = listScrollState,
-                            appViewModel = appViewModel,
-                            onNavigateToPost = onNavigateToPost
-                        )
+                        AnimatedVisibility(
+                            visible = viewModel.postsList.isNotEmpty(),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Messages(
+                                viewModel = viewModel,
+                                modifier = Modifier.weight(1f),
+                                scrollState = listScrollState,
+                                appViewModel = appViewModel,
+                                onNavigateToPost = onNavigateToPost
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visible = viewModel.postsList.isEmpty(),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            androidx.compose.material3.LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        }
 
                         if (viewModel.showDelPostDialog.value) {
                             ConfirmationDialog(
