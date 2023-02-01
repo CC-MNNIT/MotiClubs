@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
@@ -58,13 +60,17 @@ class ClubDetailsScreenViewModel @Inject constructor() : ViewModel() {
     val description = mutableStateOf("")
     val avatar_url = mutableStateOf("")
     val showLinkDialog = mutableStateOf(false)
-    lateinit var socialMedia : List<String>
+    var socialMediaUrls = mutableListOf("","","","","","")
     val isLoading = mutableStateOf(false)
+    val faceBookUrl = mutableStateOf("")
+    val instagramUrl = mutableStateOf("")
+    val linkedInUrl = mutableStateOf("")
+    val websiteUrl = mutableStateOf("")
+    val githubUrl = mutableStateOf("")
 
     val isEditButtonEnabled
         get() = !isLoading.value
                 && ((initialClubModel.value.avatar != avatar_url.value) || (initialClubModel.value.description != description.value))
-
 }
 
 @Composable
@@ -72,7 +78,9 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
     viewModel.initialClubModel.value = appViewModel.clubModel.value
     viewModel.description.value = appViewModel.clubModel.value.description
     viewModel.avatar_url.value = appViewModel.clubModel.value.avatar
-    viewModel.socialMedia = appViewModel.clubModel.value.socialMedia
+    viewModel.socialMediaUrls = appViewModel.clubModel.value.socialMedia.toMutableList()
+    Log.d("ClubDetail:",appViewModel.clubModel.value.toString())
+    Log.d("ClubDetail:",appViewModel.clubModel.value.socialMedia.size.toString())
 
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme()
@@ -175,13 +183,13 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
 
 @Composable
 fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
+    if (viewModel.showLinkDialog.value) {
+        InputSocialLinkDialog(viewModel = viewModel)
+    }
+
     val scrollState = rememberScrollState()
     Column(modifier = modifier.verticalScroll(scrollState)) {
-        if (viewModel.showLinkDialog.value) {
-            InputSocialLinkDialog(viewModel = viewModel)
-        }
-     Row() {
-         Text(viewModel.initialClubModel.value.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+
          Row(modifier = Modifier.padding(start = 45.dp)) {
          IconButton(
              onClick = {
@@ -211,9 +219,8 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
              ) {
                  Icon(painter = rememberVectorPainter(image = Icons.Rounded.Add), contentDescription = "")
              }
-         }
      }
-
+        Text(viewModel.initialClubModel.value.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = viewModel.description.value,
@@ -231,7 +238,6 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
     }
 }
 
-
 @Composable
 fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
     val colorScheme = getColorScheme()
@@ -244,7 +250,7 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    "Facebook URL",
+                    "Social-Media URLs",
                     fontSize = 16.sp,
                     modifier = Modifier
                         .padding(16.dp)
@@ -254,8 +260,8 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
 
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialMedia[0],
-                    onValueChange = { viewModel.socialMedia = listOf(it,viewModel.socialMedia.get(1)) },
+                    value = viewModel.socialMediaUrls[0],
+                    onValueChange = { viewModel.socialMediaUrls[0] = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Instagram URL") },
                     singleLine = true,
@@ -263,10 +269,38 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialMedia[1],
-                    onValueChange = { viewModel.socialMedia = listOf(viewModel.socialMedia.get(0),it) },
+                    value = viewModel.socialMediaUrls[1],
+                    onValueChange = { viewModel.socialMediaUrls[1] = it },
                     shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Link") },
+                    label = { Text(text = "Facebook URL") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.socialMediaUrls[2],
+                    onValueChange = { viewModel.socialMediaUrls[2] = it },
+                    shape = RoundedCornerShape(24.dp),
+                    label = { Text(text = "LinkedIn URL") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+                OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                value = viewModel.socialMediaUrls[3],
+                onValueChange = { viewModel.socialMediaUrls[3] = it },
+                shape = RoundedCornerShape(24.dp),
+                label = { Text(text = "Website URL") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = viewModel.socialMediaUrls[4],
+                    onValueChange = { viewModel.socialMediaUrls[4] = it },
+                    shape = RoundedCornerShape(24.dp),
+                    label = { Text(text = "Github URL") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
@@ -277,14 +311,13 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
                     },
                     modifier = Modifier
                         .padding(top = 8.dp)
+                        .border(0.dp, color = getColorScheme().onSurface, RectangleShape)
                         .align(Alignment.CenterHorizontally),
-                    enabled = ( (viewModel.socialMedia.get(0).matches(Patterns.WEB_URL.toRegex())) || (viewModel.socialMedia.get(0).matches(Patterns.WEB_URL.toRegex()))) && ( (viewModel.socialMedia.get(1).isEmpty()) || (viewModel.socialMedia.get(1).isEmpty()))
+                    enabled = true
                 ) {
                     Text(
                         text = "Add links",
-                        color = if (( (viewModel.socialMedia.get(0).matches(Patterns.WEB_URL.toRegex())) || (viewModel.socialMedia.get(0).matches(Patterns.WEB_URL.toRegex()))) && ( (viewModel.socialMedia.get(1).isEmpty()) || (viewModel.socialMedia.get(1).isEmpty()))) {
-                            colorScheme.primary
-                        } else colorScheme.contentColorFor(colorScheme.background),
+                        color = colorScheme.primary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
