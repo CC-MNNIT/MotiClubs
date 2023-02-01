@@ -61,10 +61,14 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.*
 import com.mnnit.moticlubs.ui.ConfirmationDialog
 import com.mnnit.moticlubs.ui.ProgressDialog
@@ -760,14 +764,28 @@ fun ChannelNameBar(
                 onNavigateToClubDetails()
             }), horizontalArrangement = Arrangement.SpaceAround
     ) {
-        Icon(
+        Image(
             modifier = Modifier
+                .size(62.dp)
                 .clip(CircleShape)
-                .size(64.dp)
-                .padding(16.dp)
-                .align(Alignment.CenterVertically),
-            imageVector = Icons.Outlined.AccountCircle,
-            contentDescription = ""
+                .align(Alignment.Top),
+            painter = if (viewModel.clubModel.value.avatar.isEmpty() || !viewModel.clubModel.value.avatar.matches(
+                    Patterns.WEB_URL.toRegex()
+                )
+            ) {
+                rememberVectorPainter(image = Icons.Outlined.AccountCircle)
+            } else {
+                rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(viewModel.clubModel.value.avatar)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .diskCacheKey(Constants.AVATAR)
+                        .placeholder(R.drawable.outline_account_circle_24)
+                        .build()
+                )
+            },
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
         )
 
         Column(
@@ -786,7 +804,8 @@ fun ChannelNameBar(
             Text(
                 text = viewModel.clubModel.value.description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
             )
         }
 

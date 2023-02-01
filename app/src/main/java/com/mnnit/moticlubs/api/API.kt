@@ -103,6 +103,9 @@ object API {
             @Path("club") clubID: String,
             @Body clubDTO: ClubDTO
         ) : Call<ResponseBody>
+
+        @GET("/clubs/subscribers-count/{club}")
+        fun getMembersCount(@Header("Authorization") auth: String?,@Path("club") clubID: String): Int
     }
 
     fun saveUser(
@@ -354,4 +357,22 @@ object API {
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
             })
     }
+
+//    fun getMembersCount(
+//        auth: String?,
+//        clubID: String
+//    ){
+//        getRetrofitAccessObject().getMembersCount(auth,clubID)
+//            .enqueue(object : Int {
+//                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+//                    if (!response.isSuccessful) {
+//                        onFailure(response.code())
+//                        return
+//                    }
+//                    onResponse()
+//                }
+//
+//                override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
+//            })
+//    }
 }
