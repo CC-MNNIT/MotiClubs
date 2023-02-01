@@ -132,7 +132,8 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
                 ) {
                     ClubProfilePic(
                         viewModel = viewModel,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        isAdmin = isAdmin
                     )
                     ClubInfo(
                         viewModel = viewModel,
@@ -149,7 +150,7 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
 }
 
 @Composable
-fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
+fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier,isAdmin:Boolean) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -210,7 +211,7 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
                 .clip(CircleShape)
                 .size(156.dp)
         )
-
+        if(isAdmin)
         IconButton(
             onClick = {
                 launcher.launch("image/*")
