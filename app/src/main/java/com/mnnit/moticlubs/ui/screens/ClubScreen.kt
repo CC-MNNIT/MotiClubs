@@ -82,6 +82,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
+    val editMode = mutableStateOf(false)
+    val editPostIdx = mutableStateOf(-1)
+    val showEditDialog = mutableStateOf(false)
+
     val postMsg = mutableStateOf(TextFieldValue(""))
     val postsList = mutableStateListOf<PostResponse>()
     val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf()))
@@ -143,7 +147,7 @@ fun ClubScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp, viewModel.subscribed.value)
+        SetNavBarsTheme(elevation = 2.dp, viewModel.clubModel.value.admins.contains(appViewModel.email.value))
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
                 BottomSheetContent(viewModel)
@@ -264,18 +268,41 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
             ProgressDialog(progressMsg = viewModel.progressText.value)
         }
 
-        if (viewModel.showDialog.value) {
-            PostConfirmationDialog(viewModel = viewModel) {
+        if (viewModel.showEditDialog.value) {
+            UpdatePostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
-                API.sendPost(context.getAuthToken(), viewModel.clubModel.value.id,
-                    viewModel.postMsg.value.text.replace("\n", "<br>"), {
-                        Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
+                API.updatePost(context.getAuthToken(),
+                    viewModel.postsList[viewModel.editPostIdx.value].id,
+                    viewModel.postMsg.value.text, {
+                        Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
                         viewModel.fetchPostsList(context)
 
                         viewModel.showProgress.value = false
                         viewModel.postMsg.value = TextFieldValue("")
                         scope.launch {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                            }
+                        }
+                    }) { Toast.makeText(context, "$it: Error updating msg", Toast.LENGTH_SHORT).show() }
+            }
+        }
+
+        if (viewModel.showDialog.value) {
+            PostConfirmationDialog(viewModel = viewModel) {
+                viewModel.isPreviewMode.value = false
+                API.sendPost(context.getAuthToken(), viewModel.clubModel.value.id,
+                    viewModel.postMsg.value.text, {
+                        Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
+                        viewModel.fetchPostsList(context)
+
+                        viewModel.showProgress.value = false
+                        viewModel.editMode.value = false
+                        viewModel.postMsg.value = TextFieldValue("")
+                        scope.launch {
+                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                            }
                         }
                     }) { Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show() }
             }
@@ -300,16 +327,37 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                 Text(text = "", modifier = Modifier.padding(12.dp))
             }
 
-            Text(
-                text = "Write Post",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
-            )
+            Row(modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)) {
+                Text(
+                    text = if (viewModel.editMode.value) "Update Post" else "Write Post",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                AnimatedVisibility(
+                    visible = viewModel.editMode.value,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) {
+                    IconButton(onClick = {
+                        viewModel.editMode.value = false
+                        viewModel.postMsg.value = TextFieldValue("", selection = TextRange(0))
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+
+                        scope.launch {
+                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                            }
+                        }
+                    }, modifier = Modifier.align(Alignment.CenterVertically)) {
+                        Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
+                    }
+                }
+            }
 
             Column(
                 modifier = Modifier
-                    .verticalScroll(scrollState)
                     .imePadding()
                     .fillMaxWidth()
             ) {
@@ -317,16 +365,24 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     visible = viewModel.isPreviewMode.value,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .weight(1f)
                         .horizontalScroll(horizontalScrollState)
+                        .verticalScroll(scrollState)
                 ) {
                     MarkdownText(
-                        markdown = viewModel.postMsg.value.text.replace("\n", "<br>"),
+                        markdown = viewModel.postMsg.value.text,
                         color = contentColorFor(backgroundColor = colorScheme.background),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                AnimatedVisibility(visible = !viewModel.isPreviewMode.value) {
+                AnimatedVisibility(
+                    visible = !viewModel.isPreviewMode.value,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(scrollState)
+                ) {
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -420,12 +476,16 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     AssistChip(
                         onClick = {
                             keyboardController?.hide()
-                            viewModel.showDialog.value = true
                             focusManager.clearFocus()
+                            if (viewModel.editMode.value) {
+                                viewModel.showEditDialog.value = true
+                            } else {
+                                viewModel.showDialog.value = true
+                            }
                         },
                         label = {
                             Text(
-                                text = "Send",
+                                text = if (viewModel.editMode.value) "Update" else "Send",
                                 fontSize = 14.sp,
                                 color = contentColorFor(
                                     backgroundColor = if (viewModel.postMsg.value.text.isNotEmpty()) {
@@ -590,6 +650,20 @@ fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
         imageVector = Icons.Outlined.Article,
         onPositive = {
             viewModel.progressText.value = "Posting ..."
+            viewModel.showProgress.value = true
+            onPost()
+        }
+    )
+}
+
+@Composable
+fun UpdatePostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
+    ConfirmationDialog(
+        showDialog = viewModel.showEditDialog,
+        message = "Update post message in ${viewModel.clubModel.value.name} ?", positiveBtnText = "Update",
+        imageVector = Icons.Outlined.Article,
+        onPositive = {
+            viewModel.progressText.value = "Updating ..."
             viewModel.showProgress.value = true
             onPost()
         }
@@ -827,6 +901,7 @@ fun Message(
     admin: UserDetailResponse,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()
     Card(
         modifier = Modifier
@@ -883,7 +958,17 @@ fun Message(
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        viewModel.editPostIdx.value = idx
+                        viewModel.editMode.value = true
+                        viewModel.postMsg.value =
+                            TextFieldValue(viewModel.postsList[idx].message.replace("<br>\n", "\n"))
+                        scope.launch {
+                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand()
+                            }
+                        }
+                    }) {
                         Icon(Icons.Rounded.Edit, contentDescription = "")
                     }
                 }
