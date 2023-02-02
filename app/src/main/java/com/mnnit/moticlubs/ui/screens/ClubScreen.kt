@@ -153,6 +153,7 @@ fun ClubScreen(
     viewModel.fetchSubscriberCount(appViewModel,context)
     viewModel.fetchPostsList(LocalContext.current)
     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
+    appViewModel.subscriberCount.value = viewModel.subscriberCount.value
 
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()

@@ -32,7 +32,7 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     val avatar = mutableStateOf("")
     val adminList = mutableListOf<String>()
     val subscribedList = mutableListOf<String>()
-
+    val subscriberCount = mutableStateOf<Int>(0)
     val adminInfoMap = mutableMapOf<String, UserDetailResponse>()
 
     val isAdmin

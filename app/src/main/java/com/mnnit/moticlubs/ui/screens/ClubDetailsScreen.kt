@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -43,7 +42,6 @@ import coil.request.ImageRequest
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.Constants
@@ -105,23 +103,23 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
             Scaffold(
                 modifier = Modifier,
                 floatingActionButton = {
-                    if(isAdmin)
-                    ExtendedFloatingActionButton(
-                        text = { Text(text = "Edit", fontSize = 15.sp, textAlign = TextAlign.Center) },
-                        icon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = "") },
-                        onClick = {
-                            updateClubModel(
-                                appViewModel, viewModel,
-                                ClubDTO(
-                                    viewModel.description.value,
-                                    viewModel.avatar_url.value,
-                                    viewModel.socialMediaUrls
-                                ), context
-                            )
-                        },
-                        expanded = !viewModel.isEditButtonEnabled,
-                        shape = RoundedCornerShape(24.dp),
-                    )
+                    if (isAdmin)
+                        ExtendedFloatingActionButton(
+                            text = { Text(text = "Edit", fontSize = 15.sp, textAlign = TextAlign.Center) },
+                            icon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = "") },
+                            onClick = {
+                                updateClubModel(
+                                    appViewModel, viewModel,
+                                    ClubDTO(
+                                        viewModel.description.value,
+                                        viewModel.avatar_url.value,
+                                        viewModel.socialMediaUrls
+                                    ), context
+                                )
+                            },
+                            expanded = !viewModel.isEditButtonEnabled,
+                            shape = RoundedCornerShape(24.dp),
+                        )
                 },
                 floatingActionButtonPosition = FabPosition.Center
             ) {
@@ -151,7 +149,7 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
 }
 
 @Composable
-fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier,isAdmin:Boolean) {
+fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier, isAdmin: Boolean) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -159,7 +157,8 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
             viewModel.isLoading.value = true
             val storageRef = Firebase.storage.reference
             val profilePicRef =
-                storageRef.child("club_profile_images").child(viewModel.initialClubModel.value.id).child(viewModel.initialClubModel.value.id)
+                storageRef.child("club_profile_images").child(viewModel.initialClubModel.value.id)
+                    .child(viewModel.initialClubModel.value.id)
 
             val bitmap = compressBitmap(result.uriContent!!, context)
 
@@ -176,7 +175,7 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
                     viewModel.avatar_url.value = task.result.toString()
                 } else {
                     Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                   viewModel.isLoading.value = false
+                    viewModel.isLoading.value = false
                 }
             }
         } else {
@@ -212,22 +211,22 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
                 .clip(CircleShape)
                 .size(156.dp)
         )
-        if(isAdmin)
-        IconButton(
-            onClick = {
-                launcher.launch("image/*")
-            },
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-        ) {
-            Icon(painter = rememberVectorPainter(image = Icons.Rounded.AddAPhoto), contentDescription = "")
-        }
+        if (isAdmin)
+            IconButton(
+                onClick = {
+                    launcher.launch("image/*")
+                },
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+                    .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+            ) {
+                Icon(painter = rememberVectorPainter(image = Icons.Rounded.AddAPhoto), contentDescription = "")
+            }
     }
 }
 
 @Composable
-fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier, context: Context,isAdmin : Boolean) {
+fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier, context: Context, isAdmin: Boolean) {
     if (viewModel.showLinkDialog.value) {
         InputSocialLinkDialog(viewModel = viewModel)
     }
@@ -236,115 +235,115 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
     Column(modifier = modifier.verticalScroll(scrollState)) {
 
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            if(viewModel.socialMediaUrls[0].isNotEmpty())
-            IconButton(
-                onClick = {
-                    val urlIntent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(viewModel.socialMediaUrls[0])
+            if (viewModel.socialMediaUrls[0].isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val urlIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(viewModel.socialMediaUrls[0])
+                        )
+                        context.startActivity(urlIntent)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Facebook),
+                        contentDescription = "",
+                        tint = Color.Blue
                     )
-                    context.startActivity(urlIntent)
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Rounded.Facebook),
-                    contentDescription = "",
-                    tint = Color.Blue
-                )
-            }
+                }
 
-            if(viewModel.socialMediaUrls[1].isNotEmpty())
-            IconButton(
-                onClick = {
-                    val urlIntent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(viewModel.socialMediaUrls[1])
+            if (viewModel.socialMediaUrls[1].isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val urlIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(viewModel.socialMediaUrls[1])
+                        )
+                        context.startActivity(urlIntent)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Chat),
+                        contentDescription = "",
+                        tint = Color.Red
                     )
-                    context.startActivity(urlIntent)
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Rounded.Chat),
-                    contentDescription = "",
-                    tint = Color.Red
-                )
-            }
+                }
 
-            if(viewModel.socialMediaUrls[2].isNotEmpty())
-            IconButton(
-                onClick = {
-                    val urlIntent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(viewModel.socialMediaUrls[2])
+            if (viewModel.socialMediaUrls[2].isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val urlIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(viewModel.socialMediaUrls[2])
+                        )
+                        context.startActivity(urlIntent)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Webhook), contentDescription = ""
                     )
-                    context.startActivity(urlIntent)
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Rounded.Webhook), contentDescription = ""
-                )
-            }
+                }
 
-            if(viewModel.socialMediaUrls[3].isNotEmpty())
-            IconButton(
-                onClick = {
-                    val urlIntent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(viewModel.socialMediaUrls[3])
+            if (viewModel.socialMediaUrls[3].isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val urlIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(viewModel.socialMediaUrls[3])
+                        )
+                        context.startActivity(urlIntent)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Facebook),
+                        contentDescription = "",
+                        tint = getColorScheme().primary
                     )
-                    context.startActivity(urlIntent)
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Rounded.Facebook),
-                    contentDescription = "",
-                    tint = getColorScheme().primary
-                )
-            }
+                }
 
-            if(viewModel.socialMediaUrls[4].isNotEmpty())
-            IconButton(
-                onClick = {
-                    val urlIntent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(viewModel.socialMediaUrls[4])
+            if (viewModel.socialMediaUrls[4].isNotEmpty())
+                IconButton(
+                    onClick = {
+                        val urlIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(viewModel.socialMediaUrls[4])
+                        )
+                        context.startActivity(urlIntent)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Facebook), contentDescription = ""
                     )
-                    context.startActivity(urlIntent)
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Rounded.Facebook), contentDescription = ""
-                )
-            }
+                }
 
-            if(isAdmin)
-            IconButton(
-                onClick = {
-                    viewModel.showLinkDialog.value = true
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Rounded.Add), contentDescription = ""
-                )
-            }
+            if (isAdmin)
+                IconButton(
+                    onClick = {
+                        viewModel.showLinkDialog.value = true
+                    },
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .border(0.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Add), contentDescription = ""
+                    )
+                }
 
         }
 
