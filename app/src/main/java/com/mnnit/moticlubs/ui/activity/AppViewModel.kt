@@ -8,10 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.internal.InternalTokenResult
-import com.mnnit.moticlubs.api.ClubModel
-import com.mnnit.moticlubs.api.PostResponse
-import com.mnnit.moticlubs.api.UserDetailResponse
-import com.mnnit.moticlubs.api.UserResponse
+import com.mnnit.moticlubs.api.*
 import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.setAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +32,6 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     val avatar = mutableStateOf("")
     val adminList = mutableListOf<String>()
     val subscribedList = mutableListOf<String>()
-
 
     val adminInfoMap = mutableMapOf<String, UserDetailResponse>()
 

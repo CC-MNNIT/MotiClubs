@@ -61,6 +61,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -119,6 +120,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
         )
     )
     val scrollValue = mutableStateOf(0)
+    val subscriberCount = mutableStateOf<Int>(0)
 
     fun fetchPostsList(context: Context) {
         loadingPosts.value = true
@@ -130,6 +132,12 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
             }) { loadingPosts.value = false }
         }
     }
+
+    fun fetchSubscriberCount(appViewModel : AppViewModel, context:Context) {
+        API.getMembersCount(appViewModel.getAuthToken(context),appViewModel.clubModel.value.id ,{
+            subscriberCount.value = it.count
+        }) { }
+    }
 }
 
 @Composable
@@ -139,15 +147,16 @@ fun ClubScreen(
     onNavigateToClubDetails: () -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     viewModel.clubModel.value = appViewModel.clubModel.value
     viewModel.bottomSheetScaffoldState.value = rememberBottomSheetScaffoldState()
+    viewModel.fetchSubscriberCount(appViewModel,context)
     viewModel.fetchPostsList(LocalContext.current)
     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
 
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
-    val context = LocalContext.current
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
@@ -766,9 +775,10 @@ fun ChannelNameBar(
     ) {
         Image(
             modifier = Modifier
-                .size(62.dp)
+                .size(42.dp)
                 .clip(CircleShape)
-                .align(Alignment.Top),
+                .align(Alignment.Top)
+                .padding(all=5.dp),
             painter = if (viewModel.clubModel.value.avatar.isEmpty() || !viewModel.clubModel.value.avatar.matches(
                     Patterns.WEB_URL.toRegex()
                 )
@@ -802,7 +812,7 @@ fun ChannelNameBar(
 
             // Number of members
             Text(
-                text = viewModel.clubModel.value.description,
+                text = "Members: " + viewModel.subscriberCount.value,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -856,6 +866,7 @@ fun SubscriptionConfirmationDialog(
                     appViewModel.subscribedList.add(viewModel.clubModel.value.id)
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
+                    viewModel.fetchSubscriberCount(appViewModel,context)
                     Toast.makeText(context, "Subscribed", Toast.LENGTH_SHORT).show()
                 }) {
                     viewModel.showProgress.value = false
@@ -866,6 +877,7 @@ fun SubscriptionConfirmationDialog(
                     appViewModel.subscribedList.remove(viewModel.clubModel.value.id)
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
+                    viewModel.fetchSubscriberCount(appViewModel,context)
                     Toast.makeText(context, "Unsubscribed", Toast.LENGTH_SHORT).show()
                 }) {
                     viewModel.showProgress.value = false

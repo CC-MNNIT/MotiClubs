@@ -102,10 +102,13 @@ object API {
             @Header("Authorization") auth: String?,
             @Path("club") clubID: String,
             @Body clubDTO: ClubDTO
-        ) : Call<ResponseBody>
+        ): Call<ResponseBody>
 
         @GET("/clubs/subscribers-count/{club}")
-        fun getMembersCount(@Header("Authorization") auth: String?,@Path("club") clubID: String): Int
+        fun getMembersCount(
+            @Header("Authorization") auth: String?,
+            @Path("club") clubID: String
+        ): Call<SubscriberCountResponse>
     }
 
     fun saveUser(
@@ -319,6 +322,7 @@ object API {
                     }
                     onResponse()
                 }
+
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
             })
     }
@@ -342,9 +346,9 @@ object API {
 
     fun updateClub(
         auth: String?, clubID: String, clubDTO: ClubDTO,
-        onResponse: () -> Unit,onFailure: (code: Int) -> Unit
+        onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
-        getRetrofitAccessObject().updateClub(auth,clubID,clubDTO)
+        getRetrofitAccessObject().updateClub(auth, clubID, clubDTO)
             .enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                     if (!response.isSuccessful) {
@@ -358,21 +362,30 @@ object API {
             })
     }
 
-//    fun getMembersCount(
-//        auth: String?,
-//        clubID: String
-//    ){
-//        getRetrofitAccessObject().getMembersCount(auth,clubID)
-//            .enqueue(object : Int {
-//                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-//                    if (!response.isSuccessful) {
-//                        onFailure(response.code())
-//                        return
-//                    }
-//                    onResponse()
-//                }
-//
-//                override fun onFailure(call: Call<ResponseBody>, t: Throwable) = onFailure(-1)
-//            })
-//    }
+
+    fun getMembersCount(
+        auth: String?,
+        clubID: String,
+        onResponse: (subscriberCountResponse: SubscriberCountResponse) -> Unit,
+        onFailure: (code: Int) -> Unit
+    ) {
+        getRetrofitAccessObject().getMembersCount(auth, clubID)
+            .enqueue(object : Callback<SubscriberCountResponse> {
+                override fun onResponse(
+                    call: Call<SubscriberCountResponse>,
+                    response: Response<SubscriberCountResponse>
+                ) {
+                    val body = response.body()
+                    if (!response.isSuccessful || body == null) {
+                        onFailure(response.code())
+                        return
+                    }
+                    onResponse(body)
+
+                }
+
+                override fun onFailure(call: Call<SubscriberCountResponse>, t: Throwable)= onFailure(-1)
+
+            })
+    }
 }

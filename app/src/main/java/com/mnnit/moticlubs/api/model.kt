@@ -181,3 +181,10 @@ data class ClubDTO(
     var avatar: String,
     var socialUrls: List<String>
 )
+
+data class SubscriberCountResponse(
+    @SerializedName("count")
+    @Expose
+    var count: Int
+)
+
