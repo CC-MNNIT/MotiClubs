@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

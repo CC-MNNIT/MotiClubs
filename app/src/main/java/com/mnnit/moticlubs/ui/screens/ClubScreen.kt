@@ -61,7 +61,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -309,7 +308,6 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     viewModel.postMsg.value.text, {
                         Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
                         viewModel.fetchPostsList(context)
-
                         viewModel.showProgress.value = false
                         viewModel.editMode.value = false
                         viewModel.postMsg.value = TextFieldValue("")
@@ -868,6 +866,7 @@ fun SubscriptionConfirmationDialog(
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
                     viewModel.fetchSubscriberCount(appViewModel,context)
+                    appViewModel.subscriberCount.value = viewModel.subscriberCount.value
                     Toast.makeText(context, "Subscribed", Toast.LENGTH_SHORT).show()
                 }) {
                     viewModel.showProgress.value = false
@@ -879,6 +878,7 @@ fun SubscriptionConfirmationDialog(
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
                     viewModel.fetchSubscriberCount(appViewModel,context)
+                    appViewModel.subscriberCount.value = viewModel.subscriberCount.value
                     Toast.makeText(context, "Unsubscribed", Toast.LENGTH_SHORT).show()
                 }) {
                     viewModel.showProgress.value = false

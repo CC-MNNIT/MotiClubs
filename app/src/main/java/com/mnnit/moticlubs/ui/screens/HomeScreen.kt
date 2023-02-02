@@ -111,9 +111,11 @@ fun HomeScreen(
                         ClubList(viewModel = viewModel, onNavigatePostItemClick = onNavigatePostItemClick)
                     }
                     AnimatedVisibility(visible = viewModel.clubsList.isEmpty(), modifier = Modifier.fillMaxWidth()) {
-                        LinearProgressIndicator(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp))
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
                     }
                 }
             },

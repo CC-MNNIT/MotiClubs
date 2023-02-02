@@ -50,6 +50,7 @@ import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubDTO
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.compressBitmap
+import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -72,7 +73,6 @@ class ClubDetailsScreenViewModel @Inject constructor() : ViewModel() {
     val websiteUrl = mutableStateOf("")
     val githubUrl = mutableStateOf("")
     val socialMediaUrlUpdated = mutableStateOf(false)
-
     var isEditButtonEnabled = false
         get() = !isLoading.value
                 && ((initialClubModel.value.avatar != avatar_url.value) || (initialClubModel.value.description != description.value) || socialMediaUrlUpdated.value)
@@ -129,6 +129,9 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
                         .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    if (viewModel.isLoading.value) {
+                        ProgressDialog(progressMsg = "Uploading...")
+                    }
                     ClubProfilePic(
                         viewModel = viewModel,
                         modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -136,6 +139,7 @@ fun ClubDetailsScreen(appViewModel: AppViewModel, viewModel: ClubDetailsScreenVi
                     )
                     ClubInfo(
                         viewModel = viewModel,
+                        appViewModel = appViewModel,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 36.dp),
@@ -173,6 +177,7 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
             }.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     viewModel.avatar_url.value = task.result.toString()
+                    viewModel.isLoading.value = false
                 } else {
                     Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     viewModel.isLoading.value = false
@@ -226,7 +231,7 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
 }
 
 @Composable
-fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier, context: Context, isAdmin: Boolean) {
+fun ClubInfo(viewModel: ClubDetailsScreenViewModel,appViewModel: AppViewModel, modifier: Modifier = Modifier, context: Context, isAdmin: Boolean) {
     if (viewModel.showLinkDialog.value) {
         InputSocialLinkDialog(viewModel = viewModel)
     }
@@ -348,12 +353,15 @@ fun ClubInfo(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifie
         }
 
         Text(viewModel.initialClubModel.value.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+
+        Text("Members: " + appViewModel.subscriberCount.value, fontSize = 15.sp, fontWeight = FontWeight.Normal)
+
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top=15.dp),
             value = viewModel.description.value,
             onValueChange = { viewModel.description.value = it },
             shape = RoundedCornerShape(24.dp),
-            label = { Text(text = "Description") },
+            label = { Text(text = "Description", fontSize = 14.sp) },
             enabled = isAdmin,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -449,7 +457,7 @@ fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel) {
                     },
                     enabled = true
                 ) {
-                    Text(text = "Sign up", fontSize = 14.sp)
+                    Text(text = "Add Links", fontSize = 14.sp)
                 }
             }
         }

@@ -384,7 +384,7 @@ object API {
 
                 }
 
-                override fun onFailure(call: Call<SubscriberCountResponse>, t: Throwable)= onFailure(-1)
+                override fun onFailure(call: Call<SubscriberCountResponse>, t: Throwable) = onFailure(-1)
 
             })
     }
