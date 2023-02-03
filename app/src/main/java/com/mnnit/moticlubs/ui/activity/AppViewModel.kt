@@ -3,10 +3,13 @@ package com.mnnit.moticlubs.ui.activity
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
+import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.api.UserResponse
@@ -22,6 +25,8 @@ class AppViewModel @Inject constructor(private val application: Application) : V
         private const val TAG = "AppViewModel"
     }
 
+    val showErrorScreen = mutableStateOf(false)
+    val fetchingState = mutableStateOf(false)
     val showSplashScreen = mutableStateOf(true)
     val clubModel = mutableStateOf(ClubModel())
 
@@ -63,6 +68,27 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     fun logoutUser(context: Context) {
         FirebaseAuth.getInstance().signOut()
         context.setAuthToken("")
+    }
+
+    fun fetchUser(user: FirebaseUser?, context: Context) {
+        fetchingState.value = true
+        if (user != null) {
+            API.getUserData(getAuthToken(context), {
+                setUser(it)
+                fetchingState.value = false
+                showErrorScreen.value = false
+                showSplashScreen.value = false
+                Log.d(TAG, "fetchUser")
+            }) {
+                fetchingState.value = false
+                showErrorScreen.value = true
+                showSplashScreen.value = false
+                Log.d(TAG, "fetchUser: error: $it")
+            }
+        } else {
+            fetchingState.value = false
+            showSplashScreen.value = false
+        }
     }
 
     init {

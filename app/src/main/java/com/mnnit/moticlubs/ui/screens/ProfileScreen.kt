@@ -32,8 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
@@ -43,6 +41,7 @@ import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.compressBitmap
 import com.mnnit.moticlubs.ui.ConfirmationDialog
+import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -91,12 +90,7 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                 }
             }
             if (loading.value) {
-                Dialog(
-                    onDismissRequest = {},
-                    DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.padding(16.dp), color = getColorScheme().primary)
-                }
+                ProgressDialog(progressMsg = "Uploading ...")
             }
             if (showDialog.value) {
                 ConfirmationDialog(

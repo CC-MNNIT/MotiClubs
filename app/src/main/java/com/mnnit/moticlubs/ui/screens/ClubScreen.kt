@@ -295,6 +295,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                         Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
                         viewModel.fetchPostsList(context)
 
+                        viewModel.editMode.value = false
                         viewModel.showProgress.value = false
                         viewModel.postMsg.value = TextFieldValue("")
                         scope.launch {
@@ -302,7 +303,10 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                                 viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
                             }
                         }
-                    }) { Toast.makeText(context, "$it: Error updating msg", Toast.LENGTH_SHORT).show() }
+                    }) {
+                    viewModel.showProgress.value = false
+                    Toast.makeText(context, "$it: Error updating msg", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -321,7 +325,10 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                                 viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
                             }
                         }
-                    }) { Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show() }
+                    }) {
+                    viewModel.showProgress.value = false
+                    Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         Column(
