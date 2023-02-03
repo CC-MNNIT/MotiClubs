@@ -5,11 +5,8 @@ package com.mnnit.moticlubs.ui.screens
 import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -17,8 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,7 +26,7 @@ import com.mnnit.moticlubs.api.Repository.getClubs
 import com.mnnit.moticlubs.api.Repository.getUserDetails
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.getImageUrlPainter
+import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -89,11 +84,10 @@ fun HomeScreen(
                         .consumeWindowInsets(it)
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 ) {
-                    ProfileIcon(
-                        appViewModel = appViewModel,
+                    ProfilePicture(
                         modifier = Modifier.align(Alignment.End),
-                        onNavigateProfile
-                    )
+                        url = appViewModel.avatar.value,
+                        onClick = { onNavigateProfile() })
 
                     Text(text = "MNNIT Clubs", fontSize = 28.sp)
 
@@ -141,14 +135,9 @@ fun ClubList(viewModel: HomeScreenViewModel, onNavigatePostItemClick: (club: Clu
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
             ) {
                 Row(modifier = Modifier.padding(16.dp)) {
-                    Image(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.CenterVertically),
-                        painter = LocalContext.current.getImageUrlPainter(url = viewModel.clubsList[idx].avatar),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
+                    ProfilePicture(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        url = viewModel.clubsList[idx].avatar
                     )
 
                     Column(
@@ -178,18 +167,4 @@ fun ClubList(viewModel: HomeScreenViewModel, onNavigatePostItemClick: (club: Clu
             }
         }
     }
-}
-
-@Composable
-fun ProfileIcon(
-    appViewModel: AppViewModel, modifier: Modifier,
-    onNavigateProfile: () -> Unit
-) {
-    Image(
-        painter = LocalContext.current.getImageUrlPainter(url = appViewModel.avatar.value), contentDescription = "",
-        modifier = modifier
-            .clip(CircleShape)
-            .size(48.dp)
-            .clickable { onNavigateProfile() }
-    )
 }

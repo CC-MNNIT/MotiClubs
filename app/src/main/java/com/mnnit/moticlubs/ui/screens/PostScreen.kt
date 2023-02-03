@@ -1,9 +1,7 @@
 package com.mnnit.moticlubs.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
@@ -11,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
@@ -21,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.api.PostNotificationModel
 import com.mnnit.moticlubs.postRead
 import com.mnnit.moticlubs.ui.MarkdownText
-import com.mnnit.moticlubs.ui.getImageUrlPainter
+import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -59,7 +56,7 @@ fun PostScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        AdminProfileIcon(postNotificationModel.value.adminAvatar)
+                        ProfilePicture(url = postNotificationModel.value.adminAvatar, size = 56.dp)
                         Spacer(modifier = Modifier.width(10.dp))
                         AdminNameTimestamp(
                             time = postNotificationModel.value.time,
@@ -102,15 +99,4 @@ private fun AdminNameTimestamp(time: String, name: String) {
             fontSize = 12.sp
         )
     }
-}
-
-
-@Composable
-fun AdminProfileIcon(avatar: String) {
-    Image(
-        painter = LocalContext.current.getImageUrlPainter(url = avatar), contentDescription = "",
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(56.dp)
-    )
 }

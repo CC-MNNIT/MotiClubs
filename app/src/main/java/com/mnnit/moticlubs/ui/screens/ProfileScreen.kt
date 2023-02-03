@@ -6,11 +6,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -41,10 +38,10 @@ import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.api.Repository.updateProfilePic
 import com.mnnit.moticlubs.compressBitmap
 import com.mnnit.moticlubs.getAuthToken
-import com.mnnit.moticlubs.ui.ConfirmationDialog
-import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.getImageUrlPainter
+import com.mnnit.moticlubs.ui.components.ConfirmationDialog
+import com.mnnit.moticlubs.ui.components.ProfilePicture
+import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -129,14 +126,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
     }
 
     Row(modifier = modifier) {
-        Image(
-            painter = LocalContext.current.getImageUrlPainter(url = appViewModel.avatar.value),
-            contentDescription = "",
-            modifier = modifier
-                .padding(start = 46.dp)
-                .clip(CircleShape)
-                .size(156.dp)
-        )
+        ProfilePicture(modifier = modifier.padding(start = 46.dp), url = appViewModel.avatar.value, size = 156.dp)
 
         IconButton(
             onClick = { launcher.launch("image/*") },

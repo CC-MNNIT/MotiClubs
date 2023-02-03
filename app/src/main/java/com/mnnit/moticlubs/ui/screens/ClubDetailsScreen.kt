@@ -51,8 +51,8 @@ import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.Repository.updateClub
 import com.mnnit.moticlubs.compressBitmap
 import com.mnnit.moticlubs.getAuthToken
-import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
+import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme

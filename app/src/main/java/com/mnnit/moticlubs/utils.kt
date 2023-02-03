@@ -38,6 +38,24 @@ fun Context.getMkdFormatter() = Markwon.builder(this)
 
 fun String.getDomainMail(): String = "$this@mnnit.ac.in"
 
+fun scrollMultiplierIndex(prev: String, curr: String): Int {
+    val q = if (curr.length > prev.length) prev else curr
+    val p = if (curr.length > prev.length) curr else prev
+    var breakLines = 0
+    q.forEachIndexed { index, c ->
+        if (p[index] != c) {
+            for (i in 0..index) {
+                if (p[i] == '\n') breakLines++
+            }
+            return breakLines
+        }
+    }
+    curr.forEach {
+        if (it == '\n') breakLines++
+    }
+    return breakLines
+}
+
 fun Context.setAuthToken(token: String) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
         .putString(Constants.TOKEN, token).apply()
