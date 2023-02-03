@@ -155,9 +155,9 @@ fun ClubList(viewModel: HomeScreenViewModel, onNavigatePostItemClick: (club: Clu
                 Row(modifier = Modifier.padding(16.dp)) {
                     Image(
                         modifier = Modifier
-                            .size(62.dp)
+                            .size(48.dp)
                             .clip(CircleShape)
-                            .align(Alignment.Top),
+                            .align(Alignment.CenterVertically),
                         painter = if (viewModel.clubsList[idx].avatar.isEmpty() || !viewModel.clubsList[idx].avatar.matches(
                                 Patterns.WEB_URL.toRegex()
                             )
