@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.DrawerState
@@ -52,6 +53,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -89,6 +91,9 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val editMode = mutableStateOf(false)
     val editPostIdx = mutableStateOf(-1)
     val showEditDialog = mutableStateOf(false)
+
+    val searchMode = mutableStateOf(false)
+    val searchValue = mutableStateOf("")
 
     val postMsg = mutableStateOf(TextFieldValue(""))
     val postsList = mutableStateListOf<PostResponse>()
@@ -166,7 +171,7 @@ fun ClubScreen(
                 BottomSheetContent(viewModel)
             }, topBar = {
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
-                    ChannelNameBar(
+                    TopBar(
                         viewModel,
                         appViewModel,
                         modifier = Modifier.padding(),
@@ -752,6 +757,79 @@ fun InputLinkDialog(viewModel: ClubScreenViewModel) {
 }
 
 @Composable
+fun TopBar(
+    viewModel: ClubScreenViewModel,
+    appViewModel: AppViewModel,
+    modifier: Modifier = Modifier,
+    onNavigateToClubDetails: () -> Unit
+) {
+    AnimatedVisibility(visible = viewModel.searchMode.value) {
+        SearchBar(viewModel = viewModel, modifier = modifier)
+    }
+    AnimatedVisibility(visible = !viewModel.searchMode.value) {
+        ChannelNameBar(
+            viewModel = viewModel,
+            appViewModel = appViewModel,
+            modifier = modifier,
+            onNavigateToClubDetails = onNavigateToClubDetails
+        )
+    }
+}
+
+@Composable
+fun SearchBar(
+    viewModel: ClubScreenViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val colorScheme = getColorScheme()
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(0.dp),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        IconButton(modifier = Modifier.align(Alignment.CenterVertically),
+            onClick = {
+                keyboardController?.hide()
+                viewModel.searchMode.value = false
+            }) {
+            Icon(
+                imageVector = Icons.Rounded.ArrowBack,
+                modifier = Modifier
+                    .height(64.dp), contentDescription = ""
+            )
+        }
+        OutlinedTextField(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .fillMaxWidth(),
+            value = viewModel.searchValue.value,
+            onValueChange = { viewModel.searchValue.value = it },
+            shape = RoundedCornerShape(24.dp),
+            placeholder = { Text(text = "Search") },
+            trailingIcon = {
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    onClick = { keyboardController?.hide() }) {
+                    Icon(painter = rememberVectorPainter(image = Icons.Rounded.Search), contentDescription = "")
+                }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(onAny = { keyboardController?.hide() }),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                unfocusedBorderColor = colorScheme.surfaceColorAtElevation(2.dp),
+                focusedBorderColor = colorScheme.surfaceColorAtElevation(2.dp),
+            )
+        )
+    }
+}
+
+@Composable
 fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     appViewModel: AppViewModel,
@@ -823,7 +901,10 @@ fun ChannelNameBar(
                 imageVector = Icons.Outlined.Search,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .height(64.dp), contentDescription = ""
+                    .height(64.dp)
+                    .clickable {
+                        viewModel.searchMode.value = true
+                    }, contentDescription = ""
             )
             // Info icon
             Icon(
@@ -912,6 +993,11 @@ fun Messages(
                 .padding(horizontal = 10.dp)
         ) {
             items(viewModel.postsList.size) { index ->
+                if (viewModel.searchMode.value && viewModel.searchValue.value.isNotEmpty() &&
+                    !viewModel.postsList[index].message.contains(viewModel.searchValue.value)
+                ) {
+                    return@items
+                }
                 Message(
                     viewModel,
                     appViewModel,
