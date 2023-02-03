@@ -212,18 +212,13 @@ fun ClubScreen(
                             )
                         }
 
-                        AnimatedVisibility(
-                            visible = viewModel.postsList.isNotEmpty() && !viewModel.loadingPosts.value,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Messages(
-                                viewModel = viewModel,
-                                modifier = Modifier.weight(1f),
-                                scrollState = listScrollState,
-                                appViewModel = appViewModel,
-                                onNavigateToPost = onNavigateToPost
-                            )
-                        }
+                        Messages(
+                            viewModel = viewModel,
+                            modifier = Modifier.weight(1f),
+                            scrollState = listScrollState,
+                            appViewModel = appViewModel,
+                            onNavigateToPost = onNavigateToPost
+                        )
 
                         if (viewModel.showDelPostDialog.value) {
                             ConfirmationDialog(

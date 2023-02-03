@@ -4,7 +4,6 @@ package com.mnnit.moticlubs.ui.screens
 
 import android.content.Context
 import android.util.Log
-import android.util.Patterns
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -13,14 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -103,9 +100,6 @@ fun HomeScreen(
 
                     Text(text = "MNNIT Clubs", fontSize = 28.sp)
 
-                    AnimatedVisibility(visible = viewModel.clubsList.isNotEmpty(), modifier = Modifier.fillMaxWidth()) {
-                        ClubList(viewModel = viewModel, onNavigatePostItemClick = onNavigatePostItemClick)
-                    }
                     AnimatedVisibility(visible = viewModel.clubsList.isEmpty(), modifier = Modifier.fillMaxWidth()) {
                         LinearProgressIndicator(
                             modifier = Modifier
@@ -113,6 +107,7 @@ fun HomeScreen(
                                 .padding(16.dp)
                         )
                     }
+                    ClubList(viewModel = viewModel, onNavigatePostItemClick = onNavigatePostItemClick)
                 }
             },
             floatingActionButton = {
