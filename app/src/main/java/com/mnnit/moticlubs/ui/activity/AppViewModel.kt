@@ -3,14 +3,13 @@ package com.mnnit.moticlubs.ui.activity
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
-import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.api.Repository.getUserData
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.api.UserResponse
 import com.mnnit.moticlubs.getAuthToken
@@ -36,13 +35,9 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     val regNo = mutableStateOf("")
     val course = mutableStateOf("")
     val avatar = mutableStateOf("")
-    val adminList = mutableListOf<String>()
     val subscribedList = mutableListOf<String>()
-    val subscriberCount = mutableStateOf<Int>(0)
+    val subscriberCount = mutableStateOf(0)
     val adminInfoMap = mutableMapOf<String, UserDetailResponse>()
-
-    val isAdmin
-        get() = adminList.isNotEmpty()
 
     fun setUser(user: UserResponse) {
         name.value = user.name
@@ -52,17 +47,8 @@ class AppViewModel @Inject constructor(private val application: Application) : V
         course.value = user.course
         avatar.value = user.avatar
 
-        adminList.clear()
-        user.admin.forEach { adminList.add(it) }
-
         subscribedList.clear()
         user.subscribed.forEach { subscribedList.add(it) }
-    }
-
-    fun getAuthToken(context: Context) = context.getAuthToken()
-
-    fun setAuthToken(context: Context, token: String) {
-        context.setAuthToken(token)
     }
 
     fun logoutUser(context: Context) {
@@ -73,7 +59,7 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     fun fetchUser(user: FirebaseUser?, context: Context) {
         fetchingState.value = true
         if (user != null) {
-            API.getUserData(getAuthToken(context), {
+            getUserData(context.getAuthToken(), {
                 setUser(it)
                 fetchingState.value = false
                 showErrorScreen.value = false

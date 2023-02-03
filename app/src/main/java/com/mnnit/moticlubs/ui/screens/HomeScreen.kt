@@ -25,10 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.api.Repository.getClubs
+import com.mnnit.moticlubs.api.Repository.getUserDetails
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
@@ -36,7 +36,6 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +44,7 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
     val clubsList = mutableStateListOf<ClubModel>()
 
     fun setClubsList(context: Context, appViewModel: AppViewModel) {
-        API.getClubs(context.getAuthToken(), { list ->
+        getClubs(context.getAuthToken(), { list ->
             clubsList.clear()
             val hash = HashMap<String, UserDetailResponse>()
 
@@ -57,11 +56,9 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
                         Log.d("TAG", "HomeScreen: Fetching $email")
                         hash[email] = UserDetailResponse()
 
-                        appViewModel.viewModelScope.launch {
-                            API.getUserDetails(context.getAuthToken(), email, { adminRes ->
-                                appViewModel.adminInfoMap[email] = adminRes
-                            }) {}
-                        }
+                        getUserDetails(context.getAuthToken(), email, { adminRes ->
+                            appViewModel.adminInfoMap[email] = adminRes
+                        }) {}
                     }
                 }
             }

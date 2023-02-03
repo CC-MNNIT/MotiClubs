@@ -38,8 +38,9 @@ import com.canhub.cropper.CropImageOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.api.Repository.updateProfilePic
 import com.mnnit.moticlubs.compressBitmap
+import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.ui.ConfirmationDialog
 import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
@@ -280,7 +281,7 @@ private fun updateProfilePicture(
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
             val downloadUri = task.result
-            API.updateProfilePic(appViewModel.getAuthToken(context = context), downloadUri.toString(), {
+            appViewModel.updateProfilePic(context.getAuthToken(), downloadUri.toString(), {
                 appViewModel.avatar.value = it.avatar
                 loading.value = false
             }) {}

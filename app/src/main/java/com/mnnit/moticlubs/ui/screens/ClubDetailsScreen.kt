@@ -46,10 +46,11 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubDTO
 import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.api.Repository.updateClub
 import com.mnnit.moticlubs.compressBitmap
+import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -470,7 +471,7 @@ fun updateClubModel(
     clubDTO: ClubDTO,
     context: Context
 ) {
-    API.updateClub(appViewModel.getAuthToken(context = context), appViewModel.clubModel.value.id, clubDTO = clubDTO, {
+    viewModel.updateClub(context.getAuthToken(), appViewModel.clubModel.value.id, clubDTO = clubDTO, {
         viewModel.socialMediaUrlUpdated.value = false
         viewModel.isEditButtonEnabled = false
         viewModel.isLoading.value = false

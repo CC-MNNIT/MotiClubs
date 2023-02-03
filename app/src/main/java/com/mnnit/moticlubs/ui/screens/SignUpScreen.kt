@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.mnnit.moticlubs.api.API
+import com.mnnit.moticlubs.api.Repository.saveUser
 import com.mnnit.moticlubs.api.UserModel
 import com.mnnit.moticlubs.getDomainMail
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -339,7 +339,7 @@ private fun signUpUser(
                     viewModel.emailID.value.getDomainMail(),
                     viewModel.phoneNumber.value
                 )
-                API.saveUser(token, userModel, {
+                viewModel.saveUser(token, userModel, {
                     user.sendEmailVerification().addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             auth.signOut()

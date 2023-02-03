@@ -63,12 +63,18 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.api.*
+import com.mnnit.moticlubs.api.Repository.deletePost
+import com.mnnit.moticlubs.api.Repository.getClubPosts
+import com.mnnit.moticlubs.api.Repository.getMembersCount
+import com.mnnit.moticlubs.api.Repository.sendPost
+import com.mnnit.moticlubs.api.Repository.subscribeToClub
+import com.mnnit.moticlubs.api.Repository.unsubscribeToClub
+import com.mnnit.moticlubs.api.Repository.updatePost
 import com.mnnit.moticlubs.ui.ConfirmationDialog
 import com.mnnit.moticlubs.ui.MarkdownText
 import com.mnnit.moticlubs.ui.ProgressDialog
@@ -125,17 +131,15 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
     fun fetchPostsList(context: Context) {
         loadingPosts.value = true
-        viewModelScope.launch {
-            API.getClubPosts(context.getAuthToken(), clubID = clubModel.value.id, { list ->
-                postsList.clear()
-                list.forEach { postsList.add(it) }
-                loadingPosts.value = false
-            }) { loadingPosts.value = false }
-        }
+        getClubPosts(context.getAuthToken(), clubID = clubModel.value.id, { list ->
+            postsList.clear()
+            list.forEach { postsList.add(it) }
+            loadingPosts.value = false
+        }) { loadingPosts.value = false }
     }
 
     fun fetchSubscriberCount(context: Context) {
-        API.getMembersCount(context.getAuthToken(), clubModel.value.id, {
+        getMembersCount(context.getAuthToken(), clubModel.value.id, {
             subscriberCount.value = it.count
         }) { }
     }
@@ -230,7 +234,7 @@ fun ClubScreen(
                                     viewModel.progressText.value = "Deleting ..."
                                     viewModel.showProgress.value = true
                                     if (viewModel.delPostIdx.value < 0) return@ConfirmationDialog
-                                    API.deletePost(context.getAuthToken(),
+                                    viewModel.deletePost(context.getAuthToken(),
                                         viewModel.postsList[viewModel.delPostIdx.value].id,
                                         {
                                             viewModel.showProgress.value = false
@@ -280,7 +284,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         if (viewModel.showEditDialog.value) {
             UpdatePostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
-                API.updatePost(context.getAuthToken(),
+                viewModel.updatePost(context.getAuthToken(),
                     viewModel.postsList[viewModel.editPostIdx.value].id,
                     viewModel.postMsg.value.text, {
                         Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
@@ -304,7 +308,7 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         if (viewModel.showDialog.value) {
             PostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
-                API.sendPost(context.getAuthToken(), viewModel.clubModel.value.id,
+                viewModel.sendPost(context.getAuthToken(), viewModel.clubModel.value.id,
                     viewModel.postMsg.value.text, {
                         Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
                         viewModel.fetchPostsList(context)
@@ -919,7 +923,7 @@ fun SubscriptionConfirmationDialog(
             viewModel.progressText.value = if (subscribe) "Subscribing ..." else "Unsubscribing ..."
             viewModel.showProgress.value = true
             if (subscribe) {
-                API.subscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
+                viewModel.subscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
                     appViewModel.subscribedList.add(viewModel.clubModel.value.id)
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
@@ -931,7 +935,7 @@ fun SubscriptionConfirmationDialog(
                     Toast.makeText(context, "$it: Error could not process request", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                API.unsubscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
+                viewModel.unsubscribeToClub(context.getAuthToken(), viewModel.clubModel.value.id, {
                     appViewModel.subscribedList.remove(viewModel.clubModel.value.id)
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
