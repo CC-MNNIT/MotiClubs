@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,16 +64,13 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.*
 import com.mnnit.moticlubs.ui.ConfirmationDialog
+import com.mnnit.moticlubs.ui.MarkdownText
 import com.mnnit.moticlubs.ui.ProgressDialog
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.getImageUrlPainter
@@ -80,7 +78,6 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -268,7 +265,6 @@ fun ClubScreen(
 @Composable
 private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
     val scrollState = rememberScrollState()
-    val horizontalScrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -384,20 +380,21 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()
+                    .animateContentSize()
             ) {
-                AnimatedVisibility(
-                    visible = viewModel.isPreviewMode.value,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .horizontalScroll(horizontalScrollState)
-                        .verticalScroll(scrollState)
-                ) {
-                    MarkdownText(
-                        markdown = viewModel.postMsg.value.text,
-                        color = contentColorFor(backgroundColor = colorScheme.background),
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                if (viewModel.isPreviewMode.value) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .verticalScroll(scrollState)
+                    ) {
+                        MarkdownText(
+                            markdown = viewModel.postMsg.value.text,
+                            color = contentColorFor(backgroundColor = colorScheme.background),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
 
                 AnimatedVisibility(
@@ -452,13 +449,13 @@ private fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     FilterChip(
                         selected = viewModel.isPreviewMode.value,
                         onClick = {
-                            viewModel.isPreviewMode.value = !viewModel.isPreviewMode.value
-                            if (viewModel.isPreviewMode.value) {
+                            keyboardController?.hide()
+                            if (!viewModel.isPreviewMode.value) {
                                 scope.launch {
                                     scrollState.animateScrollTo(0)
                                 }
                             }
-                            keyboardController?.hide()
+                            viewModel.isPreviewMode.value = !viewModel.isPreviewMode.value
                         },
                         label = {
                             Text(text = "Preview", fontSize = 14.sp)

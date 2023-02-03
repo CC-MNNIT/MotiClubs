@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.api.PostNotificationModel
 import com.mnnit.moticlubs.postRead
+import com.mnnit.moticlubs.ui.MarkdownText
 import com.mnnit.moticlubs.ui.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun PostScreen(
@@ -71,6 +71,8 @@ fun PostScreen(
                 MarkdownText(
                     markdown = postNotificationModel.value.message,
                     color = contentColorFor(backgroundColor = getColorScheme().background),
+                    selectable = true,
+                    disableLinkMovementMethod = false,
                     modifier = Modifier
                         .verticalScroll(scroll)
                         .padding(16.dp)
