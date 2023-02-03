@@ -74,6 +74,7 @@ fun PostScreen(
                     selectable = true,
                     disableLinkMovementMethod = false,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .verticalScroll(scroll)
                         .padding(16.dp)
                 )

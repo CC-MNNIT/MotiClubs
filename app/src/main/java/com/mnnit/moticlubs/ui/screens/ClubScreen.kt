@@ -30,13 +30,13 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
@@ -730,7 +730,7 @@ fun InputLinkDialog(viewModel: ClubScreenViewModel) {
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
 
-                TextButton(
+                Button(
                     onClick = {
                         val post = viewModel.postMsg.value.text
                         val selection = viewModel.postMsg.value.selection
@@ -746,14 +746,7 @@ fun InputLinkDialog(viewModel: ClubScreenViewModel) {
                         .align(Alignment.CenterHorizontally),
                     enabled = viewModel.inputLink.value.matches(Patterns.WEB_URL.toRegex())
                 ) {
-                    Text(
-                        text = "Add link",
-                        color = if (viewModel.inputLink.value.matches(Patterns.WEB_URL.toRegex())) {
-                            colorScheme.primary
-                        } else colorScheme.contentColorFor(colorScheme.background),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Text(text = "Add Link", fontSize = 14.sp)
                 }
             }
         }
