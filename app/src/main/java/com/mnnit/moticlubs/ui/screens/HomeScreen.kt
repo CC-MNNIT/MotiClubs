@@ -29,11 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.api.API
 import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.UserDetailResponse
@@ -158,21 +154,7 @@ fun ClubList(viewModel: HomeScreenViewModel, onNavigatePostItemClick: (club: Clu
                             .size(48.dp)
                             .clip(CircleShape)
                             .align(Alignment.CenterVertically),
-                        painter = if (viewModel.clubsList[idx].avatar.isEmpty() || !viewModel.clubsList[idx].avatar.matches(
-                                Patterns.WEB_URL.toRegex()
-                            )
-                        ) {
-                            rememberVectorPainter(image = Icons.Outlined.AccountCircle)
-                        } else {
-                            rememberAsyncImagePainter(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(viewModel.clubsList[idx].avatar)
-                                    .diskCachePolicy(CachePolicy.ENABLED)
-                                    .diskCacheKey(Constants.AVATAR)
-                                    .placeholder(R.drawable.outline_account_circle_24)
-                                    .build()
-                            )
-                        },
+                        painter = LocalContext.current.getImageUrlPainter(url = viewModel.clubsList[idx].avatar),
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )

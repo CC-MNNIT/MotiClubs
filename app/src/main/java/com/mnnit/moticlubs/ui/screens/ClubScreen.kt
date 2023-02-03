@@ -862,21 +862,7 @@ fun ChannelNameBar(
                 .size(42.dp)
                 .clip(CircleShape)
                 .align(Alignment.CenterVertically),
-            painter = if (viewModel.clubModel.value.avatar.isEmpty() || !viewModel.clubModel.value.avatar.matches(
-                    Patterns.WEB_URL.toRegex()
-                )
-            ) {
-                rememberVectorPainter(image = Icons.Outlined.AccountCircle)
-            } else {
-                rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(viewModel.clubModel.value.avatar)
-                        .diskCachePolicy(CachePolicy.ENABLED)
-                        .diskCacheKey(Constants.AVATAR)
-                        .placeholder(R.drawable.outline_account_circle_24)
-                        .build()
-                )
-            },
+            painter = LocalContext.current.getImageUrlPainter(url = viewModel.clubModel.value.avatar),
             contentScale = ContentScale.Crop,
             contentDescription = null,
         )
