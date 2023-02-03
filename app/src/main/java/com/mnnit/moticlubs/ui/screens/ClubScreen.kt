@@ -119,7 +119,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
         )
     )
     val scrollValue = mutableStateOf(0)
-    val subscriberCount = mutableStateOf<Int>(0)
+    val subscriberCount = mutableStateOf(0)
 
     fun fetchPostsList(context: Context) {
         loadingPosts.value = true
@@ -132,8 +132,8 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun fetchSubscriberCount(appViewModel : AppViewModel, context:Context) {
-        API.getMembersCount(appViewModel.getAuthToken(context),appViewModel.clubModel.value.id ,{
+    fun fetchSubscriberCount(context: Context) {
+        API.getMembersCount(context.getAuthToken(), clubModel.value.id, {
             subscriberCount.value = it.count
         }) { }
     }
@@ -149,7 +149,7 @@ fun ClubScreen(
     val context = LocalContext.current
     viewModel.clubModel.value = appViewModel.clubModel.value
     viewModel.bottomSheetScaffoldState.value = rememberBottomSheetScaffoldState()
-    viewModel.fetchSubscriberCount(appViewModel,context)
+    viewModel.fetchSubscriberCount(context)
     viewModel.fetchPostsList(LocalContext.current)
     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
     appViewModel.subscriberCount.value = viewModel.subscriberCount.value
@@ -776,8 +776,7 @@ fun ChannelNameBar(
             modifier = Modifier
                 .size(42.dp)
                 .clip(CircleShape)
-                .align(Alignment.Top)
-                .padding(all=5.dp),
+                .align(Alignment.CenterVertically),
             painter = if (viewModel.clubModel.value.avatar.isEmpty() || !viewModel.clubModel.value.avatar.matches(
                     Patterns.WEB_URL.toRegex()
                 )
@@ -811,7 +810,7 @@ fun ChannelNameBar(
 
             // Number of members
             Text(
-                text = "Members: " + viewModel.subscriberCount.value,
+                text = "${viewModel.subscriberCount.value} Members",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -865,7 +864,7 @@ fun SubscriptionConfirmationDialog(
                     appViewModel.subscribedList.add(viewModel.clubModel.value.id)
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
-                    viewModel.fetchSubscriberCount(appViewModel,context)
+                    viewModel.fetchSubscriberCount(context)
                     appViewModel.subscriberCount.value = viewModel.subscriberCount.value
                     Toast.makeText(context, "Subscribed", Toast.LENGTH_SHORT).show()
                 }) {
@@ -877,7 +876,7 @@ fun SubscriptionConfirmationDialog(
                     appViewModel.subscribedList.remove(viewModel.clubModel.value.id)
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
-                    viewModel.fetchSubscriberCount(appViewModel,context)
+                    viewModel.fetchSubscriberCount(context)
                     appViewModel.subscriberCount.value = viewModel.subscriberCount.value
                     Toast.makeText(context, "Unsubscribed", Toast.LENGTH_SHORT).show()
                 }) {
