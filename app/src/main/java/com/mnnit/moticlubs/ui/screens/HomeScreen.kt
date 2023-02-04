@@ -39,7 +39,7 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
     val clubsList = mutableStateListOf<ClubModel>()
 
     fun setClubsList(context: Context, appViewModel: AppViewModel) {
-        getClubs(context.getAuthToken(), { list ->
+        getClubs(context, { list ->
             clubsList.clear()
             val hash = HashMap<String, UserDetailResponse>()
 
@@ -51,7 +51,7 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
                         Log.d("TAG", "HomeScreen: Fetching $email")
                         hash[email] = UserDetailResponse()
 
-                        getUserDetails(context.getAuthToken(), email, { adminRes ->
+                        getUserDetails(context, email, { adminRes ->
                             appViewModel.adminInfoMap[email] = adminRes
                         }) {}
                     }

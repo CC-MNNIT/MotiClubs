@@ -36,6 +36,7 @@ import io.noties.markwon.image.AsyncDrawableScheduler
 import io.noties.markwon.image.DefaultMediaDecoder
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.gif.GifMediaDecoder
+import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
 import io.noties.markwon.image.picasso.PicassoImagesPlugin
 import io.noties.markwon.image.picasso.PicassoImagesPlugin.PicassoStore
 import io.noties.markwon.image.svg.SvgMediaDecoder
@@ -157,6 +158,7 @@ private fun createMarkdownRender(context: Context): Markwon {
             }
         })
         .usePlugin(ImagesPlugin.create { plugin ->
+            plugin.addSchemeHandler(OkHttpNetworkSchemeHandler.create())
             plugin.addMediaDecoder(GifMediaDecoder.create(true))
 
             plugin.addMediaDecoder(SvgMediaDecoder.create(context.resources))

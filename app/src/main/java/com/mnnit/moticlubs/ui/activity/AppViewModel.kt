@@ -12,7 +12,6 @@ import com.mnnit.moticlubs.api.ClubModel
 import com.mnnit.moticlubs.api.Repository.getUserData
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.api.UserResponse
-import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.setAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -59,7 +58,7 @@ class AppViewModel @Inject constructor(private val application: Application) : V
     fun fetchUser(user: FirebaseUser?, context: Context) {
         fetchingState.value = true
         if (user != null) {
-            getUserData(context.getAuthToken(), {
+            getUserData(context, {
                 setUser(it)
                 fetchingState.value = false
                 showErrorScreen.value = false

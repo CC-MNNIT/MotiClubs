@@ -34,6 +34,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.api.Repository.saveUser
 import com.mnnit.moticlubs.api.UserModel
 import com.mnnit.moticlubs.getDomainMail
+import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -332,6 +333,7 @@ private fun signUpUser(
             }
             user.getIdToken(false).addOnSuccessListener { result ->
                 val token = result.token ?: ""
+                context.setAuthToken(token)
                 val userModel = UserModel(
                     viewModel.name.value,
                     viewModel.regNo.value,
@@ -339,7 +341,7 @@ private fun signUpUser(
                     viewModel.emailID.value.getDomainMail(),
                     viewModel.phoneNumber.value
                 )
-                viewModel.saveUser(token, userModel, {
+                viewModel.saveUser(context, userModel, {
                     user.sendEmailVerification().addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             auth.signOut()

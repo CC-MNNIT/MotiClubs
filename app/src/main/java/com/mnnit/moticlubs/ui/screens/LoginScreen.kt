@@ -261,11 +261,11 @@ private fun login(
                             return@addOnSuccessListener
                         }
                         context.setAuthToken(token)
-                        handleUser(context, auth, token, viewModel, appViewModel, onNavigateToMain)
+                        handleUser(context, auth, viewModel, appViewModel, onNavigateToMain)
                     }
                 } else {
                     Log.d(TAG, "login: FirebaseIDToken invoked")
-                    handleUser(context, auth, authToken, viewModel, appViewModel, onNavigateToMain)
+                    handleUser(context, auth, viewModel, appViewModel, onNavigateToMain)
                 }
             } else {
                 auth.signOut()
@@ -278,14 +278,13 @@ private fun login(
 private fun handleUser(
     context: Context,
     auth: FirebaseAuth,
-    token: String,
     viewModel: LoginScreenViewModel,
     appViewModel: AppViewModel,
     onNavigateToMain: () -> Unit
 ) {
     FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
-        viewModel.setFCMToken(token, fcm, {
-            viewModel.getUserData(token, { userRes ->
+        viewModel.setFCMToken(context, fcm, {
+            viewModel.getUserData(context, { userRes ->
                 viewModel.resetState()
                 appViewModel.setUser(userRes)
                 onNavigateToMain()

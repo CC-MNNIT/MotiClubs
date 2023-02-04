@@ -171,6 +171,8 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         val colorScheme = getColorScheme()
         MotiClubsTheme(colorScheme) {
+            SetNavBarsTheme()
+
             Surface(
                 modifier = Modifier
                     .fillMaxSize()

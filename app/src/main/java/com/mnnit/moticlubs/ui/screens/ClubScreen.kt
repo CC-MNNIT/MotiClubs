@@ -96,7 +96,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 
     fun fetchPostsList(context: Context) {
         loadingPosts.value = true
-        getClubPosts(context.getAuthToken(), clubID = clubModel.value.id, { list ->
+        getClubPosts(context, clubID = clubModel.value.id, { list ->
             postsList.clear()
             list.forEach { postsList.add(it) }
             loadingPosts.value = false
@@ -104,7 +104,7 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     }
 
     fun fetchSubscriberCount(context: Context) {
-        getMembersCount(context.getAuthToken(), clubModel.value.id, {
+        getMembersCount(context, clubModel.value.id, {
             subscriberCount.value = it.count
         }) { }
     }
@@ -245,7 +245,7 @@ fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
             viewModel.progressText.value = "Deleting ..."
             viewModel.showProgress.value = true
             if (viewModel.delPostIdx.value < 0) return@ConfirmationDialog
-            viewModel.deletePost(context.getAuthToken(),
+            viewModel.deletePost(context,
                 viewModel.postsList[viewModel.delPostIdx.value].id,
                 {
                     viewModel.showProgress.value = false

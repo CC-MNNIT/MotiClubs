@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.api.Repository.sendPost
 import com.mnnit.moticlubs.api.Repository.updatePost
-import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.screens.PostConfirmationDialog
 import com.mnnit.moticlubs.ui.screens.UpdatePostConfirmationDialog
@@ -62,7 +61,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         if (viewModel.showEditDialog.value) {
             UpdatePostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
-                viewModel.updatePost(context.getAuthToken(),
+                viewModel.updatePost(context,
                     viewModel.postsList[viewModel.editPostIdx.value].id,
                     viewModel.postMsg.value.text, {
                         Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
@@ -86,7 +85,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         if (viewModel.showDialog.value) {
             PostConfirmationDialog(viewModel = viewModel) {
                 viewModel.isPreviewMode.value = false
-                viewModel.sendPost(context.getAuthToken(), viewModel.clubModel.value.id,
+                viewModel.sendPost(context, viewModel.clubModel.value.id,
                     viewModel.postMsg.value.text, {
                         Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
                         viewModel.fetchPostsList(context)

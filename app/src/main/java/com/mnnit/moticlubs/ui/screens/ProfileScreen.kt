@@ -37,7 +37,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.api.Repository.updateProfilePic
 import com.mnnit.moticlubs.compressBitmap
-import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -271,7 +270,7 @@ private fun updateProfilePicture(
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
             val downloadUri = task.result
-            appViewModel.updateProfilePic(context.getAuthToken(), downloadUri.toString(), {
+            appViewModel.updateProfilePic(context, downloadUri.toString(), {
                 appViewModel.avatar.value = it.avatar
                 loading.value = false
             }) {}

@@ -3,6 +3,8 @@ package com.mnnit.moticlubs
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
@@ -111,4 +113,16 @@ fun compressBitmap(uri: Uri, context: Context): Bitmap? {
     val out = BitmapFactory.decodeStream(inputStream, null, finalOptions)
     inputStream?.close()
     return out
+}
+
+fun Context.connectionAvailable(): Boolean {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val nwCap = connectivityManager.activeNetwork
+    val activeNw = connectivityManager.getNetworkCapabilities(nwCap) ?: return false
+    return when {
+        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        else -> false
+    }
 }
