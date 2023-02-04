@@ -24,7 +24,6 @@ import com.mnnit.moticlubs.api.PostResponse
 import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.toTimeString
-import com.mnnit.moticlubs.ui.MarkdownText
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.theme.getColorScheme

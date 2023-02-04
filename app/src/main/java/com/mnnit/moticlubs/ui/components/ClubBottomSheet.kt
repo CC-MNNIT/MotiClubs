@@ -33,7 +33,6 @@ import com.mnnit.moticlubs.api.Repository.sendPost
 import com.mnnit.moticlubs.api.Repository.updatePost
 import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.scrollMultiplierIndex
-import com.mnnit.moticlubs.ui.MarkdownText
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.screens.PostConfirmationDialog
 import com.mnnit.moticlubs.ui.screens.UpdatePostConfirmationDialog

@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui
+package com.mnnit.moticlubs.ui.components
 
 import android.content.Context
 import android.text.method.LinkMovementMethod
