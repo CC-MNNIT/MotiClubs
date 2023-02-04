@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.api.Repository.sendPost
 import com.mnnit.moticlubs.api.Repository.updatePost
 import com.mnnit.moticlubs.getAuthToken
-import com.mnnit.moticlubs.scrollMultiplierIndex
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.screens.PostConfirmationDialog
 import com.mnnit.moticlubs.ui.screens.UpdatePostConfirmationDialog
@@ -163,6 +162,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                 if (viewModel.isPreviewMode.value) {
                     Box(
                         modifier = Modifier
+                            .imePadding()
                             .fillMaxWidth()
                             .weight(1f)
                             .verticalScroll(scrollState)
@@ -180,11 +180,13 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .verticalScroll(scrollState)
+                        .imePadding()
                 ) {
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .imePadding()
+                            .weight(1f)
                             .onFocusChanged {
                                 if (it.hasFocus) {
                                     scope.launch {
@@ -196,15 +198,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                                 }
                             },
                         value = viewModel.postMsg.value,
-                        onValueChange = {
-                            val scrollValue = viewModel.scrollValue.value +
-                                    (scrollMultiplierIndex(viewModel.postMsg.value.text, it.text) * 53)
-
-                            viewModel.postMsg.value = it
-                            scope.launch {
-                                scrollState.animateScrollTo(scrollValue)
-                            }
-                        },
+                        onValueChange = { viewModel.postMsg.value = it },
                         shape = RoundedCornerShape(24.dp),
                         label = { Text(text = "Post") },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
