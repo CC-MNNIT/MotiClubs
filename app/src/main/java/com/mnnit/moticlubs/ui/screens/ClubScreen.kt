@@ -70,7 +70,6 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val loadingPosts = mutableStateOf(false)
 
     val isPreviewMode = mutableStateOf(false)
-    val isMemberPost = mutableStateOf(false)
 
     val inputLinkName = mutableStateOf("")
     val inputLink = mutableStateOf("")

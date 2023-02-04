@@ -250,28 +250,6 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
 
                     Spacer(Modifier.weight(1f))
 
-                    FilterChip(
-                        selected = viewModel.isMemberPost.value,
-                        onClick = { viewModel.isMemberPost.value = !viewModel.isMemberPost.value },
-                        label = {
-                            Text(text = if (viewModel.isMemberPost.value) "Members" else "General", fontSize = 14.sp)
-                        }, leadingIcon = {
-                            Icon(
-                                painter = rememberVectorPainter(
-                                    image = if (viewModel.isMemberPost.value) {
-                                        Icons.Rounded.Group
-                                    } else Icons.Rounded.Groups3
-                                ),
-                                contentDescription = ""
-                            )
-                        }, modifier = Modifier
-                            .imePadding()
-                            .align(Alignment.CenterVertically),
-                        shape = RoundedCornerShape(24.dp)
-                    )
-
-                    Spacer(Modifier.weight(1f))
-
                     AssistChip(
                         onClick = {
                             keyboardController?.hide()
