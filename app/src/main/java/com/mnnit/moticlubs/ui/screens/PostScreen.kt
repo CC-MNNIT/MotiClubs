@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.api.PostNotificationModel
 import com.mnnit.moticlubs.postRead
-import com.mnnit.moticlubs.ui.MarkdownText
+import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme

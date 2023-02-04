@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.components
 
 import android.content.Context
+import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.View
@@ -31,8 +32,13 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.AsyncDrawable
+import io.noties.markwon.image.AsyncDrawableScheduler
+import io.noties.markwon.image.DefaultMediaDecoder
+import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.image.gif.GifMediaDecoder
 import io.noties.markwon.image.picasso.PicassoImagesPlugin
 import io.noties.markwon.image.picasso.PicassoImagesPlugin.PicassoStore
+import io.noties.markwon.image.svg.SvgMediaDecoder
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import org.commonmark.node.SoftLineBreak
@@ -148,6 +154,24 @@ private fun createMarkdownRender(context: Context): Markwon {
         .usePlugin(object : AbstractMarkwonPlugin() {
             override fun configureVisitor(builder: MarkwonVisitor.Builder) {
                 builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
+            }
+        })
+        .usePlugin(ImagesPlugin.create { plugin ->
+            plugin.addMediaDecoder(GifMediaDecoder.create(true))
+
+            plugin.addMediaDecoder(SvgMediaDecoder.create(context.resources))
+            plugin.addMediaDecoder(SvgMediaDecoder.create())
+
+            plugin.defaultMediaDecoder(DefaultMediaDecoder.create(context.resources))
+            plugin.defaultMediaDecoder(DefaultMediaDecoder.create())
+        })
+        .usePlugin(object : AbstractMarkwonPlugin() {
+            override fun beforeSetText(textView: TextView, markdown: Spanned) {
+                AsyncDrawableScheduler.unschedule(textView)
+            }
+
+            override fun afterSetText(textView: TextView) {
+                AsyncDrawableScheduler.schedule(textView)
             }
         })
         .usePlugin(StrikethroughPlugin.create())
