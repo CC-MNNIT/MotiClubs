@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
 import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.connectionAvailable
 import com.mnnit.moticlubs.getAuthToken
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -42,17 +41,17 @@ object Repository {
         onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().saveUser(ctx.getAuthToken(), userModel)
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().saveUser(ctx.getAuthToken(), userModel)
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -62,17 +61,17 @@ object Repository {
         onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().getUserData(ctx.getAuthToken())
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().getUserData(ctx.getAuthToken())
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse(body)
         }
     }
 
@@ -81,18 +80,18 @@ object Repository {
         onResponse: (profilePic: ProfilePicResponse) -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject()
+                    .updateProfilePic(ctx.getAuthToken(), ProfilePicResponse(url))
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject()
-                .updateProfilePic(ctx.getAuthToken(), ProfilePicResponse(url))
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse(body)
         }
     }
 
@@ -101,17 +100,17 @@ object Repository {
         onResponse: (fcmToken: FCMToken) -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().setFCMToken(ctx.getAuthToken(), FCMToken(token))
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().setFCMToken(ctx.getAuthToken(), FCMToken(token))
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse(body)
         }
     }
 
@@ -120,13 +119,17 @@ object Repository {
         onResponse: (userDetail: UserDetailResponse) -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            val response = getRetrofitAccessObject().getUserDetails(ctx.getAuthToken(), email)
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
+            try {
+                val response = getRetrofitAccessObject().getUserDetails(ctx.getAuthToken(), email)
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
+                onFailure(-1)
             }
-            onResponse(body)
         }
     }
 
@@ -135,18 +138,18 @@ object Repository {
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject()
+                    .subscribeToClub(ctx.getAuthToken(), ClubSubscriptionModel(clubID))
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject()
-                .subscribeToClub(ctx.getAuthToken(), ClubSubscriptionModel(clubID))
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -155,18 +158,18 @@ object Repository {
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject()
+                    .unsubscribeToClub(ctx.getAuthToken(), ClubSubscriptionModel(clubID))
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject()
-                .unsubscribeToClub(ctx.getAuthToken(), ClubSubscriptionModel(clubID))
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -175,17 +178,17 @@ object Repository {
         onResponse: (clubList: List<ClubModel>) -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().getClubs(ctx.getAuthToken())
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().getClubs(ctx.getAuthToken())
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse(body)
         }
     }
 
@@ -194,17 +197,17 @@ object Repository {
         onResponse: (posts: List<PostResponse>) -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().getClubPosts(ctx.getAuthToken(), clubID)
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().getClubPosts(ctx.getAuthToken(), clubID)
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse(body)
         }
     }
 
@@ -213,17 +216,17 @@ object Repository {
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().sendPost(ctx.getAuthToken(), PostModel(message, clubID))
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().sendPost(ctx.getAuthToken(), PostModel(message, clubID))
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -232,16 +235,17 @@ object Repository {
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response =
+                    getRetrofitAccessObject().updatePost(ctx.getAuthToken(), postID, UpdatePostModel(message))
+                if (!response.isSuccessful) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().updatePost(ctx.getAuthToken(), postID, UpdatePostModel(message))
-            if (!response.isSuccessful) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -250,16 +254,16 @@ object Repository {
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().deletePost(ctx.getAuthToken(), postID)
+                if (!response.isSuccessful) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().deletePost(ctx.getAuthToken(), postID)
-            if (!response.isSuccessful) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -268,16 +272,16 @@ object Repository {
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().updateClub(ctx.getAuthToken(), clubID, clubDTO)
+                if (!response.isSuccessful) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse()
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().updateClub(ctx.getAuthToken(), clubID, clubDTO)
-            if (!response.isSuccessful) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse()
         }
     }
 
@@ -289,17 +293,17 @@ object Repository {
         onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            if (!ctx.connectionAvailable()) {
+            try {
+                val response = getRetrofitAccessObject().getMembersCount(ctx.getAuthToken(), clubID)
+                val body = response.body()
+                if (!response.isSuccessful || body == null) {
+                    onFailure(response.code())
+                    return@launch
+                }
+                onResponse(body)
+            } catch (e: Exception) {
                 onFailure(-1)
-                return@launch
             }
-            val response = getRetrofitAccessObject().getMembersCount(ctx.getAuthToken(), clubID)
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                onFailure(response.code())
-                return@launch
-            }
-            onResponse(body)
         }
     }
 }
