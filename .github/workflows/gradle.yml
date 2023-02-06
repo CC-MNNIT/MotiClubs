@@ -28,6 +28,10 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+    - name: Get secret
+      env:
+        FIREBASE: ${{ secrets.FIREBASE_JSON }}
+      run: echo $FIREBASE > app/google-services.json
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build with Gradle
