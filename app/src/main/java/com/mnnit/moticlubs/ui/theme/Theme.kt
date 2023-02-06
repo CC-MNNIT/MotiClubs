@@ -68,6 +68,20 @@ fun SetNavBarsTheme(elevation: Dp = 0.dp, setNavBar: Boolean = true) {
 }
 
 @Composable
+fun textColorFor(color: Color): Color {
+    val rgb = color.toRGB()
+    val threshold = (rgb[0] * 0.299) + (rgb[1] * 0.587) + (rgb[2] * 0.114)
+    return if (threshold > 186) Color(0xFF121212) else Color(0xFFFFFFFF)
+}
+
+private fun Color.toRGB(): IntArray {
+    val red = this.red * 255 + 0.5
+    val green = this.green * 255 + 0.5
+    val blue = this.blue * 255 + 0.5
+    return intArrayOf(red.toInt(), green.toInt(), blue.toInt())
+}
+
+@Composable
 fun MotiClubsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
