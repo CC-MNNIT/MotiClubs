@@ -35,4 +35,6 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build with Gradle
-      run: ./gradlew :app:assembleDebug
+      run: ./gradlew :app:assembleRelease
+    - name: Remove secret
+      run: rm -rf app/google-services.json
