@@ -30,8 +30,8 @@ jobs:
         distribution: 'temurin'
     - name: Get secret
       env:
-        FIREBASE: ${{ secrets.FIREBASE_JSON }}
-      run: echo $FIREBASE > app/google-services.json
+        JSON: ${{ secrets.JSON_PASS }}
+      run: chmod +x ./decrypt.sh && ./decrypt.sh
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build with Gradle
