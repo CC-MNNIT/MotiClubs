@@ -47,8 +47,6 @@ class AppFCMService : FirebaseMessagingService() {
     }
 
     private fun postNotification(user: FirebaseUser, data: Map<String, String>) {
-        Log.d(TAG, "postNotification: $data")
-
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
