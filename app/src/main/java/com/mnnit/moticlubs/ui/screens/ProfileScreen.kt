@@ -35,7 +35,6 @@ import com.canhub.cropper.CropImageOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mnnit.moticlubs.api.Repository.updateProfilePic
 import com.mnnit.moticlubs.compressBitmap
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
@@ -51,7 +50,6 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
     val loading = remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     MotiClubsTheme(getColorScheme()) {
         SetNavBarsTheme()
@@ -96,7 +94,7 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                     positiveBtnText = "Logout",
                     imageVector = Icons.Rounded.Logout,
                     onPositive = {
-                        appViewModel.logoutUser(context)
+                        appViewModel.logoutUser()
                         onNavigationLogout()
                     }
                 )
@@ -125,7 +123,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
     }
 
     Row(modifier = modifier) {
-        ProfilePicture(modifier = modifier.padding(start = 46.dp), url = appViewModel.avatar.value, size = 156.dp)
+        ProfilePicture(modifier = modifier.padding(start = 46.dp), url = appViewModel.user.avatar, size = 156.dp)
 
         IconButton(
             onClick = { launcher.launch("image/*") },
@@ -144,7 +142,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
 
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
-        value = appViewModel.name.value,
+        value = appViewModel.user.name,
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Name") },
@@ -161,7 +159,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
-        value = appViewModel.email.value.replace("@mnnit.ac.in", ""),
+        value = appViewModel.user.email.replace("@mnnit.ac.in", ""),
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "G-Suite ID") },
@@ -187,7 +185,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .padding(end = 8.dp),
-            value = appViewModel.regNo.value,
+            value = appViewModel.user.regNo,
             onValueChange = {},
             shape = RoundedCornerShape(24.dp),
             label = { Text(text = "Reg No") },
@@ -201,7 +199,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         )
 
         OutlinedTextField(
-            value = appViewModel.course.value,
+            value = appViewModel.user.course,
             onValueChange = { },
             readOnly = true,
             label = { Text(text = "Course") },
@@ -220,7 +218,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
-        value = appViewModel.phoneNumber.value,
+        value = appViewModel.user.phoneNumber,
         onValueChange = {},
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Phone No") },
@@ -269,11 +267,13 @@ private fun updateProfilePicture(
         profilePicRef.downloadUrl
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
-            val downloadUri = task.result
-            appViewModel.updateProfilePic(context, downloadUri.toString(), {
-                appViewModel.avatar.value = it.avatar
+            val downloadUrl = task.result.toString()
+            appViewModel.updateProfilePic(downloadUrl, {
                 loading.value = false
-            }) {}
+            }) {
+                loading.value = false
+                Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
+            }
         } else {
             Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
             loading.value = false

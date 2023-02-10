@@ -19,10 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.api.PostNotificationModel
-import com.mnnit.moticlubs.api.PostResponse
-import com.mnnit.moticlubs.api.UserDetailResponse
 import com.mnnit.moticlubs.getUnreadPost
+import com.mnnit.moticlubs.network.model.AdminDetailResponse
+import com.mnnit.moticlubs.network.model.PostModel
+import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.toTimeString
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
@@ -35,7 +35,7 @@ fun PostItem(
     viewModel: ClubScreenViewModel,
     appViewModel: AppViewModel,
     idx: Int,
-    admin: UserDetailResponse,
+    admin: AdminDetailResponse,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -48,9 +48,10 @@ fun PostItem(
         onClick = {
             onNavigateToPost(
                 PostNotificationModel(
-                    viewModel.clubModel.value.name,
-                    viewModel.clubModel.value.id,
-                    viewModel.postsList[idx].id,
+                    viewModel.clubNavModel.name,
+                    viewModel.clubNavModel.channel.name,
+                    viewModel.clubNavModel.channel.id,
+                    viewModel.postsList[idx].postID,
                     admin.name,
                     admin.avatar,
                     viewModel.postsList[idx].message,
@@ -80,8 +81,8 @@ fun PostItem(
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(
-                    visible = LocalContext.current.getUnreadPost(viewModel.clubModel.value.id)
-                        .contains(viewModel.postsList[idx].id),
+                    visible = LocalContext.current.getUnreadPost(viewModel.clubNavModel.channel.id)
+                        .contains(viewModel.postsList[idx].postID.toString()),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .padding(16.dp)
@@ -91,7 +92,7 @@ fun PostItem(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
+                AnimatedVisibility(visible = viewModel.postsList[idx].userID == appViewModel.user.id) {
                     IconButton(onClick = {
                         viewModel.editPostIdx.value = idx
                         viewModel.editMode.value = true
@@ -106,7 +107,7 @@ fun PostItem(
                         Icon(Icons.Rounded.Edit, contentDescription = "")
                     }
                 }
-                AnimatedVisibility(visible = viewModel.postsList[idx].adminEmail == appViewModel.email.value) {
+                AnimatedVisibility(visible = viewModel.postsList[idx].userID == appViewModel.user.id) {
                     IconButton(onClick = {
                         viewModel.delPostIdx.value = idx
                         viewModel.showDelPostDialog.value = true
@@ -127,7 +128,7 @@ fun PostItem(
 }
 
 @Composable
-private fun AuthorNameTimestamp(post: PostResponse, name: String) {
+private fun AuthorNameTimestamp(post: PostModel, name: String) {
     Column(modifier = Modifier
         .padding(start = 16.dp)
         .semantics(mergeDescendants = true) {}) {

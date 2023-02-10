@@ -1,6 +1,8 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.app.Application
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -30,19 +32,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.mnnit.moticlubs.api.Repository.saveUser
-import com.mnnit.moticlubs.api.UserModel
 import com.mnnit.moticlubs.getDomainMail
+import com.mnnit.moticlubs.network.Repository
+import com.mnnit.moticlubs.network.Success
+import com.mnnit.moticlubs.network.model.SaveUserModel
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpScreenViewModel @Inject constructor() : ViewModel() {
+class SignUpScreenViewModel @Inject constructor(
+    private val application: Application,
+    private val repository: Repository
+) : ViewModel() {
 
     val emailID = mutableStateOf("")
     val name = mutableStateOf("")
@@ -80,6 +90,21 @@ class SignUpScreenViewModel @Inject constructor() : ViewModel() {
         isPasswordVisible.value = false
         isLoading.value = false
         dropDownExpanded.value = false
+    }
+
+    fun saveUser(
+        saveUserModel: SaveUserModel,
+        onResponse: () -> Unit, onFailure: (code: Int) -> Unit
+    ) {
+        viewModelScope.launch {
+            val response = withContext(Dispatchers.IO) { repository.saveUser(application, saveUserModel) }
+            if (response is Success) {
+                onResponse()
+            } else {
+                onFailure(response.errCode)
+                Log.d("TAG", "saveUser: ${response.errMsg}")
+            }
+        }
     }
 }
 
@@ -311,54 +336,53 @@ private fun signUpUser(
 ) {
     val auth = FirebaseAuth.getInstance()
     auth.createUserWithEmailAndPassword(
-        "${viewModel.emailID.value}@mnnit.ac.in",
+        viewModel.emailID.value.getDomainMail(),
         viewModel.password.value
-    )
-        .addOnCompleteListener { createUserTask ->
-            if (!createUserTask.isSuccessful) {
-                viewModel.isLoading.value = false
-                Toast.makeText(
-                    context,
-                    createUserTask.exception?.message ?: "NULL",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@addOnCompleteListener
-            }
-            val user = auth.currentUser
-            if (user == null) {
-                viewModel.isLoading.value = false
-                Toast.makeText(context, "Error: User null despite sign up", Toast.LENGTH_SHORT)
-                    .show()
-                return@addOnCompleteListener
-            }
-            user.getIdToken(false).addOnSuccessListener { result ->
-                val token = result.token ?: ""
-                context.setAuthToken(token)
-                val userModel = UserModel(
-                    viewModel.name.value,
-                    viewModel.regNo.value,
-                    viewModel.selectedCourse.value,
-                    viewModel.emailID.value.getDomainMail(),
-                    viewModel.phoneNumber.value
-                )
-                viewModel.saveUser(context, userModel, {
-                    user.sendEmailVerification().addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            auth.signOut()
-                            viewModel.resetState()
-                            Toast.makeText(
-                                context,
-                                "Please verify email to continue",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            onNavigateToLogin()
-                        }
+    ).addOnCompleteListener { createUserTask ->
+        if (!createUserTask.isSuccessful) {
+            viewModel.isLoading.value = false
+            Toast.makeText(
+                context,
+                createUserTask.exception?.message ?: "NULL",
+                Toast.LENGTH_SHORT
+            ).show()
+            return@addOnCompleteListener
+        }
+        val user = auth.currentUser
+        if (user == null) {
+            viewModel.isLoading.value = false
+            Toast.makeText(context, "Error: User null despite sign up", Toast.LENGTH_SHORT)
+                .show()
+            return@addOnCompleteListener
+        }
+        user.getIdToken(false).addOnSuccessListener { result ->
+            val token = result.token ?: ""
+            context.setAuthToken(token)
+            val saveUserModel = SaveUserModel(
+                viewModel.regNo.value,
+                viewModel.name.value,
+                viewModel.emailID.value.getDomainMail(),
+                viewModel.selectedCourse.value,
+                viewModel.phoneNumber.value
+            )
+            viewModel.saveUser(saveUserModel, {
+                user.sendEmailVerification().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        auth.signOut()
+                        viewModel.resetState()
+                        Toast.makeText(
+                            context,
+                            "Please verify email to continue",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onNavigateToLogin()
                     }
-                }) {
-                    auth.signOut()
-                    viewModel.isLoading.value = false
-                    Toast.makeText(context, "$it: Error signing up", Toast.LENGTH_SHORT).show()
                 }
+            }) {
+                auth.signOut()
+                viewModel.isLoading.value = false
+                Toast.makeText(context, "$it: Error signing up", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 }

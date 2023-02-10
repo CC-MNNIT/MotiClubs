@@ -3,6 +3,7 @@ package com.mnnit.moticlubs.ui.activity
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
@@ -15,12 +16,9 @@ import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,8 +32,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.api.PostNotificationModel
-import com.mnnit.moticlubs.api.PostParamType
+import com.mnnit.moticlubs.network.model.ChannelNavModel
+import com.mnnit.moticlubs.network.model.ClubNavModel
+import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -48,17 +47,18 @@ class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen.value }
+        installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen }
         super.onCreate(savedInstanceState)
 
-        setContent {
-            val user = FirebaseAuth.getInstance().currentUser
-            viewModel.fetchUser(user, this)
+        val user = FirebaseAuth.getInstance().currentUser
+        viewModel.fetchUser(user)
+        viewModel.fetchAllAdmins()
 
-            AnimatedVisibility(visible = viewModel.showErrorScreen.value) {
+        setContent {
+            AnimatedVisibility(visible = viewModel.showErrorScreen) {
                 ErrorScreen()
             }
-            AnimatedVisibility(visible = !viewModel.showErrorScreen.value) {
+            AnimatedVisibility(visible = !viewModel.showErrorScreen) {
                 MainScreen(user = user)
             }
         }
@@ -66,17 +66,16 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainScreen(user: FirebaseUser?) {
-        val postNotificationModel = remember { mutableStateOf(PostNotificationModel()) }
         val colorScheme = getColorScheme()
         MotiClubsTheme(colorScheme) {
+            SetNavBarsTheme()
+
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
                     .animateContentSize()
                     .imePadding()
             ) {
-                SetNavBarsTheme()
-
                 val localBackPressed = LocalOnBackPressedDispatcherOwner.current
                 val navController = rememberNavController()
 
@@ -109,20 +108,28 @@ class MainActivity : ComponentActivity() {
                     composable(AppNavigation.HOME) {
                         HomeScreen(
                             appViewModel = viewModel,
-                            onNavigatePostItemClick = {
-                                viewModel.clubModel.value = it
-                                navController.navigate(AppNavigation.CLUB_PAGE)
+                            onNavigatePostItemClick = { channel, club ->
+                                val clubNavModel = ClubNavModel(
+                                    club.id, club.name, club.description, club.avatar, club.summary,
+                                    ChannelNavModel(channel.channelID, channel.name)
+                                )
+                                navController.navigate(
+                                    "${AppNavigation.CLUB_PAGE}/${Uri.encode(Gson().toJson(clubNavModel))}"
+                                )
                             },
                             onNavigateContactUs = { navController.navigate(AppNavigation.CONTACT_US) },
                             onNavigateProfile = { navController.navigate(AppNavigation.PROFILE) })
                     }
 
                     // CLUB PAGE
-                    composable(AppNavigation.CLUB_PAGE) {
-                        ClubScreen(appViewModel = viewModel, onNavigateToPost = { post ->
+                    composable(
+                        "${AppNavigation.CLUB_PAGE}/{club}",
+                        arguments = listOf(navArgument("club") { type = ClubNavParamType() })
+                    ) {
+                        ClubScreen(viewModel, onNavigateToPost = { post ->
                             navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(Gson().toJson(post))}")
-                        }, onNavigateToClubDetails = {
-                            navController.navigate(AppNavigation.CLUB_DETAIL)
+                        }, onNavigateToClubDetails = { club ->
+                            navController.navigate("${AppNavigation.CLUB_DETAIL}/${Uri.encode(Gson().toJson(club))}")
                         })
                     }
 
@@ -146,7 +153,7 @@ class MainActivity : ComponentActivity() {
                         arguments = listOf(navArgument("post") { type = PostParamType() }),
                         deepLinks = listOf(navDeepLink { uriPattern = "${Constants.POST_URL}/post={post}" })
                     ) {
-                        postNotificationModel.value = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val model = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             it.arguments?.getParcelable(
                                 "post",
                                 PostNotificationModel::class.java
@@ -154,11 +161,15 @@ class MainActivity : ComponentActivity() {
                         } else {
                             it.arguments?.getParcelable("post")
                         } ?: PostNotificationModel()
-                        PostScreen(postNotificationModel)
+                        Log.d("TAG", "MainScreen: $model")
+                        PostScreen(model)
                     }
 
                     // CLUB Details
-                    composable(AppNavigation.CLUB_DETAIL) {
+                    composable(
+                        "${AppNavigation.CLUB_DETAIL}/{clubDetail}",
+                        arguments = listOf(navArgument("clubDetail") { type = ClubParamType() })
+                    ) {
                         ClubDetailsScreen(viewModel)
                     }
                 }
@@ -168,7 +179,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ErrorScreen() {
-        val context = LocalContext.current
         val colorScheme = getColorScheme()
         MotiClubsTheme(colorScheme) {
             SetNavBarsTheme()
@@ -191,13 +201,13 @@ class MainActivity : ComponentActivity() {
                                 .align(Alignment.CenterVertically)
                         ) {
                             AnimatedVisibility(
-                                visible = viewModel.fetchingState.value,
+                                visible = viewModel.fetchingState,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             ) {
                                 CircularProgressIndicator(modifier = Modifier.size(36.dp))
                             }
                             AnimatedVisibility(
-                                visible = !viewModel.fetchingState.value,
+                                visible = !viewModel.fetchingState,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             ) {
                                 Column(
@@ -219,12 +229,7 @@ class MainActivity : ComponentActivity() {
                                     )
 
                                     Button(
-                                        onClick = {
-                                            viewModel.fetchUser(
-                                                FirebaseAuth.getInstance().currentUser,
-                                                context
-                                            )
-                                        },
+                                        onClick = { viewModel.fetchUser(FirebaseAuth.getInstance().currentUser) },
                                         modifier = Modifier
                                             .align(Alignment.CenterHorizontally)
                                             .padding(top = 16.dp, bottom = 16.dp)

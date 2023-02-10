@@ -21,7 +21,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.api.PostNotificationModel
+import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 
@@ -47,10 +47,14 @@ class AppFCMService : FirebaseMessagingService() {
     }
 
     private fun postNotification(user: FirebaseUser, data: Map<String, String>) {
+        Log.d(TAG, "postNotification: $data")
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
-        val postID = data["_id"] ?: ""
-        val clubID = data["club"] ?: ""
+        val channelName = data["channelName"] ?: ""
+        val channelID = data["chid"]?.toInt() ?: -1
+        val postID = data["pid"]?.toInt() ?: -1
+        val clubID = data["cid"]?.toInt() ?: -1
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
@@ -65,8 +69,8 @@ class AppFCMService : FirebaseMessagingService() {
         }
 
         val post = PostNotificationModel(
-            clubName,
-            clubID, postID, adminName, url,
+            clubName, channelName,
+            channelID, postID, adminName, url,
             message, time.toLong().toTimeString()
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
@@ -83,8 +87,8 @@ class AppFCMService : FirebaseMessagingService() {
 
         postNotificationCompat(
             notificationManager,
-            time.substring(time.length - 5).toInt(),
-            clubID,
+            postID,
+            clubID.toString(),
             clubName,
             adminName,
             message,

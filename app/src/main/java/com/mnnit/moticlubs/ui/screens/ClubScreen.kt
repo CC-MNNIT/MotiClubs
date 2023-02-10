@@ -2,10 +2,13 @@
 
 package com.mnnit.moticlubs.ui.screens
 
-import android.content.Context
+import android.app.Application
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,22 +43,29 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.api.*
-import com.mnnit.moticlubs.api.Repository.deletePost
-import com.mnnit.moticlubs.api.Repository.getClubPosts
-import com.mnnit.moticlubs.api.Repository.getMembersCount
+import com.mnnit.moticlubs.network.*
+import com.mnnit.moticlubs.network.model.*
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ClubScreenViewModel @Inject constructor() : ViewModel() {
+class ClubScreenViewModel @Inject constructor(
+    private val application: Application,
+    private val repository: Repository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
     val editMode = mutableStateOf(false)
     val editPostIdx = mutableStateOf(-1)
@@ -65,8 +75,8 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val searchValue = mutableStateOf("")
 
     val postMsg = mutableStateOf(TextFieldValue(""))
-    val postsList = mutableStateListOf<PostResponse>()
-    val clubModel = mutableStateOf(ClubModel("", "", "", "", listOf(), listOf()))
+    val postsList = mutableStateListOf<PostModel>()
+    var clubNavModel by mutableStateOf(savedStateHandle.get<ClubNavModel>("club") ?: ClubNavModel())
     val loadingPosts = mutableStateOf(false)
 
     val isPreviewMode = mutableStateOf(false)
@@ -87,26 +97,105 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
     val bottomSheetScaffoldState = mutableStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
-            bottomSheetState = BottomSheetState(initialValue = BottomSheetValue.Expanded),
+            bottomSheetState = BottomSheetState(initialValue = BottomSheetValue.Collapsed),
             snackbarHostState = SnackbarHostState()
         )
     )
     val scrollValue = mutableStateOf(0)
     val subscriberCount = mutableStateOf(0)
 
-    fun fetchPostsList(context: Context) {
+    fun fetchPostsList() {
         loadingPosts.value = true
-        getClubPosts(context, clubID = clubModel.value.id, { list ->
-            postsList.clear()
-            list.forEach { postsList.add(it) }
+        viewModelScope.launch {
+            val clubID = clubNavModel.clubId
+            val channelID = clubNavModel.channel.id
+            val response = withContext(Dispatchers.IO) {
+                repository.getPostsFromClubChannel(application, clubID = clubID, channelID = channelID)
+            }
+            if (response is Success) {
+                postsList.clear()
+                postsList.addAll(response.obj)
+            }
             loadingPosts.value = false
-        }) { loadingPosts.value = false }
+        }
     }
 
-    fun fetchSubscriberCount(context: Context) {
-        getMembersCount(context, clubModel.value.id, {
-            subscriberCount.value = it.count
-        }) { }
+    fun fetchSubscriberCount() {
+        viewModelScope.launch {
+            val clubID = clubNavModel.clubId
+            val response = withContext(Dispatchers.IO) { repository.getSubscribersCount(application, clubID) }
+            if (response is Success) {
+                subscriberCount.value = response.obj.count
+                Log.d("TAG", "fetchSubscriberCount: ${response.obj.count}")
+            }
+        }
+    }
+
+    fun subscribeToClub(clubID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+        viewModelScope.launch {
+            val response = withContext(Dispatchers.IO) { repository.subscribeClub(application, clubID) }
+            if (response is Success) {
+                onResponse()
+            } else {
+                onFailure(response.errCode)
+            }
+        }
+    }
+
+    fun unsubscribeToClub(clubID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+        viewModelScope.launch {
+            val response = withContext(Dispatchers.IO) { repository.unsubscribeClub(application, clubID) }
+            if (response is Success) {
+                onResponse()
+            } else {
+                onFailure(response.errCode)
+            }
+        }
+    }
+
+    fun sendPost(message: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+        viewModelScope.launch {
+            val clubID = clubNavModel.clubId
+            val channelID = clubNavModel.channel.id
+            val response = withContext(Dispatchers.IO) {
+                repository.sendPost(
+                    application,
+                    PushPostModel(clubID, channelID, message, true)
+                )
+            }
+            if (response is Success) {
+                onResponse()
+            } else {
+                onFailure(response.errCode)
+            }
+        }
+    }
+
+    fun updatePost(postID: Int, message: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+        viewModelScope.launch {
+            val response = withContext(Dispatchers.IO) { repository.updatePost(application, postID, message) }
+            if (response is Success) {
+                onResponse()
+            } else {
+                onFailure(response.errCode)
+            }
+        }
+    }
+
+    fun deletePost(postID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+        viewModelScope.launch {
+            val response = withContext(Dispatchers.IO) { repository.deletePost(application, postID) }
+            if (response is Success) {
+                onResponse()
+            } else {
+                onFailure(response.errCode)
+            }
+        }
+    }
+
+    init {
+        fetchPostsList()
+        fetchSubscriberCount()
     }
 }
 
@@ -114,16 +203,10 @@ class ClubScreenViewModel @Inject constructor() : ViewModel() {
 fun ClubScreen(
     appViewModel: AppViewModel,
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
-    onNavigateToClubDetails: () -> Unit,
+    onNavigateToClubDetails: (club: ClubDetailModel) -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    viewModel.clubModel.value = appViewModel.clubModel.value
-    viewModel.bottomSheetScaffoldState.value = rememberBottomSheetScaffoldState()
-    viewModel.fetchSubscriberCount(context)
-    viewModel.fetchPostsList(LocalContext.current)
-    viewModel.subscribed.value = appViewModel.subscribedList.contains(viewModel.clubModel.value.id)
-    appViewModel.subscriberCount.value = viewModel.subscriberCount.value
+    viewModel.subscribed.value = appViewModel.user.subscribed.any { it.clubID == viewModel.clubNavModel.clubId }
 
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
@@ -131,7 +214,8 @@ fun ClubScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp, viewModel.clubModel.value.admins.contains(appViewModel.email.value))
+        SetNavBarsTheme(elevation = 2.dp, appViewModel.user.admin.any { it.clubID == viewModel.clubNavModel.clubId })
+
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
                 BottomSheetContent(viewModel)
@@ -195,7 +279,7 @@ fun ClubScreen(
                     }
                 }
             }, scaffoldState = viewModel.bottomSheetScaffoldState.value,
-                sheetPeekHeight = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                sheetPeekHeight = if (appViewModel.user.admin.any { it.clubID == viewModel.clubNavModel.clubId }) {
                     72.dp
                 } else {
                     0.dp
@@ -206,27 +290,14 @@ fun ClubScreen(
 }
 
 @Composable
-fun PostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
+fun PostConfirmationDialog(viewModel: ClubScreenViewModel, update: Boolean, onPost: () -> Unit) {
     ConfirmationDialog(
         showDialog = viewModel.showDialog,
-        message = "Post message in ${viewModel.clubModel.value.name} ?", positiveBtnText = "Post",
+        message = "${if (update) "Update post" else "Post"} message in ${viewModel.clubNavModel.name} ?",
+        positiveBtnText = if (update) "Update" else "Post",
         imageVector = Icons.Outlined.Article,
         onPositive = {
-            viewModel.progressText.value = "Posting ..."
-            viewModel.showProgress.value = true
-            onPost()
-        }
-    )
-}
-
-@Composable
-fun UpdatePostConfirmationDialog(viewModel: ClubScreenViewModel, onPost: () -> Unit) {
-    ConfirmationDialog(
-        showDialog = viewModel.showEditDialog,
-        message = "Update post message in ${viewModel.clubModel.value.name} ?", positiveBtnText = "Update",
-        imageVector = Icons.Outlined.Article,
-        onPositive = {
-            viewModel.progressText.value = "Updating ..."
+            viewModel.progressText.value = if (update) "Updating ..." else "Posting ..."
             viewModel.showProgress.value = true
             onPost()
         }
@@ -245,17 +316,15 @@ fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
             viewModel.progressText.value = "Deleting ..."
             viewModel.showProgress.value = true
             if (viewModel.delPostIdx.value < 0) return@ConfirmationDialog
-            viewModel.deletePost(context,
-                viewModel.postsList[viewModel.delPostIdx.value].id,
-                {
-                    viewModel.showProgress.value = false
-                    Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show()
-                    viewModel.fetchPostsList(context)
-                }, {
-                    viewModel.showProgress.value = false
-                    Toast.makeText(context, "$it: Error deleting post", Toast.LENGTH_SHORT)
-                        .show()
-                })
+            viewModel.deletePost(viewModel.postsList[viewModel.delPostIdx.value].postID, {
+                viewModel.showProgress.value = false
+                Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show()
+                viewModel.fetchPostsList()
+            }, {
+                viewModel.showProgress.value = false
+                Toast.makeText(context, "$it: Error deleting post", Toast.LENGTH_SHORT)
+                    .show()
+            })
         }
     )
 }
@@ -327,12 +396,12 @@ fun TopBar(
     viewModel: ClubScreenViewModel,
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: () -> Unit
+    onNavigateToClubDetails: (clubModel: ClubDetailModel) -> Unit
 ) {
-    AnimatedVisibility(visible = viewModel.searchMode.value) {
+    AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         SearchBar(viewModel.searchMode, viewModel.searchValue, modifier = modifier)
     }
-    AnimatedVisibility(visible = !viewModel.searchMode.value) {
+    AnimatedVisibility(visible = !viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         ChannelNameBar(
             viewModel = viewModel,
             appViewModel = appViewModel,
@@ -355,7 +424,7 @@ fun Messages(
             state = scrollState,
             contentPadding = PaddingValues(
                 top = 16.dp,
-                bottom = if (viewModel.clubModel.value.admins.contains(appViewModel.email.value)) {
+                bottom = if (appViewModel.user.admin.any { it.clubID == viewModel.clubNavModel.clubId }) {
                     72.dp
                 } else {
                     0.dp
@@ -375,7 +444,7 @@ fun Messages(
                     viewModel,
                     appViewModel,
                     index,
-                    admin = appViewModel.adminInfoMap[viewModel.postsList[index].adminEmail] ?: UserDetailResponse(),
+                    admin = appViewModel.adminMap[viewModel.postsList[index].userID] ?: AdminDetailResponse(),
                     onNavigateToPost
                 )
             }

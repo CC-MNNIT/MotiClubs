@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -30,24 +31,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
-import com.mnnit.moticlubs.api.Repository.getUserData
-import com.mnnit.moticlubs.api.Repository.setFCMToken
 import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.getDomainMail
+import com.mnnit.moticlubs.network.Repository
+import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val TAG = "LoginScreen"
 
 @HiltViewModel
-class LoginScreenViewModel @Inject constructor() : ViewModel() {
+class LoginScreenViewModel @Inject constructor(
+    private val application: Application,
+    private val repository: Repository
+) : ViewModel() {
 
     val emailID = mutableStateOf("")
     val password = mutableStateOf("")
@@ -68,6 +76,17 @@ class LoginScreenViewModel @Inject constructor() : ViewModel() {
         password.value = ""
         isPasswordVisible.value = false
         isLoading.value = false
+    }
+
+    fun setFCMToken(token: String, onSuccess: () -> Unit, onFailure: (code: Int) -> Unit) {
+        viewModelScope.launch {
+            val fcmResponse = withContext(Dispatchers.IO) { repository.setFCMToken(application, token) }
+            if (fcmResponse is Success) {
+                onSuccess()
+            } else {
+                onFailure(fcmResponse.errCode)
+            }
+        }
     }
 }
 
@@ -283,10 +302,9 @@ private fun handleUser(
     onNavigateToMain: () -> Unit
 ) {
     FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
-        viewModel.setFCMToken(context, fcm, {
-            viewModel.getUserData(context, { userRes ->
+        viewModel.setFCMToken(fcm, {
+            appViewModel.fetchUser(auth.currentUser, {
                 viewModel.resetState()
-                appViewModel.setUser(userRes)
                 onNavigateToMain()
             }) {
                 auth.signOut()

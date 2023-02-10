@@ -1,9 +1,9 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.util.Patterns
+import android.app.Application
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,10 +20,7 @@ import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,28 +28,42 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
-import com.mnnit.moticlubs.api.ClubModel
+import com.mnnit.moticlubs.network.Repository
+import com.mnnit.moticlubs.network.Success
+import com.mnnit.moticlubs.network.model.ClubDetailModel
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ClubDetailsScreenViewModel @Inject constructor() : ViewModel() {
+class ClubDetailsScreenViewModel @Inject constructor(
+    private val application: Application,
+    private val repository: Repository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    var clubModel by mutableStateOf(savedStateHandle.get<ClubDetailModel>("clubDetail") ?: ClubDetailModel())
 
     val showSocialLinkDialog = mutableStateOf(false)
     val showOtherLinkDialog = mutableStateOf(false)
@@ -63,28 +74,46 @@ class ClubDetailsScreenViewModel @Inject constructor() : ViewModel() {
     val socialLinksList =
         mutableStateListOf(LinkComposeModel(), LinkComposeModel(), LinkComposeModel(), LinkComposeModel())
 
-//    val facebookUrl = mutableStateOf("")
-//    val instagramUrl = mutableStateOf("")
-//    val twitterUrl = mutableStateOf("")
-//    val githubUrl = mutableStateOf("")
-
     var isAdmin = false
 
-//    val initialClubModel = mutableStateOf(ClubModel())
-//    val description = mutableStateOf("")
-//    val avatar_url = mutableStateOf("")
-//    val showLinkDialog = mutableStateOf(false)
-//    var socialMediaUrls = mutableListOf("", "", "", "", "", "")
-//    val isLoading = mutableStateOf(false)
-//    val faceBookUrl = mutableStateOf("")
-//    val instagramUrl = mutableStateOf("")
-//    val linkedInUrl = mutableStateOf("")
-//    val websiteUrl = mutableStateOf("")
-//    val githubUrl = mutableStateOf("")
-//    val socialMediaUrlUpdated = mutableStateOf(false)
-//    var isEditButtonEnabled = false
-//        get() = !isLoading.value
-//                && ((initialClubModel.value.avatar != avatar_url.value) || (initialClubModel.value.description != description.value) || socialMediaUrlUpdated.value)
+    fun fetchUrls() {
+        viewModelScope.launch {
+            val clubID = clubModel.id
+            val response = withContext(Dispatchers.IO) { repository.getUrls(application, clubID) }
+            if (response is Success) {
+                val urls = response.obj
+
+                socialLinksList[0] = urls.findLast {
+                    it.url.toLowerCase(LocaleList.current).contains("facebook")
+                }?.map() ?: LinkComposeModel()
+
+                socialLinksList[1] = urls.findLast {
+                    it.url.toLowerCase(LocaleList.current).contains("instagram")
+                }?.map() ?: LinkComposeModel()
+
+                socialLinksList[2] = urls.findLast {
+                    it.url.toLowerCase(LocaleList.current).contains("twitter")
+                }?.map() ?: LinkComposeModel()
+
+                socialLinksList[3] = urls.findLast {
+                    it.url.toLowerCase(LocaleList.current).contains("github")
+                }?.map() ?: LinkComposeModel()
+
+                otherLinksList.clear()
+                otherLinksList.addAll(
+                    urls.filter { f ->
+                        !LinkComposeModel.socialLinkNames.any { s -> f.url.contains(s) }
+                    }.map { m -> m.map() }
+                )
+            } else {
+                Toast.makeText(application, "${response.errCode}: Error couldn't load links", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    init {
+        fetchUrls()
+    }
 }
 
 @Composable
@@ -94,7 +123,7 @@ fun ClubDetailsScreen(
 ) {
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
-    viewModel.isAdmin = appViewModel.clubModel.value.admins.contains(appViewModel.email.value)
+    viewModel.isAdmin = appViewModel.user.admin.any { m -> m.clubID == viewModel.clubModel.id }
 
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme(2.dp, false)
@@ -159,26 +188,28 @@ fun ClubDetailsScreen(
                                 .padding(16.dp)
                         ) {
                             ClubProfilePic(
-                                clubModel = appViewModel.clubModel.value,
+                                clubModel = viewModel.clubModel,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
 
                             Text(
                                 modifier = Modifier.padding(top = 16.dp),
-                                text = appViewModel.clubModel.value.name,
+                                text = viewModel.clubModel.name,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
                                 modifier = Modifier.padding(),
-                                text = "${appViewModel.subscriberCount.value} Members",
+                                text = "${viewModel.clubModel.subscribers} Members",
                                 fontSize = 12.sp
                             )
 
                             Links(
                                 isAdmin = viewModel.isAdmin,
                                 "Socials",
-                                listOf(),
+                                viewModel.socialLinksList.map { m ->
+                                    LinkModel(m.getName(), m.getUrl(), m.colorCode.value.replace("#", ""))
+                                }.filter { f -> f.name.isNotEmpty() },
                                 onClick = {
                                     viewModel.showSocialLinkDialog.value = true
                                 }
@@ -186,10 +217,9 @@ fun ClubDetailsScreen(
                             Links(
                                 isAdmin = viewModel.isAdmin,
                                 "Others",
-                                listOf(
-                                    LinkModel("WOC", "", "8264e3"),
-                                    LinkModel("DevJam", "", "1a37e3")
-                                ),
+                                viewModel.otherLinksList.map { m ->
+                                    LinkModel(m.getName(), m.getUrl(), m.colorCode.value.replace("#", ""))
+                                },
                                 onClick = { viewModel.showOtherLinkDialog.value = true }
                             )
                         }
@@ -201,7 +231,7 @@ fun ClubDetailsScreen(
                             .verticalScroll(scrollState)
                             .padding(16.dp)
                     ) {
-                        Text(appViewModel.clubModel.value.description, fontSize = 14.sp)
+                        Text(viewModel.clubModel.description, fontSize = 14.sp)
                     }
                 }
             }
@@ -379,7 +409,7 @@ fun InputOtherLinkDialog(viewModel: ClubDetailsScreenViewModel) {
 }
 
 @Composable
-fun ClubProfilePic(clubModel: ClubModel, modifier: Modifier = Modifier) {
+fun ClubProfilePic(clubModel: ClubDetailModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -413,16 +443,16 @@ fun ClubProfilePic(clubModel: ClubModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ClubInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+fun ClubInfo(clubModel: ClubDetailModel, modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
     Column(modifier = modifier.verticalScroll(scrollState)) {
-        Text(appViewModel.clubModel.value.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+        Text(clubModel.name, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
         Text(
             modifier = Modifier.padding(bottom = 16.dp),
-            text = "${appViewModel.subscriberCount.value} Members",
+            text = "${clubModel.subscribers} Members",
             fontSize = 12.sp
         )
-        Text(appViewModel.clubModel.value.description, fontSize = 14.sp)
+        Text(clubModel.description, fontSize = 14.sp)
     }
 }
 

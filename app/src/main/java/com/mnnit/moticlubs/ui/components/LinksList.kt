@@ -30,6 +30,10 @@ data class LinkComposeModel(
     val color: MutableState<Color>,
 ) {
 
+    companion object {
+        val socialLinkNames = listOf("facebook", "instagram", "twitter", "github")
+    }
+
     constructor() : this(mutableStateOf(TextFieldValue("\\")), mutableStateOf(""), mutableStateOf(Color.White))
 
     fun getLinkModel(): LinkModel {

@@ -7,7 +7,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
@@ -15,7 +14,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.api.PostNotificationModel
+import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.postRead
 import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -25,9 +24,9 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
 fun PostScreen(
-    postNotificationModel: MutableState<PostNotificationModel>
+    postNotificationModel: PostNotificationModel
 ) {
-    LocalContext.current.postRead(postNotificationModel.value.clubID, postNotificationModel.value.postID, true)
+    LocalContext.current.postRead(postNotificationModel.channelID, postNotificationModel.postID, true)
     val colorScheme = getColorScheme()
     val scroll = rememberScrollState(0)
 
@@ -46,7 +45,7 @@ fun PostScreen(
                     elevation = CardDefaults.cardElevation(0.dp),
                 ) {
                     Text(
-                        postNotificationModel.value.clubName,
+                        "${postNotificationModel.clubName} - ${postNotificationModel.channelName}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 16.dp, top = 16.dp)
@@ -56,17 +55,17 @@ fun PostScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        ProfilePicture(url = postNotificationModel.value.adminAvatar, size = 56.dp)
+                        ProfilePicture(url = postNotificationModel.adminAvatar, size = 56.dp)
                         Spacer(modifier = Modifier.width(10.dp))
                         AdminNameTimestamp(
-                            time = postNotificationModel.value.time,
-                            name = postNotificationModel.value.adminName
+                            time = postNotificationModel.time,
+                            name = postNotificationModel.adminName
                         )
                     }
                 }
 
                 MarkdownText(
-                    markdown = postNotificationModel.value.message,
+                    markdown = postNotificationModel.message,
                     color = contentColorFor(backgroundColor = getColorScheme().background),
                     selectable = true,
                     disableLinkMovementMethod = false,

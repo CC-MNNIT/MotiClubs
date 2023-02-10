@@ -3,6 +3,8 @@ package com.mnnit.moticlubs.ui.components
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -29,11 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.api.Repository.sendPost
-import com.mnnit.moticlubs.api.Repository.updatePost
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.screens.PostConfirmationDialog
-import com.mnnit.moticlubs.ui.screens.UpdatePostConfirmationDialog
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
 
@@ -59,13 +58,12 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         }
 
         if (viewModel.showEditDialog.value) {
-            UpdatePostConfirmationDialog(viewModel = viewModel) {
+            PostConfirmationDialog(viewModel = viewModel, update = true) {
                 viewModel.isPreviewMode.value = false
-                viewModel.updatePost(context,
-                    viewModel.postsList[viewModel.editPostIdx.value].id,
+                viewModel.updatePost(viewModel.postsList[viewModel.editPostIdx.value].postID,
                     viewModel.postMsg.value.text, {
                         Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
-                        viewModel.fetchPostsList(context)
+                        viewModel.fetchPostsList()
 
                         viewModel.editMode.value = false
                         viewModel.showProgress.value = false
@@ -83,21 +81,20 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
         }
 
         if (viewModel.showDialog.value) {
-            PostConfirmationDialog(viewModel = viewModel) {
+            PostConfirmationDialog(viewModel = viewModel, update = false) {
                 viewModel.isPreviewMode.value = false
-                viewModel.sendPost(context, viewModel.clubModel.value.id,
-                    viewModel.postMsg.value.text, {
-                        Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
-                        viewModel.fetchPostsList(context)
-                        viewModel.showProgress.value = false
-                        viewModel.editMode.value = false
-                        viewModel.postMsg.value = TextFieldValue("")
-                        scope.launch {
-                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                            }
+                viewModel.sendPost(viewModel.postMsg.value.text, {
+                    Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
+                    viewModel.fetchPostsList()
+                    viewModel.showProgress.value = false
+                    viewModel.editMode.value = false
+                    viewModel.postMsg.value = TextFieldValue("")
+                    scope.launch {
+                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
                         }
-                    }) {
+                    }
+                }) {
                     viewModel.showProgress.value = false
                     Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show()
                 }
@@ -158,7 +155,14 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     .fillMaxWidth()
                     .animateContentSize()
             ) {
-                if (viewModel.isPreviewMode.value) {
+                AnimatedVisibility(
+                    visible = viewModel.isPreviewMode.value,
+                    modifier = Modifier
+                        .imePadding()
+                        .fillMaxWidth()
+                        .weight(1f),
+                    enter = fadeIn(), exit = fadeOut()
+                ) {
                     Box(
                         modifier = Modifier
                             .imePadding()
@@ -179,7 +183,8 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .imePadding()
+                        .imePadding(),
+                    enter = fadeIn(), exit = fadeOut()
                 ) {
                     OutlinedTextField(
                         modifier = Modifier

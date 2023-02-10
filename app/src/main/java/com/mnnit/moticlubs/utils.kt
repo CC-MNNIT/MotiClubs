@@ -6,12 +6,14 @@ import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import com.mnnit.moticlubs.network.model.ClubModel
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import java.util.*
+import kotlin.math.exp
 
 object Constants {
     const val ADMIN_NAME = "admin_name"
@@ -22,7 +24,9 @@ object Constants {
     const val POST_URL = "app://moticlubs.mnnit.com"
     const val TOKEN = "token"
     const val EMAIL = "email"
-    const val BASE_URL = "https://moti-clubs.vercel.app"
+
+    //    const val BASE_URL = "https://moti-clubs.vercel.app"
+    const val BASE_URL = "https://moticlubs.vercel.app"
     const val CLUB_NAME = "club_name"
     const val CLUB_ID = "club_id"
     const val CLUB_DESC = "club_desc"
@@ -65,17 +69,37 @@ fun Context.setAuthToken(token: String) =
 fun Context.getAuthToken(): String =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getString(Constants.TOKEN, "") ?: ""
 
-fun Context.postRead(clubID: String, postID: String, read: Boolean = false) {
+fun Context.clubHasUnreadPost(clubModel: ClubModel): Boolean {
+    var has = false
+    for (i in clubModel.channels.indices) {
+        if (getUnreadPost(clubModel.channels[i].channelID).isNotEmpty()) {
+            has = true
+            break
+        }
+    }
+    return has
+}
+
+fun Context.postRead(channelID: Int, postID: Int, read: Boolean = false) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
-        .putStringSet(clubID, getUnreadPost(clubID).apply {
-            if (read) remove(postID) else add(postID)
+        .putStringSet("ch$channelID", getUnreadPost(channelID).apply {
+            if (read) remove(postID.toString()) else add(postID.toString())
         }).apply()
 }
 
-fun Context.getUnreadPost(clubID: String) =
-    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getStringSet(clubID, setOf())
+fun Context.getUnreadPost(channelID: Int) =
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        .getStringSet("ch$channelID", setOf())
         ?.toMutableSet()
         ?: setOf<String>().toMutableSet()
+
+fun Context.getExpandedChannel(clubID: Int): Boolean =
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getBoolean("cl$clubID", false)
+
+fun Context.setExpandedChannel(clubID: Int, expanded: Boolean) {
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        .edit().putBoolean("cl$clubID", expanded).apply()
+}
 
 private val mMonthsList: List<String> = listOf(
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

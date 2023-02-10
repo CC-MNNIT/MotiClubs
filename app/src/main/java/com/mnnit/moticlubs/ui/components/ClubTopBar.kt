@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.mnnit.moticlubs.network.model.ClubDetailModel
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 
@@ -24,7 +25,7 @@ fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: () -> Unit
+    onNavigateToClubDetails: (clubModel: ClubDetailModel) -> Unit
 ) {
     if (viewModel.showSubsDialog.value) {
         SubscriptionConfirmationDialog(
@@ -37,12 +38,22 @@ fun ChannelNameBar(
         modifier = modifier
             .fillMaxWidth()
             .clickable(true, onClick = {
-                onNavigateToClubDetails()
-            }), horizontalArrangement = Arrangement.SpaceAround
+                onNavigateToClubDetails(
+                    ClubDetailModel(
+                        viewModel.clubNavModel.clubId,
+                        viewModel.clubNavModel.name,
+                        viewModel.clubNavModel.description,
+                        viewModel.clubNavModel.avatar,
+                        viewModel.clubNavModel.summary,
+                        listOf(), viewModel.subscriberCount.value
+                    )
+                )
+            }),
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         ProfilePicture(
             modifier = Modifier.align(Alignment.CenterVertically),
-            url = viewModel.clubModel.value.avatar,
+            url = viewModel.clubNavModel.avatar,
             size = 42.dp
         )
 
@@ -52,7 +63,7 @@ fun ChannelNameBar(
         ) {
             // Channel name
             Text(
-                text = viewModel.clubModel.value.name,
+                text = "${viewModel.clubNavModel.name} - ${viewModel.clubNavModel.channel.name}",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,

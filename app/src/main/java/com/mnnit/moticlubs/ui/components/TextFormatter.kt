@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -53,7 +55,7 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
         InputLinkDialog(viewModel = viewModel)
     }
 
-    AnimatedVisibility(visible = !viewModel.isPreviewMode.value) {
+    AnimatedVisibility(visible = !viewModel.isPreviewMode.value, enter = fadeIn(), exit = fadeOut()) {
         Row(
             modifier = Modifier
                 .imePadding()
