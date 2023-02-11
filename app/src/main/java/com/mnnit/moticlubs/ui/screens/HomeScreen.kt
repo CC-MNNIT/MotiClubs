@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -60,7 +61,9 @@ class HomeScreenViewModel @Inject constructor(
     var isFetching by mutableStateOf(false)
 
     var showAddChannelDialog by mutableStateOf(false)
+    var showUpdateChannelDialog by mutableStateOf(false)
     var showProgressDialog by mutableStateOf(false)
+    var progressMsg by mutableStateOf("")
 
     var clubID by mutableStateOf(-1)
     var channelID by mutableStateOf(-1)
@@ -139,23 +142,55 @@ fun HomeScreen(
             modifier = Modifier,
             content = {
                 if (viewModel.showProgressDialog) {
-                    ProgressDialog(progressMsg = "")
+                    ProgressDialog(progressMsg = viewModel.progressMsg)
                 }
 
                 if (viewModel.showAddChannelDialog) {
                     InputChannelDialog(viewModel = viewModel) {
+                        viewModel.showAddChannelDialog = false
+                        viewModel.progressMsg = "Adding"
                         viewModel.showProgressDialog = true
 
                         viewModel.addChannel({
                             viewModel.showProgressDialog = false
-                            viewModel.showAddChannelDialog = false
 
                             viewModel.fetchClubsList()
                             Toast.makeText(context, "Channel Added", Toast.LENGTH_SHORT).show()
                         }) { code ->
                             viewModel.showProgressDialog = false
-                            viewModel.showAddChannelDialog = false
                             Toast.makeText(context, "$code: Error adding channel", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                if (viewModel.showUpdateChannelDialog) {
+                    UpdateChannelDialog(viewModel = viewModel, onUpdate = {
+                        viewModel.showUpdateChannelDialog = false
+                        viewModel.progressMsg = "Updating"
+                        viewModel.showProgressDialog = true
+
+                        viewModel.updateChannel({
+                            viewModel.showProgressDialog = false
+
+                            viewModel.fetchClubsList()
+                            Toast.makeText(context, "Channel Updated", Toast.LENGTH_SHORT).show()
+                        }) { code ->
+                            viewModel.showProgressDialog = false
+                            Toast.makeText(context, "$code: Error updating channel", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        viewModel.showUpdateChannelDialog = false
+                        viewModel.progressMsg = "Deleting"
+                        viewModel.showProgressDialog = true
+
+                        viewModel.deleteChannel({
+                            viewModel.showProgressDialog = false
+
+                            viewModel.fetchClubsList()
+                            Toast.makeText(context, "Channel Deleted", Toast.LENGTH_SHORT).show()
+                        }) { code ->
+                            viewModel.showProgressDialog = false
+                            Toast.makeText(context, "$code: Error deleting channel", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -313,16 +348,45 @@ fun ChannelList(
                         modifier = Modifier
                             .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 16.dp)
                             .align(Alignment.CenterVertically)
-                            .fillMaxWidth(0.9f)
+                            .fillMaxWidth(if (appViewModel.user.admin.any { it.clubID == clubModel.id }) 0.8f else 0.9f)
                     )
 
                     AnimatedVisibility(
                         visible = context.getUnreadPost(model.channelID).isNotEmpty(),
-                        modifier = Modifier.align(Alignment.CenterVertically)
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
                     ) {
-                        BadgedBox(badge = {
-                            Badge { Text(text = "${context.getUnreadPost(model.channelID).size}") }
-                        }, modifier = Modifier.align(Alignment.CenterVertically)) {}
+                        BadgedBox(
+                            badge = {
+                                Badge { Text(text = "${context.getUnreadPost(model.channelID).size}") }
+                            }, modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        ) {}
+                    }
+
+                    AnimatedVisibility(
+                        visible = appViewModel.user.admin.any { it.clubID == clubModel.id } && model.name != "General",
+                        modifier = Modifier
+                    ) {
+                        IconButton(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(top = 1.dp, start = 16.dp)
+                                .height(36.dp),
+                            onClick = {
+                                viewModel.channelID = model.channelID
+                                viewModel.updateChannel = model.name
+                                viewModel.showUpdateChannelDialog = true
+                            }
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .align(Alignment.CenterVertically),
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = ""
+                            )
+                        }
                     }
                 }
             }
@@ -340,7 +404,7 @@ fun ChannelList(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
-                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(1.dp))
+                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -403,6 +467,67 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                     enabled = viewModel.inputChannel.isNotEmpty()
                 ) {
                     Text(text = "Add Channel", fontSize = 14.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, onDelete: () -> Unit) {
+    val colorScheme = getColorScheme()
+    Dialog(onDismissRequest = { viewModel.showUpdateChannelDialog = false }, DialogProperties()) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(colorScheme.background)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Update Channel",
+                    fontSize = 16.sp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    value = viewModel.updateChannel,
+                    onValueChange = { viewModel.updateChannel = it },
+                    shape = RoundedCornerShape(24.dp),
+                    label = { Text(text = "Channel Name") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { onDelete() },
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .align(Alignment.CenterVertically),
+                        colors = ButtonDefaults.buttonColors(colorScheme.error)
+                    ) {
+                        Text(text = "Delete", fontSize = 14.sp)
+                    }
+
+                    Button(
+                        onClick = { onUpdate() },
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .align(Alignment.CenterVertically),
+                        enabled = viewModel.updateChannel.isNotEmpty()
+                    ) {
+                        Text(text = "Save", fontSize = 14.sp)
+                    }
                 }
             }
         }

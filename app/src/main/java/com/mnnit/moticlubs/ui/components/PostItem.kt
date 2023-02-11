@@ -104,7 +104,11 @@ fun PostItem(
                             }
                         }
                     }) {
-                        Icon(Icons.Rounded.Edit, contentDescription = "")
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            imageVector = Icons.Rounded.Edit,
+                            contentDescription = ""
+                        )
                     }
                 }
                 AnimatedVisibility(visible = viewModel.postsList[idx].userID == appViewModel.user.id) {
@@ -112,7 +116,11 @@ fun PostItem(
                         viewModel.delPostIdx.value = idx
                         viewModel.showDelPostDialog.value = true
                     }) {
-                        Icon(Icons.Rounded.Delete, contentDescription = "")
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = ""
+                        )
                     }
                 }
             }

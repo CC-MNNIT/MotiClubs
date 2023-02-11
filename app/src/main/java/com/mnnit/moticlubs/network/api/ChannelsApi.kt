@@ -31,9 +31,9 @@ interface ChannelsApi {
         @Body updateChannelModel: UpdateChannelModel
     ): Response<ResponseBody>
 
-    @DELETE("/channel")
+    @DELETE("/channel/{channelId}")
     suspend fun deleteChannel(
         @Header("Authorization") auth: String?,
-        @Query("channelId") channelID: Int
+        @Path("channelId") channelID: Int
     ): Response<ResponseBody>
 }

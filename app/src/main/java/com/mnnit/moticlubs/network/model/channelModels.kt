@@ -44,7 +44,7 @@ data class AddChannelModel(
 )
 
 data class UpdateChannelModel(
-    @SerializedName("name")
+    @SerializedName("channelName")
     @Expose
     var name: String
 )
