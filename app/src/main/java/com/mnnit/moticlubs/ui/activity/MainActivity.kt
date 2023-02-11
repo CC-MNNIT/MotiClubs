@@ -88,10 +88,12 @@ class MainActivity : ComponentActivity() {
                     composable(AppNavigation.LOGIN) {
                         LoginScreen(appViewModel = viewModel, {
                             navController.navigate(AppNavigation.SIGN_UP)
+                            navController.graph.setStartDestination(AppNavigation.SIGN_UP)
                         }, {
                             navController.navigate(AppNavigation.HOME) {
                                 popUpTo(AppNavigation.LOGIN) { inclusive = true }
                             }
+                            navController.graph.setStartDestination(AppNavigation.HOME)
                         })
                     }
 
@@ -152,10 +154,7 @@ class MainActivity : ComponentActivity() {
                         deepLinks = listOf(navDeepLink { uriPattern = "${Constants.POST_URL}/post={post}" })
                     ) {
                         val model = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            it.arguments?.getParcelable(
-                                "post",
-                                PostNotificationModel::class.java
-                            )
+                            it.arguments?.getParcelable("post", PostNotificationModel::class.java)
                         } else {
                             it.arguments?.getParcelable("post")
                         } ?: PostNotificationModel()
