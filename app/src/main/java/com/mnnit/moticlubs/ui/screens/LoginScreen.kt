@@ -34,11 +34,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
-import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.getDomainMail
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.setAuthToken
+import com.mnnit.moticlubs.setUserID
 import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -268,22 +268,19 @@ private fun login(
             }
 
             if (user.isEmailVerified) {
-                val authToken = context.getAuthToken()
-                if (authToken.isEmpty()) {
-                    Log.d(TAG, "login: FirebaseIDToken not invoked. Fetching token")
-                    user.getIdToken(false).addOnSuccessListener {
-                        val token = it.token
-                        if (token == null) {
-                            auth.signOut()
-                            viewModel.isLoading.value = false
-                            Toast.makeText(context, "Error: Couldn't init session", Toast.LENGTH_SHORT).show()
-                            return@addOnSuccessListener
-                        }
-                        context.setAuthToken(token)
-                        handleUser(context, auth, viewModel, appViewModel, onNavigateToMain)
+                Log.d(TAG, "login: FirebaseIDToken not invoked. Fetching token")
+                user.getIdToken(false).addOnSuccessListener {
+                    Log.d(TAG, "login: userID: ${it.claims["userId"]}")
+                    context.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
+
+                    val token = it.token
+                    if (token == null) {
+                        auth.signOut()
+                        viewModel.isLoading.value = false
+                        Toast.makeText(context, "Error: Couldn't init session", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
                     }
-                } else {
-                    Log.d(TAG, "login: FirebaseIDToken invoked")
+                    context.setAuthToken(token)
                     handleUser(context, auth, viewModel, appViewModel, onNavigateToMain)
                 }
             } else {

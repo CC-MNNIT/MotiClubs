@@ -292,7 +292,7 @@ fun ClubScreen(
 @Composable
 fun PostConfirmationDialog(viewModel: ClubScreenViewModel, update: Boolean, onPost: () -> Unit) {
     ConfirmationDialog(
-        showDialog = viewModel.showDialog,
+        showDialog = if (update) viewModel.showEditDialog else viewModel.showDialog,
         message = "${if (update) "Update post" else "Post"} message in ${viewModel.clubNavModel.name} ?",
         positiveBtnText = if (update) "Update" else "Post",
         imageVector = Icons.Outlined.Article,

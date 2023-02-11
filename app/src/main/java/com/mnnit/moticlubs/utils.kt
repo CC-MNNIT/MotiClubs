@@ -16,6 +16,7 @@ import java.util.*
 import kotlin.math.exp
 
 object Constants {
+    const val USER_ID = "userID"
     const val ADMIN_NAME = "admin_name"
     const val TIME = "time"
     const val MESSAGE = "message"
@@ -61,6 +62,16 @@ fun scrollMultiplierIndex(prev: String, curr: String): Int {
     }
     return breakLines
 }
+
+fun Context.setUserID(userID: Int) {
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
+        .putInt(Constants.USER_ID, userID).apply()
+}
+
+fun Context.getUserID(): Int =
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
+        .getInt(Constants.USER_ID, -1)
+
 
 fun Context.setAuthToken(token: String) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()

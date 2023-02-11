@@ -43,25 +43,24 @@ class AppFCMService : FirebaseMessagingService() {
         user ?: return
         Log.d(TAG, "onMessageReceived")
 
-        Handler(mainLooper).post { postNotification(user, message.data) }
+        Handler(mainLooper).post { postNotification(message.data) }
     }
 
-    private fun postNotification(user: FirebaseUser, data: Map<String, String>) {
+    private fun postNotification(data: Map<String, String>) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
         val channelID = data["chid"]?.toInt() ?: -1
         val postID = data["pid"]?.toInt() ?: -1
         val clubID = data["cid"]?.toInt() ?: -1
+        val userID = data["uid"]?.toInt() ?: -1
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
         val updated = (data["updated"]?.toInt() ?: 0) == 1
         val time = data["time"]!!
 
-        val adminEmail = data["adminEmail"] ?: ""
-        val appUserEmail = user.email ?: ""
-        if (adminEmail == appUserEmail) {
+        if (userID == getUserID()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
             return
         }
@@ -81,7 +80,7 @@ class AppFCMService : FirebaseMessagingService() {
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
-        postRead(clubID, postID)
+        postRead(channelID, postID)
 
         postNotificationCompat(
             notificationManager,

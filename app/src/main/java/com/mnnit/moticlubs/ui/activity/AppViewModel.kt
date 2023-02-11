@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.activity
 
 import android.app.Application
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -15,10 +16,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
 import com.google.gson.Gson
+import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.*
+import com.mnnit.moticlubs.postRead
 import com.mnnit.moticlubs.setAuthToken
+import com.mnnit.moticlubs.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,7 +47,7 @@ class AppViewModel @Inject constructor(
 
     fun logoutUser() {
         FirebaseAuth.getInstance().signOut()
-        application.setAuthToken("")
+        application.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit().clear().apply()
     }
 
     fun fetchUser(
@@ -54,6 +58,8 @@ class AppViewModel @Inject constructor(
         fetchingState = true
         if (user != null) {
             viewModelScope.launch {
+                fetchAllAdmins()
+
                 val response = withContext(Dispatchers.IO) { repository.getUserData(application) }
 
                 fetchingState = false
@@ -76,10 +82,12 @@ class AppViewModel @Inject constructor(
         }
     }
 
-    fun fetchAllAdmins() {
+    private fun fetchAllAdmins() {
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) { repository.getAllAdmins(application) }
             if (response is Success) {
+                Log.d(TAG, "fetchAllAdmins")
+                adminMap.clear()
                 response.obj.forEach { model -> adminMap[model.uid] = model }
             }
         }

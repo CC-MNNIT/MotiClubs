@@ -3,7 +3,6 @@ package com.mnnit.moticlubs.ui.activity
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
@@ -52,7 +51,6 @@ class MainActivity : ComponentActivity() {
 
         val user = FirebaseAuth.getInstance().currentUser
         viewModel.fetchUser(user)
-        viewModel.fetchAllAdmins()
 
         setContent {
             AnimatedVisibility(visible = viewModel.showErrorScreen) {
@@ -161,7 +159,6 @@ class MainActivity : ComponentActivity() {
                         } else {
                             it.arguments?.getParcelable("post")
                         } ?: PostNotificationModel()
-                        Log.d("TAG", "MainScreen: $model")
                         PostScreen(model)
                     }
 
