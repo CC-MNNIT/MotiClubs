@@ -1,12 +1,17 @@
 package com.mnnit.moticlubs.ui.activity
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
@@ -21,6 +26,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,10 +51,29 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: AppViewModel by viewModels()
 
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+            openApp()
+        } else {
+            Toast.makeText(
+                this, "Please enable notification permission for this app",
+                Toast.LENGTH_SHORT
+            ).show()
+            finish()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen }
         super.onCreate(savedInstanceState)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            validateNotificationPermission()
+        } else {
+            openApp()
+        }
+    }
+
+    private fun openApp() {
         val user = FirebaseAuth.getInstance().currentUser
         viewModel.fetchUser(user)
 
@@ -59,6 +84,26 @@ class MainActivity : ComponentActivity() {
             AnimatedVisibility(visible = !viewModel.showErrorScreen) {
                 MainScreen(user = user)
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun validateNotificationPermission() {
+        when {
+            (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            )) == PackageManager.PERMISSION_GRANTED -> openApp()
+
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                Toast.makeText(
+                    this, "Please enable notification permission for this app",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+                return
+            }
+
+            else -> requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
