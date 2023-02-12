@@ -313,5 +313,11 @@ private fun handleUser(
             viewModel.isLoading.value = false
             Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
         }
+    }.addOnCompleteListener {
+        if (!it.isSuccessful) {
+            auth.signOut()
+            viewModel.isLoading.value = false
+            Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
+        }
     }
 }

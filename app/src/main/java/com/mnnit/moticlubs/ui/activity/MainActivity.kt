@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
             finish()
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen }
         super.onCreate(savedInstanceState)
@@ -162,7 +163,7 @@ class MainActivity : ComponentActivity() {
                                     "${AppNavigation.CLUB_PAGE}/${Uri.encode(Gson().toJson(clubNavModel))}"
                                 )
                             },
-                            onNavigateContactUs = { navController.navigate(AppNavigation.CONTACT_US) },
+                            onNavigateContactUs = { navController.navigate(AppNavigation.ABOUT_US) },
                             onNavigateProfile = { navController.navigate(AppNavigation.PROFILE) })
                     }
 
@@ -187,10 +188,8 @@ class MainActivity : ComponentActivity() {
                         })
                     }
 
-                    // CONTACT US
-                    composable(AppNavigation.CONTACT_US) {
-                        ContactUsScreen()
-                    }
+                    // ABOUT US
+                    composable(AppNavigation.ABOUT_US) { AboutUsScreen() }
 
                     // CLUB POST
                     composable(

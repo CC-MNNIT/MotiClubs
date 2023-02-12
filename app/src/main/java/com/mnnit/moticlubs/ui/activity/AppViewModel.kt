@@ -20,9 +20,7 @@ import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.*
-import com.mnnit.moticlubs.postRead
 import com.mnnit.moticlubs.setAuthToken
-import com.mnnit.moticlubs.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -124,7 +122,7 @@ object AppNavigation {
     const val HOME = "home"
     const val CLUB_PAGE = "club_page"
     const val PROFILE = "profile"
-    const val CONTACT_US = "contact_us"
+    const val ABOUT_US = "about_us"
     const val POST_PAGE = "post_page"
     const val CLUB_DETAIL = "club_detail"
 }

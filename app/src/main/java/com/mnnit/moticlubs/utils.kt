@@ -26,8 +26,7 @@ object Constants {
     const val TOKEN = "token"
     const val EMAIL = "email"
 
-    //    const val BASE_URL = "https://moti-clubs.vercel.app"
-    const val BASE_URL = "https://moticlubs.vercel.app"
+    const val BASE_URL = "https://api-moticlubs.vercel.app/"
     const val CLUB_NAME = "club_name"
     const val CLUB_ID = "club_id"
     const val CLUB_DESC = "club_desc"

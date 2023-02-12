@@ -16,14 +16,19 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.di.AppModule
+import com.mnnit.moticlubs.network.RepositoryImpl
+import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AppFCMService : FirebaseMessagingService() {
 
@@ -33,6 +38,14 @@ class AppFCMService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = RepositoryImpl(AppModule.provideApiService()).setFCMToken(this@AppFCMService, token)
+            if (response is Success) {
+                Log.d(TAG, "onNewToken: pushed")
+            } else {
+                Log.d(TAG, "onNewToken: err: ${response.errCode}: ${response.errMsg}")
+            }
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
