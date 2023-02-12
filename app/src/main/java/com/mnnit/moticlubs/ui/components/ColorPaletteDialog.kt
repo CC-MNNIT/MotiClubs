@@ -27,7 +27,7 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.textColorFor
 
 @Composable
-fun ColorPaletteDialog(linkComposeModel: LinkComposeModel, show: MutableState<Boolean>) {
+fun ColorPaletteDialog(otherLinkComposeModel: OtherLinkComposeModel, show: MutableState<Boolean>) {
     val colorScheme = getColorScheme()
     val controller = rememberColorPickerController().apply {
         this.setWheelColor(Color.Black)
@@ -53,8 +53,9 @@ fun ColorPaletteDialog(linkComposeModel: LinkComposeModel, show: MutableState<Bo
                         .height(250.dp),
                     controller = controller,
                     onColorChanged = { colorEnvelope: ColorEnvelope ->
-                        linkComposeModel.colorCode.value = colorEnvelope.hexCode.substring(2)
-                        linkComposeModel.color.value = colorEnvelope.color
+                        otherLinkComposeModel.colorCode.value = colorEnvelope.hexCode.substring(2)
+                            .replace("#", "")
+                        otherLinkComposeModel.color.value = colorEnvelope.color
                     }
                 )
 
@@ -68,11 +69,11 @@ fun ColorPaletteDialog(linkComposeModel: LinkComposeModel, show: MutableState<Bo
                 Button(
                     onClick = { show.value = false },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    colors = ButtonDefaults.buttonColors(containerColor = linkComposeModel.color.value)
+                    colors = ButtonDefaults.buttonColors(containerColor = otherLinkComposeModel.color.value)
                 ) {
                     Text(
-                        text = "#${linkComposeModel.colorCode.value}", fontSize = 16.sp,
-                        color = textColorFor(linkComposeModel.color.value)
+                        text = "#${otherLinkComposeModel.colorCode.value}", fontSize = 16.sp,
+                        color = textColorFor(otherLinkComposeModel.color.value)
                     )
                 }
             }

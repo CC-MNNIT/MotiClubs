@@ -68,9 +68,5 @@ interface UrlRepository {
 
     suspend fun getUrls(ctx: Context, clubID: Int): ResponseModel<List<UrlResponseModel>>
 
-    suspend fun saveUrl(ctx: Context, clubID: Int, urlModel: UrlModel): ResponseModel<ResponseBody>
-
-    suspend fun updateUrl(ctx: Context, urlID: Int, clubID: Int, urlModel: UrlModel): ResponseModel<ResponseBody>
-
-    suspend fun deleteUrl(ctx: Context, urlID: Int, clubID: Int): ResponseModel<ResponseBody>
+    suspend fun pushUrls(ctx: Context, clubID: Int, list: List<UrlModel>): ResponseModel<ResponseBody>
 }

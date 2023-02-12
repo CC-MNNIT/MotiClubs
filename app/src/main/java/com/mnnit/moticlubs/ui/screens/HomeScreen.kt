@@ -281,7 +281,7 @@ fun ClubList(
 
                     Column(
                         modifier = Modifier
-                            .padding(start = 8.dp)
+                            .padding(start = 16.dp)
                             .fillMaxWidth(0.9f)
                     ) {
                         Text(text = clubsList[idx].name, fontSize = 16.sp)

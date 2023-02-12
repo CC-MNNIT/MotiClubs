@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.components
 
-import android.util.Patterns
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +24,7 @@ import com.mnnit.moticlubs.ui.theme.textColorFor
 fun OtherLinkItem(
     modifier: Modifier = Modifier,
     idx: Int,
-    linksList: SnapshotStateList<LinkComposeModel>,
+    linksList: SnapshotStateList<OtherLinkComposeModel>,
     refIdx: MutableState<Int>,
     showColorPalette: MutableState<Boolean>,
     onDeleteItem: (idx: Int) -> Unit = {}

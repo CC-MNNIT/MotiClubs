@@ -110,21 +110,8 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
         return controller { apiService.getUrls(ctx.getAuthToken(), clubID) }
     }
 
-    override suspend fun saveUrl(ctx: Context, clubID: Int, urlModel: UrlModel): ResponseModel<ResponseBody> {
-        return controller { apiService.saveUrl(ctx.getAuthToken(), clubID, urlModel) }
-    }
-
-    override suspend fun updateUrl(
-        ctx: Context,
-        urlID: Int,
-        clubID: Int,
-        urlModel: UrlModel
-    ): ResponseModel<ResponseBody> {
-        return controller { apiService.updateUrl(ctx.getAuthToken(), urlID, clubID, urlModel) }
-    }
-
-    override suspend fun deleteUrl(ctx: Context, urlID: Int, clubID: Int): ResponseModel<ResponseBody> {
-        return controller { apiService.deleteUrl(ctx.getAuthToken(), urlID, clubID, ClubUrlModel(clubID)) }
+    override suspend fun pushUrls(ctx: Context, clubID: Int, list: List<UrlModel>): ResponseModel<ResponseBody> {
+        return controller { apiService.pushUrls(ctx.getAuthToken(), clubID, UrlDto(list)) }
     }
 
     // ---------------------------------------------------- //
