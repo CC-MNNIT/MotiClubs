@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalLayoutApi::class)
+@file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 
 package com.mnnit.moticlubs.ui.screens
 
@@ -12,16 +12,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -135,6 +139,11 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val colorScheme = getColorScheme()
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isFetching,
+        onRefresh = viewModel::fetchClubsList
+    )
+
     val context = LocalContext.current
     MotiClubsTheme(colorScheme) {
         SetNavBarsTheme()
@@ -199,6 +208,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .consumeWindowInsets(it)
+                        .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 ) {
                     ProfilePicture(
@@ -208,11 +218,15 @@ fun HomeScreen(
 
                     Text(text = "MNNIT Clubs", fontSize = 28.sp)
 
-                    AnimatedVisibility(visible = viewModel.isFetching, modifier = Modifier.fillMaxWidth()) {
+                    AnimatedVisibility(
+                        visible = viewModel.isFetching || refreshState.progress.dp.value > 0.5f,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         LinearProgressIndicator(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(16.dp),
+                            strokeCap = StrokeCap.Round
                         )
                     }
                     AnimatedVisibility(

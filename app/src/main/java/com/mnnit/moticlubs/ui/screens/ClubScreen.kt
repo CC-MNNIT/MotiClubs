@@ -23,6 +23,8 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -32,6 +34,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
@@ -211,6 +214,10 @@ fun ClubScreen(
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.loadingPosts.value,
+        onRefresh = viewModel::fetchPostsList
+    )
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
@@ -231,6 +238,7 @@ fun ClubScreen(
             }, content = {
                 Box(
                     modifier = Modifier
+                        .pullRefresh(state = refreshState, enabled = !viewModel.loadingPosts.value)
                         .fillMaxSize()
                         .background(colorScheme.background)
                 ) {
@@ -240,13 +248,14 @@ fun ClubScreen(
                             .nestedScroll(scrollBehavior.nestedScrollConnection)
                     ) {
                         AnimatedVisibility(
-                            visible = viewModel.loadingPosts.value,
+                            visible = viewModel.loadingPosts.value || refreshState.progress.dp.value > 0.5f,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            androidx.compose.material3.LinearProgressIndicator(
+                            LinearProgressIndicator(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
+                                    .padding(16.dp),
+                                strokeCap = StrokeCap.Round
                             )
                         }
 

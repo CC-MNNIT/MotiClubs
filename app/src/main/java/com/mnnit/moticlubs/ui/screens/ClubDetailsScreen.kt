@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.mnnit.moticlubs.ui.screens
 
 import android.app.Application
@@ -19,15 +21,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddAPhoto
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -185,12 +191,14 @@ fun ClubDetailsScreen(
     appViewModel: AppViewModel,
     viewModel: ClubDetailsScreenViewModel = hiltViewModel()
 ) {
-
-    Log.d("TAG", "ClubDetailsScreen: ${Color(android.graphics.Color.parseColor("#FFFFFF"))}")
-
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
     viewModel.isAdmin = appViewModel.user.admin.any { m -> m.clubID == viewModel.clubModel.id }
+
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isFetching,
+        onRefresh = viewModel::fetchUrls
+    )
 
     val context = LocalContext.current
 
@@ -229,12 +237,13 @@ fun ClubDetailsScreen(
 
                 Column(
                     modifier = Modifier
+                        .pullRefresh(state = refreshState)
                         .fillMaxSize()
                         .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     AnimatedVisibility(
-                        visible = viewModel.isFetching,
+                        visible = viewModel.isFetching || refreshState.progress.dp.value > 0.5f,
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(colorScheme.surfaceColorAtElevation(2.dp))
@@ -242,7 +251,8 @@ fun ClubDetailsScreen(
                         LinearProgressIndicator(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(16.dp),
+                            strokeCap = StrokeCap.Round
                         )
                     }
 
@@ -255,6 +265,7 @@ fun ClubDetailsScreen(
                     ) {
                         Column(
                             modifier = Modifier
+                                .pullRefresh(state = refreshState)
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
