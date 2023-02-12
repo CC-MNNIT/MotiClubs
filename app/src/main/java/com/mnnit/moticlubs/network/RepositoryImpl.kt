@@ -114,6 +114,16 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
         return controller { apiService.pushUrls(ctx.getAuthToken(), clubID, UrlDto(list)) }
     }
 
+    // ---------------------- VIEWs --------------------------- //
+
+    override suspend fun getViews(ctx: Context, postID: Int): ResponseModel<ViewCount> {
+        return controller { apiService.getViews(ctx.getAuthToken(), postID) }
+    }
+
+    override suspend fun addViews(ctx: Context, postID: Int): ResponseModel<ResponseBody> {
+        return controller { apiService.addView(ctx.getAuthToken(), ViewPost(postID)) }
+    }
+
     // ---------------------------------------------------- //
 
     private suspend inline fun <T, reified R> controller(crossinline invoke: (suspend () -> Response<T>)): ResponseModel<R> {

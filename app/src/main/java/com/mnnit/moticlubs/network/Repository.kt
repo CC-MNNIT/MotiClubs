@@ -10,7 +10,7 @@ data class Failed<T>(val code: Int, val msg: String) : ResponseModel<T>(null, co
 
 data class Success<T>(val obj: T) : ResponseModel<T>(obj, 200, "Success")
 
-interface Repository : UserRepository, ClubRepository, PostsRepository, ChannelRepository, UrlRepository
+interface Repository : UserRepository, ClubRepository, PostsRepository, ChannelRepository, UrlRepository, ViewRepository
 
 interface UserRepository {
 
@@ -69,4 +69,11 @@ interface UrlRepository {
     suspend fun getUrls(ctx: Context, clubID: Int): ResponseModel<List<UrlResponseModel>>
 
     suspend fun pushUrls(ctx: Context, clubID: Int, list: List<UrlModel>): ResponseModel<ResponseBody>
+}
+
+interface ViewRepository {
+
+    suspend fun getViews(ctx: Context, postID: Int): ResponseModel<ViewCount>
+
+    suspend fun addViews(ctx: Context, postID: Int): ResponseModel<ResponseBody>
 }

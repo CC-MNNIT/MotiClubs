@@ -107,7 +107,7 @@ fun AboutUsScreen() {
 
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "Developers",
+                            text = "Maintainers",
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.SemiBold
