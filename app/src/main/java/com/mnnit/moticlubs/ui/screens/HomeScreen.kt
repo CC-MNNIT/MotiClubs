@@ -209,10 +209,10 @@ fun HomeScreen(
                         .fillMaxSize()
                         .consumeWindowInsets(it)
                         .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
-                        .padding(top = 16.dp, end = 16.dp)
+                        .padding(top = 16.dp)
                 ) {
                     ProfilePicture(
-                        modifier = Modifier.align(Alignment.End),
+                        modifier = Modifier.align(Alignment.End).padding(end = 16.dp),
                         url = appViewModel.user.avatar,
                         onClick = { onNavigateProfile() })
 
