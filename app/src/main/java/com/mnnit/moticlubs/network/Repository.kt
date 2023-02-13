@@ -48,7 +48,7 @@ interface PostsRepository {
 
     suspend fun updatePost(ctx: Context, postID: Int, message: String): ResponseModel<ResponseBody>
 
-    suspend fun deletePost(ctx: Context, postID: Int): ResponseModel<ResponseBody>
+    suspend fun deletePost(ctx: Context, postID: Int, channelID: Int): ResponseModel<ResponseBody>
 }
 
 interface ChannelRepository {

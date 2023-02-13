@@ -32,6 +32,7 @@ interface PostsApi {
     @DELETE("/posts/{postId}")
     suspend fun deletePost(
         @Header("Authorization") auth: String?,
-        @Path("postId") postID: Int
+        @Path("postId") postID: Int,
+        @Query("channelId") channelID: Int
     ): Response<ResponseBody>
 }

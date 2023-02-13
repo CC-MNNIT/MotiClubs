@@ -56,7 +56,27 @@ class AppFCMService : FirebaseMessagingService() {
         user ?: return
         Log.d(TAG, "onMessageReceived")
 
-        Handler(mainLooper).post { postNotification(message.data) }
+        Handler(mainLooper).post { handleData(message.data) }
+    }
+
+    private fun handleData(data: Map<String, String>) {
+        val deleteMode = data["deleted"]?.toInt() ?: -1
+        if (deleteMode == -1) {
+            postNotification(data)
+        } else {
+            val channelID = data["chid"]?.toInt() ?: -1
+            val postID = data["pid"]?.toInt() ?: -1
+
+            if (channelID == -1 || postID == -1) {
+                Log.d(TAG, "handleData: deleteMode: ERR -1: chid $channelID, pid: $postID")
+                return
+            }
+
+            Log.d(TAG, "handleData: deleteMode: chid: $channelID, pid: $postID")
+            postRead(channelID, postID, true)
+
+            (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(postID)
+        }
     }
 
     private fun postNotification(data: Map<String, String>) {

@@ -187,7 +187,9 @@ class ClubScreenViewModel @Inject constructor(
 
     fun deletePost(postID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) { repository.deletePost(application, postID) }
+            val response = withContext(Dispatchers.IO) {
+                repository.deletePost(application, postID, clubNavModel.channel.id)
+            }
             if (response is Success) {
                 onResponse()
             } else {

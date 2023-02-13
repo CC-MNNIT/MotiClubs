@@ -78,8 +78,8 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
         return controller { apiService.updatePost(ctx.getAuthToken(), postID, UpdatePostModel(message)) }
     }
 
-    override suspend fun deletePost(ctx: Context, postID: Int): ResponseModel<ResponseBody> {
-        return controller { apiService.deletePost(ctx.getAuthToken(), postID) }
+    override suspend fun deletePost(ctx: Context, postID: Int, channelID: Int): ResponseModel<ResponseBody> {
+        return controller { apiService.deletePost(ctx.getAuthToken(), postID, channelID) }
     }
 
     // ------------------------- CHANNEL ---------------------- //
