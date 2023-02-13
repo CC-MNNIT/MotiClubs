@@ -21,6 +21,7 @@ import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.*
 import com.mnnit.moticlubs.setAuthToken
+import com.mnnit.moticlubs.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,22 +56,33 @@ class AppViewModel @Inject constructor(
     ) {
         fetchingState = true
         if (user != null) {
-            viewModelScope.launch {
-                fetchAllAdmins()
+            user.getIdToken(false).addOnSuccessListener {
+                application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
+                application.setAuthToken(it.token ?: "")
 
-                val response = withContext(Dispatchers.IO) { repository.getUserData(application) }
+                viewModelScope.launch {
+                    fetchAllAdmins()
 
+                    val response = withContext(Dispatchers.IO) { repository.getUserData(application) }
+
+                    fetchingState = false
+                    showSplashScreen = false
+                    if (response is Success) {
+                        this@AppViewModel.user = response.obj
+                        showErrorScreen = false
+                        Log.d(TAG, "fetchUser")
+
+                        onResponse()
+                    } else {
+                        showErrorScreen = true
+                        Log.d(TAG, "fetchUser: error: code: ${response.errCode}, msg: ${response.errMsg}")
+                        onFailure()
+                    }
+                }
+            }.addOnCompleteListener {
                 fetchingState = false
-                showSplashScreen = false
-                if (response is Success) {
-                    this@AppViewModel.user = response.obj
-                    showErrorScreen = false
-                    Log.d(TAG, "fetchUser")
-
-                    onResponse()
-                } else {
+                if (!it.isSuccessful) {
                     showErrorScreen = true
-                    Log.d(TAG, "fetchUser: error: code: ${response.errCode}, msg: ${response.errMsg}")
                     onFailure()
                 }
             }

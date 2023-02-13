@@ -39,7 +39,6 @@ import com.google.gson.Gson
 import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.network.model.ChannelNavModel
 import com.mnnit.moticlubs.network.model.ClubNavModel
-import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
