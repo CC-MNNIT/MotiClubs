@@ -266,7 +266,7 @@ fun ClubScreen(
                                 .align(Alignment.CenterHorizontally)
                         ) {
                             Text(
-                                "No posts yet :/",
+                                "No posts yet :/\nPull down to refresh",
                                 fontSize = 14.sp,
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)

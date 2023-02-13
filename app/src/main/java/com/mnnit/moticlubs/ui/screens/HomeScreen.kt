@@ -209,14 +209,14 @@ fun HomeScreen(
                         .fillMaxSize()
                         .consumeWindowInsets(it)
                         .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                        .padding(top = 16.dp, end = 16.dp)
                 ) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.End),
                         url = appViewModel.user.avatar,
                         onClick = { onNavigateProfile() })
 
-                    Text(text = "MNNIT Clubs", fontSize = 28.sp)
+                    Text(modifier = Modifier.padding(start = 16.dp), text = "MNNIT Clubs", fontSize = 28.sp)
 
                     AnimatedVisibility(
                         visible = viewModel.isFetching || refreshState.progress.dp.value > 0.5f,
@@ -234,9 +234,11 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            "Error loading clubs :/",
+                            "Error loading clubs :/\nPull down to refresh",
                             fontSize = 14.sp,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(start = 16.dp)
                         )
                     }
                     ClubList(
@@ -271,7 +273,7 @@ fun ClubList(
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
-        contentPadding = PaddingValues(top = 16.dp)
+        contentPadding = PaddingValues(top = 16.dp, bottom = 72.dp, start = 16.dp, end = 16.dp)
     ) {
         items(clubsList.size) { idx ->
             var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].id)) }
