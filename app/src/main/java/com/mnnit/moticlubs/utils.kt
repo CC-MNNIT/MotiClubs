@@ -13,26 +13,14 @@ import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import java.util.*
-import kotlin.math.exp
 
 object Constants {
     const val USER_ID = "userID"
-    const val ADMIN_NAME = "admin_name"
-    const val TIME = "time"
-    const val MESSAGE = "message"
-    const val AVATAR = "avatar"
     const val SHARED_PREFERENCE = "com.mnnit.moticlubs"
     const val POST_URL = "app://moticlubs.mnnit.com"
     const val TOKEN = "token"
-    const val EMAIL = "email"
 
     const val BASE_URL = "https://api-moticlubs.up.railway.app/"
-    const val CLUB_NAME = "club_name"
-    const val CLUB_ID = "club_id"
-    const val CLUB_DESC = "club_desc"
-    const val EDIT_MODE = "edit_mode"
-    const val POST_ID = "post_id"
-    const val CLUB = "club"
 }
 
 fun Context.getMkdFormatter() = Markwon.builder(this)
@@ -44,33 +32,13 @@ fun Context.getMkdFormatter() = Markwon.builder(this)
 
 fun String.getDomainMail(): String = "$this@mnnit.ac.in"
 
-fun scrollMultiplierIndex(prev: String, curr: String): Int {
-    val q = if (curr.length > prev.length) prev else curr
-    val p = if (curr.length > prev.length) curr else prev
-    var breakLines = 0
-    q.forEachIndexed { index, c ->
-        if (p[index] != c) {
-            for (i in 0..index) {
-                if (p[i] == '\n') breakLines++
-            }
-            return breakLines
-        }
-    }
-    curr.forEach {
-        if (it == '\n') breakLines++
-    }
-    return breakLines
-}
-
 fun Context.setUserID(userID: Int) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
         .putInt(Constants.USER_ID, userID).apply()
 }
 
 fun Context.getUserID(): Int =
-    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
-        .getInt(Constants.USER_ID, -1)
-
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getInt(Constants.USER_ID, -1)
 
 fun Context.setAuthToken(token: String) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
@@ -100,8 +68,7 @@ fun Context.postRead(channelID: Int, postID: Int, read: Boolean = false) {
 fun Context.getUnreadPost(channelID: Int) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
         .getStringSet("ch$channelID", setOf())
-        ?.toMutableSet()
-        ?: setOf<String>().toMutableSet()
+        ?.toMutableSet() ?: setOf<String>().toMutableSet()
 
 fun Context.getExpandedChannel(clubID: Int): Boolean =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getBoolean("cl$clubID", false)
