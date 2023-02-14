@@ -75,9 +75,3 @@ data class UrlModel(
     @Expose
     var url: String,
 )
-
-data class ClubUrlModel(
-    @SerializedName("clubId")
-    @Expose
-    var clubID: Int
-)

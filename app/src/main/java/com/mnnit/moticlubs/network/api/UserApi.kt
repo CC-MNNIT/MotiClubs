@@ -11,7 +11,7 @@ interface UserApi {
     @POST("/user")
     suspend fun saveUser(
         @Header("Authorization") auth: String?,
-        @Body saveUserModel: SaveUserModel?
+        @Body saveUserDto: SaveUserDto?
     ): Response<ResponseBody>
 
     @GET("/user")
@@ -29,24 +29,24 @@ interface UserApi {
     @POST("/user/avatar")
     suspend fun setProfilePicUrl(
         @Header("Authorization") auth: String?,
-        @Body avatar: UpdateUserAvatarModel
+        @Body avatar: UpdateUserAvatarDto
     ): Response<ResponseBody>
 
     @POST("/user/fcmtoken")
     suspend fun setFCMToken(
         @Header("Authorization") auth: String?,
-        @Body token: FCMTokenModel
+        @Body token: FCMTokenDto
     ): Response<ResponseBody>
 
     @POST("/user/subscribe")
     suspend fun subscribeToClub(
         @Header("Authorization") auth: String?,
-        @Body club: UserClubModel
+        @Body club: UserClubDto
     ): Response<ResponseBody>
 
     @POST("/user/unsubscribe")
     suspend fun unsubscribeToClub(
         @Header("Authorization") auth: String?,
-        @Body club: UserClubModel
+        @Body club: UserClubDto
     ): Response<ResponseBody>
 }

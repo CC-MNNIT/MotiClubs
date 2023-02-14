@@ -1,8 +1,6 @@
 package com.mnnit.moticlubs.network.api
 
-import com.mnnit.moticlubs.network.model.ClubUrlModel
 import com.mnnit.moticlubs.network.model.UrlDto
-import com.mnnit.moticlubs.network.model.UrlModel
 import com.mnnit.moticlubs.network.model.UrlResponseModel
 import okhttp3.ResponseBody
 import retrofit2.Response

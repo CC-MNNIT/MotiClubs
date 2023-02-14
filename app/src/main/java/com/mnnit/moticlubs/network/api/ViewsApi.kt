@@ -1,7 +1,7 @@
 package com.mnnit.moticlubs.network.api
 
-import com.mnnit.moticlubs.network.model.ViewCount
-import com.mnnit.moticlubs.network.model.ViewPost
+import com.mnnit.moticlubs.network.model.ViewCountDto
+import com.mnnit.moticlubs.network.model.ViewPostDto
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,11 +16,11 @@ interface ViewsApi {
     suspend fun getViews(
         @Header("Authorization") auth: String?,
         @Query("postId") postID: Int
-    ): Response<ViewCount>
+    ): Response<ViewCountDto>
 
     @POST("/views")
     suspend fun addView(
         @Header("Authorization") auth: String?,
-        @Body viewPost: ViewPost
+        @Body viewPostDto: ViewPostDto
     ): Response<ResponseBody>
 }

@@ -16,7 +16,7 @@ import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.ClubNavModel
-import com.mnnit.moticlubs.network.model.PostModel
+import com.mnnit.moticlubs.network.model.PostDto
 import com.mnnit.moticlubs.network.model.PushPostModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -37,7 +37,7 @@ class ClubScreenViewModel @Inject constructor(
     val searchValue = mutableStateOf("")
 
     val postMsg = mutableStateOf(TextFieldValue(""))
-    val postsList = mutableStateListOf<PostModel>()
+    val postsList = mutableStateListOf<PostDto>()
     var clubNavModel by mutableStateOf(savedStateHandle.get<ClubNavModel>("club") ?: ClubNavModel())
     val loadingPosts = mutableStateOf(false)
 

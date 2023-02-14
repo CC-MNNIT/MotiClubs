@@ -14,7 +14,7 @@ interface Repository : UserRepository, ClubRepository, PostsRepository, ChannelR
 
 interface UserRepository {
 
-    suspend fun saveUser(ctx: Context, saveUserModel: SaveUserModel): ResponseModel<ResponseBody>
+    suspend fun saveUser(ctx: Context, saveUserDto: SaveUserDto): ResponseModel<ResponseBody>
 
     suspend fun getUserData(ctx: Context): ResponseModel<UserResponse>
 
@@ -35,14 +35,14 @@ interface ClubRepository {
 
     suspend fun getClubs(ctx: Context): ResponseModel<List<ClubModel>>
 
-    suspend fun updateClub(ctx: Context, clubID: Int, updateClubModel: UpdateClubModel): ResponseModel<ResponseBody>
+    suspend fun updateClub(ctx: Context, clubID: Int, updateClubDto: UpdateClubDto): ResponseModel<ResponseBody>
 
-    suspend fun getSubscribersCount(ctx: Context, clubID: Int): ResponseModel<SubscriberCountResponse>
+    suspend fun getSubscribersCount(ctx: Context, clubID: Int): ResponseModel<SubscriberCountDto>
 }
 
 interface PostsRepository {
 
-    suspend fun getPostsFromClubChannel(ctx: Context, clubID: Int, channelID: Int): ResponseModel<List<PostModel>>
+    suspend fun getPostsFromClubChannel(ctx: Context, clubID: Int, channelID: Int): ResponseModel<List<PostDto>>
 
     suspend fun sendPost(ctx: Context, pushPostModel: PushPostModel): ResponseModel<ResponseBody>
 
@@ -53,11 +53,11 @@ interface PostsRepository {
 
 interface ChannelRepository {
 
-    suspend fun getAllChannels(ctx: Context): ResponseModel<List<ChannelModel>>
+    suspend fun getAllChannels(ctx: Context): ResponseModel<List<ChannelDto>>
 
-    suspend fun getClubChannels(ctx: Context, clubID: Int): ResponseModel<List<ChannelModel>>
+    suspend fun getClubChannels(ctx: Context, clubID: Int): ResponseModel<List<ChannelDto>>
 
-    suspend fun createChannel(ctx: Context, addChannelModel: AddChannelModel): ResponseModel<ResponseBody>
+    suspend fun createChannel(ctx: Context, addChannelDto: AddChannelDto): ResponseModel<ResponseBody>
 
     suspend fun updateChannelName(ctx: Context, channelID: Int, name: String): ResponseModel<ResponseBody>
 
@@ -73,7 +73,7 @@ interface UrlRepository {
 
 interface ViewRepository {
 
-    suspend fun getViews(ctx: Context, postID: Int): ResponseModel<ViewCount>
+    suspend fun getViews(ctx: Context, postID: Int): ResponseModel<ViewCountDto>
 
     suspend fun addViews(ctx: Context, postID: Int): ResponseModel<ResponseBody>
 }

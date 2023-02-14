@@ -1,8 +1,8 @@
 package com.mnnit.moticlubs.network.api
 
 import com.mnnit.moticlubs.network.model.ClubModel
-import com.mnnit.moticlubs.network.model.SubscriberCountResponse
-import com.mnnit.moticlubs.network.model.UpdateClubModel
+import com.mnnit.moticlubs.network.model.SubscriberCountDto
+import com.mnnit.moticlubs.network.model.UpdateClubDto
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -16,12 +16,12 @@ interface ClubApi {
     suspend fun updateClub(
         @Header("Authorization") auth: String?,
         @Path("clubId") clubID: Int,
-        @Body data: UpdateClubModel
+        @Body data: UpdateClubDto
     ): Response<ResponseBody>
 
     @GET("/clubs/subscribers-count/{clubId}")
     suspend fun getSubscribersCount(
         @Header("Authorization") auth: String?,
         @Path("clubId") clubID: Int
-    ): Response<SubscriberCountResponse?>
+    ): Response<SubscriberCountDto?>
 }

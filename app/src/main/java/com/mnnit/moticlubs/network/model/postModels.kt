@@ -19,7 +19,7 @@ data class PostNotificationModel(
     constructor() : this("", "", -1, -1, "", "", "", "")
 }
 
-data class PostModel(
+data class PostDto(
     @SerializedName("pid")
     @Expose
     var postID: Int,

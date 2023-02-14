@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.SaveUserModel
+import com.mnnit.moticlubs.network.model.SaveUserDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -57,11 +57,11 @@ class SignUpScreenViewModel @Inject constructor(
     }
 
     fun saveUser(
-        saveUserModel: SaveUserModel,
+        saveUserDto: SaveUserDto,
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            val response = repository.saveUser(application, saveUserModel)
+            val response = repository.saveUser(application, saveUserDto)
             if (response is Success) {
                 onResponse()
             } else {

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.network.model.AdminDetailResponse
 import com.mnnit.moticlubs.network.model.ClubNavModel
-import com.mnnit.moticlubs.network.model.PostModel
+import com.mnnit.moticlubs.network.model.PostDto
 import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 fun PostItem(
     bottomSheetScaffoldState: MutableState<BottomSheetScaffoldState>,
     clubNavModel: ClubNavModel,
-    postsList: SnapshotStateList<PostModel>,
+    postsList: SnapshotStateList<PostDto>,
     userID: Int,
     idx: Int,
     admin: AdminDetailResponse,

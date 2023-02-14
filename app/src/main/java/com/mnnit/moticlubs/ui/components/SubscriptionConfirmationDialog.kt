@@ -6,7 +6,7 @@ import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.mnnit.moticlubs.network.model.UserClubModel
+import com.mnnit.moticlubs.network.model.UserClubDto
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
@@ -27,7 +27,7 @@ fun SubscriptionConfirmationDialog(
             viewModel.showProgress.value = true
             if (subscribe) {
                 viewModel.subscribeToClub(viewModel.clubNavModel.clubId, {
-                    appViewModel.user.subscribed.add(UserClubModel(viewModel.clubNavModel.clubId))
+                    appViewModel.user.subscribed.add(UserClubDto(viewModel.clubNavModel.clubId))
                     viewModel.showProgress.value = false
                     viewModel.subscribed.value =
                         appViewModel.user.subscribed.any { it.clubID == viewModel.clubNavModel.clubId }

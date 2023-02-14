@@ -37,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.clubHasUnreadPost
 import com.mnnit.moticlubs.getExpandedChannel
 import com.mnnit.moticlubs.getUnreadPost
-import com.mnnit.moticlubs.network.model.ChannelModel
+import com.mnnit.moticlubs.network.model.ChannelDto
 import com.mnnit.moticlubs.network.model.ClubModel
 import com.mnnit.moticlubs.setExpandedChannel
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -51,7 +51,7 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 @Composable
 fun HomeScreen(
     appViewModel: AppViewModel,
-    onNavigatePostItemClick: (channel: ChannelModel, club: ClubModel) -> Unit,
+    onNavigatePostItemClick: (channel: ChannelDto, club: ClubModel) -> Unit,
     onNavigateContactUs: () -> Unit,
     onNavigateProfile: () -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
@@ -188,7 +188,7 @@ fun ClubList(
     viewModel: HomeScreenViewModel,
     appViewModel: AppViewModel,
     clubsList: SnapshotStateList<ClubModel>,
-    onNavigatePostItemClick: (channel: ChannelModel, club: ClubModel) -> Unit
+    onNavigatePostItemClick: (channel: ChannelDto, club: ClubModel) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -257,11 +257,11 @@ fun ClubList(
 
 @Composable
 fun ChannelList(
-    list: List<ChannelModel>,
+    list: List<ChannelDto>,
     appViewModel: AppViewModel,
     viewModel: HomeScreenViewModel,
     clubModel: ClubModel,
-    onNavigatePostItemClick: (channel: ChannelModel, club: ClubModel) -> Unit
+    onNavigatePostItemClick: (channel: ChannelDto, club: ClubModel) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current

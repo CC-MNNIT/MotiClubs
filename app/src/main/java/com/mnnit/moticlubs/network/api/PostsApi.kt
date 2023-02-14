@@ -1,6 +1,6 @@
 package com.mnnit.moticlubs.network.api
 
-import com.mnnit.moticlubs.network.model.PostModel
+import com.mnnit.moticlubs.network.model.PostDto
 import com.mnnit.moticlubs.network.model.PushPostModel
 import com.mnnit.moticlubs.network.model.UpdatePostModel
 import okhttp3.ResponseBody
@@ -14,7 +14,7 @@ interface PostsApi {
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int,
         @Query("channelId") channelID: Int,
-    ): Response<List<PostModel>?>
+    ): Response<List<PostDto>?>
 
     @POST("/posts")
     suspend fun sendPost(

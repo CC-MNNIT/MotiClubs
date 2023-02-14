@@ -16,7 +16,7 @@ import com.google.gson.Gson
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.ClubDetailModel
-import com.mnnit.moticlubs.network.model.UpdateClubModel
+import com.mnnit.moticlubs.network.model.UpdateClubDto
 import com.mnnit.moticlubs.network.model.UrlResponseModel
 import com.mnnit.moticlubs.ui.components.OtherLinkComposeModel
 import com.mnnit.moticlubs.ui.components.SocialLinkComposeModel
@@ -77,7 +77,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
             val response = repository.updateClub(
                 application,
                 clubID,
-                UpdateClubModel(clubModel.description, url, clubModel.summary)
+                UpdateClubDto(clubModel.description, url, clubModel.summary)
             )
 
             if (response is Success) {

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ChannelModel(
+data class ChannelDto(
     @SerializedName("chid")
     @Expose
     var channelID: Int,
@@ -33,7 +33,7 @@ data class ChannelNavModel(
     constructor() : this(-1, "")
 }
 
-data class AddChannelModel(
+data class AddChannelDto(
     @SerializedName("clubId")
     @Expose
     var clubID: Int,
@@ -43,7 +43,7 @@ data class AddChannelModel(
     var name: String
 )
 
-data class UpdateChannelModel(
+data class UpdateChannelDto(
     @SerializedName("channelName")
     @Expose
     var name: String

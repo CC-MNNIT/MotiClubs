@@ -1,8 +1,8 @@
 package com.mnnit.moticlubs.network.api
 
-import com.mnnit.moticlubs.network.model.AddChannelModel
-import com.mnnit.moticlubs.network.model.ChannelModel
-import com.mnnit.moticlubs.network.model.UpdateChannelModel
+import com.mnnit.moticlubs.network.model.AddChannelDto
+import com.mnnit.moticlubs.network.model.ChannelDto
+import com.mnnit.moticlubs.network.model.UpdateChannelDto
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -10,25 +10,25 @@ import retrofit2.http.*
 interface ChannelsApi {
 
     @GET("/channel")
-    suspend fun getAllChannels(@Header("Authorization") auth: String?): Response<List<ChannelModel>?>
+    suspend fun getAllChannels(@Header("Authorization") auth: String?): Response<List<ChannelDto>?>
 
     @GET("/channel")
     suspend fun getClubChannels(
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int
-    ): Response<List<ChannelModel>?>
+    ): Response<List<ChannelDto>?>
 
     @POST("/channel")
     suspend fun createChannel(
         @Header("Authorization") auth: String?,
-        @Body addChannelModel: AddChannelModel
+        @Body addChannelDto: AddChannelDto
     ): Response<ResponseBody>
 
     @PUT("/channel/{channelId}")
     suspend fun updateChannelName(
         @Header("Authorization") auth: String?,
         @Path("channelId") channelID: Int,
-        @Body updateChannelModel: UpdateChannelModel
+        @Body updateChannelDto: UpdateChannelDto
     ): Response<ResponseBody>
 
     @DELETE("/channel/{channelId}")

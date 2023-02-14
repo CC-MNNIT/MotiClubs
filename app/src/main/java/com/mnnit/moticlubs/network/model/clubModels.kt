@@ -29,14 +29,12 @@ data class ClubModel(
 
     @SerializedName("admins")
     @Expose
-    var admins: List<ClubUserModel>,
+    var admins: List<ClubUserDto>,
 
     @SerializedName("channels")
     @Expose
-    var channels: List<ChannelModel>
-) : Parcelable {
-    constructor() : this(-1, "", "", "", "", listOf(), listOf())
-}
+    var channels: List<ChannelDto>
+) : Parcelable
 
 @Parcelize
 data class ClubDetailModel(
@@ -62,7 +60,7 @@ data class ClubDetailModel(
 
     @SerializedName("admins")
     @Expose
-    var admins: List<ClubUserModel>,
+    var admins: List<ClubUserDto>,
 
     @SerializedName("subscribers")
     @Expose
@@ -100,7 +98,7 @@ data class ClubNavModel(
     constructor() : this(-1, "", "", "", "", ChannelNavModel())
 }
 
-data class UpdateClubModel(
+data class UpdateClubDto(
     @SerializedName("description")
     @Expose
     var description: String,
@@ -114,14 +112,14 @@ data class UpdateClubModel(
     var summary: String,
 )
 
-data class SubscriberCountResponse(
+data class SubscriberCountDto(
     @SerializedName("count")
     @Expose
     var count: Int
 )
 
 @Parcelize
-data class ClubUserModel(
+data class ClubUserDto(
     @SerializedName("userId")
     @Expose
     var userID: Int

@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.AddChannelModel
+import com.mnnit.moticlubs.network.model.AddChannelDto
 import com.mnnit.moticlubs.network.model.ClubModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun addChannel(onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {
-            val response = repository.createChannel(application, AddChannelModel(clubID, inputChannel))
+            val response = repository.createChannel(application, AddChannelDto(clubID, inputChannel))
             if (response is Success) {
                 onResponse()
             } else {

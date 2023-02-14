@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.network.model.SaveUserModel
+import com.mnnit.moticlubs.network.model.SaveUserDto
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -278,14 +278,14 @@ private fun signUpUser(
         user.getIdToken(false).addOnSuccessListener { result ->
             val token = result.token ?: ""
             context.setAuthToken(token)
-            val saveUserModel = SaveUserModel(
+            val saveUserDto = SaveUserDto(
                 viewModel.regNo.value,
                 viewModel.name.value,
                 viewModel.emailID.value.getDomainMail(),
                 viewModel.selectedCourse.value,
                 viewModel.phoneNumber.value
             )
-            viewModel.saveUser(saveUserModel, {
+            viewModel.saveUser(saveUserDto, {
                 user.sendEmailVerification().addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         auth.signOut()

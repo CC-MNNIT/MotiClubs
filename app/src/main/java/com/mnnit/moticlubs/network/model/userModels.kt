@@ -3,7 +3,7 @@ package com.mnnit.moticlubs.network.model
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class SaveUserModel(
+data class SaveUserDto(
     @SerializedName("regno")
     @Expose
     var regno: String,
@@ -60,28 +60,28 @@ data class UserResponse(
 
     @SerializedName("admin")
     @Expose
-    var admin: List<UserClubModel>,
+    var admin: List<UserClubDto>,
 
     @SerializedName("subscribed")
     @Expose
-    var subscribed: MutableList<UserClubModel>,
+    var subscribed: MutableList<UserClubDto>,
 ) {
     constructor() : this(-1, "", "", "", "", "", "", listOf(), mutableListOf())
 }
 
-data class UpdateUserAvatarModel(
+data class UpdateUserAvatarDto(
     @SerializedName("avatar")
     @Expose
     var avatar: String
 )
 
-data class UserClubModel(
+data class UserClubDto(
     @SerializedName("clubId")
     @Expose
     var clubID: Int
 )
 
-data class FCMTokenModel(
+data class FCMTokenDto(
     @SerializedName("token")
     @Expose
     var token: String

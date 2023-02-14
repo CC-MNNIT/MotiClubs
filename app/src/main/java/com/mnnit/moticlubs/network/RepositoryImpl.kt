@@ -12,8 +12,8 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
 
     // ------------------------ USER ------------------------- //
 
-    override suspend fun saveUser(ctx: Context, saveUserModel: SaveUserModel): ResponseModel<ResponseBody> {
-        return controller { apiService.saveUser(ctx.getAuthToken(), saveUserModel) }
+    override suspend fun saveUser(ctx: Context, saveUserDto: SaveUserDto): ResponseModel<ResponseBody> {
+        return controller { apiService.saveUser(ctx.getAuthToken(), saveUserDto) }
     }
 
     override suspend fun getUserData(ctx: Context): ResponseModel<UserResponse> {
@@ -29,19 +29,19 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
     }
 
     override suspend fun setProfilePicUrl(ctx: Context, url: String): ResponseModel<ResponseBody> {
-        return controller { apiService.setProfilePicUrl(ctx.getAuthToken(), UpdateUserAvatarModel(url)) }
+        return controller { apiService.setProfilePicUrl(ctx.getAuthToken(), UpdateUserAvatarDto(url)) }
     }
 
     override suspend fun setFCMToken(ctx: Context, fcmToken: String): ResponseModel<ResponseBody> {
-        return controller { apiService.setFCMToken(ctx.getAuthToken(), FCMTokenModel(token = fcmToken)) }
+        return controller { apiService.setFCMToken(ctx.getAuthToken(), FCMTokenDto(token = fcmToken)) }
     }
 
     override suspend fun subscribeClub(ctx: Context, clubID: Int): ResponseModel<ResponseBody> {
-        return controller { apiService.subscribeToClub(ctx.getAuthToken(), UserClubModel(clubID = clubID)) }
+        return controller { apiService.subscribeToClub(ctx.getAuthToken(), UserClubDto(clubID = clubID)) }
     }
 
     override suspend fun unsubscribeClub(ctx: Context, clubID: Int): ResponseModel<ResponseBody> {
-        return controller { apiService.unsubscribeToClub(ctx.getAuthToken(), UserClubModel(clubID = clubID)) }
+        return controller { apiService.unsubscribeToClub(ctx.getAuthToken(), UserClubDto(clubID = clubID)) }
     }
 
     // ------------------------ CLUBS ------------------------- //
@@ -53,12 +53,12 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
     override suspend fun updateClub(
         ctx: Context,
         clubID: Int,
-        updateClubModel: UpdateClubModel
+        updateClubDto: UpdateClubDto
     ): ResponseModel<ResponseBody> {
-        return controller { apiService.updateClub(ctx.getAuthToken(), clubID = clubID, updateClubModel) }
+        return controller { apiService.updateClub(ctx.getAuthToken(), clubID = clubID, updateClubDto) }
     }
 
-    override suspend fun getSubscribersCount(ctx: Context, clubID: Int): ResponseModel<SubscriberCountResponse> {
+    override suspend fun getSubscribersCount(ctx: Context, clubID: Int): ResponseModel<SubscriberCountDto> {
         return controller { apiService.getSubscribersCount(ctx.getAuthToken(), clubID) }
     }
 
@@ -68,7 +68,7 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
         ctx: Context,
         clubID: Int,
         channelID: Int
-    ): ResponseModel<List<PostModel>> {
+    ): ResponseModel<List<PostDto>> {
         return controller { apiService.getPostsFromClubChannel(ctx.getAuthToken(), clubID, channelID) }
     }
 
@@ -86,20 +86,20 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
 
     // ------------------------- CHANNEL ---------------------- //
 
-    override suspend fun getAllChannels(ctx: Context): ResponseModel<List<ChannelModel>> {
+    override suspend fun getAllChannels(ctx: Context): ResponseModel<List<ChannelDto>> {
         return controller { apiService.getAllChannels(ctx.getAuthToken()) }
     }
 
-    override suspend fun getClubChannels(ctx: Context, clubID: Int): ResponseModel<List<ChannelModel>> {
+    override suspend fun getClubChannels(ctx: Context, clubID: Int): ResponseModel<List<ChannelDto>> {
         return controller { apiService.getClubChannels(ctx.getAuthToken(), clubID) }
     }
 
-    override suspend fun createChannel(ctx: Context, addChannelModel: AddChannelModel): ResponseModel<ResponseBody> {
-        return controller { apiService.createChannel(ctx.getAuthToken(), addChannelModel) }
+    override suspend fun createChannel(ctx: Context, addChannelDto: AddChannelDto): ResponseModel<ResponseBody> {
+        return controller { apiService.createChannel(ctx.getAuthToken(), addChannelDto) }
     }
 
     override suspend fun updateChannelName(ctx: Context, channelID: Int, name: String): ResponseModel<ResponseBody> {
-        return controller { apiService.updateChannelName(ctx.getAuthToken(), channelID, UpdateChannelModel(name)) }
+        return controller { apiService.updateChannelName(ctx.getAuthToken(), channelID, UpdateChannelDto(name)) }
     }
 
     override suspend fun deleteChannel(ctx: Context, channelID: Int): ResponseModel<ResponseBody> {
@@ -118,12 +118,12 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
 
     // ---------------------- VIEWs --------------------------- //
 
-    override suspend fun getViews(ctx: Context, postID: Int): ResponseModel<ViewCount> {
+    override suspend fun getViews(ctx: Context, postID: Int): ResponseModel<ViewCountDto> {
         return controller { apiService.getViews(ctx.getAuthToken(), postID) }
     }
 
     override suspend fun addViews(ctx: Context, postID: Int): ResponseModel<ResponseBody> {
-        return controller { apiService.addView(ctx.getAuthToken(), ViewPost(postID)) }
+        return controller { apiService.addView(ctx.getAuthToken(), ViewPostDto(postID)) }
     }
 
     // ---------------------------------------------------- //
