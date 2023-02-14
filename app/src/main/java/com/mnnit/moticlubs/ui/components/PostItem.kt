@@ -24,9 +24,9 @@ import com.mnnit.moticlubs.network.model.AdminDetailResponse
 import com.mnnit.moticlubs.network.model.PostModel
 import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.toTimeString
-import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)

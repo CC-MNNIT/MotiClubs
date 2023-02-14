@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.activity
+package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
 import android.content.Context

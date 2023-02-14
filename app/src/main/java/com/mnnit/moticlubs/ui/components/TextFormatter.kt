@@ -27,8 +27,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.compressBitmap
-import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
 import com.mnnit.moticlubs.ui.screens.InputLinkDialog
+import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable

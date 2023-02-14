@@ -43,6 +43,7 @@ import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.viewmodel.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

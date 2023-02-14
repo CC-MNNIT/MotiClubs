@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,9 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LastBaseline
@@ -22,63 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.postRead
 import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
-
-@HiltViewModel
-class PostScreenViewModel @Inject constructor(
-    private val application: Application,
-    private val repository: Repository,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
-
-    var viewCount by mutableStateOf("-")
-    var postNotificationModel by mutableStateOf(
-        savedStateHandle.get<PostNotificationModel>("post") ?: PostNotificationModel()
-    )
-
-    private fun viewPost() {
-        viewModelScope.launch {
-            val postID = postNotificationModel.postID
-            withContext(Dispatchers.IO) { repository.addViews(application, postID) }
-        }
-    }
-
-    private fun getViews() {
-        viewModelScope.launch {
-            val postID = postNotificationModel.postID
-            val response = withContext(Dispatchers.IO) { repository.getViews(application, postID) }
-            if (response is Success) {
-                viewCount = "${response.obj.count}"
-            }
-        }
-    }
-
-    init {
-        viewPost()
-        getViews()
-    }
-}
+import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
 @Composable
-fun PostScreen(
-    viewModel: PostScreenViewModel = hiltViewModel()
-) {
+fun PostScreen(viewModel: PostScreenViewModel = hiltViewModel()) {
     LocalContext.current.postRead(
         viewModel.postNotificationModel.channelID,
         viewModel.postNotificationModel.postID,

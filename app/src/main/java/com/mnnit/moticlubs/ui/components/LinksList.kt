@@ -21,7 +21,7 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.network.model.UrlResponseModel
-import com.mnnit.moticlubs.ui.screens.ClubDetailsScreenViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 
 abstract class LinkComposeModel {
     abstract fun getUrl(): String

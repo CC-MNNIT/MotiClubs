@@ -2,11 +2,9 @@
 
 package com.mnnit.moticlubs.ui.screens
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,159 +30,32 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.intl.LocaleList
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.google.gson.Gson
 import com.mnnit.moticlubs.compressBitmap
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.ClubDetailModel
-import com.mnnit.moticlubs.network.model.UpdateClubModel
 import com.mnnit.moticlubs.network.model.UrlResponseModel
-import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
-import javax.inject.Inject
-
-@HiltViewModel
-class ClubDetailsScreenViewModel @Inject constructor(
-    private val application: Application,
-    private val repository: Repository,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
-
-    var clubModel by mutableStateOf(savedStateHandle.get<ClubDetailModel>("clubDetail") ?: ClubDetailModel())
-    var isFetching by mutableStateOf(false)
-    var progressMsg by mutableStateOf("")
-
-    val showSocialLinkDialog = mutableStateOf(false)
-    val showOtherLinkDialog = mutableStateOf(false)
-    val showProgressDialog = mutableStateOf(false)
-    val showColorPaletteDialog = mutableStateOf(false)
-
-    val otherLinks = mutableStateListOf<UrlResponseModel>()
-    val otherLinksLiveList = mutableStateListOf<OtherLinkComposeModel>()
-    val otherLinkIdx = mutableStateOf(0)
-
-    val socialLinksLiveList = mutableStateListOf(
-        SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel()
-    )
-    val socialLinks = mutableStateListOf(
-        UrlResponseModel(), UrlResponseModel(), UrlResponseModel(), UrlResponseModel()
-    )
-
-    var isAdmin = false
-
-    fun pushUrls(
-        _list: List<UrlResponseModel>,
-        onResponse: () -> Unit,
-        onFailure: (code: Int) -> Unit,
-    ) {
-        viewModelScope.launch {
-            val clubID = clubModel.id
-            val list = _list.map { it.mapToUrlModel() }
-            Log.d("TAG", "pushUrls: ${Gson().toJson(list)}")
-            val response = withContext(Dispatchers.IO) { repository.pushUrls(application, clubID, list) }
-            if (response is Success) {
-                onResponse()
-            } else {
-                onFailure(response.errCode)
-            }
-        }
-    }
-
-    fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
-        viewModelScope.launch {
-            val clubID = clubModel.id
-            val response = withContext(Dispatchers.IO) {
-                repository.updateClub(
-                    application,
-                    clubID,
-                    UpdateClubModel(clubModel.description, url, clubModel.summary)
-                )
-            }
-            if (response is Success) {
-                onResponse()
-            } else {
-                onFailure(response.errCode)
-            }
-        }
-    }
-
-    fun fetchUrls() {
-        isFetching = true
-
-        viewModelScope.launch {
-            val clubID = clubModel.id
-            val response = withContext(Dispatchers.IO) { repository.getUrls(application, clubID) }
-            if (response is Success) {
-                val urls = response.obj
-
-                socialLinks[0] = urls.findLast {
-                    it.name.toLowerCase(LocaleList.current).contains("facebook")
-                } ?: UrlResponseModel()
-                socialLinks[1] = urls.findLast {
-                    it.name.toLowerCase(LocaleList.current).contains("instagram")
-                } ?: UrlResponseModel()
-                socialLinks[2] = urls.findLast {
-                    it.name.toLowerCase(LocaleList.current).contains("twitter")
-                } ?: UrlResponseModel()
-                socialLinks[3] = urls.findLast {
-                    it.name.toLowerCase(LocaleList.current).contains("github")
-                } ?: UrlResponseModel()
-
-                for (i in socialLinks.indices) {
-                    socialLinksLiveList[i] = socialLinks[i].mapToSocialLinkModel()
-                        .apply {
-                            this.urlName = SocialLinkComposeModel.socialLinkNames[i]
-                            this.clubID = clubModel.id
-                        }
-                }
-
-                otherLinks.clear()
-                otherLinks.addAll(urls.filter { f ->
-                    !SocialLinkComposeModel.socialLinkNames.any { s -> f.name.contains(s) }
-                })
-                otherLinksLiveList.clear()
-                otherLinksLiveList.addAll(otherLinks.map { m -> m.mapToOtherLinkModel() })
-            } else {
-                Toast.makeText(application, "${response.errCode}: Error couldn't load links", Toast.LENGTH_LONG).show()
-            }
-            isFetching = false
-        }
-    }
-
-    init {
-        fetchUrls()
-    }
-}
 
 @Composable
 fun ClubDetailsScreen(

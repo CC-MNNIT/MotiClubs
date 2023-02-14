@@ -7,8 +7,8 @@ import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.mnnit.moticlubs.network.model.UserClubModel
-import com.mnnit.moticlubs.ui.activity.AppViewModel
-import com.mnnit.moticlubs.ui.screens.ClubScreenViewModel
+import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
 @Composable
 fun SubscriptionConfirmationDialog(

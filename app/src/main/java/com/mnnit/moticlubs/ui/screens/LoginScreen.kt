@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,65 +28,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.setUserID
-import com.mnnit.moticlubs.ui.activity.AppViewModel
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.LoginScreenViewModel
 
 private const val TAG = "LoginScreen"
-
-@HiltViewModel
-class LoginScreenViewModel @Inject constructor(
-    private val application: Application,
-    private val repository: Repository
-) : ViewModel() {
-
-    val emailID = mutableStateOf("")
-    val password = mutableStateOf("")
-
-    val isPasswordVisible = mutableStateOf(false)
-    val isLoading = mutableStateOf(false)
-    val isPasswordInvalid
-        get() = password.value.isNotEmpty() && password.value.length <= 6
-
-    val isLoginButtonEnabled
-        get() = !isLoading.value
-                && !isPasswordInvalid
-                && password.value.isNotEmpty()
-                && emailID.value.isNotEmpty()
-
-    fun resetState() {
-        emailID.value = ""
-        password.value = ""
-        isPasswordVisible.value = false
-        isLoading.value = false
-    }
-
-    fun setFCMToken(token: String, onSuccess: () -> Unit, onFailure: (code: Int) -> Unit) {
-        viewModelScope.launch {
-            val fcmResponse = withContext(Dispatchers.IO) { repository.setFCMToken(application, token) }
-            if (fcmResponse is Success) {
-                onSuccess()
-            } else {
-                onFailure(fcmResponse.errCode)
-            }
-        }
-    }
-}
 
 @Composable
 fun LoginScreen(

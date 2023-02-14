@@ -1,8 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.app.Application
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -18,7 +16,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,82 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.SaveUserModel
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
-
-@HiltViewModel
-class SignUpScreenViewModel @Inject constructor(
-    private val application: Application,
-    private val repository: Repository
-) : ViewModel() {
-
-    val emailID = mutableStateOf("")
-    val name = mutableStateOf("")
-    val regNo = mutableStateOf("")
-    val phoneNumber = mutableStateOf("")
-    val password = mutableStateOf("")
-
-    val courseList = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD")
-    val selectedCourse = mutableStateOf("")
-
-    val isPasswordVisible = mutableStateOf(false)
-    val isLoading = mutableStateOf(false)
-    val isPasswordInvalid
-        get() = password.value.isNotEmpty() && password.value.length <= 6
-
-    val isSignUpButtonEnabled
-        get() = !isLoading.value
-                && !isPasswordInvalid
-                && password.value.isNotEmpty()
-                && emailID.value.isNotEmpty()
-                && name.value.isNotEmpty()
-                && regNo.value.isNotEmpty()
-                && phoneNumber.value.isNotEmpty()
-                && selectedCourse.value.isNotEmpty()
-
-    val dropDownExpanded = mutableStateOf(false)
-
-    fun resetState() {
-        emailID.value = ""
-        name.value = ""
-        regNo.value = ""
-        phoneNumber.value = ""
-        password.value = ""
-        selectedCourse.value = ""
-        isPasswordVisible.value = false
-        isLoading.value = false
-        dropDownExpanded.value = false
-    }
-
-    fun saveUser(
-        saveUserModel: SaveUserModel,
-        onResponse: () -> Unit, onFailure: (code: Int) -> Unit
-    ) {
-        viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) { repository.saveUser(application, saveUserModel) }
-            if (response is Success) {
-                onResponse()
-            } else {
-                onFailure(response.errCode)
-                Log.d("TAG", "saveUser: ${response.errMsg}")
-            }
-        }
-    }
-}
+import com.mnnit.moticlubs.ui.viewmodel.SignUpScreenViewModel
 
 @Composable
 fun SignupScreen(
