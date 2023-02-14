@@ -1,8 +1,8 @@
-package com.mnnit.moticlubs.network
+package com.mnnit.moticlubs.data.network
 
 import android.content.Context
+import com.mnnit.moticlubs.data.network.model.*
 import com.mnnit.moticlubs.getAuthToken
-import com.mnnit.moticlubs.network.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody

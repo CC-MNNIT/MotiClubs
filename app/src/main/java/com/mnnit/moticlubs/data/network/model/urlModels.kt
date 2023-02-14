@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.network.model
+package com.mnnit.moticlubs.data.network.model
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color

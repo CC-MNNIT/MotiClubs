@@ -21,9 +21,9 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.di.AppModule
-import com.mnnit.moticlubs.network.RepositoryImpl
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.PostNotificationModel
+import com.mnnit.moticlubs.data.network.RepositoryImpl
+import com.mnnit.moticlubs.data.network.Success
+import com.mnnit.moticlubs.data.network.model.PostNotificationModel
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.coroutines.CoroutineScope

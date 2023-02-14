@@ -1,8 +1,8 @@
-package com.mnnit.moticlubs.network.api
+package com.mnnit.moticlubs.data.network.api
 
-import com.mnnit.moticlubs.network.model.AddChannelDto
-import com.mnnit.moticlubs.network.model.ChannelDto
-import com.mnnit.moticlubs.network.model.UpdateChannelDto
+import com.mnnit.moticlubs.data.network.model.AddChannelDto
+import com.mnnit.moticlubs.data.network.model.ChannelDto
+import com.mnnit.moticlubs.data.network.model.UpdateChannelDto
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*

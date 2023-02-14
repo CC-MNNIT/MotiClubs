@@ -20,7 +20,7 @@ import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.network.model.UrlResponseModel
+import com.mnnit.moticlubs.data.network.model.UrlResponseModel
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 
 abstract class LinkComposeModel {

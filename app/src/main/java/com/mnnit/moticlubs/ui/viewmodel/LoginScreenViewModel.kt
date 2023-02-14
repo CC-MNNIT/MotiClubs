@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
+import com.mnnit.moticlubs.data.network.Repository
+import com.mnnit.moticlubs.data.network.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

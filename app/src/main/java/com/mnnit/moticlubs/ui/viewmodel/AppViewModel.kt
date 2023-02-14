@@ -17,9 +17,9 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
 import com.google.gson.Gson
 import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.*
+import com.mnnit.moticlubs.data.network.Repository
+import com.mnnit.moticlubs.data.network.Success
+import com.mnnit.moticlubs.data.network.model.*
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel

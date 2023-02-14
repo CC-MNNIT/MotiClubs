@@ -23,10 +23,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.getUnreadPost
-import com.mnnit.moticlubs.network.model.AdminDetailResponse
-import com.mnnit.moticlubs.network.model.ClubNavModel
-import com.mnnit.moticlubs.network.model.PostDto
-import com.mnnit.moticlubs.network.model.PostNotificationModel
+import com.mnnit.moticlubs.data.network.model.AdminDetailResponse
+import com.mnnit.moticlubs.data.network.model.ClubNavModel
+import com.mnnit.moticlubs.data.network.model.PostDto
+import com.mnnit.moticlubs.data.network.model.PostNotificationModel
 import com.mnnit.moticlubs.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch

@@ -1,7 +1,7 @@
-package com.mnnit.moticlubs.network
+package com.mnnit.moticlubs.data.network
 
 import android.content.Context
-import com.mnnit.moticlubs.network.model.*
+import com.mnnit.moticlubs.data.network.model.*
 import okhttp3.ResponseBody
 
 open class ResponseModel<T>(val t: T?, val errCode: Int, val errMsg: String)

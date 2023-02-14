@@ -37,7 +37,7 @@ import com.canhub.cropper.CropImageOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.compressBitmap
-import com.mnnit.moticlubs.network.model.UrlResponseModel
+import com.mnnit.moticlubs.data.network.model.UrlResponseModel
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme

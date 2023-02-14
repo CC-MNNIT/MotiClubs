@@ -2,9 +2,9 @@ package com.mnnit.moticlubs.di
 
 import com.google.gson.GsonBuilder
 import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.network.ApiService
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.RepositoryImpl
+import com.mnnit.moticlubs.data.network.ApiService
+import com.mnnit.moticlubs.data.network.Repository
+import com.mnnit.moticlubs.data.network.RepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.network.model
+package com.mnnit.moticlubs.data.network.model
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

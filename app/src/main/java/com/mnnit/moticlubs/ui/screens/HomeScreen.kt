@@ -37,8 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.clubHasUnreadPost
 import com.mnnit.moticlubs.getExpandedChannel
 import com.mnnit.moticlubs.getUnreadPost
-import com.mnnit.moticlubs.network.model.ChannelDto
-import com.mnnit.moticlubs.network.model.ClubModel
+import com.mnnit.moticlubs.data.network.model.ChannelDto
+import com.mnnit.moticlubs.data.network.model.ClubModel
 import com.mnnit.moticlubs.setExpandedChannel
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog

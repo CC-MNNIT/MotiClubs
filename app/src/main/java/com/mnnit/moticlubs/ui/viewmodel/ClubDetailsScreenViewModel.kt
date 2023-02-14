@@ -13,11 +13,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.ClubDetailModel
-import com.mnnit.moticlubs.network.model.UpdateClubDto
-import com.mnnit.moticlubs.network.model.UrlResponseModel
+import com.mnnit.moticlubs.data.network.Repository
+import com.mnnit.moticlubs.data.network.Success
+import com.mnnit.moticlubs.data.network.model.ClubDetailModel
+import com.mnnit.moticlubs.data.network.model.UpdateClubDto
+import com.mnnit.moticlubs.data.network.model.UrlResponseModel
 import com.mnnit.moticlubs.ui.components.OtherLinkComposeModel
 import com.mnnit.moticlubs.ui.components.SocialLinkComposeModel
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -7,10 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.AddChannelDto
-import com.mnnit.moticlubs.network.model.ClubModel
+import com.mnnit.moticlubs.data.network.Repository
+import com.mnnit.moticlubs.data.network.Success
+import com.mnnit.moticlubs.data.network.model.AddChannelDto
+import com.mnnit.moticlubs.data.network.model.ClubModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

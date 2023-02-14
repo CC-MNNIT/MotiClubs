@@ -1,7 +1,6 @@
-package com.mnnit.moticlubs.network.api
+package com.mnnit.moticlubs.data.network.api
 
-import com.mnnit.moticlubs.network.*
-import com.mnnit.moticlubs.network.model.*
+import com.mnnit.moticlubs.data.network.model.*
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*

@@ -30,8 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.network.*
-import com.mnnit.moticlubs.network.model.*
+import com.mnnit.moticlubs.data.network.model.AdminDetailResponse
+import com.mnnit.moticlubs.data.network.model.ClubDetailModel
+import com.mnnit.moticlubs.data.network.model.PostNotificationModel
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme

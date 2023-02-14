@@ -13,11 +13,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.network.Repository
-import com.mnnit.moticlubs.network.Success
-import com.mnnit.moticlubs.network.model.ClubNavModel
-import com.mnnit.moticlubs.network.model.PostDto
-import com.mnnit.moticlubs.network.model.PushPostModel
+import com.mnnit.moticlubs.data.network.Repository
+import com.mnnit.moticlubs.data.network.Success
+import com.mnnit.moticlubs.data.network.model.ClubNavModel
+import com.mnnit.moticlubs.data.network.model.PostDto
+import com.mnnit.moticlubs.data.network.model.PushPostModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

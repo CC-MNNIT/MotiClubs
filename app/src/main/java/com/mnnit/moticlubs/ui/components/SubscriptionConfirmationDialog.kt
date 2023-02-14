@@ -6,7 +6,7 @@ import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.mnnit.moticlubs.network.model.UserClubDto
+import com.mnnit.moticlubs.data.network.model.UserClubDto
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
