@@ -3,6 +3,8 @@ package com.mnnit.moticlubs.network
 import android.content.Context
 import com.mnnit.moticlubs.getAuthToken
 import com.mnnit.moticlubs.network.model.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Response
 
@@ -128,7 +130,7 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
 
     private suspend inline fun <T, reified R> controller(crossinline invoke: (suspend () -> Response<T>)): ResponseModel<R> {
         try {
-            val response = invoke()
+            val response = withContext(Dispatchers.IO) { invoke() }
             val body = response.body()
             if (!response.isSuccessful || body == null) {
                 return Failed(response.code(), response.message())

@@ -23,9 +23,7 @@ import com.mnnit.moticlubs.network.model.*
 import com.mnnit.moticlubs.setAuthToken
 import com.mnnit.moticlubs.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,12 +59,11 @@ class AppViewModel @Inject constructor(
                 application.setAuthToken(it.token ?: "")
 
                 viewModelScope.launch {
-                    fetchAllAdmins()
-
-                    val response = withContext(Dispatchers.IO) { repository.getUserData(application) }
-
                     fetchingState = false
                     showSplashScreen = false
+
+                    val response = repository.getUserData(application)
+                    fetchAllAdmins()
                     if (response is Success) {
                         this@AppViewModel.user = response.obj
                         showErrorScreen = false
@@ -94,7 +91,7 @@ class AppViewModel @Inject constructor(
 
     private fun fetchAllAdmins() {
         viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) { repository.getAllAdmins(application) }
+            val response = repository.getAllAdmins(application)
             if (response is Success) {
                 Log.d(TAG, "fetchAllAdmins")
                 adminMap.clear()
@@ -109,7 +106,7 @@ class AppViewModel @Inject constructor(
         onFailure: () -> Unit
     ) {
         viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) { repository.setProfilePicUrl(application, url) }
+            val response = repository.setProfilePicUrl(application, url)
             if (response is Success) {
                 user.avatar = url
                 onResponse()

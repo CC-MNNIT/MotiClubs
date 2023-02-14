@@ -7,9 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +39,7 @@ class LoginScreenViewModel @Inject constructor(
 
     fun setFCMToken(token: String, onSuccess: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {
-            val fcmResponse = withContext(Dispatchers.IO) { repository.setFCMToken(application, token) }
+            val fcmResponse = repository.setFCMToken(application, token)
             if (fcmResponse is Success) {
                 onSuccess()
             } else {

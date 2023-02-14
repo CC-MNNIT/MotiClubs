@@ -21,9 +21,7 @@ import com.mnnit.moticlubs.network.model.UrlResponseModel
 import com.mnnit.moticlubs.ui.components.OtherLinkComposeModel
 import com.mnnit.moticlubs.ui.components.SocialLinkComposeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,7 +62,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
             val clubID = clubModel.id
             val list = _list.map { it.mapToUrlModel() }
             Log.d("TAG", "pushUrls: ${Gson().toJson(list)}")
-            val response = withContext(Dispatchers.IO) { repository.pushUrls(application, clubID, list) }
+            val response = repository.pushUrls(application, clubID, list)
             if (response is Success) {
                 onResponse()
             } else {
@@ -76,13 +74,12 @@ class ClubDetailsScreenViewModel @Inject constructor(
     fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {
             val clubID = clubModel.id
-            val response = withContext(Dispatchers.IO) {
-                repository.updateClub(
-                    application,
-                    clubID,
-                    UpdateClubModel(clubModel.description, url, clubModel.summary)
-                )
-            }
+            val response = repository.updateClub(
+                application,
+                clubID,
+                UpdateClubModel(clubModel.description, url, clubModel.summary)
+            )
+
             if (response is Success) {
                 onResponse()
             } else {
@@ -96,7 +93,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
 
         viewModelScope.launch {
             val clubID = clubModel.id
-            val response = withContext(Dispatchers.IO) { repository.getUrls(application, clubID) }
+            val response = repository.getUrls(application, clubID)
             if (response is Success) {
                 val urls = response.obj
 

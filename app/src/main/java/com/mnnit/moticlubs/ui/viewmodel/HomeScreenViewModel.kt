@@ -38,9 +38,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun addChannel(onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) {
-                repository.createChannel(application, AddChannelModel(clubID, inputChannel))
-            }
+            val response = repository.createChannel(application, AddChannelModel(clubID, inputChannel))
             if (response is Success) {
                 onResponse()
             } else {

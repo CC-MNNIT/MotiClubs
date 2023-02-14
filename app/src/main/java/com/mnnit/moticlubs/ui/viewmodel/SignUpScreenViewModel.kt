@@ -9,9 +9,7 @@ import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.SaveUserModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,7 +61,7 @@ class SignUpScreenViewModel @Inject constructor(
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) { repository.saveUser(application, saveUserModel) }
+            val response = repository.saveUser(application, saveUserModel)
             if (response is Success) {
                 onResponse()
             } else {

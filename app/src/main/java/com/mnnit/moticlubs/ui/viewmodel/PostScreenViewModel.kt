@@ -11,9 +11,7 @@ import com.mnnit.moticlubs.network.Repository
 import com.mnnit.moticlubs.network.Success
 import com.mnnit.moticlubs.network.model.PostNotificationModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,14 +29,14 @@ class PostScreenViewModel @Inject constructor(
     private fun viewPost() {
         viewModelScope.launch {
             val postID = postNotificationModel.postID
-            withContext(Dispatchers.IO) { repository.addViews(application, postID) }
+            repository.addViews(application, postID)
         }
     }
 
     private fun getViews() {
         viewModelScope.launch {
             val postID = postNotificationModel.postID
-            val response = withContext(Dispatchers.IO) { repository.getViews(application, postID) }
+            val response = repository.getViews(application, postID)
             if (response is Success) {
                 viewCount = "${response.obj.count}"
             }
