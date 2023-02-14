@@ -296,8 +296,7 @@ fun ChannelList(
                         BadgedBox(
                             badge = {
                                 Badge { Text(text = "${context.getUnreadPost(model.channelID).size}") }
-                            }, modifier = Modifier
-                                .align(Alignment.CenterVertically)
+                            }, modifier = Modifier.align(Alignment.CenterVertically)
                         ) {}
                     }
 

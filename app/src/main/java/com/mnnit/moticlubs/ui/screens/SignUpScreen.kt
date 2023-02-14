@@ -247,11 +247,7 @@ fun SignupScreen(
                         .align(Alignment.CenterHorizontally),
                     enabled = !viewModel.isLoading.value
                 ) {
-                    Text(
-                        text = "Already a user ? Login",
-                        color = colorScheme.primary,
-                        fontSize = 14.sp
-                    )
+                    Text(text = "Already a user ? Login", color = colorScheme.primary, fontSize = 14.sp)
                 }
             }
         }
@@ -270,18 +266,13 @@ private fun signUpUser(
     ).addOnCompleteListener { createUserTask ->
         if (!createUserTask.isSuccessful) {
             viewModel.isLoading.value = false
-            Toast.makeText(
-                context,
-                createUserTask.exception?.message ?: "NULL",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, createUserTask.exception?.message ?: "NULL", Toast.LENGTH_SHORT).show()
             return@addOnCompleteListener
         }
         val user = auth.currentUser
         if (user == null) {
             viewModel.isLoading.value = false
-            Toast.makeText(context, "Error: User null despite sign up", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(context, "Error: User null despite sign up", Toast.LENGTH_SHORT).show()
             return@addOnCompleteListener
         }
         user.getIdToken(false).addOnSuccessListener { result ->
@@ -299,11 +290,7 @@ private fun signUpUser(
                     if (task.isSuccessful) {
                         auth.signOut()
                         viewModel.resetState()
-                        Toast.makeText(
-                            context,
-                            "Please verify email to continue",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, "Please verify email to continue", Toast.LENGTH_SHORT).show()
                         onNavigateToLogin()
                     }
                 }

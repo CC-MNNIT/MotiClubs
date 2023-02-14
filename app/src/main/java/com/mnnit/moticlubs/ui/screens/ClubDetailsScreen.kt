@@ -66,23 +66,15 @@ fun ClubDetailsScreen(
     val colorScheme = getColorScheme()
     viewModel.isAdmin = appViewModel.user.admin.any { m -> m.clubID == viewModel.clubModel.id }
 
-    val refreshState = rememberPullRefreshState(
-        refreshing = viewModel.isFetching,
-        onRefresh = viewModel::fetchUrls
-    )
+    val refreshState = rememberPullRefreshState(refreshing = viewModel.isFetching, onRefresh = viewModel::fetchUrls)
 
     val context = LocalContext.current
 
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme(2.dp, false)
 
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Scaffold(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+        Surface(modifier = Modifier.fillMaxWidth()) {
+            Scaffold(modifier = Modifier.fillMaxWidth()) {
                 if (viewModel.showProgressDialog.value) {
                     ProgressDialog(progressMsg = viewModel.progressMsg)
                 }

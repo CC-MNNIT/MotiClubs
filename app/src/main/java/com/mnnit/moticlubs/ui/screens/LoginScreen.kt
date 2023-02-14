@@ -132,8 +132,7 @@ fun LoginScreen(
                             .addOnCompleteListener { task ->
                                 viewModel.isLoading.value = false
                                 if (task.isSuccessful) {
-                                    Toast.makeText(context, "Email sent", Toast.LENGTH_SHORT)
-                                        .show()
+                                    Toast.makeText(context, "Email sent", Toast.LENGTH_SHORT).show()
                                 } else {
                                     Toast.makeText(context, "Could not send reset password mail", Toast.LENGTH_SHORT)
                                         .show()

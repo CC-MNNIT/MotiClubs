@@ -55,10 +55,7 @@ class MainActivity : ComponentActivity() {
         if (it) {
             openApp()
         } else {
-            Toast.makeText(
-                this, "Please enable notification permission for this app",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Please enable notification permission for this app", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
@@ -96,10 +93,7 @@ class MainActivity : ComponentActivity() {
             )) == PackageManager.PERMISSION_GRANTED -> openApp()
 
             shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-                Toast.makeText(
-                    this, "Please enable notification permission for this app",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Please enable notification permission for this app", Toast.LENGTH_SHORT).show()
                 finish()
                 return
             }
@@ -245,10 +239,7 @@ class MainActivity : ComponentActivity() {
                                 visible = !viewModel.fetchingState,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
                                     Icon(
                                         modifier = Modifier
                                             .size(72.dp)

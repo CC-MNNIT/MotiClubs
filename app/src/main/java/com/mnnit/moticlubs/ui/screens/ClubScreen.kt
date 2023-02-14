@@ -282,11 +282,7 @@ fun Messages(
             state = scrollState,
             contentPadding = PaddingValues(
                 top = 16.dp,
-                bottom = if (appViewModel.user.admin.any { it.clubID == viewModel.clubNavModel.clubId }) {
-                    72.dp
-                } else {
-                    0.dp
-                }
+                bottom = if (appViewModel.user.admin.any { it.clubID == viewModel.clubNavModel.clubId }) 72.dp else 0.dp
             ),
             modifier = Modifier
                 .fillMaxSize()

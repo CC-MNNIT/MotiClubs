@@ -171,12 +171,7 @@ fun ColumnScope.DeveloperProfile(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            ProfilePicture(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically),
-                url = github,
-                size = 56.dp
-            )
+            ProfilePicture(modifier = Modifier.align(Alignment.CenterVertically), url = github, size = 56.dp)
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
