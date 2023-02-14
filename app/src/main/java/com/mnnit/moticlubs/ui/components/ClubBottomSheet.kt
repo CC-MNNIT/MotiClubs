@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.ui.screens.PostConfirmationDialog
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import kotlinx.coroutines.launch
@@ -293,4 +293,19 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel) {
             }
         }
     }
+}
+
+@Composable
+private fun PostConfirmationDialog(viewModel: ClubScreenViewModel, update: Boolean, onPost: () -> Unit) {
+    ConfirmationDialog(
+        showDialog = if (update) viewModel.showEditDialog else viewModel.showDialog,
+        message = "${if (update) "Update post" else "Post"} message in ${viewModel.clubNavModel.name} ?",
+        positiveBtnText = if (update) "Update" else "Post",
+        imageVector = Icons.Outlined.Article,
+        onPositive = {
+            viewModel.progressText.value = if (update) "Updating ..." else "Posting ..."
+            viewModel.showProgress.value = true
+            onPost()
+        }
+    )
 }

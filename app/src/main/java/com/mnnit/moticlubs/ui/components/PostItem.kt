@@ -3,13 +3,16 @@ package com.mnnit.moticlubs.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LastBaseline
@@ -21,21 +24,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.network.model.AdminDetailResponse
+import com.mnnit.moticlubs.network.model.ClubNavModel
 import com.mnnit.moticlubs.network.model.PostModel
 import com.mnnit.moticlubs.network.model.PostNotificationModel
 import com.mnnit.moticlubs.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
-import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostItem(
-    viewModel: ClubScreenViewModel,
-    appViewModel: AppViewModel,
+    bottomSheetScaffoldState: MutableState<BottomSheetScaffoldState>,
+    clubNavModel: ClubNavModel,
+    postsList: SnapshotStateList<PostModel>,
+    userID: Int,
     idx: Int,
     admin: AdminDetailResponse,
+    editMode: MutableState<Boolean>,
+    editPostIdx: MutableState<Int>,
+    postMsg: MutableState<TextFieldValue>,
+    delPostIdx: MutableState<Int>,
+    showDelPostDialog: MutableState<Boolean>,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -48,14 +57,14 @@ fun PostItem(
         onClick = {
             onNavigateToPost(
                 PostNotificationModel(
-                    viewModel.clubNavModel.name,
-                    viewModel.clubNavModel.channel.name,
-                    viewModel.clubNavModel.channel.id,
-                    viewModel.postsList[idx].postID,
+                    clubNavModel.name,
+                    clubNavModel.channel.name,
+                    clubNavModel.channel.id,
+                    postsList[idx].postID,
                     admin.name,
                     admin.avatar,
-                    viewModel.postsList[idx].message,
-                    viewModel.postsList[idx].time.toTimeString()
+                    postsList[idx].message,
+                    postsList[idx].time.toTimeString()
                 )
             )
         },
@@ -77,12 +86,12 @@ fun PostItem(
                     size = 42.dp
                 )
 
-                AuthorNameTimestamp(viewModel.postsList[idx], admin.name)
+                AuthorNameTimestamp(postsList[idx].time, admin.name)
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(
-                    visible = LocalContext.current.getUnreadPost(viewModel.clubNavModel.channel.id)
-                        .contains(viewModel.postsList[idx].postID.toString()),
+                    visible = LocalContext.current.getUnreadPost(clubNavModel.channel.id)
+                        .contains(postsList[idx].postID.toString()),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .padding(16.dp)
@@ -92,15 +101,15 @@ fun PostItem(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                AnimatedVisibility(visible = viewModel.postsList[idx].userID == appViewModel.user.id) {
+                AnimatedVisibility(visible = postsList[idx].userID == userID) {
                     IconButton(onClick = {
-                        viewModel.editPostIdx.value = idx
-                        viewModel.editMode.value = true
-                        viewModel.postMsg.value =
-                            TextFieldValue(viewModel.postsList[idx].message.replace("<br>\n", "\n"))
+                        editPostIdx.value = idx
+                        editMode.value = true
+                        postMsg.value =
+                            TextFieldValue(postsList[idx].message.replace("<br>\n", "\n"))
                         scope.launch {
-                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
-                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand()
+                            if (bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                                bottomSheetScaffoldState.value.bottomSheetState.expand()
                             }
                         }
                     }) {
@@ -111,10 +120,10 @@ fun PostItem(
                         )
                     }
                 }
-                AnimatedVisibility(visible = viewModel.postsList[idx].userID == appViewModel.user.id) {
+                AnimatedVisibility(visible = postsList[idx].userID == userID) {
                     IconButton(onClick = {
-                        viewModel.delPostIdx.value = idx
-                        viewModel.showDelPostDialog.value = true
+                        delPostIdx.value = idx
+                        showDelPostDialog.value = true
                     }) {
                         Icon(
                             modifier = Modifier.size(20.dp),
@@ -126,7 +135,7 @@ fun PostItem(
             }
         }
         MarkdownText(
-            markdown = viewModel.postsList[idx].message,
+            markdown = postsList[idx].message,
             color = contentColorFor(backgroundColor = getColorScheme().background),
             maxLines = 4,
             modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp),
@@ -136,7 +145,7 @@ fun PostItem(
 }
 
 @Composable
-private fun AuthorNameTimestamp(post: PostModel, name: String) {
+private fun AuthorNameTimestamp(time: Long, name: String) {
     Column(modifier = Modifier
         .padding(start = 16.dp)
         .semantics(mergeDescendants = true) {}) {
@@ -149,7 +158,7 @@ private fun AuthorNameTimestamp(post: PostModel, name: String) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = post.time.toTimeString(),
+            text = time.toTimeString(),
             style = MaterialTheme.typography.bodySmall,
             fontSize = 12.sp
         )

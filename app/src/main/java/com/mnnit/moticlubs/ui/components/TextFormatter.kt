@@ -23,11 +23,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.compressBitmap
-import com.mnnit.moticlubs.ui.screens.InputLinkDialog
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import java.io.ByteArrayOutputStream
 
@@ -52,7 +50,12 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
     })
 
     if (viewModel.showLinkDialog.value) {
-        InputLinkDialog(viewModel = viewModel)
+        InputLinkDialog(
+            showDialog = viewModel.showLinkDialog,
+            inputLinkName = viewModel.inputLinkName,
+            inputLink = viewModel.inputLink,
+            postMsg = viewModel.postMsg
+        )
     }
 
     AnimatedVisibility(visible = !viewModel.isPreviewMode.value, enter = fadeIn(), exit = fadeOut()) {
@@ -109,7 +112,7 @@ private fun uploadPostPic(
 
     val storageRef = Firebase.storage.reference
     val profilePicRef =
-        storageRef.child("post_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
+        storageRef.child("post_images").child(viewModel.clubNavModel.channel.id.toString())
             .child(System.currentTimeMillis().toString())
 
     val bitmap = compressBitmap(imageUri, context)

@@ -110,7 +110,7 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             loading.value = true
-            updateProfilePicture(context, result.uriContent!!, appViewModel, loading)
+            updateClubProfilePicture(context, result.uriContent!!, appViewModel, loading)
         } else {
             val exception = result.error
             Toast.makeText(context, "Error ${exception?.message}", Toast.LENGTH_SHORT).show()
@@ -243,7 +243,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     )
 }
 
-private fun updateProfilePicture(
+private fun updateClubProfilePicture(
     context: Context,
     imageUri: Uri,
     appViewModel: AppViewModel,
@@ -252,7 +252,6 @@ private fun updateProfilePicture(
     val storageRef = Firebase.storage.reference
     val profilePicRef =
         storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
-            .child(FirebaseAuth.getInstance().currentUser!!.uid)
 
     val bitmap = compressBitmap(imageUri, context)
     bitmap ?: return

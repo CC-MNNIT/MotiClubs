@@ -9,19 +9,14 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -29,21 +24,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.compressBitmap
@@ -54,7 +44,6 @@ import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
-import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
 @Composable
@@ -80,13 +69,23 @@ fun ClubDetailsScreen(
                 }
 
                 if (viewModel.showSocialLinkDialog.value) {
-                    InputSocialLinkDialog(viewModel = viewModel) { list ->
+                    InputSocialLinkDialog(
+                        showDialog = viewModel.showOtherLinkDialog,
+                        socialLinksLiveList = viewModel.socialLinksLiveList,
+                        otherLinksLiveList = viewModel.otherLinksLiveList
+                    ) { list ->
                         handleUrls(viewModel, context, list)
                     }
                 }
 
                 if (viewModel.showOtherLinkDialog.value) {
-                    InputOtherLinkDialog(viewModel = viewModel) { list ->
+                    InputOtherLinkDialog(
+                        showDialog = viewModel.showOtherLinkDialog,
+                        showColorPaletteDialog = viewModel.showColorPaletteDialog,
+                        otherLinksLiveList = viewModel.otherLinksLiveList,
+                        otherLinkIdx = viewModel.otherLinkIdx,
+                        socialLinksLiveList = viewModel.socialLinksLiveList
+                    ) { list ->
                         handleUrls(viewModel, context, list)
                     }
                 }
@@ -206,197 +205,14 @@ fun ClubDetailsScreen(
 }
 
 @Composable
-fun InputSocialLinkDialog(viewModel: ClubDetailsScreenViewModel, onClick: (list: List<UrlResponseModel>) -> Unit) {
-    val colorScheme = getColorScheme()
-    Dialog(onDismissRequest = { viewModel.showSocialLinkDialog.value = false }, DialogProperties()) {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    "Link Input",
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialLinksLiveList[0].urlFieldValue.value,
-                    onValueChange = { viewModel.socialLinksLiveList[0].urlFieldValue.value = it },
-                    shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Facebook") },
-                    singleLine = true,
-                    isError = viewModel.socialLinksLiveList[0].getUrl().isNotEmpty()
-                            && !viewModel.socialLinksLiveList[0].validUrl(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialLinksLiveList[1].urlFieldValue.value,
-                    onValueChange = { viewModel.socialLinksLiveList[1].urlFieldValue.value = it },
-                    shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Instagram") },
-                    singleLine = true,
-                    isError = viewModel.socialLinksLiveList[1].getUrl().isNotEmpty()
-                            && !viewModel.socialLinksLiveList[1].validUrl(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialLinksLiveList[2].urlFieldValue.value,
-                    onValueChange = { viewModel.socialLinksLiveList[2].urlFieldValue.value = it },
-                    shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Twitter") },
-                    singleLine = true,
-                    isError = viewModel.socialLinksLiveList[2].getUrl().isNotEmpty()
-                            && !viewModel.socialLinksLiveList[2].validUrl(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = viewModel.socialLinksLiveList[3].urlFieldValue.value,
-                    onValueChange = { viewModel.socialLinksLiveList[3].urlFieldValue.value = it },
-                    shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Github") },
-                    singleLine = true,
-                    isError = viewModel.socialLinksLiveList[3].getUrl().isNotEmpty()
-                            && !viewModel.socialLinksLiveList[3].validUrl(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                )
-
-                Button(
-                    onClick = {
-                        val list = viewModel.socialLinksLiveList
-                            .filter { it.validUrl() }.map { it.mapToUrlModel() }
-                            .toMutableList()
-                        val others = viewModel.otherLinksLiveList
-                            .filter { it.validUrl() && it.getName().isNotEmpty() }.map { it.mapToUrlModel() }
-                        list.addAll(others)
-                        onClick(list)
-                    },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .align(Alignment.CenterHorizontally),
-                    enabled = viewModel.socialLinksLiveList.any { it.validUrl() }
-                ) {
-                    Text(text = "Save Link(s)", fontSize = 14.sp)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun InputOtherLinkDialog(viewModel: ClubDetailsScreenViewModel, onClick: (list: List<UrlResponseModel>) -> Unit) {
-    val colorScheme = getColorScheme()
-    val scope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
-    Dialog(
-        onDismissRequest = { viewModel.showOtherLinkDialog.value = false },
-        DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .wrapContentHeight()
-                .clip(RoundedCornerShape(24.dp))
-                .animateContentSize()
-                .background(colorScheme.background)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .heightIn(128.dp, 512.dp)
-                    .fillMaxWidth()
-                    .animateContentSize()
-            ) {
-                Text(
-                    "Other Link Input",
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                if (viewModel.otherLinksLiveList.isEmpty()) {
-                    viewModel.otherLinksLiveList.add(OtherLinkComposeModel())
-                }
-
-                LazyColumn(
-                    state = listState, modifier = Modifier
-                        .weight(1f, false)
-                        .animateContentSize()
-                ) {
-                    items(viewModel.otherLinksLiveList.size) { idx ->
-                        OtherLinkItem(
-                            modifier = Modifier.animateItemPlacement(),
-                            idx,
-                            viewModel.otherLinksLiveList,
-                            viewModel.otherLinkIdx,
-                            viewModel.showColorPaletteDialog
-                        ) { id -> scope.launch { listState.animateScrollToItem(id) } }
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.3f)
-                ) {
-                    Spacer(
-                        modifier = Modifier
-                            .border(1.dp, color = colorScheme.primary)
-                            .fillMaxWidth()
-                    )
-                    IconButton(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .align(Alignment.End),
-                        onClick = {
-                            viewModel.otherLinksLiveList.add(OtherLinkComposeModel())
-                            scope.launch { listState.animateScrollToItem(viewModel.otherLinksLiveList.size - 1) }
-                        },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = colorScheme.primary,
-                            contentColor = contentColorFor(backgroundColor = colorScheme.primary)
-                        )
-                    ) {
-                        Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
-                    }
-
-                    Button(
-                        onClick = {
-                            val list = viewModel.socialLinksLiveList
-                                .filter { it.validUrl() }.map { it.mapToUrlModel() }
-                                .toMutableList()
-                            val others = viewModel.otherLinksLiveList
-                                .filter { it.validUrl() && it.getName().isNotEmpty() }.map { it.mapToUrlModel() }
-                            list.addAll(others)
-                            onClick(list)
-                        },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    ) {
-                        Text(text = "Save Link", fontSize = 14.sp)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
+private fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
+            viewModel.progressMsg = "Uploading ..."
             viewModel.showProgressDialog.value = true
-            updateProfilePicture(context, result.uriContent!!, viewModel, viewModel.showProgressDialog)
+            updateClubProfilePicture(context, result.uriContent!!, viewModel, viewModel.showProgressDialog)
         } else {
             val exception = result.error
             Toast.makeText(context, "Error ${exception?.message}", Toast.LENGTH_SHORT).show()
@@ -430,7 +246,7 @@ fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = M
     }
 }
 
-private fun updateProfilePicture(
+private fun updateClubProfilePicture(
     context: Context,
     imageUri: Uri,
     viewModel: ClubDetailsScreenViewModel,
@@ -438,8 +254,7 @@ private fun updateProfilePicture(
 ) {
     val storageRef = Firebase.storage.reference
     val profilePicRef =
-        storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)
-            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+        storageRef.child("profile_images").child(viewModel.clubModel.id.toString())
 
     val bitmap = compressBitmap(imageUri, context)
     bitmap ?: return
@@ -469,3 +284,18 @@ private fun updateProfilePicture(
     }
 }
 
+private fun handleUrls(viewModel: ClubDetailsScreenViewModel, context: Context, list: List<UrlResponseModel>) {
+    viewModel.progressMsg = "Updating"
+    viewModel.showProgressDialog.value = true
+    viewModel.showSocialLinkDialog.value = false
+    viewModel.showOtherLinkDialog.value = false
+    viewModel.pushUrls(list, {
+        viewModel.fetchUrls()
+
+        viewModel.showProgressDialog.value = false
+        Toast.makeText(context, "Links updated", Toast.LENGTH_SHORT).show()
+    }) { code ->
+        viewModel.showProgressDialog.value = false
+        Toast.makeText(context, "$code: Error updating links", Toast.LENGTH_SHORT).show()
+    }
+}

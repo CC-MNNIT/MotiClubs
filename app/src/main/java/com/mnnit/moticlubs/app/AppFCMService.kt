@@ -163,6 +163,7 @@ class AppFCMService : FirebaseMessagingService() {
         Picasso.get().load(url).into(object : Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 notificationHandler.setLargeIcon(bitmap)
+                notificationManager.notify(id, notificationHandler.build())
                 Log.d(TAG, "postNotification: loaded profile icon")
             }
 

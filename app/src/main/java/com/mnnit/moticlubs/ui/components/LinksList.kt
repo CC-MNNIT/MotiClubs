@@ -107,22 +107,6 @@ fun List<UrlResponseModel>.toStringBadges(): String {
     return sb.toString()
 }
 
-fun handleUrls(viewModel: ClubDetailsScreenViewModel, context: Context, list: List<UrlResponseModel>) {
-    viewModel.progressMsg = "Updating"
-    viewModel.showProgressDialog.value = true
-    viewModel.showSocialLinkDialog.value = false
-    viewModel.showOtherLinkDialog.value = false
-    viewModel.pushUrls(list, {
-        viewModel.fetchUrls()
-
-        viewModel.showProgressDialog.value = false
-        Toast.makeText(context, "Links updated", Toast.LENGTH_SHORT).show()
-    }) { code ->
-        viewModel.showProgressDialog.value = false
-        Toast.makeText(context, "$code: Error updating links", Toast.LENGTH_SHORT).show()
-    }
-}
-
 @Composable
 fun Links(isAdmin: Boolean, linksHeader: String, links: List<UrlResponseModel>, onClick: () -> Unit = {}) {
     Text(modifier = Modifier.padding(top = 16.dp), text = linksHeader, fontSize = 13.sp)
