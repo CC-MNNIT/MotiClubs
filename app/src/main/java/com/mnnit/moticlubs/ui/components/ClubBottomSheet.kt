@@ -52,11 +52,25 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
         }
 
         if (viewModel.showEditDialog.value) {
-            PostConfirmationDialog(viewModel = viewModel, update = true) { viewModel.updatePost() }
+            PostConfirmationDialog(viewModel = viewModel, update = true) {
+                viewModel.updatePost()
+                scope.launch {
+                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                    }
+                }
+            }
         }
 
         if (viewModel.showDialog.value) {
-            PostConfirmationDialog(viewModel = viewModel, update = false) { viewModel.sendPost() }
+            PostConfirmationDialog(viewModel = viewModel, update = false) {
+                viewModel.sendPost()
+                scope.launch {
+                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                    }
+                }
+            }
         }
         Column(
             modifier = Modifier
@@ -92,6 +106,11 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                     focusManager.clearFocus()
 
                     viewModel.clearEditor()
+                    scope.launch {
+                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                        }
+                    }
                 }, modifier = Modifier.align(Alignment.CenterVertically)) {
                     Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
                 }

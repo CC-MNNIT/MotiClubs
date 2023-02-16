@@ -10,11 +10,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -79,6 +77,10 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
         )
     }
 
+    if (viewModel.showGuidanceDialog.value) {
+        PostGuidanceDialog(viewModel.showGuidanceDialog)
+    }
+
     AnimatedVisibility(visible = !viewModel.isPreviewMode.value, enter = fadeIn(), exit = fadeOut()) {
         Row(
             modifier = Modifier
@@ -104,6 +106,12 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
 
             IconButton(onClick = { viewModel.showLinkDialog.value = true }) {
                 Icon(Icons.Rounded.InsertLink, contentDescription = "")
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            IconButton(onClick = { viewModel.showGuidanceDialog.value = true }) {
+                Icon(Icons.Outlined.Info, contentDescription = "")
             }
         }
     }

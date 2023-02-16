@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -21,7 +20,9 @@ import com.mnnit.moticlubs.data.network.model.PostDto
 import com.mnnit.moticlubs.data.network.model.PushPostModel
 import com.mnnit.moticlubs.data.network.model.UserClubDto
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,10 +42,11 @@ class ClubScreenViewModel @Inject constructor(
     val postMsg = mutableStateOf(TextFieldValue(""))
     val imageReplacerMap = mutableMapOf<String, String>()
     val postsList = mutableStateListOf<PostDto>()
-    var clubNavModel by mutableStateOf(savedStateHandle.get<ClubNavModel>("club") ?: ClubNavModel())
+    val clubNavModel by mutableStateOf(savedStateHandle.get<ClubNavModel>("club") ?: ClubNavModel())
     val loadingPosts = mutableStateOf(false)
 
     val isPreviewMode = mutableStateOf(false)
+    val showGuidanceDialog = mutableStateOf(false)
 
     val inputLinkName = mutableStateOf("")
     val inputLink = mutableStateOf("")
@@ -75,12 +77,6 @@ class ClubScreenViewModel @Inject constructor(
         imageReplacerMap.clear()
         editMode.value = false
         showProgress.value = false
-
-        viewModelScope.launch {
-            if (bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                bottomSheetScaffoldState.value.bottomSheetState.collapse()
-            }
-        }
     }
 
     fun fetchPostsList() {
