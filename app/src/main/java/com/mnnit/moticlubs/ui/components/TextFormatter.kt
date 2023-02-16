@@ -3,6 +3,7 @@ package com.mnnit.moticlubs.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -119,7 +120,11 @@ private fun uploadPostPic(
     bitmap ?: return
 
     val boas = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, boas)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 100, boas)
+    } else {
+        bitmap.compress(Bitmap.CompressFormat.WEBP, 100, boas)
+    }
     profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
         if (!task.isSuccessful) {
             Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
