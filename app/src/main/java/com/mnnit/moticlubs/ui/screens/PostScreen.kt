@@ -1,9 +1,7 @@
 package com.mnnit.moticlubs.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
@@ -19,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.postRead
-import com.mnnit.moticlubs.ui.components.MarkdownText
+import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -27,7 +25,7 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
 @Composable
-fun PostScreen(viewModel: PostScreenViewModel = hiltViewModel()) {
+fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScreenViewModel = hiltViewModel()) {
     LocalContext.current.postRead(
         viewModel.postNotificationModel.channelID,
         viewModel.postNotificationModel.postID,
@@ -35,8 +33,6 @@ fun PostScreen(viewModel: PostScreenViewModel = hiltViewModel()) {
     )
 
     val colorScheme = getColorScheme()
-    val scroll = rememberScrollState(0)
-
     MotiClubsTheme(colorScheme) {
         SetNavBarsTheme(2.dp, false)
         Surface(
@@ -84,15 +80,14 @@ fun PostScreen(viewModel: PostScreenViewModel = hiltViewModel()) {
                     }
                 }
 
-                MarkdownText(
-                    markdown = viewModel.postNotificationModel.message,
-                    color = contentColorFor(backgroundColor = getColorScheme().background),
-                    selectable = true,
-                    disableLinkMovementMethod = false,
+                MarkdownRender(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .verticalScroll(scroll)
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    mkd = viewModel.postNotificationModel.message,
+                    selectable = true,
+                    disableLinkMovementMethod = true,
+                    onImageClick = onNavigateImageClick
                 )
             }
         }

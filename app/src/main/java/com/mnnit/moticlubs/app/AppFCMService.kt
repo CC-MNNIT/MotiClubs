@@ -107,7 +107,7 @@ class AppFCMService : FirebaseMessagingService() {
             addNextIntentWithParentStack(
                 Intent(
                     Intent.ACTION_VIEW,
-                    "${Constants.POST_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
+                    "${Constants.APP_SCHEME_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
                 )
             )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

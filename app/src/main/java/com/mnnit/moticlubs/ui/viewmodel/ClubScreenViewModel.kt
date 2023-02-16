@@ -37,6 +37,7 @@ class ClubScreenViewModel @Inject constructor(
     val searchValue = mutableStateOf("")
 
     val postMsg = mutableStateOf(TextFieldValue(""))
+    val imageReplacerMap = mutableMapOf<String, String>()
     val postsList = mutableStateListOf<PostDto>()
     var clubNavModel by mutableStateOf(savedStateHandle.get<ClubNavModel>("club") ?: ClubNavModel())
     val loadingPosts = mutableStateOf(false)

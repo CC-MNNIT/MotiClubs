@@ -29,7 +29,7 @@ fun ProfilePicture(
     onClick: (() -> Unit)? = null
 ) {
     Image(
-        painter = LocalContext.current.getImageUrlPainter(url = url), contentDescription = "",
+        painter = LocalContext.current.getProfileUrlPainter(url = url), contentDescription = "",
         modifier = modifier
             .clip(CircleShape)
             .size(size)
@@ -38,24 +38,31 @@ fun ProfilePicture(
 }
 
 @Composable
-private fun Context.getImageUrlPainter(url: String): Painter {
+private fun Context.getUrlPainter(url: String, profile: Boolean): Painter {
+    val resID = if (profile) R.drawable.outline_account_circle_24 else R.drawable.outline_image_24
     if (url.isEmpty()) {
-        return painterResource(id = R.drawable.outline_account_circle_24)
+        return painterResource(id = resID)
     }
 
     val picasso = remember { mutableStateOf(Picasso.Builder(this).build()) }
     val error = remember { mutableStateOf(false) }
     return if (error.value) {
         picasso.value.rememberPainter(request = {
-            it.load(url).placeholder(R.drawable.outline_account_circle_24).error(R.drawable.outline_account_circle_24)
-        }, key = url, onError = { Log.d("TAG", "getImageUrlPainter: network error") })
+            it.load(url).placeholder(resID).error(resID)
+        }, key = url, onError = { Log.d("TAG", "getProfileUrlPainter: network error") })
     } else {
         picasso.value.rememberPainter(request = {
             it.load(url).networkPolicy(NetworkPolicy.OFFLINE)
-                .placeholder(R.drawable.outline_account_circle_24).error(R.drawable.outline_account_circle_24)
+                .placeholder(resID).error(resID)
         }, key = url, onError = {
-            Log.d("TAG", "getImageUrlPainter: Error, fallback to network")
+            Log.d("TAG", "getProfileUrlPainter: Error, fallback to network")
             error.value = true
         })
     }
 }
+
+@Composable
+private fun Context.getProfileUrlPainter(url: String): Painter = getUrlPainter(url = url, profile = true)
+
+@Composable
+fun Context.getImageUrlPainter(url: String): Painter = getUrlPainter(url = url, profile = false)

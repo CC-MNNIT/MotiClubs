@@ -45,6 +45,7 @@ fun ClubScreen(
     appViewModel: AppViewModel,
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
     onNavigateToClubDetails: (club: ClubDetailModel) -> Unit,
+    onNavigateToImageScreen: (url: String) -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     viewModel.subscribed.value = appViewModel.user.subscribed.any { it.clubID == viewModel.clubNavModel.clubId }
@@ -63,7 +64,7 @@ fun ClubScreen(
 
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(modifier = Modifier.imePadding(), sheetContent = {
-                BottomSheetContent(viewModel)
+                BottomSheetContent(viewModel, onNavigateToImageScreen)
             }, topBar = {
                 Surface(color = colorScheme.background, tonalElevation = 2.dp) {
                     TopBar(
@@ -216,6 +217,7 @@ fun Messages(
                     editMode = viewModel.editMode,
                     editPostIdx = viewModel.editPostIdx,
                     postMsg = viewModel.postMsg,
+                    imageReplacerMap = viewModel.imageReplacerMap,
                     delPostIdx = viewModel.delPostIdx,
                     showDelPostDialog = viewModel.showDelPostDialog,
                     onNavigateToPost

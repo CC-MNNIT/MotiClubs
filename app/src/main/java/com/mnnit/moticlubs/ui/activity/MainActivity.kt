@@ -39,6 +39,7 @@ import com.google.gson.Gson
 import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.data.network.model.ChannelNavModel
 import com.mnnit.moticlubs.data.network.model.ClubNavModel
+import com.mnnit.moticlubs.data.network.model.ImageUrl
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -170,6 +171,8 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(Gson().toJson(post))}")
                         }, onNavigateToClubDetails = { club ->
                             navController.navigate("${AppNavigation.CLUB_DETAIL}/${Uri.encode(Gson().toJson(club))}")
+                        }, onNavigateToImageScreen = {
+                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
                         })
                     }
 
@@ -189,9 +192,11 @@ class MainActivity : ComponentActivity() {
                     composable(
                         "${AppNavigation.POST_PAGE}/{post}",
                         arguments = listOf(navArgument("post") { type = PostParamType() }),
-                        deepLinks = listOf(navDeepLink { uriPattern = "${Constants.POST_URL}/post={post}" })
+                        deepLinks = listOf(navDeepLink { uriPattern = "${Constants.APP_SCHEME_URL}/post={post}" })
                     ) {
-                        PostScreen()
+                        PostScreen(onNavigateImageClick = {
+                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
+                        })
                     }
 
                     // CLUB Details
@@ -200,6 +205,14 @@ class MainActivity : ComponentActivity() {
                         arguments = listOf(navArgument("clubDetail") { type = ClubParamType() })
                     ) {
                         ClubDetailsScreen(viewModel)
+                    }
+
+                    // CLUB POST
+                    composable(
+                        "${AppNavigation.IMAGE_PAGE}/{image}",
+                        arguments = listOf(navArgument("image") { type = ImageUrlParamType() })
+                    ) {
+                        ImageScreen()
                     }
                 }
             }

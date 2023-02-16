@@ -1,8 +1,10 @@
 package com.mnnit.moticlubs.ui.components
 
 import android.content.Context
+import android.text.Layout
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.text.style.AlignmentSpan
 import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
@@ -25,12 +27,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
-import io.noties.markwon.AbstractMarkwonPlugin
-import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonVisitor
+import io.noties.markwon.*
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.html.HtmlTag
+import io.noties.markwon.html.tag.SimpleTagHandler
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableScheduler
 import io.noties.markwon.image.DefaultMediaDecoder
@@ -43,6 +45,7 @@ import io.noties.markwon.image.svg.SvgMediaDecoder
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import org.commonmark.node.SoftLineBreak
+import java.util.*
 
 /**
  * Modified from and Credits to : https://github.com/jeziellago/compose-markdown
@@ -143,7 +146,7 @@ private fun createTextView(
 
 private fun createMarkdownRender(context: Context): Markwon {
     return Markwon.builder(context)
-        .usePlugin(HtmlPlugin.create())
+        .usePlugin(HtmlPlugin.create { plugin -> plugin.addHandler(TagAlignmentHandler()) })
         .usePlugin(PicassoImagesPlugin.create(object : PicassoStore {
             override fun load(drawable: AsyncDrawable): RequestCreator =
                 Picasso.get().load(drawable.destination).tag(drawable)
@@ -156,6 +159,14 @@ private fun createMarkdownRender(context: Context): Markwon {
             override fun configureVisitor(builder: MarkwonVisitor.Builder) {
                 builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
             }
+
+            override fun beforeSetText(textView: TextView, markdown: Spanned) {
+                AsyncDrawableScheduler.unschedule(textView)
+            }
+
+            override fun afterSetText(textView: TextView) {
+                AsyncDrawableScheduler.schedule(textView)
+            }
         })
         .usePlugin(ImagesPlugin.create { plugin ->
             plugin.addSchemeHandler(OkHttpNetworkSchemeHandler.create())
@@ -167,18 +178,22 @@ private fun createMarkdownRender(context: Context): Markwon {
             plugin.defaultMediaDecoder(DefaultMediaDecoder.create(context.resources))
             plugin.defaultMediaDecoder(DefaultMediaDecoder.create())
         })
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun beforeSetText(textView: TextView, markdown: Spanned) {
-                AsyncDrawableScheduler.unschedule(textView)
-            }
-
-            override fun afterSetText(textView: TextView) {
-                AsyncDrawableScheduler.schedule(textView)
-            }
-        })
         .usePlugin(StrikethroughPlugin.create())
         .usePlugin(TablePlugin.create(context))
         .usePlugin(LinkifyPlugin.create())
         .usePlugin(MarkwonInlineParserPlugin.create())
         .build()
+}
+
+private class TagAlignmentHandler : SimpleTagHandler() {
+    override fun supportedTags(): MutableCollection<String> = Collections.singleton("align")
+
+    override fun getSpans(configuration: MarkwonConfiguration, renderProps: RenderProps, tag: HtmlTag): Any {
+        return AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
+    }
+}
+
+sealed class PreviewMarkdown(val str: String) {
+    class Text(text: String) : PreviewMarkdown(text)
+    class Image(url: String) : PreviewMarkdown(url)
 }

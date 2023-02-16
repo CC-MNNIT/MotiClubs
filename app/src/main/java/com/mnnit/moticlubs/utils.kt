@@ -17,7 +17,7 @@ import java.util.*
 object Constants {
     const val USER_ID = "userID"
     const val SHARED_PREFERENCE = "com.mnnit.moticlubs"
-    const val POST_URL = "app://moticlubs.mnnit.com"
+    const val APP_SCHEME_URL = "app://moticlubs.mnnit.com"
     const val TOKEN = "token"
 
     const val BASE_URL = "https://api-moticlubs.up.railway.app/"

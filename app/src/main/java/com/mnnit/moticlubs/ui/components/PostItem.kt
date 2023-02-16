@@ -22,11 +22,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.data.network.model.AdminDetailResponse
 import com.mnnit.moticlubs.data.network.model.ClubNavModel
 import com.mnnit.moticlubs.data.network.model.PostDto
 import com.mnnit.moticlubs.data.network.model.PostNotificationModel
+import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
@@ -43,6 +43,7 @@ fun PostItem(
     editMode: MutableState<Boolean>,
     editPostIdx: MutableState<Int>,
     postMsg: MutableState<TextFieldValue>,
+    imageReplacerMap: MutableMap<String, String>,
     delPostIdx: MutableState<Int>,
     showDelPostDialog: MutableState<Boolean>,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
@@ -105,8 +106,17 @@ fun PostItem(
                     IconButton(onClick = {
                         editPostIdx.value = idx
                         editMode.value = true
-                        postMsg.value =
-                            TextFieldValue(postsList[idx].message.replace("<br>\n", "\n"))
+
+                        var preprocessText = postsList[idx].message
+                        imageReplacerMap.clear()
+                        postsList[idx].message.lines().forEach {
+                            if (it.startsWith("<img src")) {
+                                val key = "[image_${imageReplacerMap.size}]"
+                                imageReplacerMap[key] = it
+                                preprocessText = preprocessText.replace(it, key)
+                            }
+                        }
+                        postMsg.value = TextFieldValue(preprocessText)
                         scope.launch {
                             if (bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
                                 bottomSheetScaffoldState.value.bottomSheetState.expand()

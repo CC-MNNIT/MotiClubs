@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.data.network.model
 
+import android.os.Parcelable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
@@ -7,6 +8,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.mnnit.moticlubs.ui.components.OtherLinkComposeModel
 import com.mnnit.moticlubs.ui.components.SocialLinkComposeModel
+import kotlinx.parcelize.Parcelize
 
 data class UrlResponseModel(
     @SerializedName("urlId")
@@ -75,3 +77,8 @@ data class UrlModel(
     @Expose
     var url: String,
 )
+
+@Parcelize
+data class ImageUrl(
+    val imageUrl: String
+) : Parcelable
