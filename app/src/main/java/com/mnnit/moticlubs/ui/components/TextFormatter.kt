@@ -24,6 +24,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.compressBitmap
@@ -34,21 +38,37 @@ import java.io.ByteArrayOutputStream
 fun TextFormatter(viewModel: ClubScreenViewModel) {
     val context = LocalContext.current
 
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(), onResult = {
-        if (it == null) {
-            Toast.makeText(context, "Image not selected", Toast.LENGTH_SHORT).show()
-            return@rememberLauncherForActivityResult
+    val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            val uri = result.uriContent
+            if (uri == null) {
+                Toast.makeText(context, "Image not selected", Toast.LENGTH_SHORT).show()
+                return@rememberLauncherForActivityResult
+            }
+
+            uploadPostPic(context, uri, viewModel) { url ->
+                val post = viewModel.postMsg.value.text
+                val selection = viewModel.postMsg.value.selection
+                val urlLink = "\n<img src=\"$url\">\n"
+                val msgLink = "\n[image_${viewModel.imageReplacerMap.size}]\n"
+                viewModel.imageReplacerMap[msgLink.replace("\n", "")] = urlLink
+
+                viewModel.postMsg.value = TextFieldValue(
+                    post.replaceRange(selection.start, selection.end, msgLink),
+                    selection = TextRange(selection.end + msgLink.length, selection.end + msgLink.length)
+                )
+            }
+        } else {
+            val exception = result.error
+            Toast.makeText(context, "Error ${exception?.message}", Toast.LENGTH_SHORT).show()
         }
-        uploadPostPic(context, it, viewModel) { url ->
-            val post = viewModel.postMsg.value.text
-            val selection = viewModel.postMsg.value.selection
-            val urlLink = "\n![post_img]($url)\n"
-            viewModel.postMsg.value = TextFieldValue(
-                post.replaceRange(selection.start, selection.end, urlLink),
-                selection = TextRange(selection.end + urlLink.length, selection.end + urlLink.length)
-            )
-        }
-    })
+    }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        val cropOptions = CropImageContractOptions(uri, CropImageOptions())
+        cropOptions.setCropShape(CropImageView.CropShape.RECTANGLE)
+        imageCropLauncher.launch(cropOptions)
+    }
 
     if (viewModel.showLinkDialog.value) {
         InputLinkDialog(
