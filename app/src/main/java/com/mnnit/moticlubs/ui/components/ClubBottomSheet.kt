@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.components
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
@@ -22,12 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -42,7 +39,6 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
     val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
 
     Surface(
         color = colorScheme.background,
@@ -56,61 +52,11 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
         }
 
         if (viewModel.showEditDialog.value) {
-            PostConfirmationDialog(viewModel = viewModel, update = true) {
-                viewModel.isPreviewMode.value = false
-
-                var text = viewModel.postMsg.value.text
-                viewModel.imageReplacerMap.forEach { (key, value) ->
-                    text = text.replace(key.replace("\n", ""), value)
-                }
-
-                viewModel.updatePost(viewModel.postsList[viewModel.editPostIdx.value].postID, text, {
-                    Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
-                    viewModel.editMode.value = false
-                    viewModel.showProgress.value = false
-
-                    viewModel.postMsg.value = TextFieldValue("")
-                    viewModel.imageReplacerMap.clear()
-                    viewModel.fetchPostsList()
-                    scope.launch {
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                        }
-                    }
-                }) {
-                    viewModel.showProgress.value = false
-                    Toast.makeText(context, "$it: Error updating msg", Toast.LENGTH_SHORT).show()
-                }
-            }
+            PostConfirmationDialog(viewModel = viewModel, update = true) { viewModel.updatePost() }
         }
 
         if (viewModel.showDialog.value) {
-            PostConfirmationDialog(viewModel = viewModel, update = false) {
-                viewModel.isPreviewMode.value = false
-
-                var text = viewModel.postMsg.value.text
-                viewModel.imageReplacerMap.forEach { (key, value) ->
-                    text = text.replace(key.replace("\n", ""), value)
-                }
-
-                viewModel.sendPost(text, {
-                    Toast.makeText(context, "Posted", Toast.LENGTH_SHORT).show()
-                    viewModel.showProgress.value = false
-                    viewModel.editMode.value = false
-
-                    viewModel.postMsg.value = TextFieldValue("")
-                    viewModel.imageReplacerMap.clear()
-                    viewModel.fetchPostsList()
-                    scope.launch {
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                        }
-                    }
-                }) {
-                    viewModel.showProgress.value = false
-                    Toast.makeText(context, "$it: Error posting msg", Toast.LENGTH_SHORT).show()
-                }
-            }
+            PostConfirmationDialog(viewModel = viewModel, update = false) { viewModel.sendPost() }
         }
         Column(
             modifier = Modifier
@@ -145,15 +91,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                     keyboardController?.hide()
                     focusManager.clearFocus()
 
-                    viewModel.postMsg.value = TextFieldValue("")
-                    viewModel.imageReplacerMap.clear()
-                    viewModel.editMode.value = false
-
-                    scope.launch {
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                        }
-                    }
+                    viewModel.clearEditor()
                 }, modifier = Modifier.align(Alignment.CenterVertically)) {
                     Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
                 }

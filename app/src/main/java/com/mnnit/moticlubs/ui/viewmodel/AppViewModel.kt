@@ -54,7 +54,7 @@ class AppViewModel @Inject constructor(
     ) {
         fetchingState = true
         if (user != null) {
-            user.getIdToken(false).addOnSuccessListener {
+            user.getIdToken(true).addOnSuccessListener {
                 application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
                 application.setAuthToken(it.token ?: "")
 

@@ -2,7 +2,6 @@
 
 package com.mnnit.moticlubs.ui.screens
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -62,7 +61,6 @@ fun HomeScreen(
         onRefresh = viewModel::fetchClubsList
     )
 
-    val context = LocalContext.current
     MotiClubsTheme(colorScheme) {
         SetNavBarsTheme()
         Scaffold(
@@ -73,53 +71,15 @@ fun HomeScreen(
                 }
 
                 if (viewModel.showAddChannelDialog) {
-                    InputChannelDialog(viewModel = viewModel) {
-                        viewModel.showAddChannelDialog = false
-                        viewModel.progressMsg = "Adding"
-                        viewModel.showProgressDialog = true
-
-                        viewModel.addChannel({
-                            viewModel.showProgressDialog = false
-
-                            viewModel.fetchClubsList()
-                            Toast.makeText(context, "Channel Added", Toast.LENGTH_SHORT).show()
-                        }) { code ->
-                            viewModel.showProgressDialog = false
-                            Toast.makeText(context, "$code: Error adding channel", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    InputChannelDialog(viewModel = viewModel) { viewModel.addChannel() }
                 }
 
                 if (viewModel.showUpdateChannelDialog) {
-                    UpdateChannelDialog(viewModel = viewModel, onUpdate = {
-                        viewModel.showUpdateChannelDialog = false
-                        viewModel.progressMsg = "Updating"
-                        viewModel.showProgressDialog = true
-
-                        viewModel.updateChannel({
-                            viewModel.showProgressDialog = false
-
-                            viewModel.fetchClubsList()
-                            Toast.makeText(context, "Channel Updated", Toast.LENGTH_SHORT).show()
-                        }) { code ->
-                            viewModel.showProgressDialog = false
-                            Toast.makeText(context, "$code: Error updating channel", Toast.LENGTH_SHORT).show()
-                        }
-                    }) {
-                        viewModel.showUpdateChannelDialog = false
-                        viewModel.progressMsg = "Deleting"
-                        viewModel.showProgressDialog = true
-
-                        viewModel.deleteChannel({
-                            viewModel.showProgressDialog = false
-
-                            viewModel.fetchClubsList()
-                            Toast.makeText(context, "Channel Deleted", Toast.LENGTH_SHORT).show()
-                        }) { code ->
-                            viewModel.showProgressDialog = false
-                            Toast.makeText(context, "$code: Error deleting channel", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    UpdateChannelDialog(
+                        viewModel = viewModel,
+                        onUpdate = { viewModel.updateChannel() },
+                        onDelete = { viewModel.deleteChannel() }
+                    )
                 }
 
                 Column(

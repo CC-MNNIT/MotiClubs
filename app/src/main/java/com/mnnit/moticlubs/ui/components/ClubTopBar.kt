@@ -28,12 +28,19 @@ fun ChannelNameBar(
     onNavigateToClubDetails: (clubModel: ClubDetailModel) -> Unit
 ) {
     if (viewModel.showSubsDialog.value) {
-        SubscriptionConfirmationDialog(
-            viewModel = viewModel,
-            appViewModel = appViewModel,
-            subscribe = !viewModel.subscribed.value
+        val subscribe = !viewModel.subscribed.value
+        ConfirmationDialog(
+            showDialog = viewModel.showSubsDialog,
+            message = "Are you sure you want to ${if (subscribe) "subscribe" else "unsubscribe"} ?",
+            positiveBtnText = if (subscribe) "Subscribe" else "Unsubscribe",
+            imageVector = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff,
+            onPositive = {
+                viewModel.progressText.value = if (subscribe) "Subscribing ..." else "Unsubscribing ..."
+                viewModel.subscribeToClub(appViewModel, subscribe)
+            }
         )
     }
+
     Row(
         modifier = modifier
             .fillMaxWidth()

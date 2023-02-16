@@ -57,9 +57,6 @@ fun ClubDetailsScreen(
     viewModel.isAdmin = appViewModel.user.admin.any { m -> m.clubID == viewModel.clubModel.id }
 
     val refreshState = rememberPullRefreshState(refreshing = viewModel.isFetching, onRefresh = viewModel::fetchUrls)
-
-    val context = LocalContext.current
-
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme(2.dp, false)
 
@@ -74,9 +71,7 @@ fun ClubDetailsScreen(
                         showDialog = viewModel.showOtherLinkDialog,
                         socialLinksLiveList = viewModel.socialLinksLiveList,
                         otherLinksLiveList = viewModel.otherLinksLiveList
-                    ) { list ->
-                        handleUrls(viewModel, context, list)
-                    }
+                    ) { list -> viewModel.pushUrls(list) }
                 }
 
                 if (viewModel.showOtherLinkDialog.value) {
@@ -86,9 +81,7 @@ fun ClubDetailsScreen(
                         otherLinksLiveList = viewModel.otherLinksLiveList,
                         otherLinkIdx = viewModel.otherLinkIdx,
                         socialLinksLiveList = viewModel.socialLinksLiveList
-                    ) { list ->
-                        handleUrls(viewModel, context, list)
-                    }
+                    ) { list -> viewModel.pushUrls(list) }
                 }
 
                 if (viewModel.showColorPaletteDialog.value) {
@@ -286,21 +279,5 @@ private fun updateClubProfilePicture(
             Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
             loading.value = false
         }
-    }
-}
-
-private fun handleUrls(viewModel: ClubDetailsScreenViewModel, context: Context, list: List<UrlResponseModel>) {
-    viewModel.progressMsg = "Updating"
-    viewModel.showProgressDialog.value = true
-    viewModel.showSocialLinkDialog.value = false
-    viewModel.showOtherLinkDialog.value = false
-    viewModel.pushUrls(list, {
-        viewModel.fetchUrls()
-
-        viewModel.showProgressDialog.value = false
-        Toast.makeText(context, "Links updated", Toast.LENGTH_SHORT).show()
-    }) { code ->
-        viewModel.showProgressDialog.value = false
-        Toast.makeText(context, "$code: Error updating links", Toast.LENGTH_SHORT).show()
     }
 }

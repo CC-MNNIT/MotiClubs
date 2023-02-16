@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,39 +37,60 @@ class HomeScreenViewModel @Inject constructor(
     var inputChannel by mutableStateOf("")
     var updateChannel by mutableStateOf("")
 
-    fun addChannel(onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun addChannel() {
+        showAddChannelDialog = false
+        progressMsg = "Adding"
+        showProgressDialog = true
+
         viewModelScope.launch {
             val response = repository.createChannel(application, AddChannelDto(clubID, inputChannel))
             if (response is Success) {
-                onResponse()
+                showProgressDialog = false
+                fetchClubsList()
+                Toast.makeText(application, "Channel Added", Toast.LENGTH_SHORT).show()
             } else {
-                onFailure(response.errCode)
+                showProgressDialog = false
+                Toast.makeText(application, "${response.errCode}: Error adding channel", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun updateChannel(onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun updateChannel() {
+        showUpdateChannelDialog = false
+        progressMsg = "Updating"
+        showProgressDialog = true
+
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) {
                 repository.updateChannelName(application, channelID, updateChannel)
             }
             if (response is Success) {
-                onResponse()
+                showProgressDialog = false
+                fetchClubsList()
+                Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
             } else {
-                onFailure(response.errCode)
+                showProgressDialog = false
+                Toast.makeText(application, "${response.errCode}: Error updating channel", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun deleteChannel(onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun deleteChannel() {
+        showUpdateChannelDialog = false
+        progressMsg = "Deleting"
+        showProgressDialog = true
+
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) {
                 repository.deleteChannel(application, channelID)
             }
             if (response is Success) {
-                onResponse()
+                showProgressDialog = false
+                fetchClubsList()
+                Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
             } else {
-                onFailure(response.errCode)
+                showProgressDialog = false
+                Toast.makeText(application, "${response.errCode}: Error deleting channel", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -4,6 +4,7 @@ package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -18,6 +19,7 @@ import com.mnnit.moticlubs.data.network.Success
 import com.mnnit.moticlubs.data.network.model.ClubNavModel
 import com.mnnit.moticlubs.data.network.model.PostDto
 import com.mnnit.moticlubs.data.network.model.PushPostModel
+import com.mnnit.moticlubs.data.network.model.UserClubDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,6 +68,20 @@ class ClubScreenViewModel @Inject constructor(
     )
     val scrollValue = mutableStateOf(0)
     val subscriberCount = mutableStateOf(0)
+    var isAdmin = false
+
+    fun clearEditor() {
+        postMsg.value = TextFieldValue("")
+        imageReplacerMap.clear()
+        editMode.value = false
+        showProgress.value = false
+
+        viewModelScope.launch {
+            if (bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                bottomSheetScaffoldState.value.bottomSheetState.collapse()
+            }
+        }
+    }
 
     fun fetchPostsList() {
         loadingPosts.value = true
@@ -81,7 +97,7 @@ class ClubScreenViewModel @Inject constructor(
         }
     }
 
-    fun fetchSubscriberCount() {
+    private fun fetchSubscriberCount() {
         viewModelScope.launch {
             val clubID = clubNavModel.clubId
             val response = repository.getSubscribersCount(application, clubID)
@@ -92,62 +108,97 @@ class ClubScreenViewModel @Inject constructor(
         }
     }
 
-    fun subscribeToClub(clubID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun subscribeToClub(appViewModel: AppViewModel, subscribe: Boolean) {
+        showProgress.value = true
         viewModelScope.launch {
-            val response = repository.subscribeClub(application, clubID)
-            if (response is Success) {
-                onResponse()
+            val response = if (subscribe) {
+                repository.subscribeClub(application, clubNavModel.clubId)
             } else {
-                onFailure(response.errCode)
+                repository.unsubscribeClub(application, clubNavModel.clubId)
             }
+            if (response is Success) {
+                appViewModel.user.subscribed.apply {
+                    if (subscribe) {
+                        add(UserClubDto(clubNavModel.clubId))
+                    } else {
+                        removeIf { it.clubID == clubNavModel.clubId }
+                    }
+                }
+                subscribed.value = appViewModel.user.subscribed.any { it.clubID == clubNavModel.clubId }
+
+                fetchSubscriberCount()
+                Toast.makeText(application, if (subscribe) "Subscribed" else "Unsubscribed", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(application, "${response.errCode}: Error could not process request", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            showProgress.value = false
         }
     }
 
-    fun unsubscribeToClub(clubID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
-        viewModelScope.launch {
-            val response = repository.unsubscribeClub(application, clubID)
-            if (response is Success) {
-                onResponse()
-            } else {
-                onFailure(response.errCode)
-            }
-        }
-    }
+    fun sendPost() {
+        isPreviewMode.value = false
 
-    fun sendPost(message: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+        var text = postMsg.value.text
+        imageReplacerMap.forEach { (key, value) ->
+            text = text.replace(key.replace("\n", ""), value)
+        }
+
         viewModelScope.launch {
             val clubID = clubNavModel.clubId
             val channelID = clubNavModel.channel.id
             val response = repository.sendPost(
-                application, PushPostModel(clubID, channelID, message, true)
+                application, PushPostModel(clubID, channelID, text, true)
             )
 
             if (response is Success) {
-                onResponse()
+                Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
+                clearEditor()
+                fetchPostsList()
             } else {
-                onFailure(response.errCode)
+                showProgress.value = false
+                Toast.makeText(application, "${response.errCode}: Error posting msg", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun updatePost(postID: Int, message: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun updatePost() {
+        isPreviewMode.value = false
+
+        var text = postMsg.value.text
+        imageReplacerMap.forEach { (key, value) ->
+            text = text.replace(key.replace("\n", ""), value)
+        }
+
         viewModelScope.launch {
-            val response = repository.updatePost(application, postID, message)
+            val response = repository.updatePost(application, postsList[editPostIdx.value].postID, text)
             if (response is Success) {
-                onResponse()
+                Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
+                clearEditor()
+                fetchPostsList()
             } else {
-                onFailure(response.errCode)
+                showProgress.value = false
+                Toast.makeText(application, "${response.errCode}: Error updating msg", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun deletePost(postID: Int, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun deletePost() {
+        progressText.value = "Deleting ..."
+        showProgress.value = true
+        if (delPostIdx.value < 0) return
+
         viewModelScope.launch {
-            val response = repository.deletePost(application, postID, clubNavModel.channel.id)
+            val response = repository.deletePost(
+                application, postsList[delPostIdx.value].postID, clubNavModel.channel.id
+            )
             if (response is Success) {
-                onResponse()
+                showProgress.value = false
+                Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
+                fetchPostsList()
             } else {
-                onFailure(response.errCode)
+                showProgress.value = false
+                Toast.makeText(application, "${response.errCode}: Error deleting post", Toast.LENGTH_SHORT).show()
             }
         }
     }

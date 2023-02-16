@@ -53,20 +53,24 @@ class ClubDetailsScreenViewModel @Inject constructor(
 
     var isAdmin = false
 
-    fun pushUrls(
-        _list: List<UrlResponseModel>,
-        onResponse: () -> Unit,
-        onFailure: (code: Int) -> Unit,
-    ) {
+    fun pushUrls(_list: List<UrlResponseModel>) {
+        progressMsg = "Updating"
+        showProgressDialog.value = true
+        showSocialLinkDialog.value = false
+        showOtherLinkDialog.value = false
+
         viewModelScope.launch {
             val clubID = clubModel.id
             val list = _list.map { it.mapToUrlModel() }
             Log.d("TAG", "pushUrls: ${Gson().toJson(list)}")
             val response = repository.pushUrls(application, clubID, list)
             if (response is Success) {
-                onResponse()
+                fetchUrls()
+                showProgressDialog.value = false
+                Toast.makeText(application, "Links updated", Toast.LENGTH_SHORT).show()
             } else {
-                onFailure(response.errCode)
+                showProgressDialog.value = false
+                Toast.makeText(application, "${response.errCode}: Error updating links", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -111,11 +115,10 @@ class ClubDetailsScreenViewModel @Inject constructor(
                 } ?: UrlResponseModel()
 
                 for (i in socialLinks.indices) {
-                    socialLinksLiveList[i] = socialLinks[i].mapToSocialLinkModel()
-                        .apply {
-                            this.urlName = SocialLinkComposeModel.socialLinkNames[i]
-                            this.clubID = clubModel.id
-                        }
+                    socialLinksLiveList[i] = socialLinks[i].mapToSocialLinkModel().apply {
+                        this.urlName = SocialLinkComposeModel.socialLinkNames[i]
+                        this.clubID = clubModel.id
+                    }
                 }
 
                 otherLinks.clear()
