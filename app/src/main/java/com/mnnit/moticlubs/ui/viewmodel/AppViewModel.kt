@@ -60,17 +60,18 @@ class AppViewModel @Inject constructor(
 
                 viewModelScope.launch {
                     fetchingState = false
-                    showSplashScreen = false
 
                     val response = repository.getUserData(application)
                     fetchAllAdmins()
                     if (response is Success) {
                         this@AppViewModel.user = response.obj
+                        showSplashScreen = false
                         showErrorScreen = false
                         Log.d(TAG, "fetchUser")
 
                         onResponse()
                     } else {
+                        showSplashScreen = false
                         showErrorScreen = true
                         Log.d(TAG, "fetchUser: error: code: ${response.errCode}, msg: ${response.errMsg}")
                         onFailure()
@@ -134,6 +135,7 @@ object AppNavigation {
     const val ABOUT_US = "about_us"
     const val POST_PAGE = "post_page"
     const val CLUB_DETAIL = "club_detail"
+    const val IMAGE_PAGE = "img_page"
 }
 
 class ClubParamType : NavType<ClubDetailModel>(isNullableAllowed = false) {
@@ -183,6 +185,23 @@ class PostParamType : NavType<PostNotificationModel>(isNullableAllowed = false) 
         Gson().fromJson(value, PostNotificationModel::class.java)
 
     override fun put(bundle: Bundle, key: String, value: PostNotificationModel) {
+        bundle.putParcelable(key, value)
+    }
+}
+
+class ImageUrlParamType : NavType<ImageUrl>(isNullableAllowed = false) {
+
+    override fun get(bundle: Bundle, key: String): ImageUrl? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle.getParcelable(key, ImageUrl::class.java)
+        } else {
+            bundle.getParcelable(key)
+        }
+
+    override fun parseValue(value: String): ImageUrl =
+        Gson().fromJson(value, ImageUrl::class.java)
+
+    override fun put(bundle: Bundle, key: String, value: ImageUrl) {
         bundle.putParcelable(key, value)
     }
 }
