@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.mnnit.moticlubs.data.network.model.UrlResponseModel
+import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
@@ -30,7 +30,7 @@ fun InputSocialLinkDialog(
     showDialog: MutableState<Boolean>,
     socialLinksLiveList: SnapshotStateList<SocialLinkComposeModel>,
     otherLinksLiveList: SnapshotStateList<OtherLinkComposeModel>,
-    onClick: (list: List<UrlResponseModel>) -> Unit
+    onClick: (list: List<UrlModel>) -> Unit
 ) {
     val colorScheme = getColorScheme()
     Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties()) {

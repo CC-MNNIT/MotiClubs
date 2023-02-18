@@ -1,8 +1,6 @@
 package com.mnnit.moticlubs.ui.components
 
-import android.content.Context
 import android.util.Patterns
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
@@ -20,8 +18,8 @@ import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.data.network.model.UrlResponseModel
-import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
+import com.mnnit.moticlubs.data.network.dto.UrlModel
+import com.mnnit.moticlubs.domain.model.Url
 
 abstract class LinkComposeModel {
     abstract fun getUrl(): String
@@ -33,7 +31,7 @@ abstract class LinkComposeModel {
 }
 
 data class SocialLinkComposeModel(
-    val urlID: Int,
+    val urlID: Long = -1L,
     var clubID: Int,
     var urlName: String,
     val urlFieldValue: MutableState<TextFieldValue>,
@@ -55,13 +53,12 @@ data class SocialLinkComposeModel(
         mutableStateOf(Color.White)
     )
 
-    fun mapToUrlModel(): UrlResponseModel {
-        return UrlResponseModel(
-            urlID,
-            clubID,
-            urlName.trim(),
-            socialColors[socialLinkNames.indexOf(urlName.trim())],
-            urlFieldValue.value.text.toLowerCase(LocaleList.current).trim()
+    fun mapToUrlModel(): UrlModel {
+        return UrlModel(
+            urlID = if (urlID == -1L) System.currentTimeMillis() else urlID,
+            name = urlName.trim(),
+            color = socialColors[socialLinkNames.indexOf(urlName.trim())],
+            url = urlFieldValue.value.text.toLowerCase(LocaleList.current).trim()
         )
     }
 
@@ -71,7 +68,7 @@ data class SocialLinkComposeModel(
 }
 
 data class OtherLinkComposeModel(
-    val urlID: Int,
+    val urlID: Long = -1L,
     val clubID: Int,
     val fieldValue: MutableState<TextFieldValue>,
     val colorCode: MutableState<String>,
@@ -86,14 +83,13 @@ data class OtherLinkComposeModel(
         mutableStateOf(Color.White)
     )
 
-    fun mapToUrlModel(): UrlResponseModel {
+    fun mapToUrlModel(): UrlModel {
         val tokens = fieldValue.value.text.split("\\")
-        return UrlResponseModel(
-            urlID,
-            clubID,
-            tokens[0].trim(),
-            colorCode.value.replace("#", ""),
-            tokens[1].toLowerCase(LocaleList.current).trim()
+        return UrlModel(
+            urlID = if (urlID == -1L) System.currentTimeMillis() else urlID,
+            name = tokens[0].trim(),
+            color = colorCode.value.replace("#", ""),
+            url = tokens[1].toLowerCase(LocaleList.current).trim()
         )
     }
 
@@ -101,14 +97,14 @@ data class OtherLinkComposeModel(
     override fun getName(): String = fieldValue.value.text.split("\\")[0].trim()
 }
 
-fun List<UrlResponseModel>.toStringBadges(): String {
+fun List<Url>.toStringBadges(): String {
     val sb = StringBuilder()
     forEach { sb.append(it.getLinkBadge()) }
     return sb.toString()
 }
 
 @Composable
-fun Links(isAdmin: Boolean, linksHeader: String, links: List<UrlResponseModel>, onClick: () -> Unit = {}) {
+fun Links(isAdmin: Boolean, linksHeader: String, links: List<Url>, onClick: () -> Unit = {}) {
     Text(modifier = Modifier.padding(top = 16.dp), text = linksHeader, fontSize = 13.sp)
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
         MarkdownText(

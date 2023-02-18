@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.data.network.model
+package com.mnnit.moticlubs.data.network.dto
 
 import android.os.Parcelable
 import com.google.gson.annotations.Expose
@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class ChannelDto(
     @SerializedName("chid")
     @Expose
-    var channelID: Int,
+    var channelID: Long,
 
     @SerializedName("cid")
     @Expose
@@ -24,27 +24,9 @@ data class ChannelDto(
 data class ChannelNavModel(
     @SerializedName("chid")
     @Expose
-    var id: Int,
+    var id: Long,
 
     @SerializedName("name")
     @Expose
     var name: String,
-) : Parcelable {
-    constructor() : this(-1, "")
-}
-
-data class AddChannelDto(
-    @SerializedName("clubId")
-    @Expose
-    var clubID: Int,
-
-    @SerializedName("channelName")
-    @Expose
-    var name: String
-)
-
-data class UpdateChannelDto(
-    @SerializedName("channelName")
-    @Expose
-    var name: String
-)
+) : Parcelable

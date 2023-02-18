@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,25 +39,19 @@ import com.canhub.cropper.CropImageOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.compressBitmap
-import com.mnnit.moticlubs.data.network.model.UrlResponseModel
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun ClubDetailsScreen(
-    appViewModel: AppViewModel,
-    viewModel: ClubDetailsScreenViewModel = hiltViewModel()
-) {
+fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
-    viewModel.isAdmin = appViewModel.user.admin.any { m -> m.clubID == viewModel.clubModel.id }
 
-    val refreshState = rememberPullRefreshState(refreshing = viewModel.isFetching, onRefresh = viewModel::fetchUrls)
+    val refreshState = rememberPullRefreshState(refreshing = viewModel.isFetching, onRefresh = viewModel::getUrls)
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme(2.dp, false)
 
@@ -68,7 +63,7 @@ fun ClubDetailsScreen(
 
                 if (viewModel.showSocialLinkDialog.value) {
                     InputSocialLinkDialog(
-                        showDialog = viewModel.showOtherLinkDialog,
+                        showDialog = viewModel.showSocialLinkDialog,
                         socialLinksLiveList = viewModel.socialLinksLiveList,
                         otherLinksLiveList = viewModel.otherLinksLiveList
                     ) { list -> viewModel.pushUrls(list) }
@@ -144,7 +139,7 @@ fun ClubDetailsScreen(
                             )
                             Text(
                                 modifier = Modifier.padding(),
-                                text = "${viewModel.clubModel.subscribers} Members",
+                                text = "${viewModel.subscriberList.size} Members",
                                 fontSize = 12.sp
                             )
 
@@ -160,9 +155,11 @@ fun ClubDetailsScreen(
                                                 viewModel.socialLinks[i].mapToSocialLinkModel()
                                                     .apply {
                                                         this.urlName = SocialLinkComposeModel.socialLinkNames[i]
-                                                        this.clubID = viewModel.clubModel.id
+                                                        this.clubID = viewModel.clubModel.clubID
                                                     }
+                                            Log.d("TAG", "ClubDetailsScreen: ${viewModel.socialLinksLiveList[i]}")
                                         }
+
                                         viewModel.showSocialLinkDialog.value = true
                                     }
                                 )
@@ -248,7 +245,7 @@ private fun updateClubProfilePicture(
 ) {
     val storageRef = Firebase.storage.reference
     val profilePicRef =
-        storageRef.child("profile_images").child(viewModel.clubModel.id.toString())
+        storageRef.child("profile_images").child(viewModel.clubModel.clubID.toString())
 
     val bitmap = compressBitmap(imageUri, context)
     bitmap ?: return
@@ -270,7 +267,7 @@ private fun updateClubProfilePicture(
             val downloadUrl = task.result.toString()
             viewModel.updateProfilePic(downloadUrl, {
                 loading.value = false
-                viewModel.clubModel.avatar = downloadUrl
+                viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
             }) {
                 loading.value = false
                 Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()

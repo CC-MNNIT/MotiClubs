@@ -1,10 +1,14 @@
 package com.mnnit.moticlubs.di
 
+import android.app.Application
+import androidx.room.Room
 import com.google.gson.GsonBuilder
 import com.mnnit.moticlubs.Constants
+import com.mnnit.moticlubs.data.data_source.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
-import com.mnnit.moticlubs.data.network.Repository
-import com.mnnit.moticlubs.data.network.RepositoryImpl
+import com.mnnit.moticlubs.data.repository.RepositoryImpl
+import com.mnnit.moticlubs.domain.repository.Repository
+import com.mnnit.moticlubs.domain.use_case.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,9 +31,9 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .client(
                 OkHttpClient.Builder()
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .writeTimeout(15, TimeUnit.SECONDS)
-                    .readTimeout(15, TimeUnit.SECONDS)
+                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .writeTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(5, TimeUnit.SECONDS)
                     .build()
             )
             .build()
@@ -38,6 +42,73 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideRepository(apiService: ApiService): Repository =
-        RepositoryImpl(apiService = apiService)
+    fun provideLocalDatabase(application: Application): LocalDatabase =
+        Room.databaseBuilder(application, LocalDatabase::class.java, LocalDatabase.DATABASE_NAME).build()
+
+    @Provides
+    @Singleton
+    fun provideRepository(application: Application, apiService: ApiService, db: LocalDatabase): Repository =
+        RepositoryImpl(dao = db.dao, apiService = apiService, application = application)
+
+    @Provides
+    @Singleton
+    fun providePostUseCases(repository: Repository): PostUseCases =
+        PostUseCases(
+            getPosts = GetPosts(repository),
+            sendPost = SendPost(repository),
+            updatePost = UpdatePost(repository),
+            deletePost = DeletePost(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideSubscriberUseCases(repository: Repository): SubscriberUseCases =
+        SubscriberUseCases(
+            getSubscribers = GetSubscribers(repository),
+            subscribeClub = SubscribeClub(repository),
+            unsubscribeClub = UnsubscribeClub(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideUserUseCases(repository: Repository): UserUseCases =
+        UserUseCases(
+            getUser = GetUser(repository),
+            updateUser = UpdateUser(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideChannelUseCases(repository: Repository): ChannelUseCases =
+        ChannelUseCases(
+            getChannels = GetChannels(repository),
+            addChannel = AddChannel(repository),
+            updateChannel = UpdateChannel(repository),
+            deleteChannel = DeleteChannel(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideClubUseCases(repository: Repository): ClubUseCases =
+        ClubUseCases(
+            getClubs = GetClubs(repository),
+            getAdmins = GetAdmins(repository),
+            updateClub = UpdateClub(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideViewUseCases(repository: Repository): ViewUseCases =
+        ViewUseCases(
+            getViews = GetViews(repository),
+            addViews = AddViews(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideUrlUseCases(repository: Repository): UrlUseCases =
+        UrlUseCases(
+            getUrls = GetUrls(repository),
+            addUrls = AddUrls(repository)
+        )
 }

@@ -24,43 +24,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.*
-import com.mnnit.moticlubs.data.network.model.AdminDetailResponse
-import com.mnnit.moticlubs.data.network.model.ClubDetailModel
-import com.mnnit.moticlubs.data.network.model.PostNotificationModel
-import com.mnnit.moticlubs.data.network.model.UserResponse
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.PostNotificationModel
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
 @Composable
 fun ClubScreen(
-    appViewModel: AppViewModel,
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
-    onNavigateToClubDetails: (club: ClubDetailModel) -> Unit,
+    onNavigateToClubDetails: (club: Club, user: User) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
-    viewModel.subscribed.value = appViewModel.user.subscribed.any { it.clubID == viewModel.clubNavModel.clubId }
-    viewModel.isAdmin = appViewModel.user.admin.any { it.clubID == viewModel.clubNavModel.clubId }
-
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.loadingPosts.value,
-        onRefresh = viewModel::fetchPostsList
+        onRefresh = viewModel::getPostsList
     )
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp, viewModel.isAdmin)
+        SetNavBarsTheme(elevation = 2.dp, true)
 
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(
@@ -72,7 +68,6 @@ fun ClubScreen(
                     Surface(color = colorScheme.background, tonalElevation = 2.dp) {
                         TopBar(
                             viewModel,
-                            appViewModel,
                             modifier = Modifier.padding(),
                             onNavigateToClubDetails = onNavigateToClubDetails
                         )
@@ -121,8 +116,7 @@ fun ClubScreen(
                                 viewModel = viewModel,
                                 modifier = Modifier.weight(1f),
                                 scrollState = listScrollState,
-                                user = appViewModel.user,
-                                adminMap = appViewModel.adminMap,
+                                adminMap = viewModel.adminMap,
                                 onNavigateToPost = onNavigateToPost
                             )
 
@@ -154,9 +148,8 @@ fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
 @Composable
 fun TopBar(
     viewModel: ClubScreenViewModel,
-    appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: (clubModel: ClubDetailModel) -> Unit
+    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         SearchBar(viewModel.searchMode, viewModel.searchValue, modifier = modifier)
@@ -164,7 +157,6 @@ fun TopBar(
     AnimatedVisibility(visible = !viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         ChannelNameBar(
             viewModel = viewModel,
-            appViewModel = appViewModel,
             modifier = modifier,
             onNavigateToClubDetails = onNavigateToClubDetails
         )
@@ -174,8 +166,7 @@ fun TopBar(
 @Composable
 fun Messages(
     viewModel: ClubScreenViewModel,
-    user: UserResponse,
-    adminMap: MutableMap<Int, AdminDetailResponse>,
+    adminMap: MutableMap<Int, User>,
     scrollState: LazyListState,
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
     modifier: Modifier = Modifier,
@@ -193,22 +184,24 @@ fun Messages(
         ) {
             items(viewModel.postsList.size) { index ->
                 if (viewModel.searchMode.value && viewModel.searchValue.value.isNotEmpty() &&
-                    !viewModel.postsList[index].message.contains(viewModel.searchValue.value)
+                    !viewModel.postsList[index].message.toLowerCase(LocaleList.current)
+                        .contains(viewModel.searchValue.value.toLowerCase(LocaleList.current))
                 ) {
                     return@items
                 }
                 PostItem(
                     bottomSheetScaffoldState = viewModel.bottomSheetScaffoldState,
-                    clubNavModel = viewModel.clubNavModel,
+                    clubModel = viewModel.clubModel,
+                    channelModel = viewModel.channelModel,
                     postsList = viewModel.postsList,
-                    userID = user.id,
+                    userID = viewModel.userModel.userID,
                     idx = index,
-                    admin = adminMap[viewModel.postsList[index].userID] ?: AdminDetailResponse(),
+                    admin = adminMap[viewModel.postsList[index].userID] ?: User(),
                     editMode = viewModel.editMode,
-                    editPostIdx = viewModel.editPostIdx,
-                    postMsg = viewModel.postMsg,
-                    imageReplacerMap = viewModel.imageReplacerMap,
-                    delPostIdx = viewModel.delPostIdx,
+                    eventUpdatePost = viewModel.eventUpdatePost,
+                    postMsg = viewModel.eventPostMsg,
+                    imageReplacerMap = viewModel.eventImageReplacerMap,
+                    eventDeletePost = viewModel.eventDeletePost,
                     showDelPostDialog = viewModel.showDelPostDialog,
                     onNavigateToPost
                 )

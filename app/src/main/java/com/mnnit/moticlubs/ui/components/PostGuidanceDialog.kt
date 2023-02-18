@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -38,7 +38,8 @@ fun PostGuidanceDialog(
                 MarkdownText(
                     markdown = guideMkd, modifier = Modifier
                         .fillMaxWidth()
-                        .verticalScroll(scrollState)
+                        .verticalScroll(scrollState),
+                    color = contentColorFor(backgroundColor = colorScheme.background)
                 )
             }
         }

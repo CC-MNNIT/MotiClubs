@@ -20,10 +20,10 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
+import com.mnnit.moticlubs.data.repository.RepositoryImpl
 import com.mnnit.moticlubs.di.AppModule
-import com.mnnit.moticlubs.data.network.RepositoryImpl
-import com.mnnit.moticlubs.data.network.Success
-import com.mnnit.moticlubs.data.network.model.PostNotificationModel
+import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.coroutines.CoroutineScope
@@ -39,11 +39,16 @@ class AppFCMService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
         CoroutineScope(Dispatchers.IO).launch {
-            val response = RepositoryImpl(AppModule.provideApiService()).setFCMToken(this@AppFCMService, token)
-            if (response is Success) {
+            val response = RepositoryImpl(
+                AppModule.provideLocalDatabase(this@AppFCMService.application).dao,
+                AppModule.provideApiService(),
+                this@AppFCMService.application
+            ).getAPIService().setFCMToken(getAuthToken(), FCMTokenDto(token))
+
+            if (response.isSuccessful && response.body() != null) {
                 Log.d(TAG, "onNewToken: pushed")
             } else {
-                Log.d(TAG, "onNewToken: err: ${response.errCode}: ${response.errMsg}")
+                Log.d(TAG, "onNewToken: err: ${response.code()}: ${response.message()}")
             }
         }
     }
@@ -64,10 +69,10 @@ class AppFCMService : FirebaseMessagingService() {
         if (deleteMode == -1) {
             postNotification(data)
         } else {
-            val channelID = data["chid"]?.toInt() ?: -1
-            val postID = data["pid"]?.toInt() ?: -1
+            val channelID = data["chid"]?.toLong() ?: -1
+            val postID = data["pid"]?.toLong() ?: -1
 
-            if (channelID == -1 || postID == -1) {
+            if (channelID == -1L || postID == -1L) {
                 Log.d(TAG, "handleData: deleteMode: ERR -1: chid $channelID, pid: $postID")
                 return
             }
@@ -75,7 +80,7 @@ class AppFCMService : FirebaseMessagingService() {
             Log.d(TAG, "handleData: deleteMode: chid: $channelID, pid: $postID")
             postRead(channelID, postID, true)
 
-            (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(postID)
+            (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(postID.toNotificationID())
         }
     }
 
@@ -83,8 +88,8 @@ class AppFCMService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
-        val channelID = data["chid"]?.toInt() ?: -1
-        val postID = data["pid"]?.toInt() ?: -1
+        val channelID = data["chid"]?.toLong() ?: -1
+        val postID = data["pid"]?.toLong() ?: -1
         val clubID = data["cid"]?.toInt() ?: -1
         val userID = data["uid"]?.toInt() ?: -1
         val message = data["message"] ?: ""
@@ -100,7 +105,7 @@ class AppFCMService : FirebaseMessagingService() {
 
         val post = PostNotificationModel(
             clubName, channelName,
-            channelID, postID, adminName, url,
+            channelID, postID, userID, adminName, url,
             message, time.toLong().toTimeString()
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
@@ -130,7 +135,7 @@ class AppFCMService : FirebaseMessagingService() {
 
     private fun postNotificationCompat(
         notificationManager: NotificationManager,
-        id: Int,
+        postID: Long,
         clubID: String,
         clubName: String,
         adminName: String,
@@ -163,13 +168,15 @@ class AppFCMService : FirebaseMessagingService() {
         Picasso.get().load(url).into(object : Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 notificationHandler.setLargeIcon(bitmap)
-                notificationManager.notify(id, notificationHandler.build())
+                notificationManager.notify(postID.toNotificationID(), notificationHandler.build())
                 Log.d(TAG, "postNotification: loaded profile icon")
             }
 
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
         })
-        notificationManager.notify(id, notificationHandler.build())
+        notificationManager.notify(postID.toNotificationID(), notificationHandler.build())
     }
+
+    private fun Long.toNotificationID(): Int = (this % 1000000L).toInt()
 }

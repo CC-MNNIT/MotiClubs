@@ -34,8 +34,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.clubHasUnreadPost
-import com.mnnit.moticlubs.data.network.model.ChannelDto
-import com.mnnit.moticlubs.data.network.model.ClubModel
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.getExpandedChannel
 import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.setExpandedChannel
@@ -50,15 +50,15 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 @Composable
 fun HomeScreen(
     appViewModel: AppViewModel,
-    onNavigatePostItemClick: (channel: ChannelDto, club: ClubModel) -> Unit,
+    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit,
     onNavigateContactUs: () -> Unit,
-    onNavigateProfile: () -> Unit,
+    onNavigateProfile: (viewModel: HomeScreenViewModel) -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val colorScheme = getColorScheme()
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetching,
-        onRefresh = viewModel::fetchClubsList
+        onRefresh = viewModel::refreshAll
     )
 
     MotiClubsTheme(colorScheme) {
@@ -85,7 +85,6 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .fillMaxHeight()
                         .consumeWindowInsets(it)
                         .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
                         .padding(top = 16.dp)
@@ -95,7 +94,7 @@ fun HomeScreen(
                             .align(Alignment.End)
                             .padding(end = 16.dp),
                         url = appViewModel.user.avatar,
-                        onClick = { onNavigateProfile() })
+                        onClick = { onNavigateProfile(viewModel) })
 
                     Text(modifier = Modifier.padding(start = 16.dp), text = "MNNIT Clubs", fontSize = 28.sp)
 
@@ -124,9 +123,9 @@ fun HomeScreen(
                     }
                     ClubList(
                         viewModel,
-                        appViewModel,
                         clubsList = viewModel.clubsList,
-                        onNavigatePostItemClick = onNavigatePostItemClick
+                        channelMap = viewModel.channelMap,
+                        onNavigateChannelClick = onNavigateChannelClick
                     )
                 }
             },
@@ -146,9 +145,9 @@ fun HomeScreen(
 @Composable
 fun ClubList(
     viewModel: HomeScreenViewModel,
-    appViewModel: AppViewModel,
-    clubsList: SnapshotStateList<ClubModel>,
-    onNavigatePostItemClick: (channel: ChannelDto, club: ClubModel) -> Unit
+    clubsList: SnapshotStateList<Club>,
+    channelMap: MutableMap<Int, SnapshotStateList<Channel>>,
+    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -157,14 +156,14 @@ fun ClubList(
         contentPadding = PaddingValues(top = 16.dp, bottom = 72.dp, start = 16.dp, end = 16.dp)
     ) {
         items(clubsList.size) { idx ->
-            var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].id)) }
+            var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].clubID)) }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 onClick = {
                     channelVisibility = !channelVisibility
-                    context.setExpandedChannel(clubsList[idx].id, channelVisibility)
+                    context.setExpandedChannel(clubsList[idx].clubID, channelVisibility)
                 },
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(if (channelVisibility) 8.dp else 0.dp),
@@ -192,7 +191,9 @@ fun ClubList(
                     }
 
                     AnimatedVisibility(
-                        visible = context.clubHasUnreadPost(clubsList[idx]),
+                        visible = context.clubHasUnreadPost(
+                            channelMap.getOrDefault(clubsList[idx].clubID, mutableListOf())
+                        ),
                         modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
                         BadgedBox(badge = {
@@ -203,11 +204,10 @@ fun ClubList(
 
                 AnimatedVisibility(visible = channelVisibility) {
                     ChannelList(
-                        list = clubsList[idx].channels,
-                        appViewModel,
+                        list = channelMap.getOrDefault(clubsList[idx].clubID, mutableListOf()),
                         viewModel,
                         clubsList[idx],
-                        onNavigatePostItemClick
+                        onNavigateChannelClick
                     )
                 }
             }
@@ -217,11 +217,10 @@ fun ClubList(
 
 @Composable
 fun ChannelList(
-    list: List<ChannelDto>,
-    appViewModel: AppViewModel,
+    list: List<Channel>,
     viewModel: HomeScreenViewModel,
-    clubModel: ClubModel,
-    onNavigatePostItemClick: (channel: ChannelDto, club: ClubModel) -> Unit
+    clubModel: Club,
+    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -233,7 +232,7 @@ fun ChannelList(
     ) {
         list.forEach { model ->
             Card(
-                onClick = { onNavigatePostItemClick(model, clubModel) },
+                onClick = { onNavigateChannelClick(model, clubModel) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
@@ -245,7 +244,9 @@ fun ChannelList(
                         modifier = Modifier
                             .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 16.dp)
                             .align(Alignment.CenterVertically)
-                            .fillMaxWidth(if (appViewModel.user.admin.any { it.clubID == clubModel.id }) 0.8f else 0.9f)
+                            .fillMaxWidth(if (viewModel.adminList.any {
+                                    it.userID == viewModel.user.userID && it.clubID == clubModel.clubID
+                                }) 0.8f else 0.9f)
                     )
 
                     AnimatedVisibility(
@@ -261,7 +262,9 @@ fun ChannelList(
                     }
 
                     AnimatedVisibility(
-                        visible = appViewModel.user.admin.any { it.clubID == clubModel.id } && model.name != "General",
+                        visible = viewModel.adminList.any {
+                            it.userID == viewModel.user.userID && it.clubID == clubModel.clubID
+                        } && model.name != "General",
                         modifier = Modifier
                     ) {
                         IconButton(
@@ -270,8 +273,8 @@ fun ChannelList(
                                 .padding(top = 1.dp, start = 16.dp)
                                 .height(36.dp),
                             onClick = {
-                                viewModel.channelID = model.channelID
-                                viewModel.updateChannel = model.name
+                                viewModel.eventChannel = model
+                                viewModel.updateChannelName = model.name
                                 viewModel.showUpdateChannelDialog = true
                             }
                         ) {
@@ -289,13 +292,15 @@ fun ChannelList(
         }
 
         AnimatedVisibility(
-            visible = appViewModel.user.admin.any { it.clubID == clubModel.id },
+            visible = viewModel.adminList.any {
+                it.userID == viewModel.user.userID && it.clubID == clubModel.clubID
+            },
             enter = fadeIn(),
             exit = fadeOut()
         ) {
             Card(
                 onClick = {
-                    viewModel.clubID = clubModel.id
+                    viewModel.eventChannel = Channel(-1L, clubModel.clubID, "")
                     viewModel.showAddChannelDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -347,8 +352,8 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
-                    value = viewModel.inputChannel,
-                    onValueChange = { viewModel.inputChannel = it },
+                    value = viewModel.inputChannelName,
+                    onValueChange = { viewModel.inputChannelName = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Channel Name") },
                     singleLine = true,
@@ -356,11 +361,17 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                 )
 
                 Button(
-                    onClick = { onClick() },
+                    onClick = {
+                        viewModel.eventChannel = viewModel.eventChannel.copy(
+                            channelID = System.currentTimeMillis(),
+                            name = viewModel.inputChannelName
+                        )
+                        onClick()
+                    },
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .align(Alignment.CenterHorizontally),
-                    enabled = viewModel.inputChannel.isNotEmpty()
+                    enabled = viewModel.inputChannelName.isNotEmpty()
                 ) {
                     Text(text = "Add Channel", fontSize = 14.sp)
                 }
@@ -391,8 +402,8 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
-                    value = viewModel.updateChannel,
-                    onValueChange = { viewModel.updateChannel = it },
+                    value = viewModel.updateChannelName,
+                    onValueChange = { viewModel.updateChannelName = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Channel Name") },
                     singleLine = true,
@@ -416,11 +427,14 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                     }
 
                     Button(
-                        onClick = { onUpdate() },
+                        onClick = {
+                            viewModel.eventChannel = viewModel.eventChannel.copy(name = viewModel.updateChannelName)
+                            onUpdate()
+                        },
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
-                        enabled = viewModel.updateChannel.isNotEmpty()
+                        enabled = viewModel.updateChannelName.isNotEmpty()
                     ) {
                         Text(text = "Save", fontSize = 14.sp)
                     }

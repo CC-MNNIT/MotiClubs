@@ -37,9 +37,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.mnnit.moticlubs.Constants
-import com.mnnit.moticlubs.data.network.model.ChannelNavModel
-import com.mnnit.moticlubs.data.network.model.ClubNavModel
-import com.mnnit.moticlubs.data.network.model.ImageUrl
+import com.mnnit.moticlubs.data.network.dto.ImageUrl
+import com.mnnit.moticlubs.domain.util.*
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -74,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
     private fun openApp() {
         val user = FirebaseAuth.getInstance().currentUser
-        viewModel.fetchUser(user)
+        viewModel.getUser(user)
 
         setContent {
             AnimatedVisibility(visible = viewModel.showErrorScreen) {
@@ -123,14 +122,14 @@ class MainActivity : ComponentActivity() {
                         .imePadding()
                         .systemBarsPadding(),
                     navController = navController,
-                    startDestination = if (user != null) AppNavigation.HOME else AppNavigation.LOGIN
+                    startDestination = if (user != null) AppNavigation.HOME else AppNavigation.LOGIN,
                 ) {
                     // LOGIN
                     composable(AppNavigation.LOGIN) {
-                        LoginScreen(appViewModel = viewModel, {
+                        LoginScreen(viewModel, onNavigateToSignUp = {
                             navController.navigate(AppNavigation.SIGN_UP)
                             navController.graph.setStartDestination(AppNavigation.SIGN_UP)
-                        }, {
+                        }, onNavigateToMain = {
                             navController.navigate(AppNavigation.HOME) {
                                 popUpTo(AppNavigation.LOGIN) { inclusive = true }
                             }
@@ -149,13 +148,12 @@ class MainActivity : ComponentActivity() {
                     composable(AppNavigation.HOME) {
                         HomeScreen(
                             appViewModel = viewModel,
-                            onNavigatePostItemClick = { channel, club ->
-                                val clubNavModel = ClubNavModel(
-                                    club.id, club.name, club.description, club.avatar, club.summary,
-                                    ChannelNavModel(channel.channelID, channel.name)
-                                )
+                            onNavigateChannelClick = { channel, club ->
                                 navController.navigate(
-                                    "${AppNavigation.CLUB_PAGE}/${Uri.encode(Gson().toJson(clubNavModel))}"
+                                    "${AppNavigation.CLUB_PAGE}?" +
+                                            "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(Gson().toJson(channel))}&" +
+                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}&" +
+                                            "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(viewModel.user))}"
                                 )
                             },
                             onNavigateContactUs = { navController.navigate(AppNavigation.ABOUT_US) },
@@ -164,13 +162,24 @@ class MainActivity : ComponentActivity() {
 
                     // CLUB PAGE
                     composable(
-                        "${AppNavigation.CLUB_PAGE}/{club}",
-                        arguments = listOf(navArgument("club") { type = ClubNavParamType() })
+                        "${AppNavigation.CLUB_PAGE}?" +
+                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
+                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}&" +
+                                "${NavigationArgs.USER_ARG}={${NavigationArgs.USER_ARG}}",
+                        arguments = listOf(
+                            navArgument(NavigationArgs.CHANNEL_ARG) { type = ChannelParamType() },
+                            navArgument(NavigationArgs.CLUB_ARG) { type = ClubParamType() },
+                            navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
+                        )
                     ) {
-                        ClubScreen(viewModel, onNavigateToPost = { post ->
+                        ClubScreen(onNavigateToPost = { post ->
                             navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(Gson().toJson(post))}")
-                        }, onNavigateToClubDetails = { club ->
-                            navController.navigate("${AppNavigation.CLUB_DETAIL}/${Uri.encode(Gson().toJson(club))}")
+                        }, onNavigateToClubDetails = { club, user ->
+                            navController.navigate(
+                                "${AppNavigation.CLUB_DETAIL}?" +
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}&" +
+                                        "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(user))}"
+                            )
                         }, onNavigateToImageScreen = {
                             navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
                         })
@@ -190,9 +199,12 @@ class MainActivity : ComponentActivity() {
 
                     // CLUB POST
                     composable(
-                        "${AppNavigation.POST_PAGE}/{post}",
-                        arguments = listOf(navArgument("post") { type = PostParamType() }),
-                        deepLinks = listOf(navDeepLink { uriPattern = "${Constants.APP_SCHEME_URL}/post={post}" })
+                        "${AppNavigation.POST_PAGE}/{${NavigationArgs.POST_ARG}}",
+                        arguments = listOf(navArgument(NavigationArgs.POST_ARG) { type = PostParamType() }),
+                        deepLinks = listOf(navDeepLink {
+                            uriPattern =
+                                "${Constants.APP_SCHEME_URL}/${NavigationArgs.POST_ARG}={${NavigationArgs.POST_ARG}}"
+                        })
                     ) {
                         PostScreen(onNavigateImageClick = {
                             navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
@@ -201,10 +213,15 @@ class MainActivity : ComponentActivity() {
 
                     // CLUB Details
                     composable(
-                        "${AppNavigation.CLUB_DETAIL}/{clubDetail}",
-                        arguments = listOf(navArgument("clubDetail") { type = ClubParamType() })
+                        "${AppNavigation.CLUB_DETAIL}?" +
+                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}&" +
+                                "${NavigationArgs.USER_ARG}={${NavigationArgs.USER_ARG}}",
+                        arguments = listOf(
+                            navArgument(NavigationArgs.CLUB_ARG) { type = ClubParamType() },
+                            navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
+                        )
                     ) {
-                        ClubDetailsScreen(viewModel)
+                        ClubDetailsScreen()
                     }
 
                     // CLUB POST
@@ -268,7 +285,7 @@ class MainActivity : ComponentActivity() {
                                     )
 
                                     Button(
-                                        onClick = { viewModel.fetchUser(FirebaseAuth.getInstance().currentUser) },
+                                        onClick = { viewModel.getUser(FirebaseAuth.getInstance().currentUser) },
                                         modifier = Modifier
                                             .align(Alignment.CenterHorizontally)
                                             .padding(top = 16.dp, bottom = 16.dp)

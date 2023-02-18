@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.mnnit.moticlubs.data.network.model.ImageUrl
+import com.mnnit.moticlubs.data.network.dto.ImageUrl
 import com.mnnit.moticlubs.ui.components.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme

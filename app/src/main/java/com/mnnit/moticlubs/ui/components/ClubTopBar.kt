@@ -16,19 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mnnit.moticlubs.data.network.model.ClubDetailModel
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
 @Composable
 fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
-    appViewModel: AppViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: (clubModel: ClubDetailModel) -> Unit
+    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit
 ) {
     if (viewModel.showSubsDialog.value) {
-        val subscribe = !viewModel.subscribed.value
+        val subscribe = !viewModel.userSubscribed.value
         ConfirmationDialog(
             showDialog = viewModel.showSubsDialog,
             message = "Are you sure you want to ${if (subscribe) "subscribe" else "unsubscribe"} ?",
@@ -36,7 +35,7 @@ fun ChannelNameBar(
             imageVector = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff,
             onPositive = {
                 viewModel.progressText.value = if (subscribe) "Subscribing ..." else "Unsubscribing ..."
-                viewModel.subscribeToClub(appViewModel, subscribe)
+                viewModel.subscribeToClub(subscribe)
             }
         )
     }
@@ -44,23 +43,12 @@ fun ChannelNameBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(true, onClick = {
-                onNavigateToClubDetails(
-                    ClubDetailModel(
-                        viewModel.clubNavModel.clubId,
-                        viewModel.clubNavModel.name,
-                        viewModel.clubNavModel.description,
-                        viewModel.clubNavModel.avatar,
-                        viewModel.clubNavModel.summary,
-                        listOf(), viewModel.subscriberCount.value
-                    )
-                )
-            }),
+            .clickable(true, onClick = { onNavigateToClubDetails(viewModel.clubModel, viewModel.userModel) }),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         ProfilePicture(
             modifier = Modifier.align(Alignment.CenterVertically),
-            url = viewModel.clubNavModel.avatar,
+            url = viewModel.clubModel.avatar,
             size = 42.dp
         )
 
@@ -70,7 +58,7 @@ fun ChannelNameBar(
         ) {
             // Channel name
             Text(
-                text = "${viewModel.clubNavModel.name} - ${viewModel.clubNavModel.channel.name}",
+                text = "${viewModel.clubModel.name} - ${viewModel.channelModel.name}",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
@@ -78,7 +66,7 @@ fun ChannelNameBar(
 
             // Number of members
             Text(
-                text = "${viewModel.subscriberCount.value} Members",
+                text = "${viewModel.subscriberList.size} Members",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -98,7 +86,7 @@ fun ChannelNameBar(
             )
             // Info icon
             Icon(
-                imageVector = if (viewModel.subscribed.value) {
+                imageVector = if (viewModel.userSubscribed.value) {
                     Icons.Rounded.NotificationsActive
                 } else Icons.Outlined.NotificationsOff,
                 modifier = Modifier

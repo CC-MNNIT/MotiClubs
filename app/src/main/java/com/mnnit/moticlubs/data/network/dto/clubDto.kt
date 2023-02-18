@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.data.network.model
+package com.mnnit.moticlubs.data.network.dto
 
 import android.os.Parcelable
 import com.google.gson.annotations.Expose
@@ -40,7 +40,7 @@ data class ClubModel(
 data class ClubDetailModel(
     @SerializedName("cid")
     @Expose
-    var id: Int,
+    var clubID: Int,
 
     @SerializedName("name")
     @Expose
@@ -65,38 +65,7 @@ data class ClubDetailModel(
     @SerializedName("subscribers")
     @Expose
     var subscribers: Int
-) : Parcelable {
-    constructor() : this(-1, "", "", "", "", listOf(), 0)
-}
-
-@Parcelize
-data class ClubNavModel(
-    @SerializedName("cid")
-    @Expose
-    var clubId: Int,
-
-    @SerializedName("name")
-    @Expose
-    var name: String,
-
-    @SerializedName("description")
-    @Expose
-    var description: String,
-
-    @SerializedName("avatar")
-    @Expose
-    var avatar: String,
-
-    @SerializedName("summary")
-    @Expose
-    var summary: String,
-
-    @SerializedName("channel")
-    @Expose
-    var channel: ChannelNavModel,
-) : Parcelable {
-    constructor() : this(-1, "", "", "", "", ChannelNavModel())
-}
+) : Parcelable
 
 data class UpdateClubDto(
     @SerializedName("description")
@@ -112,10 +81,14 @@ data class UpdateClubDto(
     var summary: String,
 )
 
-data class SubscriberCountDto(
-    @SerializedName("count")
+data class SubscriberDto(
+    @SerializedName("uid")
     @Expose
-    var count: Int
+    var userID: Int,
+
+    @SerializedName("cid")
+    @Expose
+    var clubID: Int
 )
 
 @Parcelize

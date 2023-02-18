@@ -4,8 +4,11 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.data.network.Repository
-import com.mnnit.moticlubs.data.network.Success
+import com.mnnit.moticlubs.data.network.ApiService
+import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
+import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.apiInvoker
+import com.mnnit.moticlubs.getAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val application: Application,
-    private val repository: Repository
+    private val apiService: ApiService
 ) : ViewModel() {
 
     val emailID = mutableStateOf("")
@@ -39,11 +42,11 @@ class LoginScreenViewModel @Inject constructor(
 
     fun setFCMToken(token: String, onSuccess: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {
-            val fcmResponse = repository.setFCMToken(application, token)
-            if (fcmResponse is Success) {
+            val bodyResource = apiInvoker { apiService.setFCMToken(application.getAuthToken(), FCMTokenDto(token)) }
+            if (bodyResource is Resource.Success) {
                 onSuccess()
             } else {
-                onFailure(fcmResponse.errCode)
+                onFailure(bodyResource.errorCode)
             }
         }
     }

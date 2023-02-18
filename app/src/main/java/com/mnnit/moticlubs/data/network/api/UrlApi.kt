@@ -1,7 +1,7 @@
 package com.mnnit.moticlubs.data.network.api
 
-import com.mnnit.moticlubs.data.network.model.UrlDto
-import com.mnnit.moticlubs.data.network.model.UrlResponseModel
+import com.mnnit.moticlubs.data.network.dto.UrlDto
+import com.mnnit.moticlubs.data.network.dto.UrlResponseModel
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -19,5 +19,5 @@ interface UrlApi {
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int,
         @Body urlDto: UrlDto
-    ): Response<ResponseBody>
+    ): Response<ResponseBody?>
 }

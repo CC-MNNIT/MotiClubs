@@ -22,10 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.data.network.model.AdminDetailResponse
-import com.mnnit.moticlubs.data.network.model.ClubNavModel
-import com.mnnit.moticlubs.data.network.model.PostDto
-import com.mnnit.moticlubs.data.network.model.PostNotificationModel
+import com.mnnit.moticlubs.domain.model.*
 import com.mnnit.moticlubs.getUnreadPost
 import com.mnnit.moticlubs.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -35,16 +32,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun PostItem(
     bottomSheetScaffoldState: MutableState<BottomSheetScaffoldState>,
-    clubNavModel: ClubNavModel,
-    postsList: SnapshotStateList<PostDto>,
+    clubModel: Club,
+    channelModel: Channel,
+    postsList: SnapshotStateList<Post>,
     userID: Int,
     idx: Int,
-    admin: AdminDetailResponse,
+    admin: User,
     editMode: MutableState<Boolean>,
-    editPostIdx: MutableState<Int>,
+    eventUpdatePost: MutableState<Post>,
     postMsg: MutableState<TextFieldValue>,
     imageReplacerMap: MutableMap<String, String>,
-    delPostIdx: MutableState<Int>,
+    eventDeletePost: MutableState<Post>,
     showDelPostDialog: MutableState<Boolean>,
     onNavigateToPost: (post: PostNotificationModel) -> Unit
 ) {
@@ -58,10 +56,11 @@ fun PostItem(
         onClick = {
             onNavigateToPost(
                 PostNotificationModel(
-                    clubNavModel.name,
-                    clubNavModel.channel.name,
-                    clubNavModel.channel.id,
+                    clubModel.name,
+                    channelModel.name,
+                    channelModel.channelID,
                     postsList[idx].postID,
+                    userID,
                     admin.name,
                     admin.avatar,
                     postsList[idx].message,
@@ -91,7 +90,7 @@ fun PostItem(
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(
-                    visible = LocalContext.current.getUnreadPost(clubNavModel.channel.id)
+                    visible = LocalContext.current.getUnreadPost(channelModel.channelID)
                         .contains(postsList[idx].postID.toString()),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
@@ -104,7 +103,7 @@ fun PostItem(
 
                 AnimatedVisibility(visible = postsList[idx].userID == userID) {
                     IconButton(onClick = {
-                        editPostIdx.value = idx
+                        eventUpdatePost.value = postsList[idx]
                         editMode.value = true
 
                         var preprocessText = postsList[idx].message
@@ -132,7 +131,7 @@ fun PostItem(
                 }
                 AnimatedVisibility(visible = postsList[idx].userID == userID) {
                     IconButton(onClick = {
-                        delPostIdx.value = idx
+                        eventDeletePost.value = postsList[idx]
                         showDelPostDialog.value = true
                     }) {
                         Icon(

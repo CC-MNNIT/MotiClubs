@@ -250,7 +250,7 @@ private fun handleUser(
 ) {
     FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
         viewModel.setFCMToken(fcm, {
-            appViewModel.fetchUser(auth.currentUser, {
+            appViewModel.getUser(auth.currentUser, {
                 viewModel.resetState()
                 onNavigateToMain()
             }) {

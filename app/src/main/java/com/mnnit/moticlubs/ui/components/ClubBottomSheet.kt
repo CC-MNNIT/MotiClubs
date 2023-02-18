@@ -137,7 +137,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                             .weight(1f)
                     ) {
                         MarkdownRender(
-                            mkd = viewModel.postMsg.value.text, imageReplacerMap = viewModel.imageReplacerMap,
+                            mkd = viewModel.eventPostMsg.value.text, imageReplacerMap = viewModel.eventImageReplacerMap,
                             onImageClick = onNavigateImageClick
                         )
                     }
@@ -166,15 +166,11 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                                     }
                                 }
                             },
-                        value = viewModel.postMsg.value,
-                        onValueChange = { viewModel.postMsg.value = it },
+                        value = viewModel.eventPostMsg.value,
+                        onValueChange = { viewModel.eventPostMsg.value = it },
                         shape = RoundedCornerShape(24.dp),
-                        label = { Text(text = "Post") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
-                            disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
-                        )
+                        placeholder = { Text(text = "Write your message here\nSupports Markdown formatting") },
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
                     )
                 }
 
@@ -228,7 +224,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                                 text = if (viewModel.editMode.value) "Update" else "Send",
                                 fontSize = 14.sp,
                                 color = contentColorFor(
-                                    backgroundColor = if (viewModel.postMsg.value.text.isNotEmpty()) {
+                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isNotEmpty()) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
@@ -240,7 +236,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                                 painter = rememberVectorPainter(image = Icons.Rounded.Send),
                                 contentDescription = "",
                                 tint = contentColorFor(
-                                    backgroundColor = if (viewModel.postMsg.value.text.isNotEmpty()) {
+                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isNotEmpty()) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
@@ -252,7 +248,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                             .align(Alignment.CenterVertically),
                         shape = RoundedCornerShape(24.dp),
                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
-                        enabled = viewModel.postMsg.value.text.isNotEmpty()
+                        enabled = viewModel.eventPostMsg.value.text.isNotEmpty()
                     )
                 }
             }
@@ -264,7 +260,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
 private fun PostConfirmationDialog(viewModel: ClubScreenViewModel, update: Boolean, onPost: () -> Unit) {
     ConfirmationDialog(
         showDialog = if (update) viewModel.showEditDialog else viewModel.showDialog,
-        message = "${if (update) "Update post" else "Post"} message in ${viewModel.clubNavModel.name} ?",
+        message = "${if (update) "Update post" else "Post"} message in ${viewModel.clubModel.name} ?",
         positiveBtnText = if (update) "Update" else "Post",
         imageVector = Icons.Outlined.Article,
         onPositive = {

@@ -1,26 +1,21 @@
 package com.mnnit.moticlubs.data.network.api
 
-import com.mnnit.moticlubs.data.network.model.ViewCountDto
-import com.mnnit.moticlubs.data.network.model.ViewPostDto
+import com.mnnit.moticlubs.data.network.dto.ViewDto
 import okhttp3.ResponseBody
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ViewsApi {
 
     @GET("/views")
     suspend fun getViews(
         @Header("Authorization") auth: String?,
-        @Query("postId") postID: Int
-    ): Response<ViewCountDto>
+        @Query("postId") postID: Long
+    ): Response<List<ViewDto>?>
 
     @POST("/views")
     suspend fun addView(
         @Header("Authorization") auth: String?,
-        @Body viewPostDto: ViewPostDto
-    ): Response<ResponseBody>
+        @Body viewDto: ViewDto
+    ): Response<ResponseBody?>
 }

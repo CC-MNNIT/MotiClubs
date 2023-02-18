@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.data.network.Repository
-import com.mnnit.moticlubs.data.network.Success
-import com.mnnit.moticlubs.data.network.model.SaveUserDto
+import com.mnnit.moticlubs.data.network.ApiService
+import com.mnnit.moticlubs.data.network.dto.SaveUserDto
+import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.apiInvoker
+import com.mnnit.moticlubs.getAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpScreenViewModel @Inject constructor(
     private val application: Application,
-    private val repository: Repository
+    private val apiService: ApiService
 ) : ViewModel() {
 
     val emailID = mutableStateOf("")
@@ -61,12 +63,12 @@ class SignUpScreenViewModel @Inject constructor(
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            val response = repository.saveUser(application, saveUserDto)
-            if (response is Success) {
+            val bodyResource = apiInvoker { apiService.saveUser(application.getAuthToken(), saveUserDto) }
+            if (bodyResource is Resource.Success) {
                 onResponse()
             } else {
-                onFailure(response.errCode)
-                Log.d("TAG", "saveUser: ${response.errMsg}")
+                onFailure(bodyResource.errorCode)
+                Log.d("TAG", "saveUser: ${bodyResource.errorMsg}")
             }
         }
     }

@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import com.mnnit.moticlubs.data.network.model.ClubModel
+import com.mnnit.moticlubs.domain.model.Channel
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
@@ -47,10 +47,10 @@ fun Context.setAuthToken(token: String) =
 fun Context.getAuthToken(): String =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getString(Constants.TOKEN, "") ?: ""
 
-fun Context.clubHasUnreadPost(clubModel: ClubModel): Boolean {
+fun Context.clubHasUnreadPost(channels: List<Channel>): Boolean {
     var has = false
-    for (i in clubModel.channels.indices) {
-        if (getUnreadPost(clubModel.channels[i].channelID).isNotEmpty()) {
+    for (i in channels.indices) {
+        if (getUnreadPost(channels[i].channelID).isNotEmpty()) {
             has = true
             break
         }
@@ -58,14 +58,14 @@ fun Context.clubHasUnreadPost(clubModel: ClubModel): Boolean {
     return has
 }
 
-fun Context.postRead(channelID: Int, postID: Int, read: Boolean = false) {
+fun Context.postRead(channelID: Long, postID: Long, read: Boolean = false) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
         .putStringSet("ch$channelID", getUnreadPost(channelID).apply {
             if (read) remove(postID.toString()) else add(postID.toString())
         }).apply()
 }
 
-fun Context.getUnreadPost(channelID: Int) =
+fun Context.getUnreadPost(channelID: Long) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
         .getStringSet("ch$channelID", setOf())
         ?.toMutableSet() ?: setOf<String>().toMutableSet()

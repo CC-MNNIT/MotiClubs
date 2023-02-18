@@ -1,30 +1,49 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.data.network.Repository
-import com.mnnit.moticlubs.data.network.Success
-import com.mnnit.moticlubs.data.network.model.AddChannelDto
-import com.mnnit.moticlubs.data.network.model.ClubModel
+import com.google.firebase.auth.FirebaseAuth
+import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
+import com.mnnit.moticlubs.domain.use_case.ClubUseCases
+import com.mnnit.moticlubs.domain.use_case.UserUseCases
+import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.getUserID
+import com.mnnit.moticlubs.setAuthToken
+import com.mnnit.moticlubs.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val application: Application,
-    private val repository: Repository
+    private val channelUseCases: ChannelUseCases,
+    private val clubUseCases: ClubUseCases,
+    private val userUseCases: UserUseCases
 ) : ViewModel() {
 
-    val clubsList = mutableStateListOf<ClubModel>()
+    companion object {
+        private const val TAG = "HomeScreenViewModel"
+    }
+
+    var user by mutableStateOf(User())
+    val adminList = mutableStateListOf<Admin>()
+    val clubsList = mutableStateListOf<Club>()
+    val channelMap = mutableMapOf<Int, SnapshotStateList<Channel>>()
     var isFetching by mutableStateOf(false)
 
     var showAddChannelDialog by mutableStateOf(false)
@@ -32,82 +51,210 @@ class HomeScreenViewModel @Inject constructor(
     var showProgressDialog by mutableStateOf(false)
     var progressMsg by mutableStateOf("")
 
-    var clubID by mutableStateOf(-1)
-    var channelID by mutableStateOf(-1)
-    var inputChannel by mutableStateOf("")
-    var updateChannel by mutableStateOf("")
+    var eventChannel by mutableStateOf(Channel())
+    var inputChannelName by mutableStateOf("")
+    var updateChannelName by mutableStateOf("")
+
+    private var getUserJob: Job? = null
+    private var getAdminJob: Job? = null
+    private var getClubJob: Job? = null
+    private var getChannelsJob: Job? = null
+    private var addChannelJob: Job? = null
+    private var updateChannelJob: Job? = null
+    private var deleteChannelJob: Job? = null
 
     fun addChannel() {
-        showAddChannelDialog = false
-        progressMsg = "Adding"
-        showProgressDialog = true
+        addChannelJob?.cancel()
+        addChannelJob = channelUseCases.addChannel(eventChannel).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    showAddChannelDialog = false
+                    progressMsg = "Adding"
+                    showProgressDialog = true
 
-        viewModelScope.launch {
-            val response = repository.createChannel(application, AddChannelDto(clubID, inputChannel))
-            if (response is Success) {
-                showProgressDialog = false
-                fetchClubsList()
-                Toast.makeText(application, "Channel Added", Toast.LENGTH_SHORT).show()
-            } else {
-                showProgressDialog = false
-                Toast.makeText(application, "${response.errCode}: Error adding channel", Toast.LENGTH_SHORT).show()
+//                    resource.data?.let {
+//                        channelMap[event.channel.clubID]?.removeIf { m -> m.channelID == event.channel.channelID }
+//                        channelMap[event.channel.clubID]?.add(event.channel)
+//                    }
+                }
+                is Resource.Success -> {
+                    showProgressDialog = false
+                    channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
+                    channelMap[eventChannel.clubID]?.add(eventChannel)
+
+                    Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error -> {
+                    showProgressDialog = false
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     fun updateChannel() {
-        showUpdateChannelDialog = false
-        progressMsg = "Updating"
-        showProgressDialog = true
+        updateChannelJob?.cancel()
+        updateChannelJob = channelUseCases.updateChannel(eventChannel).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    showUpdateChannelDialog = false
+                    progressMsg = "Updating"
+                    showProgressDialog = true
+                }
+                is Resource.Success -> {
+                    showProgressDialog = false
+                    channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
+                    channelMap[eventChannel.clubID]?.add(eventChannel)
 
-        viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) {
-                repository.updateChannelName(application, channelID, updateChannel)
+                    Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error -> {
+                    showProgressDialog = false
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                }
             }
-            if (response is Success) {
-                showProgressDialog = false
-                fetchClubsList()
-                Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
-            } else {
-                showProgressDialog = false
-                Toast.makeText(application, "${response.errCode}: Error updating channel", Toast.LENGTH_SHORT).show()
-            }
-        }
+        }.launchIn(viewModelScope)
     }
 
     fun deleteChannel() {
-        showUpdateChannelDialog = false
-        progressMsg = "Deleting"
-        showProgressDialog = true
+        deleteChannelJob?.cancel()
+        deleteChannelJob = channelUseCases.deleteChannel(eventChannel).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    showUpdateChannelDialog = false
+                    progressMsg = "Deleting"
+                    showProgressDialog = true
+                }
+                is Resource.Success -> {
+                    showProgressDialog = false
+                    channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
 
-        viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) {
-                repository.deleteChannel(application, channelID)
+                    Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error -> {
+                    showProgressDialog = false
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                }
             }
-            if (response is Success) {
-                showProgressDialog = false
-                fetchClubsList()
-                Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
-            } else {
-                showProgressDialog = false
-                Toast.makeText(application, "${response.errCode}: Error deleting channel", Toast.LENGTH_SHORT).show()
+        }.launchIn(viewModelScope)
+    }
+
+    fun refreshAll() {
+        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.addOnSuccessListener {
+            application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
+            application.setAuthToken(it.token ?: "")
+
+            getUser()
+            getAdmins()
+            getClubs()
+            getChannels()
+        }?.addOnCompleteListener {
+            isFetching = false
+            if (!it.isSuccessful) {
+                Toast.makeText(application, "Error refreshing", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun fetchClubsList() {
-        isFetching = true
-        viewModelScope.launch {
-            val response = withContext(Dispatchers.IO) { repository.getClubs(application) }
-            if (response is Success) {
-                clubsList.clear()
-                clubsList.addAll(response.obj)
+    private fun getUser() {
+        getUserJob?.cancel()
+        getUserJob = userUseCases.getUser(application.getUserID(), false).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    isFetching = true
+                    resource.data?.let { user = it }
+                }
+                is Resource.Success -> {
+                    isFetching = false
+                    user = resource.data
+                }
+                is Resource.Error -> {
+                    isFetching = false
+                    Log.d(TAG, "getUser: error: ${resource.errCode} : ${resource.errMsg}")
+                }
             }
-            isFetching = false
-        }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getAdmins() {
+        getAdminJob?.cancel()
+        getAdminJob = clubUseCases.getAdmins().onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    isFetching = true
+                    Log.d(TAG, "getAdmins: loading ${resource.data}")
+                    resource.data?.let { list ->
+                        if (list.isNotEmpty()) {
+                            adminList.clear()
+                            adminList.addAll(list)
+                        }
+                    }
+                }
+                is Resource.Success -> {
+                    Log.d(TAG, "getAdmins: success ${resource.data}")
+                    isFetching = false
+                    adminList.clear()
+                    adminList.addAll(resource.data)
+                }
+                is Resource.Error -> {
+                    Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
+                    isFetching = false
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getClubs() {
+        getClubJob?.cancel()
+        getClubJob = clubUseCases.getClubs().onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    resource.data?.let { list ->
+                        if (list.isNotEmpty()) {
+                            clubsList.clear()
+                            clubsList.addAll(list)
+                        }
+                    }
+                    isFetching = true
+                }
+                is Resource.Success -> {
+                    isFetching = false
+                    clubsList.clear()
+                    clubsList.addAll(resource.data)
+                }
+                is Resource.Error -> {
+                    Log.d(TAG, "getClubs: error: ${resource.errCode}: ${resource.errMsg}")
+                    isFetching = false
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getChannels() {
+        getChannelsJob?.cancel()
+        getChannelsJob = channelUseCases.getChannels().onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    resource.data?.let { list ->
+                        list.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
+                        list.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
+                    }
+                    isFetching = true
+                }
+                is Resource.Success -> {
+                    isFetching = false
+                    resource.data.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
+                    resource.data.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
+                }
+                is Resource.Error -> {
+                    Log.d(TAG, "getChannels: error: ${resource.errCode}: ${resource.errMsg}")
+                    isFetching = false
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     init {
-        fetchClubsList()
+        refreshAll()
     }
 }

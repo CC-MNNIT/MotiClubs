@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.data.network.model
+package com.mnnit.moticlubs.data.network.dto
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class SaveUserDto(
     @SerializedName("regno")
     @Expose
-    var regno: String,
+    var regNo: String,
 
     @SerializedName("name")
     @Expose
@@ -60,14 +60,12 @@ data class UserResponse(
 
     @SerializedName("admin")
     @Expose
-    var admin: List<UserClubDto>,
+    var admin: List<SubscribedClubDto>,
 
     @SerializedName("subscribed")
     @Expose
-    var subscribed: MutableList<UserClubDto>,
-) {
-    constructor() : this(-1, "", "", "", "", "", "", listOf(), mutableListOf())
-}
+    var subscribed: MutableList<SubscribedClubDto>
+)
 
 data class UpdateUserAvatarDto(
     @SerializedName("avatar")
@@ -75,7 +73,7 @@ data class UpdateUserAvatarDto(
     var avatar: String
 )
 
-data class UserClubDto(
+data class SubscribedClubDto(
     @SerializedName("clubId")
     @Expose
     var clubID: Int
@@ -88,9 +86,13 @@ data class FCMTokenDto(
 )
 
 data class AdminDetailResponse(
-    @SerializedName("userId")
+    @SerializedName("uid")
     @Expose
     var uid: Int,
+
+    @SerializedName("regno")
+    @Expose
+    var regNo: String,
 
     @SerializedName("name")
     @Expose
@@ -100,13 +102,19 @@ data class AdminDetailResponse(
     @Expose
     var email: String,
 
+    @SerializedName("course")
+    @Expose
+    var course: String,
+
     @SerializedName("phone")
     @Expose
     var phoneNumber: String,
 
     @SerializedName("avatar")
     @Expose
-    var avatar: String
-) {
-    constructor() : this(-1, "", "", "", "")
-}
+    var avatar: String,
+
+    @SerializedName("cid")
+    @Expose
+    var clubID: Int
+)

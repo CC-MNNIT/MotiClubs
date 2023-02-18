@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.mnnit.moticlubs.data.network.model.UrlResponseModel
+import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
 
@@ -33,7 +33,7 @@ fun InputOtherLinkDialog(
     otherLinksLiveList: SnapshotStateList<OtherLinkComposeModel>,
     otherLinkIdx: MutableState<Int>,
     socialLinksLiveList: SnapshotStateList<SocialLinkComposeModel>,
-    onClick: (list: List<UrlResponseModel>) -> Unit
+    onClick: (list: List<UrlModel>) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val scope = rememberCoroutineScope()

@@ -45,13 +45,13 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
             }
 
             uploadPostPic(context, uri, viewModel) { url ->
-                val post = viewModel.postMsg.value.text
-                val selection = viewModel.postMsg.value.selection
+                val post = viewModel.eventPostMsg.value.text
+                val selection = viewModel.eventPostMsg.value.selection
                 val urlLink = "\n<img src=\"$url\">\n"
-                val msgLink = "\n[image_${viewModel.imageReplacerMap.size}]\n"
-                viewModel.imageReplacerMap[msgLink.replace("\n", "")] = urlLink
+                val msgLink = "\n[image_${viewModel.eventImageReplacerMap.size}]\n"
+                viewModel.eventImageReplacerMap[msgLink.replace("\n", "")] = urlLink
 
-                viewModel.postMsg.value = TextFieldValue(
+                viewModel.eventPostMsg.value = TextFieldValue(
                     post.replaceRange(selection.start, selection.end, msgLink),
                     selection = TextRange(selection.end + msgLink.length, selection.end + msgLink.length)
                 )
@@ -73,7 +73,7 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
             showDialog = viewModel.showLinkDialog,
             inputLinkName = viewModel.inputLinkName,
             inputLink = viewModel.inputLink,
-            postMsg = viewModel.postMsg
+            postMsg = viewModel.eventPostMsg
         )
     }
 
@@ -118,13 +118,13 @@ fun TextFormatter(viewModel: ClubScreenViewModel) {
 }
 
 private fun formatMsg(viewModel: ClubScreenViewModel, token: String) {
-    val str = viewModel.postMsg.value.text
-    val tr = viewModel.postMsg.value.selection
+    val str = viewModel.eventPostMsg.value.text
+    val tr = viewModel.eventPostMsg.value.selection
     val subStr = str.substring(tr.start, tr.end)
     if (subStr.isEmpty()) return
 
     val offset = token.length * 2
-    viewModel.postMsg.value = TextFieldValue(
+    viewModel.eventPostMsg.value = TextFieldValue(
         str.replaceRange(tr.start, tr.end, "$token$subStr$token"),
         selection = TextRange(tr.end + offset, tr.end + offset)
     )
@@ -141,7 +141,7 @@ private fun uploadPostPic(
 
     val storageRef = Firebase.storage.reference
     val profilePicRef =
-        storageRef.child("post_images").child(viewModel.clubNavModel.channel.id.toString())
+        storageRef.child("post_images").child(viewModel.channelModel.channelID.toString())
             .child(System.currentTimeMillis().toString())
 
     val bitmap = compressBitmap(imageUri, context)
