@@ -78,9 +78,9 @@ class HomeScreenViewModel @Inject constructor(
 //                    }
                 }
                 is Resource.Success -> {
-                    showProgressDialog = false
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
                     channelMap[eventChannel.clubID]?.add(eventChannel)
+                    showProgressDialog = false
 
                     Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
                 }
@@ -102,9 +102,9 @@ class HomeScreenViewModel @Inject constructor(
                     showProgressDialog = true
                 }
                 is Resource.Success -> {
-                    showProgressDialog = false
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
                     channelMap[eventChannel.clubID]?.add(eventChannel)
+                    showProgressDialog = false
 
                     Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
                 }
@@ -126,8 +126,8 @@ class HomeScreenViewModel @Inject constructor(
                     showProgressDialog = true
                 }
                 is Resource.Success -> {
-                    showProgressDialog = false
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
+                    showProgressDialog = false
 
                     Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
                 }
@@ -165,8 +165,8 @@ class HomeScreenViewModel @Inject constructor(
                     resource.data?.let { user = it }
                 }
                 is Resource.Success -> {
-                    isFetching = false
                     user = resource.data
+                    isFetching = false
                 }
                 is Resource.Error -> {
                     isFetching = false
@@ -181,20 +181,18 @@ class HomeScreenViewModel @Inject constructor(
         getAdminJob = clubUseCases.getAdmins().onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    isFetching = true
-                    Log.d(TAG, "getAdmins: loading ${resource.data}")
                     resource.data?.let { list ->
                         if (list.isNotEmpty()) {
                             adminList.clear()
                             adminList.addAll(list)
                         }
                     }
+                    isFetching = true
                 }
                 is Resource.Success -> {
-                    Log.d(TAG, "getAdmins: success ${resource.data}")
-                    isFetching = false
                     adminList.clear()
                     adminList.addAll(resource.data)
+                    isFetching = false
                 }
                 is Resource.Error -> {
                     Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
@@ -218,9 +216,9 @@ class HomeScreenViewModel @Inject constructor(
                     isFetching = true
                 }
                 is Resource.Success -> {
-                    isFetching = false
                     clubsList.clear()
                     clubsList.addAll(resource.data)
+                    isFetching = false
                 }
                 is Resource.Error -> {
                     Log.d(TAG, "getClubs: error: ${resource.errCode}: ${resource.errMsg}")
@@ -242,9 +240,9 @@ class HomeScreenViewModel @Inject constructor(
                     isFetching = true
                 }
                 is Resource.Success -> {
-                    isFetching = false
                     resource.data.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
                     resource.data.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
+                    isFetching = false
                 }
                 is Resource.Error -> {
                     Log.d(TAG, "getChannels: error: ${resource.errCode}: ${resource.errMsg}")

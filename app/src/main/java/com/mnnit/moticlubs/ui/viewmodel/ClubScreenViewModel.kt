@@ -97,16 +97,16 @@ class ClubScreenViewModel @Inject constructor(
         getPostsJob = postUseCases.getPosts(channelModel.channelID).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    loadingPosts.value = true
                     resource.data?.let { list ->
                         postsList.clear()
                         postsList.addAll(list)
                     }
+                    loadingPosts.value = true
                 }
                 is Resource.Success -> {
-                    loadingPosts.value = false
                     postsList.clear()
                     postsList.addAll(resource.data)
+                    loadingPosts.value = false
                 }
                 is Resource.Error -> {
                     loadingPosts.value = false
@@ -221,10 +221,10 @@ class ClubScreenViewModel @Inject constructor(
                     is Resource.Loading -> showProgress.value = true
                     is Resource.Success -> {
                         Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
-                        clearEditor()
 
                         postsList.clear()
                         postsList.addAll(resource.data)
+                        clearEditor()
                     }
                     is Resource.Error -> {
                         showProgress.value = false
@@ -249,10 +249,10 @@ class ClubScreenViewModel @Inject constructor(
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
                     Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
-                    clearEditor()
 
                     postsList.clear()
                     postsList.addAll(resource.data)
+                    clearEditor()
                 }
                 is Resource.Error -> {
                     showProgress.value = false
@@ -272,11 +272,11 @@ class ClubScreenViewModel @Inject constructor(
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
-                    showProgress.value = false
                     Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
 
                     postsList.clear()
                     postsList.addAll(resource.data)
+                    showProgress.value = false
                 }
                 is Resource.Error -> {
                     showProgress.value = false

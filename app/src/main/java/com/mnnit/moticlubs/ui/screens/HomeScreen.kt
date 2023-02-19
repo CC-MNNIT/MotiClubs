@@ -96,7 +96,13 @@ fun HomeScreen(
                         url = appViewModel.user.avatar,
                         onClick = { onNavigateProfile(viewModel) })
 
-                    Text(modifier = Modifier.padding(start = 16.dp), text = "MNNIT Clubs", fontSize = 28.sp)
+                    Text(
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .pullRefresh(state = refreshState, enabled = !viewModel.isFetching),
+                        text = "MNNIT Clubs",
+                        fontSize = 28.sp
+                    )
 
                     AnimatedVisibility(
                         visible = viewModel.isFetching || refreshState.progress.dp.value > 0.5f,
@@ -111,13 +117,16 @@ fun HomeScreen(
                     }
                     AnimatedVisibility(
                         visible = viewModel.clubsList.isEmpty() && !viewModel.isFetching,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
                     ) {
                         Text(
                             "Error loading clubs :/\nPull down to refresh",
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
+                                .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
                                 .padding(start = 16.dp)
                         )
                     }
