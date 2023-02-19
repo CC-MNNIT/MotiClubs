@@ -50,7 +50,8 @@ inline fun <ReqT, ResT> Repository.networkResource(
             Resource.Error(apiResponse.errorCode, apiResponse.errorMsg)
         }
     } catch (e: Exception) {
-        Resource.Error(-1, e.message ?: errorMsg)
+        e.printStackTrace()
+        Resource.Error(-1, errorMsg)
     }
     emit(flow)
 }
