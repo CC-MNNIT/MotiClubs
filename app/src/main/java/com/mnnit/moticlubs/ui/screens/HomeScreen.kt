@@ -57,7 +57,7 @@ fun HomeScreen(
 ) {
     val colorScheme = getColorScheme()
     val refreshState = rememberPullRefreshState(
-        refreshing = viewModel.isFetching,
+        refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingChannels || viewModel.isFetchingClubs,
         onRefresh = viewModel::refreshAll
     )
 
@@ -86,7 +86,12 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .consumeWindowInsets(it)
-                        .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
+                        .pullRefresh(
+                            state = refreshState,
+                            enabled = !viewModel.isFetchingAdmins
+                                    && !viewModel.isFetchingChannels
+                                    && !viewModel.isFetchingClubs
+                        )
                         .padding(top = 16.dp)
                 ) {
                     ProfilePicture(
@@ -99,13 +104,21 @@ fun HomeScreen(
                     Text(
                         modifier = Modifier
                             .padding(start = 16.dp)
-                            .pullRefresh(state = refreshState, enabled = !viewModel.isFetching),
+                            .pullRefresh(
+                                state = refreshState,
+                                enabled = !viewModel.isFetchingAdmins
+                                        && !viewModel.isFetchingChannels
+                                        && !viewModel.isFetchingClubs
+                            ),
                         text = "MNNIT Clubs",
                         fontSize = 28.sp
                     )
 
                     AnimatedVisibility(
-                        visible = viewModel.isFetching || refreshState.progress.dp.value > 0.5f,
+                        visible = viewModel.isFetchingAdmins
+                                || viewModel.isFetchingChannels
+                                || viewModel.isFetchingClubs
+                                || refreshState.progress.dp.value > 0.5f,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         LinearProgressIndicator(
@@ -116,17 +129,27 @@ fun HomeScreen(
                         )
                     }
                     AnimatedVisibility(
-                        visible = viewModel.clubsList.isEmpty() && !viewModel.isFetching,
+                        visible = viewModel.clubsList.isEmpty() && !viewModel.isFetchingAdmins
+                                && !viewModel.isFetchingChannels
+                                && !viewModel.isFetchingClubs,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
+                            .pullRefresh(
+                                state = refreshState, enabled = !viewModel.isFetchingAdmins
+                                        && !viewModel.isFetchingChannels
+                                        && !viewModel.isFetchingClubs
+                            )
                     ) {
                         Text(
                             "Error loading clubs :/\nPull down to refresh",
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .pullRefresh(state = refreshState, enabled = !viewModel.isFetching)
+                                .pullRefresh(
+                                    state = refreshState, enabled = !viewModel.isFetchingAdmins
+                                            && !viewModel.isFetchingChannels
+                                            && !viewModel.isFetchingClubs
+                                )
                                 .padding(start = 16.dp)
                         )
                     }

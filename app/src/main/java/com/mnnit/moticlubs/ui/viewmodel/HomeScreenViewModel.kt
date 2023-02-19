@@ -44,7 +44,9 @@ class HomeScreenViewModel @Inject constructor(
     val adminList = mutableStateListOf<Admin>()
     val clubsList = mutableStateListOf<Club>()
     val channelMap = mutableMapOf<Int, SnapshotStateList<Channel>>()
-    var isFetching by mutableStateOf(false)
+    var isFetchingAdmins by mutableStateOf(false)
+    var isFetchingChannels by mutableStateOf(false)
+    var isFetchingClubs by mutableStateOf(false)
 
     var showAddChannelDialog by mutableStateOf(false)
     var showUpdateChannelDialog by mutableStateOf(false)
@@ -71,11 +73,6 @@ class HomeScreenViewModel @Inject constructor(
                     showAddChannelDialog = false
                     progressMsg = "Adding"
                     showProgressDialog = true
-
-//                    resource.data?.let {
-//                        channelMap[event.channel.clubID]?.removeIf { m -> m.channelID == event.channel.channelID }
-//                        channelMap[event.channel.clubID]?.add(event.channel)
-//                    }
                 }
                 is Resource.Success -> {
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
@@ -149,7 +146,9 @@ class HomeScreenViewModel @Inject constructor(
             getClubs()
             getChannels()
         }?.addOnCompleteListener {
-            isFetching = false
+            isFetchingAdmins = false
+            isFetchingChannels = false
+            isFetchingClubs = false
             if (!it.isSuccessful) {
                 Toast.makeText(application, "Error refreshing", Toast.LENGTH_SHORT).show()
             }
@@ -160,18 +159,9 @@ class HomeScreenViewModel @Inject constructor(
         getUserJob?.cancel()
         getUserJob = userUseCases.getUser(application.getUserID(), false).onEach { resource ->
             when (resource) {
-                is Resource.Loading -> {
-                    isFetching = true
-                    resource.data?.let { user = it }
-                }
-                is Resource.Success -> {
-                    user = resource.data
-                    isFetching = false
-                }
-                is Resource.Error -> {
-                    isFetching = false
-                    Log.d(TAG, "getUser: error: ${resource.errCode} : ${resource.errMsg}")
-                }
+                is Resource.Loading -> resource.data?.let { user = it }
+                is Resource.Success -> user = resource.data
+                is Resource.Error -> Log.d(TAG, "getUser: error: ${resource.errCode} : ${resource.errMsg}")
             }
         }.launchIn(viewModelScope)
     }
@@ -187,16 +177,16 @@ class HomeScreenViewModel @Inject constructor(
                             adminList.addAll(list)
                         }
                     }
-                    isFetching = true
+                    isFetchingAdmins = true
                 }
                 is Resource.Success -> {
                     adminList.clear()
                     adminList.addAll(resource.data)
-                    isFetching = false
+                    isFetchingAdmins = false
                 }
                 is Resource.Error -> {
                     Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
-                    isFetching = false
+                    isFetchingAdmins = false
                 }
             }
         }.launchIn(viewModelScope)
@@ -213,16 +203,16 @@ class HomeScreenViewModel @Inject constructor(
                             clubsList.addAll(list)
                         }
                     }
-                    isFetching = true
+                    isFetchingClubs = true
                 }
                 is Resource.Success -> {
                     clubsList.clear()
                     clubsList.addAll(resource.data)
-                    isFetching = false
+                    isFetchingClubs = false
                 }
                 is Resource.Error -> {
                     Log.d(TAG, "getClubs: error: ${resource.errCode}: ${resource.errMsg}")
-                    isFetching = false
+                    isFetchingClubs = false
                 }
             }
         }.launchIn(viewModelScope)
@@ -237,16 +227,16 @@ class HomeScreenViewModel @Inject constructor(
                         list.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
                         list.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
                     }
-                    isFetching = true
+                    isFetchingChannels = true
                 }
                 is Resource.Success -> {
                     resource.data.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
                     resource.data.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
-                    isFetching = false
+                    isFetchingChannels = false
                 }
                 is Resource.Error -> {
                     Log.d(TAG, "getChannels: error: ${resource.errCode}: ${resource.errMsg}")
-                    isFetching = false
+                    isFetchingChannels = false
                 }
             }
         }.launchIn(viewModelScope)
