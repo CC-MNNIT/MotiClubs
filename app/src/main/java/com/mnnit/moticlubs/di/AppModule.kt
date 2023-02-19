@@ -31,9 +31,9 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .client(
                 OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .writeTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(5, TimeUnit.SECONDS)
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
                     .build()
             )
             .build()
