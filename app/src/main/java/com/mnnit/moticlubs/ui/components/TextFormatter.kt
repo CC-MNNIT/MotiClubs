@@ -28,7 +28,7 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mnnit.moticlubs.compressBitmap
+import com.mnnit.moticlubs.domain.util.compressBitmap
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import java.io.ByteArrayOutputStream
 

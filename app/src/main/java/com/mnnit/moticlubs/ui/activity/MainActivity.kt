@@ -36,7 +36,6 @@ import androidx.navigation.navDeepLink
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
-import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.data.network.dto.ImageUrl
 import com.mnnit.moticlubs.domain.util.*
 import com.mnnit.moticlubs.ui.screens.*

@@ -36,7 +36,7 @@ import com.canhub.cropper.CropImageOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.mnnit.moticlubs.compressBitmap
+import com.mnnit.moticlubs.domain.util.compressBitmap
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog

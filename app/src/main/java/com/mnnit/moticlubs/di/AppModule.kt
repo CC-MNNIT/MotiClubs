@@ -3,12 +3,12 @@ package com.mnnit.moticlubs.di
 import android.app.Application
 import androidx.room.Room
 import com.google.gson.GsonBuilder
-import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.data.data_source.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.repository.RepositoryImpl
 import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.*
+import com.mnnit.moticlubs.domain.util.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

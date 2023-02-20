@@ -11,13 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
-import com.mnnit.moticlubs.Constants
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
-import com.mnnit.moticlubs.domain.util.Resource
-import com.mnnit.moticlubs.getUserID
-import com.mnnit.moticlubs.setAuthToken
-import com.mnnit.moticlubs.setUserID
+import com.mnnit.moticlubs.domain.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn

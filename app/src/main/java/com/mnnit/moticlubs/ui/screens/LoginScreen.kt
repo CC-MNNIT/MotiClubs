@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
-import com.mnnit.moticlubs.getDomainMail
-import com.mnnit.moticlubs.setAuthToken
-import com.mnnit.moticlubs.setUserID
+import com.mnnit.moticlubs.domain.util.getDomainMail
+import com.mnnit.moticlubs.domain.util.setAuthToken
+import com.mnnit.moticlubs.domain.util.setUserID
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme

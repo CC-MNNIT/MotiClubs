@@ -1,10 +1,8 @@
 package com.mnnit.moticlubs.domain.util
 
 import android.util.Log
-import com.mnnit.moticlubs.connectionAvailable
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.getAuthToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

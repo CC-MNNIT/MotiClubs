@@ -9,7 +9,7 @@ import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.network.dto.SaveUserDto
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.apiInvoker
-import com.mnnit.moticlubs.getAuthToken
+import com.mnnit.moticlubs.domain.util.getAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

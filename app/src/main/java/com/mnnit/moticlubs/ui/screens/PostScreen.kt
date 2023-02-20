@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mnnit.moticlubs.postRead
+import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme

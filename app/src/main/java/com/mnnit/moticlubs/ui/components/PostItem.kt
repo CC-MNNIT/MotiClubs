@@ -23,8 +23,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.*
-import com.mnnit.moticlubs.getUnreadPost
-import com.mnnit.moticlubs.toTimeString
+import com.mnnit.moticlubs.domain.util.getUnreadPost
+import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
 

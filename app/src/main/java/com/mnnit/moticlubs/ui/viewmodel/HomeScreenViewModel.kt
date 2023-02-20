@@ -19,9 +19,9 @@ import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.Resource
-import com.mnnit.moticlubs.getUserID
-import com.mnnit.moticlubs.setAuthToken
-import com.mnnit.moticlubs.setUserID
+import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.setAuthToken
+import com.mnnit.moticlubs.domain.util.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn

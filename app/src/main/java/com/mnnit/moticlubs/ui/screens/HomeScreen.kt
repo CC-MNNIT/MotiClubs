@@ -33,12 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mnnit.moticlubs.clubHasUnreadPost
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
-import com.mnnit.moticlubs.getExpandedChannel
-import com.mnnit.moticlubs.getUnreadPost
-import com.mnnit.moticlubs.setExpandedChannel
+import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
+import com.mnnit.moticlubs.domain.util.getExpandedChannel
+import com.mnnit.moticlubs.domain.util.getUnreadPost
+import com.mnnit.moticlubs.domain.util.setExpandedChannel
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
