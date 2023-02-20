@@ -9,13 +9,19 @@ import kotlinx.coroutines.flow.Flow
 
 class GetChannels(private val repository: Repository) {
 
+    private lateinit var cachedList: List<Channel>
+
     operator fun invoke(): Flow<Resource<List<Channel>>> = repository.networkResource(
         "Error getting channels",
-        query = { repository.getChannels() },
+        query = {
+            cachedList = repository.getChannels()
+            cachedList
+        },
         apiCall = { apiService, auth -> apiService.getAllChannels(auth) },
         saveResponse = {
-            val list = it.map { m -> m.mapToDomain() }
-            list.forEach { m -> repository.insertOrUpdateChannel(m) }
+            cachedList.forEach { channel -> repository.deleteChannel(channel) }
+            it.map { channelDto -> channelDto.mapToDomain() }
+                .forEach { channel -> repository.insertOrUpdateChannel(channel) }
         }
     )
 }

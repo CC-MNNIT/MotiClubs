@@ -23,6 +23,8 @@ interface Repository {
 
     suspend fun getClub(clubID: Int): Club
 
+    suspend fun deleteClub(club: Club)
+
     // ----------- ADMIN
 
     suspend fun insertOrUpdateAdmin(admin: Admin)

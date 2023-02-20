@@ -9,16 +9,23 @@ import kotlinx.coroutines.flow.Flow
 
 class GetAdmins(private val repository: Repository) {
 
+    private lateinit var cachedList: List<Admin>
+
     operator fun invoke(shouldFetch: Boolean = true): Flow<Resource<List<Admin>>> = repository.networkResource(
         "Error getting admins",
-        query = { repository.getAdmins() },
+        query = {
+            cachedList = repository.getAdmins()
+            cachedList
+        },
         apiCall = { apiService, auth -> apiService.getAllAdmins(auth) },
         saveResponse = {
-            val maps = it.map { m -> m.mapToDomain() }
-            maps.forEach { m -> repository.insertOrUpdateUser(m) }
+            cachedList.forEach { admin -> repository.deleteAdmin(admin) }
 
-            val admins = it.map { m -> Admin(m.uid, m.clubID) }
-            admins.forEach { m -> repository.insertOrUpdateAdmin(m) }
+            it.map { adminDetailResponse -> adminDetailResponse.mapToDomain() }
+                .forEach { user -> repository.insertOrUpdateUser(user) }
+
+            it.map { adminDetailResponse -> Admin(adminDetailResponse.uid, adminDetailResponse.clubID) }
+                .forEach { admin -> repository.insertOrUpdateAdmin(admin) }
         },
         shouldFetch = shouldFetch
     )

@@ -8,12 +8,19 @@ import kotlinx.coroutines.flow.Flow
 
 class GetSubscribers(private val repository: Repository) {
 
+    private lateinit var cachedList: List<Subscriber>
+
     operator fun invoke(clubID: Int): Flow<Resource<List<Subscriber>>> = repository.networkResource(
         "",
-        query = { repository.getSubscribers(clubID) },
+        query = {
+            cachedList = repository.getSubscribers(clubID)
+            cachedList
+        },
         apiCall = { apiService, auth -> apiService.getSubscribers(auth, clubID) },
         saveResponse = {
-            it.map { m -> Subscriber(m.userID, m.clubID) }.forEach { m -> repository.insertOrUpdateSubscriber(m) }
+            cachedList.forEach { subscriber -> repository.deleteSubscriber(subscriber) }
+            it.map { subscriberDto -> Subscriber(subscriberDto.userID, subscriberDto.clubID) }
+                .forEach { subscriber -> repository.insertOrUpdateSubscriber(subscriber) }
         }
     )
 }

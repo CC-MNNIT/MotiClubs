@@ -39,6 +39,10 @@ class RepositoryImpl(
         return dao.getClub(clubID)
     }
 
+    override suspend fun deleteClub(club: Club) {
+        dao.deleteClub(club)
+    }
+
     // ----------- ADMIN
 
     override suspend fun insertOrUpdateAdmin(admin: Admin) {

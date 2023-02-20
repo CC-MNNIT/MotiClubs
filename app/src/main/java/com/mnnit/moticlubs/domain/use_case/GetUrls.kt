@@ -9,12 +9,19 @@ import kotlinx.coroutines.flow.Flow
 
 class GetUrls(private val repository: Repository) {
 
+    private lateinit var cachedList: List<Url>
+
     operator fun invoke(clubID: Int): Flow<Resource<List<Url>>> = repository.networkResource(
         "Error getting urls",
-        query = { repository.getUrlsFromClub(clubID) },
+        query = {
+            cachedList = repository.getUrlsFromClub(clubID)
+            cachedList
+        },
         apiCall = { apiService, auth -> apiService.getUrls(auth, clubID) },
         saveResponse = {
-            it.map { m -> m.mapToDomain() }.forEach { m -> repository.insertOrUpdateUrl(m) }
+            cachedList.forEach { url -> repository.deleteUrl(url) }
+            it.map { urlResponseModel -> urlResponseModel.mapToDomain() }
+                .forEach { url -> repository.insertOrUpdateUrl(url) }
         }
     )
 }
