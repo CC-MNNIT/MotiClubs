@@ -50,6 +50,9 @@ class ClubDetailsScreenViewModel @Inject constructor(
     var isFetching by mutableStateOf(false)
     var progressMsg by mutableStateOf("")
 
+    var editDescriptionMode by mutableStateOf(false)
+    var displayedDescription by mutableStateOf(clubModel.description)
+
     val showSocialLinkDialog = mutableStateOf(false)
     val showOtherLinkDialog = mutableStateOf(false)
     val showProgressDialog = mutableStateOf(false)
@@ -135,25 +138,35 @@ class ClubDetailsScreenViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: (code: Int) -> Unit) {
+    fun updateClub(
+        url: String = clubModel.avatar,
+        description: String = clubModel.description,
+        onResponse: () -> Unit,
+        onFailure: (code: Int) -> Unit
+    ) {
         updateClubJob?.cancel()
-        updateClubJob = clubUseCases.updateClub(clubModel.copy(avatar = url)).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    isFetching = true
-                    resource.data?.let { model -> clubModel = model }
+        updateClubJob = clubUseCases.updateClub(clubModel.copy(avatar = url, description = description))
+            .onEach { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        isFetching = true
+                        resource.data?.let { model ->
+                            clubModel = model
+                            displayedDescription = clubModel.description
+                        }
+                    }
+                    is Resource.Success -> {
+                        isFetching = false
+                        clubModel = resource.data
+                        displayedDescription = clubModel.description
+                        onResponse()
+                    }
+                    is Resource.Error -> {
+                        isFetching = false
+                        onFailure(resource.errCode)
+                    }
                 }
-                is Resource.Success -> {
-                    isFetching = false
-                    clubModel = resource.data
-                    onResponse()
-                }
-                is Resource.Error -> {
-                    isFetching = false
-                    onFailure(resource.errCode)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun getUrls() {

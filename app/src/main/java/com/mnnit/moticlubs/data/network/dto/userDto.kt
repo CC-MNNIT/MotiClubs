@@ -29,44 +29,6 @@ data class SaveUserDto(
     var avatar: String = ""
 )
 
-data class UserResponse(
-    @SerializedName("uid")
-    @Expose
-    var id: Int,
-
-    @SerializedName("regno")
-    @Expose
-    var regNo: String,
-
-    @SerializedName("name")
-    @Expose
-    var name: String,
-
-    @SerializedName("email")
-    @Expose
-    var email: String,
-
-    @SerializedName("course")
-    @Expose
-    var course: String,
-
-    @SerializedName("phone")
-    @Expose
-    var phoneNumber: String,
-
-    @SerializedName("avatar")
-    @Expose
-    var avatar: String = "",
-
-    @SerializedName("admin")
-    @Expose
-    var admin: List<SubscribedClubDto>,
-
-    @SerializedName("subscribed")
-    @Expose
-    var subscribed: MutableList<SubscribedClubDto>
-)
-
 data class UpdateUserAvatarDto(
     @SerializedName("avatar")
     @Expose

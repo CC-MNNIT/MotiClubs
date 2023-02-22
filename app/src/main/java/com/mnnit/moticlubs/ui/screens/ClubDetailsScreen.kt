@@ -55,8 +55,16 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme(2.dp, false)
 
-        Surface(modifier = Modifier.fillMaxWidth()) {
-            Scaffold(modifier = Modifier.fillMaxWidth()) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .imePadding()
+        ) {
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding()
+            ) {
                 if (viewModel.showProgressDialog.value) {
                     ProgressDialog(progressMsg = viewModel.progressMsg)
                 }
@@ -90,6 +98,8 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
                     modifier = Modifier
                         .pullRefresh(state = refreshState)
                         .fillMaxSize()
+                        .imePadding()
+                        .verticalScroll(scrollState)
                         .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -181,14 +191,7 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
                         }
                     }
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(scrollState)
-                            .padding(16.dp)
-                    ) {
-                        Text(viewModel.clubModel.description, fontSize = 14.sp)
-                    }
+                    DescriptionComponent(viewModel = viewModel)
                 }
             }
         }
@@ -265,13 +268,13 @@ private fun updateClubProfilePicture(
     }.addOnCompleteListener { task ->
         if (task.isSuccessful) {
             val downloadUrl = task.result.toString()
-            viewModel.updateProfilePic(downloadUrl, {
+            viewModel.updateClub(url = downloadUrl, onResponse = {
                 loading.value = false
                 viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
-            }) {
+            }, onFailure = {
                 loading.value = false
                 Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
-            }
+            })
         } else {
             Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
             loading.value = false
