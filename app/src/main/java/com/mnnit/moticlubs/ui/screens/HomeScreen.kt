@@ -8,8 +8,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -133,23 +135,19 @@ fun HomeScreen(
                                 && !viewModel.isFetchingChannels
                                 && !viewModel.isFetchingClubs,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxSize()
                             .pullRefresh(
                                 state = refreshState, enabled = !viewModel.isFetchingAdmins
                                         && !viewModel.isFetchingChannels
                                         && !viewModel.isFetchingClubs
                             )
+                            .verticalScroll(rememberScrollState())
                     ) {
                         Text(
                             "Error loading clubs :/\nPull down to refresh",
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .pullRefresh(
-                                    state = refreshState, enabled = !viewModel.isFetchingAdmins
-                                            && !viewModel.isFetchingChannels
-                                            && !viewModel.isFetchingClubs
-                                )
                                 .padding(start = 16.dp)
                         )
                     }

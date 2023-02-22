@@ -44,6 +44,7 @@ class HomeScreenViewModel @Inject constructor(
     val adminList = mutableStateListOf<Admin>()
     val clubsList = mutableStateListOf<Club>()
     val channelMap = mutableMapOf<Int, SnapshotStateList<Channel>>()
+
     var isFetchingAdmins by mutableStateOf(false)
     var isFetchingChannels by mutableStateOf(false)
     var isFetchingClubs by mutableStateOf(false)
@@ -137,7 +138,8 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun refreshAll() {
-        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.addOnSuccessListener {
+        isFetchingAdmins = true
+        FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.addOnSuccessListener {
             application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
             application.setAuthToken(it.token ?: "")
 
@@ -167,6 +169,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getAdmins() {
+        isFetchingAdmins = true
         getAdminJob?.cancel()
         getAdminJob = clubUseCases.getAdmins().onEach { resource ->
             when (resource) {
@@ -193,6 +196,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getClubs() {
+        isFetchingClubs = true
         getClubJob?.cancel()
         getClubJob = clubUseCases.getClubs().onEach { resource ->
             when (resource) {
@@ -219,6 +223,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getChannels() {
+        isFetchingChannels = true
         getChannelsJob?.cancel()
         getChannelsJob = channelUseCases.getChannels().onEach { resource ->
             when (resource) {
