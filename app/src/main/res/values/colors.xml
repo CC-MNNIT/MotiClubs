@@ -10,4 +10,5 @@
 
     <color name="backGroundColor">#FF000000</color>
     <color name="notificationColor">#FF266EF1</color>
+    <color name="splashColor">#FF323E4E</color>
 </resources>
