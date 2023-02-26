@@ -2,11 +2,10 @@
 
 package com.mnnit.moticlubs.ui.screens
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberBottomSheetScaffoldState
@@ -14,6 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -78,20 +80,34 @@ fun AboutUsScreen() {
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
                                     .padding(16.dp)
+                                    .clip(CircleShape)
+                                    .background(color = Color(0xFF323E4E))
                             ) {
-                                ProfilePicture(
-                                    url = cc,
-                                    size = 108.dp,
-                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                Image(
+                                    painter = painterResource(id = R.drawable.app_icon), contentDescription = "",
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .size(108.dp)
+                                        .padding(16.dp)
+                                        .align(Alignment.CenterVertically)
                                 )
                             }
+
                             Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally),
+                                text = LocalContext.current.getString(R.string.app_name),
+                                textAlign = TextAlign.Center,
+                                fontSize = 24.sp
+                            )
+
+                            DeveloperProfile(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
                                     .padding(bottom = 16.dp),
-                                text = "Made with 💻\nBy CC Club - MNNIT",
-                                textAlign = TextAlign.Center,
-                                fontSize = 16.sp
+                                name = "Made with 💻\nBy CC Club - MNNIT",
+                                github = cc,
+                                showIcons = false
                             )
                         }
 
@@ -141,8 +157,9 @@ fun AboutUsScreen() {
 @Composable
 fun ColumnScope.DeveloperProfile(
     modifier: Modifier = Modifier,
-    github: String, linkedin: String, name: String,
-    stream: String, year: String
+    github: String = "", linkedin: String = "",
+    name: String, stream: String = "", year: String = "",
+    showIcons: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
     val uriHandler = LocalUriHandler.current
@@ -175,23 +192,27 @@ fun ColumnScope.DeveloperProfile(
                     textAlign = TextAlign.Center
                 )
 
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 2.dp),
-                    text = stream,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center
-                )
+                if (stream.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 2.dp),
+                        text = stream,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
 
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 2.dp),
-                    text = year,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                )
+                if (year.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 2.dp),
+                        text = year,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
             Column(
@@ -199,40 +220,47 @@ fun ColumnScope.DeveloperProfile(
                     .align(Alignment.CenterVertically)
                     .fillMaxHeight()
             ) {
-                IconButton(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .align(Alignment.CenterHorizontally),
-                    onClick = {
-                        focusManager.clearFocus(true)
-                        uriHandler.openUri(github.replace(".png", ""))
+                if (showIcons) {
+                    if (github.isNotEmpty()) {
+                        IconButton(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .align(Alignment.CenterHorizontally),
+                            onClick = {
+                                focusManager.clearFocus(true)
+                                uriHandler.openUri(github.replace(".png", ""))
+                            }
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .align(Alignment.CenterHorizontally),
+                                painter = painterResource(id = R.drawable.github),
+                                contentDescription = ""
+                            )
+                        }
                     }
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .align(Alignment.CenterHorizontally),
-                        painter = painterResource(id = R.drawable.github),
-                        contentDescription = ""
-                    )
-                }
-                Spacer(modifier = Modifier.padding(8.dp))
-                IconButton(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .align(Alignment.CenterHorizontally),
-                    onClick = {
-                        focusManager.clearFocus(true)
-                        uriHandler.openUri(linkedin)
+
+                    if (linkedin.isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        IconButton(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .align(Alignment.CenterHorizontally),
+                            onClick = {
+                                focusManager.clearFocus(true)
+                                uriHandler.openUri(linkedin)
+                            }
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .align(Alignment.CenterHorizontally),
+                                painter = painterResource(id = R.drawable.linkedin),
+                                contentDescription = ""
+                            )
+                        }
                     }
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .align(Alignment.CenterHorizontally),
-                        painter = painterResource(id = R.drawable.linkedin),
-                        contentDescription = ""
-                    )
                 }
             }
         }
