@@ -25,7 +25,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,6 +42,7 @@ import com.mnnit.moticlubs.domain.util.getUnreadPost
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
+import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -116,20 +116,12 @@ fun HomeScreen(
                         fontSize = 28.sp
                     )
 
-                    AnimatedVisibility(
+                    PullDownProgressIndicator(
                         visible = viewModel.isFetchingAdmins
                                 || viewModel.isFetchingChannels
-                                || viewModel.isFetchingClubs
-                                || refreshState.progress.dp.value > 0.5f,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            strokeCap = StrokeCap.Round
-                        )
-                    }
+                                || viewModel.isFetchingClubs,
+                        refreshState = refreshState
+                    )
                     AnimatedVisibility(
                         visible = viewModel.clubsList.isEmpty() && !viewModel.isFetchingAdmins
                                 && !viewModel.isFetchingChannels

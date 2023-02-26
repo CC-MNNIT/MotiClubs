@@ -10,7 +10,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -103,19 +101,12 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
                         .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AnimatedVisibility(
-                        visible = viewModel.isFetching || refreshState.progress.dp.value > 0.5f,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(colorScheme.surfaceColorAtElevation(2.dp))
-                    ) {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            strokeCap = StrokeCap.Round
-                        )
-                    }
+
+                    PullDownProgressIndicator(
+                        modifier = Modifier.background(colorScheme.surfaceColorAtElevation(2.dp)),
+                        visible = viewModel.isFetching,
+                        refreshState = refreshState
+                    )
 
                     Card(
                         modifier = Modifier

@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
@@ -85,17 +84,10 @@ fun ClubScreen(
                                 .fillMaxSize()
                                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                         ) {
-                            AnimatedVisibility(
-                                visible = viewModel.loadingPosts.value || refreshState.progress.dp.value > 0.5f,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                LinearProgressIndicator(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    strokeCap = StrokeCap.Round
-                                )
-                            }
+                            PullDownProgressIndicator(
+                                visible = viewModel.loadingPosts.value,
+                                refreshState = refreshState
+                            )
 
                             AnimatedVisibility(
                                 visible = viewModel.postsList.isEmpty() && !viewModel.loadingPosts.value,
