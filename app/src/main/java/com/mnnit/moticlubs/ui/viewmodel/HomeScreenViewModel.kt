@@ -137,9 +137,11 @@ class HomeScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun refreshAll() {
+    fun refreshAll(tokenRefresh: Boolean = true) {
+        Log.d(TAG, "refreshAll: tokenRefresh = $tokenRefresh")
+
         isFetchingAdmins = true
-        FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.addOnSuccessListener {
+        FirebaseAuth.getInstance().currentUser?.getIdToken(tokenRefresh)?.addOnSuccessListener {
             application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
             application.setAuthToken(it.token ?: "")
 
@@ -248,6 +250,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
-        refreshAll()
+        refreshAll(tokenRefresh = false)
     }
 }
