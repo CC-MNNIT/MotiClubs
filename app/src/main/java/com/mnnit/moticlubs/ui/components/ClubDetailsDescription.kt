@@ -127,7 +127,6 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel) {
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledBorderColor = colorScheme.background,
-                textColor = contentColorFor(backgroundColor = colorScheme.background),
                 focusedLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                 focusedBorderColor = colorScheme.background,
                 unfocusedLabelColor = contentColorFor(backgroundColor = colorScheme.background),
