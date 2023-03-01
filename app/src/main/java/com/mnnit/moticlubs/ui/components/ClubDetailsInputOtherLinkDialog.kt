@@ -1,6 +1,5 @@
 package com.mnnit.moticlubs.ui.components
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -47,7 +46,6 @@ fun InputOtherLinkDialog(
                 .fillMaxWidth(0.85f)
                 .wrapContentHeight()
                 .clip(RoundedCornerShape(24.dp))
-                .animateContentSize()
                 .background(colorScheme.background)
         ) {
             Column(
@@ -55,7 +53,6 @@ fun InputOtherLinkDialog(
                     .padding(16.dp)
                     .heightIn(128.dp, 512.dp)
                     .fillMaxWidth()
-                    .animateContentSize()
             ) {
                 Text(
                     "Other Link Input",
@@ -70,9 +67,7 @@ fun InputOtherLinkDialog(
                 }
 
                 LazyColumn(
-                    state = listState, modifier = Modifier
-                        .weight(1f, false)
-                        .animateContentSize()
+                    state = listState, modifier = Modifier.weight(1f, false)
                 ) {
                     items(otherLinksLiveList.size) { idx ->
                         OtherLinkItem(

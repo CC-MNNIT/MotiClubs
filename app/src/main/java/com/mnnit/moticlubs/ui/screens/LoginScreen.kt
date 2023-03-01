@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -58,7 +57,6 @@ fun LoginScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .animateContentSize()
                 .verticalScroll(scrollState),
             color = colorScheme.background
         ) {
@@ -91,8 +89,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
-                        .animateContentSize(),
+                        .padding(top = 16.dp),
                     value = viewModel.password.value,
                     onValueChange = { viewModel.password.value = it },
                     shape = RoundedCornerShape(24.dp),

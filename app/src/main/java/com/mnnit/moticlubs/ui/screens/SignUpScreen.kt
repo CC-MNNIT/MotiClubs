@@ -3,7 +3,6 @@ package com.mnnit.moticlubs.ui.screens
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -56,9 +55,7 @@ fun SignupScreen(
             color = colorScheme.background
         ) {
             Column(
-                modifier = Modifier
-                    .padding(top = 120.dp, start = 16.dp, end = 16.dp)
-                    .animateContentSize()
+                modifier = Modifier.padding(top = 120.dp, start = 16.dp, end = 16.dp)
             ) {
                 Text(text = "Sign up", fontSize = 32.sp)
 
@@ -174,8 +171,7 @@ fun SignupScreen(
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .animateContentSize(),
+                        .padding(top = 8.dp),
                     value = viewModel.password.value,
                     onValueChange = { viewModel.password.value = it },
                     shape = RoundedCornerShape(24.dp),

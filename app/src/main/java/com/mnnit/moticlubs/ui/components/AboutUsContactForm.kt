@@ -1,7 +1,6 @@
 package com.mnnit.moticlubs.ui.components
 
 import android.widget.Toast
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,7 +65,6 @@ fun BottomSheetForm() {
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()
-                    .animateContentSize()
             ) {
                 OutlinedTextField(
                     modifier = Modifier

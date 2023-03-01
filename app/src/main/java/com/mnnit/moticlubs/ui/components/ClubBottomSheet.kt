@@ -1,7 +1,6 @@
 package com.mnnit.moticlubs.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -120,7 +119,6 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                 modifier = Modifier
                     .imePadding()
                     .fillMaxWidth()
-                    .animateContentSize()
             ) {
                 AnimatedVisibility(
                     visible = viewModel.isPreviewMode.value,
