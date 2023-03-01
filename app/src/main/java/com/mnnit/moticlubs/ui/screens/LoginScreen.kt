@@ -71,7 +71,11 @@ fun LoginScreen(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = viewModel.emailID.value,
-                    onValueChange = { viewModel.emailID.value = it.replace("@", "") },
+                    onValueChange = {
+                        viewModel.emailID.value = it.trim { c ->
+                            c == '@' || c == ' ' || c == '\t' || c == '\n' || c == '\r'
+                        }
+                    },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "G-Suite ID") },
                     enabled = !viewModel.isLoading.value,

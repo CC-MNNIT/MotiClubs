@@ -153,7 +153,11 @@ fun SignupScreen(
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     value = viewModel.emailID.value,
-                    onValueChange = { viewModel.emailID.value = it.replace("@", "") },
+                    onValueChange = {
+                        viewModel.emailID.value = it.trim { c ->
+                            c == '@' || c == ' ' || c == '\t' || c == '\n' || c == '\r'
+                        }
+                    },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "G-Suite ID") },
                     enabled = !viewModel.isLoading.value,
