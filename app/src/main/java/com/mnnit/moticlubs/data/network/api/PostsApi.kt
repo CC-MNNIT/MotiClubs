@@ -14,7 +14,7 @@ interface PostsApi {
         @Header("Authorization") auth: String?,
         @Query("channelId") channelID: Long,
         @Query("page") page: Int,
-        @Query("items") items: Int = 4
+        @Query("items") items: Int = 10
     ): Response<List<PostDto>?>
 
     @POST("/posts")
