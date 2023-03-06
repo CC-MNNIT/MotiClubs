@@ -11,7 +11,7 @@ class SendPost(private val repository: Repository) {
 
     operator fun invoke(post: Post, clubID: Int, general: Int): Flow<Resource<List<Post>>> = repository.networkResource(
         "Error sending post",
-        query = { repository.getPostsFromChannel(post.channelID) },
+        query = { repository.getPostsFromChannel(post.channelID, post.pageNo) },
         apiCall = { apiService, auth -> apiService.sendPost(auth, post.mapFromDomain(clubID, general)) },
         saveResponse = { repository.insertOrUpdatePost(post) }
     )

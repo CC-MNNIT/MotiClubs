@@ -11,16 +11,16 @@ class GetPosts(private val repository: Repository) {
 
     private lateinit var cachedList: List<Post>
 
-    operator fun invoke(channelID: Long): Flow<Resource<List<Post>>> = repository.networkResource(
+    operator fun invoke(channelID: Long, page: Int): Flow<Resource<List<Post>>> = repository.networkResource(
         "Error getting posts",
         query = {
-            cachedList = repository.getPostsFromChannel(channelID)
+            cachedList = repository.getPostsFromChannel(channelID, page)
             cachedList
         },
-        apiCall = { apiService, auth -> apiService.getPostsFromClubChannel(auth, channelID) },
+        apiCall = { apiService, auth -> apiService.getPostsFromClubChannel(auth, channelID, page) },
         saveResponse = {
             cachedList.forEach { post -> repository.deletePost(post) }
-            it.map { postDto -> postDto.mapToDomain() }
+            it.map { postDto -> postDto.mapToDomain(page) }
                 .forEach { post -> repository.insertOrUpdatePost(post) }
         }
     )

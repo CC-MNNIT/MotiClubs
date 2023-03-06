@@ -12,7 +12,9 @@ interface PostsApi {
     @GET("/posts")
     suspend fun getPostsFromClubChannel(
         @Header("Authorization") auth: String?,
-        @Query("channelId") channelID: Long
+        @Query("channelId") channelID: Long,
+        @Query("page") page: Int,
+        @Query("items") items: Int = 4
     ): Response<List<PostDto>?>
 
     @POST("/posts")

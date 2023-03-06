@@ -21,7 +21,6 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
-import com.mnnit.moticlubs.data.repository.RepositoryImpl
 import com.mnnit.moticlubs.di.AppModule
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.util.*
@@ -40,10 +39,10 @@ class AppFCMService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
         CoroutineScope(Dispatchers.IO).launch {
-            val response = RepositoryImpl(
-                AppModule.provideLocalDatabase(this@AppFCMService.application).dao,
+            val response = AppModule.provideRepository(
+                this@AppFCMService.application,
                 AppModule.provideApiService(),
-                this@AppFCMService.application
+                AppModule.provideLocalDatabase(this@AppFCMService.application)
             ).getAPIService().setFCMToken(getAuthToken(), FCMTokenDto(token))
 
             if (response.isSuccessful && response.body() != null) {

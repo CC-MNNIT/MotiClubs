@@ -30,10 +30,11 @@ fun ChannelDto.mapToDomain(): Channel =
         name = this.name
     )
 
-fun PostDto.mapToDomain(): Post =
+fun PostDto.mapToDomain(page: Int): Post =
     Post(
         postID = this.postID,
         channelID = this.channelID,
+        pageNo = page,
         message = this.message,
         time = this.time,
         userID = this.userID

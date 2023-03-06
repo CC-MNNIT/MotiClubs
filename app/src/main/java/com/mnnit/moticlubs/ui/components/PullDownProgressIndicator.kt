@@ -26,7 +26,7 @@ fun PullDownProgressIndicator(
             LinearProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 strokeCap = StrokeCap.Round,
                 progress = 0f
             )

@@ -1,16 +1,19 @@
 package com.mnnit.moticlubs.data.repository
 
 import android.app.Application
-import com.mnnit.moticlubs.data.data_source.LocalDao
+import androidx.room.withTransaction
+import com.mnnit.moticlubs.data.data_source.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.*
 import com.mnnit.moticlubs.domain.repository.Repository
 
 class RepositoryImpl(
-    private val dao: LocalDao,
+    private val db: LocalDatabase,
     private val apiService: ApiService,
     private val application: Application
 ) : Repository {
+
+    private val dao = db.dao
 
     override fun getAPIService() = apiService
     override fun getApplication() = application
@@ -18,7 +21,7 @@ class RepositoryImpl(
     // ----------- USER
 
     override suspend fun insertOrUpdateUser(user: User) {
-        dao.insertOrUpdateUser(user)
+        db.withTransaction { dao.insertOrUpdateUser(user) }
     }
 
     override suspend fun getUser(userID: Int): User? {
@@ -28,7 +31,7 @@ class RepositoryImpl(
     // ----------- CLUB
 
     override suspend fun insertOrUpdateClub(club: Club) {
-        dao.insertOrUpdateClub(club)
+        db.withTransaction { dao.insertOrUpdateClub(club) }
     }
 
     override suspend fun getClubs(): List<Club> {
@@ -40,13 +43,13 @@ class RepositoryImpl(
     }
 
     override suspend fun deleteClub(club: Club) {
-        dao.deleteClub(club)
+        db.withTransaction { dao.deleteClub(club) }
     }
 
     // ----------- ADMIN
 
     override suspend fun insertOrUpdateAdmin(admin: Admin) {
-        dao.insertOrUpdateAdmin(admin)
+        db.withTransaction { dao.insertOrUpdateAdmin(admin) }
     }
 
     override suspend fun getAdmins(): List<Admin> {
@@ -54,13 +57,13 @@ class RepositoryImpl(
     }
 
     override suspend fun deleteAdmin(admin: Admin) {
-        dao.deleteAdmin(admin)
+        db.withTransaction { dao.deleteAdmin(admin) }
     }
 
     // ----------- CHANNEL
 
     override suspend fun insertOrUpdateChannel(channel: Channel) {
-        dao.insertOrUpdateChannel(channel)
+        db.withTransaction { dao.insertOrUpdateChannel(channel) }
     }
 
     override suspend fun getChannels(): List<Channel> {
@@ -68,27 +71,27 @@ class RepositoryImpl(
     }
 
     override suspend fun deleteChannel(channel: Channel) {
-        dao.deleteChannel(channel)
+        db.withTransaction { dao.deleteChannel(channel) }
     }
 
     // ----------- POST
 
     override suspend fun insertOrUpdatePost(post: Post) {
-        dao.insertOrUpdatePost(post)
+        db.withTransaction { dao.insertOrUpdatePost(post) }
     }
 
-    override suspend fun getPostsFromChannel(channelID: Long): List<Post> {
-        return dao.getPostsFromChannel(channelID)
+    override suspend fun getPostsFromChannel(channelID: Long, page: Int): List<Post> {
+        return dao.getPostsFromChannel(channelID, page)
     }
 
     override suspend fun deletePost(post: Post) {
-        dao.deletePost(post)
+        db.withTransaction { dao.deletePost(post) }
     }
 
     // ----------- SUBSCRIBER
 
     override suspend fun insertOrUpdateSubscriber(subscriber: Subscriber) {
-        dao.insertOrUpdateSubscriber(subscriber)
+        db.withTransaction { dao.insertOrUpdateSubscriber(subscriber) }
     }
 
     override suspend fun getSubscribers(clubID: Int): List<Subscriber> {
@@ -96,13 +99,13 @@ class RepositoryImpl(
     }
 
     override suspend fun deleteSubscriber(subscriber: Subscriber) {
-        dao.deleteSubscriber(subscriber)
+        db.withTransaction { dao.deleteSubscriber(subscriber) }
     }
 
     // ----------- URL
 
     override suspend fun insertOrUpdateUrl(url: Url) {
-        dao.insertOrUpdateUrl(url)
+        db.withTransaction { dao.insertOrUpdateUrl(url) }
     }
 
     override suspend fun getUrlsFromClub(clubID: Int): List<Url> {
@@ -110,13 +113,13 @@ class RepositoryImpl(
     }
 
     override suspend fun deleteUrl(url: Url) {
-        dao.deleteUrl(url)
+        db.withTransaction { dao.deleteUrl(url) }
     }
 
     // ----------- VIEW
 
     override suspend fun insertOrUpdateView(view: View) {
-        dao.insertOrUpdateView(view)
+        db.withTransaction { dao.insertOrUpdateView(view) }
     }
 
     override suspend fun getViewsFromPost(postID: Long): List<View> {

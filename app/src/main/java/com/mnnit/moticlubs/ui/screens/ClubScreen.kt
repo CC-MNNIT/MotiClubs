@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
@@ -78,6 +79,7 @@ fun ClubScreen(
                             .pullRefresh(state = refreshState, enabled = !viewModel.loadingPosts.value)
                             .fillMaxSize()
                             .background(colorScheme.background)
+                            .padding(bottom = if (viewModel.isAdmin) 72.dp else 0.dp)
                     ) {
                         Column(
                             Modifier
@@ -111,6 +113,22 @@ fun ClubScreen(
                                 adminMap = viewModel.adminMap,
                                 onNavigateToPost = onNavigateToPost
                             )
+
+                            AnimatedVisibility(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                                    .weight(0.03f),
+                                visible = viewModel.paging,
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                LinearProgressIndicator(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    strokeCap = StrokeCap.Round
+                                )
+                            }
 
                             if (viewModel.showDelPostDialog.value) {
                                 DeleteConfirmationDialog(viewModel = viewModel)
@@ -166,13 +184,10 @@ fun Messages(
     Box(modifier = modifier) {
         LazyColumn(
             state = scrollState,
-            contentPadding = PaddingValues(
-                top = 16.dp,
-                bottom = if (viewModel.isAdmin) 72.dp else 0.dp
-            ),
+            contentPadding = PaddingValues(top = 16.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 10.dp)
+                .padding(horizontal = 16.dp)
         ) {
             items(viewModel.postsList.size) { index ->
                 if (viewModel.searchMode.value && viewModel.searchValue.value.isNotEmpty() &&
@@ -197,6 +212,13 @@ fun Messages(
                     showDelPostDialog = viewModel.showDelPostDialog,
                     onNavigateToPost
                 )
+            }
+            item {
+                LaunchedEffect(scrollState.canScrollForward) {
+                    if (!scrollState.canScrollForward && !viewModel.loadingPosts.value) {
+                        viewModel.getPostsList(refresh = false)
+                    }
+                }
             }
         }
     }

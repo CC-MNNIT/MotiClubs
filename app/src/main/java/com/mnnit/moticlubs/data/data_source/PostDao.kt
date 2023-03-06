@@ -9,8 +9,8 @@ interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdatePost(post: Post)
 
-    @Query("SELECT * FROM post WHERE post.chid = :channelID ORDER BY post.time DESC")
-    suspend fun getPostsFromChannel(channelID: Long): List<Post>
+    @Query("SELECT * FROM post WHERE post.chid = :channelID AND post.page = :page ORDER BY post.time DESC")
+    suspend fun getPostsFromChannel(channelID: Long, page: Int): List<Post>
 
     @Delete
     suspend fun deletePost(post: Post)

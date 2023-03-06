@@ -43,12 +43,14 @@ object AppModule {
     @Singleton
     @Provides
     fun provideLocalDatabase(application: Application): LocalDatabase =
-        Room.databaseBuilder(application, LocalDatabase::class.java, LocalDatabase.DATABASE_NAME).build()
+        Room.databaseBuilder(application, LocalDatabase::class.java, LocalDatabase.DATABASE_NAME)
+            .fallbackToDestructiveMigration()
+            .build()
 
     @Provides
     @Singleton
     fun provideRepository(application: Application, apiService: ApiService, db: LocalDatabase): Repository =
-        RepositoryImpl(dao = db.dao, apiService = apiService, application = application)
+        RepositoryImpl(db = db, apiService = apiService, application = application)
 
     @Provides
     @Singleton

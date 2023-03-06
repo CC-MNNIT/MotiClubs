@@ -77,6 +77,9 @@ class ClubScreenViewModel @Inject constructor(
     val scrollValue = mutableStateOf(0)
     var isAdmin by mutableStateOf(false)
 
+    var paging by mutableStateOf(false)
+    private var postPage = 1
+
     private var crudPostJob: Job? = null
     private var getPostsJob: Job? = null
 
@@ -90,23 +93,42 @@ class ClubScreenViewModel @Inject constructor(
         showProgress.value = false
     }
 
-    fun getPostsList() {
-        loadingPosts.value = true
+    fun getPostsList(refresh: Boolean = true) {
+        if (refresh) {
+            postPage = 1
+            loadingPosts.value = true
+        } else {
+            if (paging) return
+            paging = true
+        }
 
         getPostsJob?.cancel()
-        getPostsJob = postUseCases.getPosts(channelModel.channelID).onEach { resource ->
+        getPostsJob = postUseCases.getPosts(channelModel.channelID, postPage).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
-                        postsList.clear()
+                        when (refresh) {
+                            true -> {
+                                loadingPosts.value = true
+                                postsList.clear()
+                            }
+                            else -> {
+                                paging = true
+                                postsList.removeIf { post -> post.pageNo == postPage }
+                            }
+                        }
                         postsList.addAll(list)
                     }
-                    loadingPosts.value = true
                 }
                 is Resource.Success -> {
-                    postsList.clear()
+                    when (refresh) {
+                        true -> postsList.clear()
+                        else -> postsList.removeIf { post -> post.pageNo == postPage }
+                    }
+                    if (resource.data.isNotEmpty()) postPage++
                     postsList.addAll(resource.data)
                     loadingPosts.value = false
+                    paging = false
                 }
                 is Resource.Error -> {
                     loadingPosts.value = false
@@ -215,24 +237,26 @@ class ClubScreenViewModel @Inject constructor(
         val channelID = channelModel.channelID
         val time = System.currentTimeMillis()
         crudPostJob?.cancel()
-        crudPostJob = postUseCases.sendPost(Post(time, channelID, text, time, userModel.userID), clubModel.clubID, 1)
-            .onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> showProgress.value = true
-                    is Resource.Success -> {
-                        Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
+        crudPostJob = postUseCases.sendPost(
+            Post(time, channelID, pageNo = 1, text, time, userModel.userID),
+            clubModel.clubID, 1
+        ).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> showProgress.value = true
+                is Resource.Success -> {
+                    Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
 
-                        postsList.clear()
-                        postsList.addAll(resource.data)
-                        clearEditor()
-                    }
-                    is Resource.Error -> {
-                        showProgress.value = false
-                        Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                    postsList.clear()
+                    postsList.addAll(resource.data)
+                    clearEditor()
                 }
-            }.launchIn(viewModelScope)
+                is Resource.Error -> {
+                    showProgress.value = false
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun updatePost() {
@@ -244,14 +268,14 @@ class ClubScreenViewModel @Inject constructor(
         }
 
         crudPostJob?.cancel()
-        crudPostJob = postUseCases.updatePost(eventUpdatePost.value.copy(message = text)).onEach { resource ->
+        val post = eventUpdatePost.value.copy(message = text)
+        crudPostJob = postUseCases.updatePost(post).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
                     Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
 
-                    postsList.clear()
-                    postsList.addAll(resource.data)
+                    postsList.replaceAll { p -> if (p.postID == post.postID) post else p }
                     clearEditor()
                 }
                 is Resource.Error -> {
@@ -263,9 +287,9 @@ class ClubScreenViewModel @Inject constructor(
     }
 
     fun deletePost() {
+        if (eventDeletePost.value.time == 0L) return
         progressText.value = "Deleting ..."
         showProgress.value = true
-        if (eventDeletePost.value.time == 0L) return
 
         crudPostJob?.cancel()
         crudPostJob = postUseCases.deletePost(eventDeletePost.value).onEach { resource ->
@@ -274,8 +298,7 @@ class ClubScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
 
-                    postsList.clear()
-                    postsList.addAll(resource.data)
+                    postsList.removeIf { post -> post.postID == eventDeletePost.value.postID }
                     showProgress.value = false
                 }
                 is Resource.Error -> {

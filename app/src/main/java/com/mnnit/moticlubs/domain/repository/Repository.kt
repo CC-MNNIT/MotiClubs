@@ -45,7 +45,7 @@ interface Repository {
 
     suspend fun insertOrUpdatePost(post: Post)
 
-    suspend fun getPostsFromChannel(channelID: Long): List<Post>
+    suspend fun getPostsFromChannel(channelID: Long, page: Int): List<Post>
 
     suspend fun deletePost(post: Post)
 
