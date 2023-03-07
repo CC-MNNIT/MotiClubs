@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -90,7 +90,7 @@ fun SetNavBarsTheme(elevation: Dp = 0.dp, setNavBar: Boolean = true) {
     val colorScheme = getColorScheme()
     val darkTheme = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
-    DisposableEffect(systemUiController, darkTheme) {
+    LaunchedEffect(systemUiController, darkTheme) {
         systemUiController.setStatusBarColor(
             color = if (elevation == 0.dp) colorScheme.background else colorScheme.surfaceColorAtElevation(2.dp),
             darkIcons = !darkTheme
@@ -101,7 +101,6 @@ fun SetNavBarsTheme(elevation: Dp = 0.dp, setNavBar: Boolean = true) {
             },
             darkIcons = !darkTheme
         )
-        onDispose { }
     }
 }
 

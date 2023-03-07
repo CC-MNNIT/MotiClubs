@@ -215,7 +215,7 @@ fun Messages(
             }
             item {
                 LaunchedEffect(scrollState.canScrollForward) {
-                    if (!scrollState.canScrollForward && !viewModel.loadingPosts.value) {
+                    if (!scrollState.canScrollForward && !viewModel.loadingPosts.value && !viewModel.pageEnded) {
                         viewModel.getPostsList(refresh = false)
                     }
                 }

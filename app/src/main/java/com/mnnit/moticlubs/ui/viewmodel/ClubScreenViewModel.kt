@@ -77,6 +77,7 @@ class ClubScreenViewModel @Inject constructor(
     val scrollValue = mutableStateOf(0)
     var isAdmin by mutableStateOf(false)
 
+    var pageEnded by mutableStateOf(false)
     var paging by mutableStateOf(false)
     private var postPage = 1
 
@@ -96,9 +97,10 @@ class ClubScreenViewModel @Inject constructor(
     fun getPostsList(refresh: Boolean = true) {
         if (refresh) {
             postPage = 1
+            pageEnded = false
             loadingPosts.value = true
         } else {
-            if (paging) return
+            if (pageEnded || paging) return
             paging = true
         }
 
@@ -125,7 +127,10 @@ class ClubScreenViewModel @Inject constructor(
                         true -> postsList.clear()
                         else -> postsList.removeIf { post -> post.pageNo == postPage }
                     }
-                    if (resource.data.isNotEmpty()) postPage++
+                    when (resource.data.isEmpty()) {
+                        true -> pageEnded = true
+                        else -> postPage++
+                    }
                     postsList.addAll(resource.data)
                     loadingPosts.value = false
                     paging = false
@@ -310,8 +315,8 @@ class ClubScreenViewModel @Inject constructor(
     }
 
     init {
-        getPostsList()
         getSubscribers()
         getAdmins()
+        getPostsList()
     }
 }
