@@ -19,22 +19,18 @@ fun PullDownProgressIndicator(
     refreshState: PullRefreshState
 ) {
     AnimatedVisibility(
-        visible = visible || refreshState.progress > 0.5f,
+        visible = visible || refreshState.progress > 0.69f,
         modifier = modifier.fillMaxWidth()
     ) {
-        if (refreshState.progress > 0.5f) {
+        if (refreshState.progress > 0.69f) {
             LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 strokeCap = StrokeCap.Round,
                 progress = 0f
             )
         } else {
             LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 strokeCap = StrokeCap.Round
             )
         }

@@ -188,6 +188,8 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(AppNavigation.LOGIN) {
                                 popUpTo(AppNavigation.HOME) { inclusive = true }
                             }
+                        }, onBackPressed = {
+                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                         })
                     }
 

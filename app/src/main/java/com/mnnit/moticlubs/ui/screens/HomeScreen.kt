@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
+@file:OptIn(ExperimentalMaterialApi::class)
 
 package com.mnnit.moticlubs.ui.screens
 
@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,11 +63,26 @@ fun HomeScreen(
         refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingChannels || viewModel.isFetchingClubs,
         onRefresh = viewModel::refreshAll
     )
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     MotiClubsTheme(colorScheme) {
         SetNavBarsTheme()
         Scaffold(
-            modifier = Modifier,
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                LargeTopAppBar(
+                    modifier = Modifier,
+                    title = { Text(text = "MNNIT Clubs", fontSize = 28.sp) },
+                    actions = {
+                        ProfilePicture(
+                            modifier = Modifier.padding(end = 16.dp),
+                            url = appViewModel.user.avatar,
+                            onClick = { onNavigateProfile(viewModel) })
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.largeTopAppBarColors(scrolledContainerColor = colorScheme.background)
+                )
+            },
             content = {
                 if (viewModel.showProgressDialog) {
                     ProgressDialog(progressMsg = viewModel.progressMsg)
@@ -87,41 +103,21 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .consumeWindowInsets(it)
+                        .padding(it)
                         .pullRefresh(
                             state = refreshState,
                             enabled = !viewModel.isFetchingAdmins
                                     && !viewModel.isFetchingChannels
                                     && !viewModel.isFetchingClubs
                         )
-                        .padding(top = 16.dp)
                 ) {
-                    ProfilePicture(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = 16.dp),
-                        url = appViewModel.user.avatar,
-                        onClick = { onNavigateProfile(viewModel) })
-
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .pullRefresh(
-                                state = refreshState,
-                                enabled = !viewModel.isFetchingAdmins
-                                        && !viewModel.isFetchingChannels
-                                        && !viewModel.isFetchingClubs
-                            ),
-                        text = "MNNIT Clubs",
-                        fontSize = 28.sp
-                    )
-
                     PullDownProgressIndicator(
                         visible = viewModel.isFetchingAdmins
                                 || viewModel.isFetchingChannels
                                 || viewModel.isFetchingClubs,
                         refreshState = refreshState
                     )
+
                     AnimatedVisibility(
                         visible = viewModel.clubsList.isEmpty() && !viewModel.isFetchingAdmins
                                 && !viewModel.isFetchingChannels
@@ -175,7 +171,7 @@ fun ClubList(
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
-        contentPadding = PaddingValues(top = 16.dp, bottom = 72.dp, start = 16.dp, end = 16.dp)
+        contentPadding = PaddingValues(bottom = 72.dp, start = 16.dp, end = 16.dp),
     ) {
         items(clubsList.size) { idx ->
             var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].clubID)) }

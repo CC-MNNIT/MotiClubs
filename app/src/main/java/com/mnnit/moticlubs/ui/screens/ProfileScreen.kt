@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddAPhoto
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -47,18 +48,14 @@ import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
+fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit, onBackPressed: () -> Unit) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
     val loading = remember { mutableStateOf(false) }
 
     MotiClubsTheme(getColorScheme()) {
         SetNavBarsTheme()
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
+        Surface(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,6 +63,17 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit) {
                     .verticalScroll(scrollState)
                     .wrapContentHeight(Alignment.Top),
             ) {
+                TopAppBar(
+                    modifier = Modifier.padding(top = 16.dp),
+                    title = { Text(text = "Profile", fontSize = 28.sp) },
+                    navigationIcon = {
+                        IconButton(onClick = onBackPressed) {
+                            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+                        }
+                    },
+                    scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+                )
+
                 ProfileIcon(
                     appViewModel = appViewModel,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -142,7 +150,9 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     val colorScheme = getColorScheme()
 
     OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
         value = appViewModel.user.name,
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
@@ -159,7 +169,8 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = 8.dp)
+            .padding(horizontal = 16.dp),
         value = appViewModel.user.email.replace("@mnnit.ac.in", ""),
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
@@ -181,7 +192,9 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         )
     )
 
-    Row(modifier = Modifier.padding(top = 8.dp)) {
+    Row(modifier = Modifier
+        .padding(top = 8.dp)
+        .padding(horizontal = 16.dp)) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
@@ -218,7 +231,8 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = 8.dp)
+            .padding(horizontal = 16.dp),
         value = appViewModel.user.phoneNumber,
         onValueChange = {},
         shape = RoundedCornerShape(24.dp),

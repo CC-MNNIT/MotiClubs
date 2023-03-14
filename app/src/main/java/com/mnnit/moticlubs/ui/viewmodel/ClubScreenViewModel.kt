@@ -137,6 +137,7 @@ class ClubScreenViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     loadingPosts.value = false
+                    paging = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
                 }
             }
