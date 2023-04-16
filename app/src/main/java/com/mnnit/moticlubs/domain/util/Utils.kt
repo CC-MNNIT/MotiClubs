@@ -34,6 +34,19 @@ private val mMonthsList: List<String> = listOf(
 )
 
 fun Long.toTimeString(): String {
+    val minuteMilli = 60 * 1000
+    var time = this
+    if (time < 1000000000000L) time *= 1000
+
+    val now = System.currentTimeMillis()
+    if (time > now || time <= 0) return "Future"
+
+    val diff = now - time
+    return when {
+        diff < minuteMilli -> "Just now"
+        diff < 2 * minuteMilli -> "A minute ago"
+        diff < 50 * minuteMilli -> "${diff / minuteMilli} minutes ago"
+        else -> {
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = this
 
@@ -43,7 +56,10 @@ fun Long.toTimeString(): String {
     val day = calendar.get(Calendar.DAY_OF_MONTH)
     val month = calendar.get(Calendar.MONTH)
 
-    return "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " + "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
+            "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
+                    "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
+        }
+    }
 }
 
 fun compressBitmap(uri: Uri, context: Context): Bitmap? {
