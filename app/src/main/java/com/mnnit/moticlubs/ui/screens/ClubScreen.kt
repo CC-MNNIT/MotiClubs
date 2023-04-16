@@ -123,7 +123,7 @@ fun ClubScreen(
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {
-                                LinearProgressIndicator(
+                                androidx.compose.material3.LinearProgressIndicator(
                                     modifier = Modifier
                                         .fillMaxWidth(),
                                     strokeCap = StrokeCap.Round
