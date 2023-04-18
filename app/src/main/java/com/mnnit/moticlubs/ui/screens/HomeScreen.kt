@@ -171,7 +171,7 @@ fun ClubList(
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
-        contentPadding = PaddingValues(bottom = 72.dp, start = 16.dp, end = 16.dp),
+        contentPadding = PaddingValues(bottom = 72.dp, top = 16.dp, start = 16.dp, end = 16.dp),
     ) {
         items(clubsList.size) { idx ->
             var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].clubID)) }

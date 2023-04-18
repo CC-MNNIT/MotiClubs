@@ -9,7 +9,7 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
-import java.util.*
+import java.util.Calendar
 
 object Constants {
     const val USER_ID = "userID"
@@ -47,14 +47,14 @@ fun Long.toTimeString(): String {
         diff < 2 * minuteMilli -> "A minute ago"
         diff < 50 * minuteMilli -> "${diff / minuteMilli} minutes ago"
         else -> {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = this
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = this
 
-    val hour = calendar.get(Calendar.HOUR)
-    val min = calendar.get(Calendar.MINUTE)
-    val amPm = calendar.get(Calendar.AM_PM)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-    val month = calendar.get(Calendar.MONTH)
+            val hour = calendar.get(Calendar.HOUR)
+            val min = calendar.get(Calendar.MINUTE)
+            val amPm = calendar.get(Calendar.AM_PM)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+            val month = calendar.get(Calendar.MONTH)
 
             "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
                     "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
