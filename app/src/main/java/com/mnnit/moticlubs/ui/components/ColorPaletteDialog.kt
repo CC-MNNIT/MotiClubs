@@ -3,6 +3,8 @@ package com.mnnit.moticlubs.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +13,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +36,10 @@ fun ColorPaletteDialog(otherLinkComposeModel: OtherLinkComposeModel, show: Mutab
     val controller = rememberColorPickerController().apply {
         this.setWheelColor(Color.Black)
     }
+
+    val colorCode = remember { mutableStateOf("") }
+    val color = remember { mutableStateOf(Color.White) }
+
     Dialog(onDismissRequest = { show.value = false }, DialogProperties()) {
         Box(
             modifier = Modifier
@@ -44,7 +52,8 @@ fun ColorPaletteDialog(otherLinkComposeModel: OtherLinkComposeModel, show: Mutab
                     "Color Palette",
                     fontSize = 16.sp,
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 8.dp),
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -53,28 +62,45 @@ fun ColorPaletteDialog(otherLinkComposeModel: OtherLinkComposeModel, show: Mutab
                         .height(250.dp),
                     controller = controller,
                     onColorChanged = { colorEnvelope: ColorEnvelope ->
-                        otherLinkComposeModel.colorCode.value = colorEnvelope.hexCode.substring(2)
+                        colorCode.value = colorEnvelope.hexCode.substring(2)
                             .replace("#", "")
-                        otherLinkComposeModel.color.value = colorEnvelope.color
+                        color.value = colorEnvelope.color
                     }
                 )
 
                 Text(
-                    text = "Select",
-                    fontSize = 15.sp,
+                    text = "#${colorCode.value}", fontSize = 16.sp,
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .align(Alignment.CenterHorizontally),
+                    color = colorScheme.onBackground
                 )
-                Button(
-                    onClick = { show.value = false },
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    colors = ButtonDefaults.buttonColors(containerColor = otherLinkComposeModel.color.value)
-                ) {
-                    Text(
-                        text = "#${otherLinkComposeModel.colorCode.value}", fontSize = 16.sp,
-                        color = textColorFor(otherLinkComposeModel.color.value)
-                    )
+
+                Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Button(
+                        onClick = { show.value = false },
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.background)
+                    ) {
+                        Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
+                    }
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+                    Button(
+                        onClick = {
+                            show.value = false
+                            otherLinkComposeModel.colorCode.value = colorCode.value
+                            otherLinkComposeModel.color.value = color.value
+                        },
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        colors = ButtonDefaults.buttonColors(containerColor = color.value)
+                    ) {
+                        Text(
+                            text = "Select", fontSize = 14.sp,
+                            color = textColorFor(color.value)
+                        )
+                    }
                 }
             }
         }
