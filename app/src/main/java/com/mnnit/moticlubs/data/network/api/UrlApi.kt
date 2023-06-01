@@ -2,19 +2,20 @@ package com.mnnit.moticlubs.data.network.api
 
 import com.mnnit.moticlubs.data.network.dto.UrlDto
 import com.mnnit.moticlubs.data.network.dto.UrlResponseModel
+import com.mnnit.moticlubs.domain.util.Constants.URL_PREFIX
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface UrlApi {
 
-    @GET("url")
+    @GET("${URL_PREFIX}url")
     suspend fun getUrls(
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int
     ): Response<List<UrlResponseModel>?>
 
-    @POST("url")
+    @POST("${URL_PREFIX}url")
     suspend fun pushUrls(
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int,
