@@ -84,7 +84,7 @@ data class UpdateClubDto(
 data class SubscriberDto(
     @SerializedName("uid")
     @Expose
-    var userID: Int,
+    var userID: Long,
 
     @SerializedName("cid")
     @Expose
@@ -95,5 +95,5 @@ data class SubscriberDto(
 data class ClubUserDto(
     @SerializedName("userId")
     @Expose
-    var userID: Int
+    var userID: Long
 ) : Parcelable

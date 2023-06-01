@@ -42,7 +42,7 @@ class ClubScreenViewModel @Inject constructor(
     val eventUpdatePost = mutableStateOf(Post())
     val eventDeletePost = mutableStateOf(Post())
 
-    val adminMap = mutableStateMapOf<Int, User>()
+    val adminMap = mutableStateMapOf<Long, User>()
     val postsList = mutableStateListOf<Post>()
     val loadingPosts = mutableStateOf(false)
     val subscriberList = mutableStateListOf<Subscriber>()

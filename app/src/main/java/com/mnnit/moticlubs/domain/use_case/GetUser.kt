@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 class GetUser(private val repository: Repository) {
 
-    operator fun invoke(userID: Int, shouldFetch: Boolean = true): Flow<Resource<User>> = repository.networkResource(
+    operator fun invoke(userID: Long, shouldFetch: Boolean = true): Flow<Resource<User>> = repository.networkResource(
         "Error getting user",
         query = { repository.getUser(userID) ?: User() },
         apiCall = { apiService, auth -> apiService.getUserDetails(auth, userID) },

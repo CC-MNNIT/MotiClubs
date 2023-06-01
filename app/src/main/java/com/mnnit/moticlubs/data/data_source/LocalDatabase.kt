@@ -13,9 +13,10 @@ import com.mnnit.moticlubs.domain.model.*
         Subscriber::class,
         Url::class,
         User::class,
-        View::class
+        View::class,
+        Reply::class
     ],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 abstract class LocalDatabase : RoomDatabase() {

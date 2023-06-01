@@ -4,7 +4,15 @@ import android.app.Application
 import androidx.room.withTransaction
 import com.mnnit.moticlubs.data.data_source.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
-import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Post
+import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.Subscriber
+import com.mnnit.moticlubs.domain.model.Url
+import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.model.View
 import com.mnnit.moticlubs.domain.repository.Repository
 
 class RepositoryImpl(
@@ -24,8 +32,16 @@ class RepositoryImpl(
         db.withTransaction { dao.insertOrUpdateUser(user) }
     }
 
-    override suspend fun getUser(userID: Int): User? {
+    override suspend fun getUser(userID: Long): User? {
         return dao.getUser(userID)
+    }
+
+    override suspend fun getAllUsers(): List<User> {
+        return dao.getAllUsers()
+    }
+
+    override suspend fun deleteUser(user: User) {
+        db.withTransaction { dao.deleteUser(user) }
     }
 
     // ----------- CLUB
@@ -124,5 +140,19 @@ class RepositoryImpl(
 
     override suspend fun getViewsFromPost(postID: Long): List<View> {
         return dao.getViewsFromPost(postID)
+    }
+
+    // ----------- REPLY
+
+    override suspend fun insertOrUpdateReply(reply: Reply) {
+        db.withTransaction { dao.insertOrUpdateReply(reply) }
+    }
+
+    override suspend fun getRepliesByPost(postID: Long): List<Reply> {
+        return dao.getRepliesByPost(postID)
+    }
+
+    override suspend fun deleteReply(reply: Reply) {
+        db.withTransaction { dao.deleteReply(reply) }
     }
 }

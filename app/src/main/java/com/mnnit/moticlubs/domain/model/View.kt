@@ -6,7 +6,7 @@ import androidx.room.Entity
 @Entity(tableName = "view", primaryKeys = ["uid", "pid"])
 data class View(
     @ColumnInfo(name = "uid", index = true)
-    val userID: Int,
+    val userID: Long,
 
     @ColumnInfo(name = "pid", index = true)
     val postID: Long

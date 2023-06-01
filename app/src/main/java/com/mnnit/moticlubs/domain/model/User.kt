@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 data class User(
     @PrimaryKey
     @ColumnInfo(name = "uid", index = true)
-    val userID: Int,
+    val userID: Long,
 
     @ColumnInfo(name = "regno")
     val regNo: String,

@@ -7,23 +7,23 @@ import retrofit2.http.*
 
 interface ChannelsApi {
 
-    @GET("/channel")
+    @GET("channel")
     suspend fun getAllChannels(@Header("Authorization") auth: String?): Response<List<ChannelDto>?>
 
-    @POST("/channel")
+    @POST("channel")
     suspend fun createChannel(
         @Header("Authorization") auth: String?,
         @Body channelDto: ChannelDto
     ): Response<ResponseBody?>
 
-    @PUT("/channel/{channelId}")
+    @PUT("channel/{channelId}")
     suspend fun updateChannelName(
         @Header("Authorization") auth: String?,
         @Path("channelId") channelID: Long,
         @Body channelDto: ChannelDto
     ): Response<ResponseBody?>
 
-    @DELETE("/channel/{channelId}")
+    @DELETE("channel/{channelId}")
     suspend fun deleteChannel(
         @Header("Authorization") auth: String?,
         @Path("channelId") channelID: Long

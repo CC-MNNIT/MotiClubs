@@ -44,6 +44,7 @@ fun ClubScreen(
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
     onNavigateToClubDetails: (club: Club, user: User) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
+    onBackPressed: () -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
 ) {
     val listScrollState = rememberLazyListState()
@@ -69,7 +70,8 @@ fun ClubScreen(
                         TopBar(
                             viewModel,
                             modifier = Modifier.padding(),
-                            onNavigateToClubDetails = onNavigateToClubDetails
+                            onNavigateToClubDetails = onNavigateToClubDetails,
+                            onBackPressed = onBackPressed
                         )
                     }
                 },
@@ -159,7 +161,8 @@ fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
 fun TopBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit
+    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
+    onBackPressed: () -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         SearchBar(viewModel.searchMode, viewModel.searchValue, modifier = modifier)
@@ -168,7 +171,8 @@ fun TopBar(
         ChannelNameBar(
             viewModel = viewModel,
             modifier = modifier,
-            onNavigateToClubDetails = onNavigateToClubDetails
+            onNavigateToClubDetails = onNavigateToClubDetails,
+            onBackPressed = onBackPressed
         )
     }
 }
@@ -176,7 +180,7 @@ fun TopBar(
 @Composable
 fun Messages(
     viewModel: ClubScreenViewModel,
-    adminMap: MutableMap<Int, User>,
+    adminMap: MutableMap<Long, User>,
     scrollState: LazyListState,
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
     modifier: Modifier = Modifier,

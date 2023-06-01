@@ -91,7 +91,7 @@ class AppFCMService : FirebaseMessagingService() {
         val channelID = data["chid"]?.toLong() ?: -1
         val postID = data["pid"]?.toLong() ?: -1
         val clubID = data["cid"]?.toInt() ?: -1
-        val userID = data["uid"]?.toInt() ?: -1
+        val userID = data["uid"]?.toLong() ?: -1
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""

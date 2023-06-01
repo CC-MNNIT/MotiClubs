@@ -9,17 +9,17 @@ import retrofit2.http.*
 
 interface ClubApi {
 
-    @GET("/clubs")
+    @GET("clubs")
     suspend fun getClubs(@Header("Authorization") auth: String?): Response<List<ClubModel>?>
 
-    @PUT("/clubs/{clubId}")
+    @PUT("clubs/{clubId}")
     suspend fun updateClub(
         @Header("Authorization") auth: String?,
         @Path("clubId") clubID: Int,
         @Body data: UpdateClubDto
     ): Response<ResponseBody?>
 
-    @GET("/clubs/subscribers/{clubId}")
+    @GET("clubs/subscribers/{clubId}")
     suspend fun getSubscribers(
         @Header("Authorization") auth: String?,
         @Path("clubId") clubID: Int

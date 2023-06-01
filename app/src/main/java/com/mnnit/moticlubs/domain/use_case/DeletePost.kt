@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 class DeletePost(private val repository: Repository) {
 
     operator fun invoke(post: Post): Flow<Resource<List<Post>>> = repository.networkResource(
-        "Error sending post",
+        "Error deleting post",
         query = { repository.getPostsFromChannel(post.channelID, post.pageNo) },
         apiCall = { apiService, auth -> apiService.deletePost(auth, post.postID, post.channelID) },
         saveResponse = { repository.deletePost(post) }

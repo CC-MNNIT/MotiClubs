@@ -3,13 +3,13 @@ package com.mnnit.moticlubs.domain.util
 import android.content.Context
 import com.mnnit.moticlubs.domain.model.Channel
 
-fun Context.setUserID(userID: Int) {
+fun Context.setUserID(userID: Long) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
-        .putInt(Constants.USER_ID, userID).apply()
+        .putLong(Constants.USER_ID, userID).apply()
 }
 
-fun Context.getUserID(): Int =
-    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getInt(Constants.USER_ID, -1)
+fun Context.getUserID(): Long =
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getLong(Constants.USER_ID, -1)
 
 fun Context.setAuthToken(token: String) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()

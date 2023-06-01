@@ -25,7 +25,7 @@ data class Post(
     val time: Long,
 
     @ColumnInfo(name = "uid", index = true)
-    val userID: Int
+    val userID: Long
 ) {
     constructor() : this(-1L, -1L, 0, "", 0L, -1)
 }
@@ -36,7 +36,7 @@ data class PostNotificationModel(
     val channelName: String,
     val channelID: Long,
     val postID: Long,
-    val userID: Int,
+    val userID: Long,
     val adminName: String,
     val adminAvatar: String,
     val message: String,

@@ -76,6 +76,7 @@ object AppModule {
     fun provideUserUseCases(repository: Repository): UserUseCases =
         UserUseCases(
             getUser = GetUser(repository),
+            getAllUsers = GetAllUsers(repository),
             updateUser = UpdateUser(repository)
         )
 
@@ -112,5 +113,14 @@ object AppModule {
         UrlUseCases(
             getUrls = GetUrls(repository),
             addUrls = AddUrls(repository)
+        )
+
+    @Provides
+    @Singleton
+    fun provideReplyUseCases(repository: Repository): ReplyUseCases =
+        ReplyUseCases(
+            getReplies = GetReplies(repository),
+            sendReply = SendReply(repository),
+            deleteReply = DeleteReply(repository)
         )
 }

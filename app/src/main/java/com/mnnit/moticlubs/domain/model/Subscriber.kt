@@ -6,7 +6,7 @@ import androidx.room.Entity
 @Entity(tableName = "subscriber", primaryKeys = ["uid", "cid"])
 data class Subscriber(
     @ColumnInfo(name = "uid", index = true)
-    val userID: Int,
+    val userID: Long,
 
     @ColumnInfo(name = "cid", index = true)
     val clubID: Int

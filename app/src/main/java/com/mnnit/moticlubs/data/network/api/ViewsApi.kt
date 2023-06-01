@@ -7,13 +7,13 @@ import retrofit2.http.*
 
 interface ViewsApi {
 
-    @GET("/views")
+    @GET("views")
     suspend fun getViews(
         @Header("Authorization") auth: String?,
         @Query("postId") postID: Long
     ): Response<List<ViewDto>?>
 
-    @POST("/views")
+    @POST("views")
     suspend fun addView(
         @Header("Authorization") auth: String?,
         @Body viewDto: ViewDto

@@ -13,7 +13,10 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
-import com.mnnit.moticlubs.domain.util.*
+import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.setAuthToken
+import com.mnnit.moticlubs.domain.util.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -38,7 +41,11 @@ class AppViewModel @Inject constructor(
     private var getUserJob: Job? = null
     private var updateUserJob: Job? = null
 
-    fun getUser(firebaseUser: FirebaseUser?, onResponse: () -> Unit = {}, onFailure: () -> Unit = {}) {
+    fun getUser(
+        firebaseUser: FirebaseUser?,
+        onResponse: () -> Unit = {},
+        onFailure: () -> Unit = {}
+    ) {
         if (firebaseUser == null) {
             fetchingState = false
             showSplashScreen = false
@@ -48,25 +55,28 @@ class AppViewModel @Inject constructor(
 
         fetchingState = true
         firebaseUser.getIdToken(true).addOnSuccessListener {
-            application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
+            val currentUserID = it.claims["userId"]?.toString()?.toLong() ?: -1
+            application.setUserID(currentUserID)
             application.setAuthToken(it.token ?: "")
 
             getUserJob?.cancel()
-            getUserJob = userUseCases.getUser(application.getUserID()).onEach { resource ->
+            getUserJob = userUseCases.getAllUsers().onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        resource.data?.let { m -> user = m }
+                        resource.data?.let { list -> user = list.find { usr -> usr.userID == currentUserID } ?: User() }
                         fetchingState = true
                         showErrorScreen = false
                     }
+
                     is Resource.Success -> {
                         fetchingState = false
                         showErrorScreen = false
                         showSplashScreen = false
 
-                        user = resource.data
+                        user = resource.data.find { usr -> usr.userID == currentUserID } ?: User()
                         onResponse()
                     }
+
                     is Resource.Error -> {
                         fetchingState = false
                         showSplashScreen = false
@@ -93,6 +103,7 @@ class AppViewModel @Inject constructor(
                     user = resource.data
                     onResponse()
                 }
+
                 is Resource.Error -> onFailure()
             }
         }.launchIn(viewModelScope)

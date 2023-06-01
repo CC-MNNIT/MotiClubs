@@ -35,7 +35,7 @@ fun PostItem(
     clubModel: Club,
     channelModel: Channel,
     postsList: SnapshotStateList<Post>,
-    userID: Int,
+    userID: Long,
     idx: Int,
     admin: User,
     editMode: MutableState<Boolean>,

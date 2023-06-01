@@ -91,7 +91,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                 Text(text = "", modifier = Modifier.padding(12.dp))
             }
 
-            Row(modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)) {
+            Row(modifier = Modifier.padding(bottom = 20.dp)) {
                 Text(
                     text = if (viewModel.editMode.value) "Update Post" else "Write Post",
                     fontSize = 18.sp,
@@ -172,7 +172,7 @@ fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (ur
                     )
                 }
 
-                TextFormatter(viewModel = viewModel)
+                PostTextFormatter(viewModel = viewModel)
 
                 Row(
                     modifier = Modifier

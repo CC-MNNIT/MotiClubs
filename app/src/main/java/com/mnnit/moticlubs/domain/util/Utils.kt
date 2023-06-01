@@ -17,7 +17,11 @@ object Constants {
     const val APP_SCHEME_URL = "app://moticlubs.mnnit.com"
     const val TOKEN = "token"
 
-    const val BASE_URL = "https://api-moticlubs.up.railway.app/"
+//    const val BASE_URL = "https://api-moticlubs.up.railway.app/"
+//    const val BASE_URL = "http://172.18.19.238:3000/api/"
+//    const val BASE_URL = "http://192.168.1.114:3000/api/"
+//    const val BASE_URL = "http://192.168.1.114:8002/api/"
+    const val BASE_URL = "http://210.212.49.10/api/"
 }
 
 fun Context.getMkdFormatter() = Markwon.builder(this)

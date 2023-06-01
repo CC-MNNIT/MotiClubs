@@ -8,13 +8,13 @@ import retrofit2.http.*
 
 interface UrlApi {
 
-    @GET("/url")
+    @GET("url")
     suspend fun getUrls(
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int
     ): Response<List<UrlResponseModel>?>
 
-    @POST("/url")
+    @POST("url")
     suspend fun pushUrls(
         @Header("Authorization") auth: String?,
         @Query("clubId") clubID: Int,

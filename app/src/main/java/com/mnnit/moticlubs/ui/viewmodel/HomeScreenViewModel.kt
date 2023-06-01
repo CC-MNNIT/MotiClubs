@@ -75,6 +75,7 @@ class HomeScreenViewModel @Inject constructor(
                     progressMsg = "Adding"
                     showProgressDialog = true
                 }
+
                 is Resource.Success -> {
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
                     channelMap[eventChannel.clubID]?.add(eventChannel)
@@ -82,6 +83,7 @@ class HomeScreenViewModel @Inject constructor(
 
                     Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
                 }
+
                 is Resource.Error -> {
                     showProgressDialog = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
@@ -99,6 +101,7 @@ class HomeScreenViewModel @Inject constructor(
                     progressMsg = "Updating"
                     showProgressDialog = true
                 }
+
                 is Resource.Success -> {
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
                     channelMap[eventChannel.clubID]?.add(eventChannel)
@@ -106,6 +109,7 @@ class HomeScreenViewModel @Inject constructor(
 
                     Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
                 }
+
                 is Resource.Error -> {
                     showProgressDialog = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
@@ -123,12 +127,14 @@ class HomeScreenViewModel @Inject constructor(
                     progressMsg = "Deleting"
                     showProgressDialog = true
                 }
+
                 is Resource.Success -> {
                     channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
                     showProgressDialog = false
 
                     Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
                 }
+
                 is Resource.Error -> {
                     showProgressDialog = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
@@ -142,7 +148,7 @@ class HomeScreenViewModel @Inject constructor(
 
         isFetchingAdmins = true
         FirebaseAuth.getInstance().currentUser?.getIdToken(tokenRefresh)?.addOnSuccessListener {
-            application.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
+            application.setUserID(it.claims["userId"]?.toString()?.toLong() ?: -1)
             application.setAuthToken(it.token ?: "")
 
             getUser()
@@ -184,11 +190,13 @@ class HomeScreenViewModel @Inject constructor(
                     }
                     isFetchingAdmins = true
                 }
+
                 is Resource.Success -> {
                     adminList.clear()
                     adminList.addAll(resource.data)
                     isFetchingAdmins = false
                 }
+
                 is Resource.Error -> {
                     Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
                     isFetchingAdmins = false
@@ -211,11 +219,13 @@ class HomeScreenViewModel @Inject constructor(
                     }
                     isFetchingClubs = true
                 }
+
                 is Resource.Success -> {
                     clubsList.clear()
                     clubsList.addAll(resource.data)
                     isFetchingClubs = false
                 }
+
                 is Resource.Error -> {
                     Log.d(TAG, "getClubs: error: ${resource.errCode}: ${resource.errMsg}")
                     isFetchingClubs = false
@@ -236,11 +246,13 @@ class HomeScreenViewModel @Inject constructor(
                     }
                     isFetchingChannels = true
                 }
+
                 is Resource.Success -> {
                     resource.data.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
                     resource.data.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
                     isFetchingChannels = false
                 }
+
                 is Resource.Error -> {
                     Log.d(TAG, "getChannels: error: ${resource.errCode}: ${resource.errMsg}")
                     isFetchingChannels = false

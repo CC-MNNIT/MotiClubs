@@ -6,8 +6,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +26,8 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit
+    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
+    onBackPressed: () -> Unit
 ) {
     if (viewModel.showSubsDialog.value) {
         val subscribe = !viewModel.userSubscribed.value
@@ -46,6 +49,15 @@ fun ChannelNameBar(
             .clickable(true, onClick = { onNavigateToClubDetails(viewModel.clubModel, viewModel.userModel) }),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .size(24.dp),
+            onClick = { onBackPressed() }
+        ) {
+            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+        }
+
         ProfilePicture(
             modifier = Modifier.align(Alignment.CenterVertically),
             url = viewModel.clubModel.avatar,

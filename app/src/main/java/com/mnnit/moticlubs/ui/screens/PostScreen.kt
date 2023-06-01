@@ -2,6 +2,7 @@ package com.mnnit.moticlubs.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
@@ -18,12 +19,15 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.ui.components.MarkdownRender
+import com.mnnit.moticlubs.ui.components.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.components.ProfilePicture
+import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScreenViewModel = hiltViewModel()) {
     LocalContext.current.postRead(
@@ -34,62 +38,76 @@ fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScree
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(2.dp, false)
+        SetNavBarsTheme(elevation = 2.dp, true)
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = colorScheme.background
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
-                    shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                ) {
-                    Text(
-                        "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 16.dp, top = 16.dp)
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        ProfilePicture(url = viewModel.postNotificationModel.adminAvatar, size = 56.dp)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        AdminNameTimestamp(
-                            time = viewModel.postNotificationModel.time,
-                            name = viewModel.postNotificationModel.adminName
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Row(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(end = 16.dp, bottom = 16.dp)
-                        ) {
-                            Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = viewModel.viewCount,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                }
+            androidx.compose.material.BottomSheetScaffold(
+                modifier = Modifier.imePadding(),
+                sheetContent = { PostBottomSheetContent(viewModel = viewModel) },
+                content = {
+                    Column(modifier = Modifier.fillMaxWidth()) {
 
-                MarkdownRender(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    mkd = viewModel.postNotificationModel.message,
-                    selectable = true,
-                    disableLinkMovementMethod = true,
-                    onImageClick = onNavigateImageClick
-                )
-            }
+                        if (viewModel.showDialog.value) {
+                            ProgressDialog(progressMsg = "Replying...")
+                        }
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+                            shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp),
+                            elevation = CardDefaults.cardElevation(0.dp),
+                        ) {
+                            Text(
+                                "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                ProfilePicture(url = viewModel.postNotificationModel.adminAvatar, size = 56.dp)
+                                Spacer(modifier = Modifier.width(10.dp))
+                                AdminNameTimestamp(
+                                    time = viewModel.postNotificationModel.time,
+                                    name = viewModel.postNotificationModel.adminName
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(end = 16.dp, bottom = 16.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
+                                    Text(
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        text = viewModel.viewCount,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        MarkdownRender(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp),
+                            mkd = viewModel.postNotificationModel.message,
+                            selectable = true,
+                            disableLinkMovementMethod = true,
+                            onImageClick = onNavigateImageClick
+                        )
+                    }
+                },
+                scaffoldState = viewModel.bottomSheetScaffoldState.value,
+                sheetPeekHeight = 72.dp,
+                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp)
+            )
         }
     }
 }

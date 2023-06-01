@@ -222,7 +222,7 @@ private fun login(
                 Log.d(TAG, "login: FirebaseIDToken not invoked. Fetching token")
                 user.getIdToken(false).addOnSuccessListener {
                     Log.d(TAG, "login: userID: ${it.claims["userId"]}")
-                    context.setUserID(it.claims["userId"]?.toString()?.toInt() ?: -1)
+                    context.setUserID(it.claims["userId"]?.toString()?.toLong() ?: -1)
 
                     val token = it.token
                     if (token == null) {
@@ -250,6 +250,7 @@ private fun handleUser(
     onNavigateToMain: () -> Unit
 ) {
     FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
+        Log.d(TAG, "handleUser: $fcm")
         viewModel.setFCMToken(fcm, {
             appViewModel.getUser(auth.currentUser, {
                 viewModel.resetState()
@@ -262,7 +263,7 @@ private fun handleUser(
         }) {
             auth.signOut()
             viewModel.isLoading.value = false
-            Toast.makeText(context, "Error: Couldn't set msg token", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error: Couldn't set db-msg token", Toast.LENGTH_SHORT).show()
         }
     }.addOnCompleteListener {
         if (!it.isSuccessful) {

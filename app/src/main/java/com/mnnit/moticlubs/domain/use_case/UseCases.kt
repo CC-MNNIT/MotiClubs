@@ -15,6 +15,7 @@ data class SubscriberUseCases(
 
 data class UserUseCases(
     val getUser: GetUser,
+    val getAllUsers: GetAllUsers,
     val updateUser: UpdateUser
 )
 
@@ -39,4 +40,10 @@ data class UrlUseCases(
 data class ViewUseCases(
     val getViews: GetViews,
     val addViews: AddViews
+)
+
+data class ReplyUseCases(
+    val getReplies: GetReplies,
+    val sendReply: SendReply,
+    val deleteReply: DeleteReply
 )

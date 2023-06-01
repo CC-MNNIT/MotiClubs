@@ -13,7 +13,11 @@ interface Repository {
 
     suspend fun insertOrUpdateUser(user: User)
 
-    suspend fun getUser(userID: Int): User?
+    suspend fun getUser(userID: Long): User?
+
+    suspend fun getAllUsers(): List<User>
+
+    suspend fun deleteUser(user: User)
 
     // ----------- CLUB
 
@@ -70,4 +74,12 @@ interface Repository {
     suspend fun insertOrUpdateView(view: View)
 
     suspend fun getViewsFromPost(postID: Long): List<View>
+
+    // ----------- REPLY
+
+    suspend fun insertOrUpdateReply(reply: Reply)
+
+    suspend fun getRepliesByPost(postID: Long): List<Reply>
+
+    suspend fun deleteReply(reply: Reply)
 }

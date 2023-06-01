@@ -179,6 +179,8 @@ class MainActivity : ComponentActivity() {
                             )
                         }, onNavigateToImageScreen = {
                             navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
+                        }, onBackPressed = {
+                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                         })
                     }
 

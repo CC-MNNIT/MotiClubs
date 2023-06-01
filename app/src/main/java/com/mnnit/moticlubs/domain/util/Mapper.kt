@@ -1,9 +1,34 @@
 package com.mnnit.moticlubs.domain.util
 
-import com.mnnit.moticlubs.data.network.dto.*
-import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.data.network.dto.AdminDetailDto
+import com.mnnit.moticlubs.data.network.dto.ChannelDto
+import com.mnnit.moticlubs.data.network.dto.ClubModel
+import com.mnnit.moticlubs.data.network.dto.PostDto
+import com.mnnit.moticlubs.data.network.dto.ReplyDto
+import com.mnnit.moticlubs.data.network.dto.SendPostDto
+import com.mnnit.moticlubs.data.network.dto.UrlResponseModel
+import com.mnnit.moticlubs.data.network.dto.UserDto
+import com.mnnit.moticlubs.data.network.dto.ViewDto
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Post
+import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.Url
+import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.model.View
 
-fun AdminDetailResponse.mapToDomain(): User =
+fun UserDto.mapToDomain(): User =
+    User(
+        userID = this.uid,
+        regNo = this.regNo,
+        name = this.name,
+        email = this.email,
+        course = this.course,
+        phoneNumber = this.phone,
+        avatar = this.avatar
+    )
+
+fun AdminDetailDto.mapToDomain(): User =
     User(
         userID = this.uid,
         regNo = this.regNo,
@@ -64,4 +89,22 @@ fun UrlResponseModel.mapToDomain(): Url =
         name = this.name,
         colorCode = this.color,
         url = this.url,
+    )
+
+fun ReplyDto.mapToDomain(): Reply =
+    Reply(
+        postID = this.postID,
+        userID = this.userID,
+        repliedToUID = this.toUID,
+        message = this.message,
+        time = this.time
+    )
+
+fun Reply.mapFromDomain(): ReplyDto =
+    ReplyDto(
+        postID = this.postID,
+        userID = this.userID,
+        toUID = this.repliedToUID,
+        message = this.message,
+        time = this.time
     )

@@ -22,7 +22,7 @@ data class PostDto(
 
     @SerializedName("uid")
     @Expose
-    var userID: Int,
+    var userID: Long,
 
     @SerializedName("general")
     @Expose
@@ -52,7 +52,7 @@ data class SendPostDto(
 
     @SerializedName("uid")
     @Expose
-    var userID: Int,
+    var userID: Long,
 
     @SerializedName("general")
     @Expose
