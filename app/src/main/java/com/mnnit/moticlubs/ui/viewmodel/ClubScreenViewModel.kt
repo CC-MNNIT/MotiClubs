@@ -1,6 +1,10 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.material.*
@@ -9,11 +13,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.mnnit.moticlubs.domain.model.*
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.PostUseCases
 import com.mnnit.moticlubs.domain.use_case.SubscriberUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
+import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,7 +80,7 @@ class ClubScreenViewModel @Inject constructor(
             snackbarHostState = SnackbarHostState()
         )
     )
-    val scrollValue = mutableStateOf(0)
+    val scrollValue = mutableIntStateOf(0)
     var isAdmin by mutableStateOf(false)
 
     var pageEnded by mutableStateOf(false)
@@ -114,6 +120,7 @@ class ClubScreenViewModel @Inject constructor(
                                 loadingPosts.value = true
                                 postsList.clear()
                             }
+
                             else -> {
                                 paging = true
                                 postsList.removeIf { post -> post.pageNo == postPage }
@@ -122,6 +129,7 @@ class ClubScreenViewModel @Inject constructor(
                         postsList.addAll(list)
                     }
                 }
+
                 is Resource.Success -> {
                     when (refresh) {
                         true -> postsList.clear()
@@ -135,6 +143,7 @@ class ClubScreenViewModel @Inject constructor(
                     loadingPosts.value = false
                     paging = false
                 }
+
                 is Resource.Error -> {
                     loadingPosts.value = false
                     paging = false
@@ -154,6 +163,7 @@ class ClubScreenViewModel @Inject constructor(
                         subscriberList.addAll(list)
                     }
                 }
+
                 is Resource.Success -> {
                     subscriberList.clear()
                     subscriberList.addAll(resource.data)
@@ -164,6 +174,7 @@ class ClubScreenViewModel @Inject constructor(
 
                     Log.d("TAG", "fetchSubscribers: ${subscriberList.size}")
                 }
+
                 is Resource.Error -> {
                     Log.d("TAG", "fetchSubscribers: error: ${resource.errCode} : ${resource.errMsg}")
                 }
@@ -206,6 +217,7 @@ class ClubScreenViewModel @Inject constructor(
                         getSubscribers()
                         Toast.makeText(application, "Subscribed", Toast.LENGTH_SHORT).show()
                     }
+
                     is Resource.Error -> {
                         showProgress.value = false
                         Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
@@ -222,6 +234,7 @@ class ClubScreenViewModel @Inject constructor(
                         getSubscribers()
                         Toast.makeText(application, "Unsubscribed", Toast.LENGTH_SHORT).show()
                     }
+
                     is Resource.Error -> {
                         showProgress.value = false
                         Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
@@ -256,6 +269,7 @@ class ClubScreenViewModel @Inject constructor(
                     postsList.addAll(resource.data)
                     clearEditor()
                 }
+
                 is Resource.Error -> {
                     showProgress.value = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
@@ -284,6 +298,7 @@ class ClubScreenViewModel @Inject constructor(
                     postsList.replaceAll { p -> if (p.postID == post.postID) post else p }
                     clearEditor()
                 }
+
                 is Resource.Error -> {
                     showProgress.value = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
@@ -307,6 +322,7 @@ class ClubScreenViewModel @Inject constructor(
                     postsList.removeIf { post -> post.postID == eventDeletePost.value.postID }
                     showProgress.value = false
                 }
+
                 is Resource.Error -> {
                     showProgress.value = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
@@ -315,7 +331,18 @@ class ClubScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private fun registerPostReceiver() {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                getPostsList()
+            }
+        }
+        LocalBroadcastManager.getInstance(application)
+            .registerReceiver(receiver, IntentFilter("${Constants.SHARED_PREFERENCE}.post"))
+    }
+
     init {
+        registerPostReceiver()
         getSubscribers()
         getAdmins()
         getPostsList()

@@ -14,4 +14,7 @@ interface PostDao {
 
     @Delete
     suspend fun deletePost(post: Post)
+
+    @Query("DELETE FROM post WHERE post.pid = :postID")
+    suspend fun deletePostID(postID: Long)
 }

@@ -18,4 +18,7 @@ interface ReplyDao {
 
     @Delete
     suspend fun deleteReply(reply: Reply)
+
+    @Query("DELETE FROM reply WHERE time = :replyID")
+    suspend fun deleteReplyID(replyID: Long)
 }

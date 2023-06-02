@@ -15,6 +15,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -23,7 +24,12 @@ import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.di.AppModule
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
-import com.mnnit.moticlubs.domain.util.*
+import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.getAuthToken
+import com.mnnit.moticlubs.domain.util.getMkdFormatter
+import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.postRead
+import com.mnnit.moticlubs.domain.util.toTimeString
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.coroutines.CoroutineScope
@@ -39,11 +45,7 @@ class AppFCMService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
         CoroutineScope(Dispatchers.IO).launch {
-            val response = AppModule.provideRepository(
-                this@AppFCMService.application,
-                AppModule.provideApiService(),
-                AppModule.provideLocalDatabase(this@AppFCMService.application)
-            ).getAPIService().setFCMToken(getAuthToken(), FCMTokenDto(token))
+            val response = AppModule.provideApiService().setFCMToken(getAuthToken(), FCMTokenDto(token))
 
             if (response.isSuccessful && response.body() != null) {
                 Log.d(TAG, "onNewToken: pushed")
@@ -65,26 +67,75 @@ class AppFCMService : FirebaseMessagingService() {
     }
 
     private fun handleData(data: Map<String, String>) {
-        val deleteMode = data["deleted"]?.toInt() ?: -1
-        if (deleteMode == -1) {
-            postNotification(data)
-        } else {
-            val channelID = data["chid"]?.toLong() ?: -1
-            val postID = data["pid"]?.toLong() ?: -1
-
-            if (channelID == -1L || postID == -1L) {
-                Log.d(TAG, "handleData: deleteMode: ERR -1: chid $channelID, pid: $postID")
-                return
-            }
-
-            Log.d(TAG, "handleData: deleteMode: chid: $channelID, pid: $postID")
-            postRead(channelID, postID, true)
-
-            (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(postID.toNotificationID())
+        val type = data["type"]?.toInt() ?: -1
+        Log.d(TAG, "handleData: $type")
+        when (type) {
+            0 -> postNotification(data)
+            1 -> deletePostNotification(data)
+            2 -> replyNotification(data)
+            3 -> deleteReplyNotification(data)
+            else -> Log.d(TAG, "handleData: unknown type: $type - #${data["type"]}")
         }
     }
 
+    private fun deletePostNotification(data: Map<String, String>) {
+        Log.d(TAG, "handleData: delete post")
+
+        val channelID = data["chid"]?.toLong() ?: -1
+        val postID = data["pid"]?.toLong() ?: -1
+
+        if (channelID == -1L || postID == -1L) {
+            Log.d(TAG, "deletePostNotification: deleteMode: ERR -1: chid $channelID, pid: $postID")
+            return
+        }
+
+        Log.d(TAG, "deletePostNotification: deleteMode")
+        postRead(channelID, postID, true)
+
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(postID.toNotificationID())
+
+        CoroutineScope(Dispatchers.IO).launch {
+            AppModule.provideRepository(
+                this@AppFCMService.application,
+                AppModule.provideApiService(),
+                AppModule.provideLocalDatabase(this@AppFCMService.application)
+            ).deletePostID(postID)
+        }
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.post"))
+    }
+
+    private fun deleteReplyNotification(data: Map<String, String>) {
+        Log.d(TAG, "handleData: delete reply")
+
+        val channelID = data["chid"]?.toLong() ?: -1
+        val postID = data["pid"]?.toLong() ?: -1
+        val replyID = data["time"]?.toLong() ?: -1
+
+        if (channelID == -1L || postID == -1L || replyID == -1L) {
+            Log.d(TAG, "deleteReplyNotification: deleteMode: ERR -1: chid $channelID, pid: $postID, rid: $replyID")
+            return
+        }
+
+        Log.d(TAG, "deleteReplyNotification: deleteMode")
+        postRead(channelID, postID, true)
+
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(replyID.toNotificationID())
+
+        CoroutineScope(Dispatchers.IO).launch {
+            AppModule.provideRepository(
+                this@AppFCMService.application,
+                AppModule.provideApiService(),
+                AppModule.provideLocalDatabase(this@AppFCMService.application)
+            ).deleteReplyID(replyID)
+        }
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.reply"))
+    }
+
     private fun postNotification(data: Map<String, String>) {
+        Log.d(TAG, "handleData: post notification")
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
@@ -96,7 +147,10 @@ class AppFCMService : FirebaseMessagingService() {
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
         val updated = (data["updated"]?.toInt() ?: 0) == 1
-        val time = data["time"]!!
+        val time = data["time"]!!.toLong()
+
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.post"))
 
         if (userID == getUserID()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
@@ -106,7 +160,7 @@ class AppFCMService : FirebaseMessagingService() {
         val post = PostNotificationModel(
             clubName, channelName,
             channelID, postID, userID, adminName, url,
-            message, time.toLong().toTimeString()
+            message, time.toTimeString()
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(
@@ -120,28 +174,82 @@ class AppFCMService : FirebaseMessagingService() {
 
         postRead(channelID, postID)
 
-        postNotificationCompat(
+        notificationCompat(
             notificationManager,
             postID,
+            notificationStamp = postID,
             clubID.toString(),
             clubName,
-            adminName,
+            "$adminName ${if (updated) "updated" else "posted"} in $clubName",
             message,
             url,
-            updated,
             pendingIntent
         )
     }
 
-    private fun postNotificationCompat(
+    private fun replyNotification(data: Map<String, String>) {
+        Log.d(TAG, "handleData: reply notification")
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val clubName = data["clubName"] ?: ""
+        val channelName = data["channelName"] ?: ""
+        val channelID = data["chid"]?.toLong() ?: -1
+        val postID = data["pid"]?.toLong() ?: -1
+        val clubID = data["cid"]?.toInt() ?: -1
+        val userID = data["uid"]?.toLong() ?: -1
+//        val toUserID = data["to_uid"]?.toLong() ?: -1
+        val message = data["message"] ?: ""
+        val time = data["time"]!!.toLong()
+        val userName = data["userName"] ?: ""
+        val url = data["userAvatar"] ?: ""
+
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.reply"))
+
+        if (userID == getUserID()) {
+            Log.d(TAG, "replyNotification: reply sender and receiver same")
+            return
+        }
+
+        val post = PostNotificationModel(
+            clubName, channelName,
+            channelID, postID, userID, userName, url,
+            message, time.toTimeString()
+        )
+        val pendingIntent = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    "${Constants.APP_SCHEME_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
+                )
+            )
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        postRead(channelID, postID)
+
+        notificationCompat(
+            notificationManager,
+            postID,
+            notificationStamp = time,
+            clubID.toString(),
+            clubName,
+            "$userName replied in $clubName",
+            message,
+            url,
+            pendingIntent
+        )
+    }
+
+    private fun notificationCompat(
         notificationManager: NotificationManager,
         postID: Long,
+        notificationStamp: Long,
         clubID: String,
         clubName: String,
-        adminName: String,
+        title: String,
         message: String,
         url: String,
-        updated: Boolean,
         pendingIntent: PendingIntent?
     ) {
         notificationManager.createNotificationChannel(
@@ -156,7 +264,7 @@ class AppFCMService : FirebaseMessagingService() {
             })
 
         val notificationHandler = NotificationCompat.Builder(applicationContext, clubID)
-            .setContentTitle("$adminName ${if (updated) "updated" else "posted"} in $clubName")
+            .setContentTitle(title)
             .setContentText(getMkdFormatter().toMarkdown(message))
             .setColorized(true)
             .setColor(ContextCompat.getColor(applicationContext, R.color.backGroundColor))
@@ -175,7 +283,7 @@ class AppFCMService : FirebaseMessagingService() {
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
         })
-        notificationManager.notify(postID.toNotificationID(), notificationHandler.build())
+        notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
     }
 
     private fun Long.toNotificationID(): Int = (this % 1000000L).toInt()

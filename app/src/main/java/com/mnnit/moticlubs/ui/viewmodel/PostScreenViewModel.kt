@@ -1,6 +1,10 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.material.BottomSheetScaffoldState
@@ -17,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.model.User
@@ -24,6 +29,7 @@ import com.mnnit.moticlubs.domain.model.View
 import com.mnnit.moticlubs.domain.use_case.ReplyUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.use_case.ViewUseCases
+import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getUserID
@@ -179,7 +185,18 @@ class PostScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private fun registerReplyReceiver() {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                getReplies()
+            }
+        }
+        LocalBroadcastManager.getInstance(application)
+            .registerReceiver(receiver, IntentFilter("${Constants.SHARED_PREFERENCE}.reply"))
+    }
+
     init {
+        registerReplyReceiver()
         viewPost()
         getViews()
         getReplies()

@@ -104,6 +104,10 @@ class RepositoryImpl(
         db.withTransaction { dao.deletePost(post) }
     }
 
+    override suspend fun deletePostID(postID: Long) {
+        db.withTransaction { dao.deletePostID(postID) }
+    }
+
     // ----------- SUBSCRIBER
 
     override suspend fun insertOrUpdateSubscriber(subscriber: Subscriber) {
@@ -154,5 +158,9 @@ class RepositoryImpl(
 
     override suspend fun deleteReply(reply: Reply) {
         db.withTransaction { dao.deleteReply(reply) }
+    }
+
+    override suspend fun deleteReplyID(replyID: Long) {
+        db.withTransaction { dao.deleteReplyID(replyID) }
     }
 }

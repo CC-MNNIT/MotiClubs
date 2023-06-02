@@ -53,6 +53,8 @@ interface Repository {
 
     suspend fun deletePost(post: Post)
 
+    suspend fun deletePostID(postID: Long)
+
     // ----------- SUBSCRIBER
 
     suspend fun insertOrUpdateSubscriber(subscriber: Subscriber)
@@ -82,4 +84,6 @@ interface Repository {
     suspend fun getRepliesByPost(postID: Long): List<Reply>
 
     suspend fun deleteReply(reply: Reply)
+
+    suspend fun deleteReplyID(replyID: Long)
 }
