@@ -57,7 +57,9 @@ class PostScreenViewModel @Inject constructor(
     var viewCount by mutableStateOf("-")
     val replyList = mutableListOf<Reply>()
     val replyMsg = mutableStateOf("")
+
     val showProgress = mutableStateOf(false)
+    val loadingReplies = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -85,11 +87,12 @@ class PostScreenViewModel @Inject constructor(
     private var viewPostJob: Job? = null
     private var getViewJob: Job? = null
 
-    private fun getReplies() {
+    fun getReplies() {
         getRepliesJob?.cancel()
         getRepliesJob = replyUseCases.getReplies(postNotificationModel.postID).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
+                    loadingReplies.value = true
                     resource.data?.let { list ->
                         replyList.clear()
                         replyList.addAll(list)
@@ -97,12 +100,13 @@ class PostScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
+                    loadingReplies.value = false
                     replyList.clear()
                     replyList.addAll(resource.data)
-                    Log.d("TAG", "getReplies: SUCCESS: $replyList")
                 }
 
                 is Resource.Error -> {
+                    loadingReplies.value = false
                     Toast.makeText(
                         application,
                         "Error ${resource.errCode}: ${resource.errMsg}",
