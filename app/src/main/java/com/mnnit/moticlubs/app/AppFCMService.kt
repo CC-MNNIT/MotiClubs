@@ -176,7 +176,6 @@ class AppFCMService : FirebaseMessagingService() {
 
         notificationCompat(
             notificationManager,
-            postID,
             notificationStamp = postID,
             clubID.toString(),
             clubName,
@@ -199,6 +198,7 @@ class AppFCMService : FirebaseMessagingService() {
         val userID = data["uid"]?.toLong() ?: -1
 //        val toUserID = data["to_uid"]?.toLong() ?: -1
         val message = data["message"] ?: ""
+        val postMessage = data["postMessage"] ?: ""
         val time = data["time"]!!.toLong()
         val userName = data["userName"] ?: ""
         val url = data["userAvatar"] ?: ""
@@ -214,7 +214,7 @@ class AppFCMService : FirebaseMessagingService() {
         val post = PostNotificationModel(
             clubName, channelName,
             channelID, postID, userID, userName, url,
-            message, time.toTimeString()
+            postMessage, time.toTimeString()
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(
@@ -230,7 +230,6 @@ class AppFCMService : FirebaseMessagingService() {
 
         notificationCompat(
             notificationManager,
-            postID,
             notificationStamp = time,
             clubID.toString(),
             clubName,
@@ -243,7 +242,6 @@ class AppFCMService : FirebaseMessagingService() {
 
     private fun notificationCompat(
         notificationManager: NotificationManager,
-        postID: Long,
         notificationStamp: Long,
         clubID: String,
         clubName: String,
@@ -276,7 +274,7 @@ class AppFCMService : FirebaseMessagingService() {
         Picasso.get().load(url).into(object : Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 notificationHandler.setLargeIcon(bitmap)
-                notificationManager.notify(postID.toNotificationID(), notificationHandler.build())
+                notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
                 Log.d(TAG, "postNotification: loaded profile icon")
             }
 
