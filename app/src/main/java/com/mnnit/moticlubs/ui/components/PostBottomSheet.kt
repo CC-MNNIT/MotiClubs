@@ -18,8 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Send
@@ -30,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -129,7 +129,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                 value = viewModel.replyMsg.value,
                 onValueChange = { viewModel.replyMsg.value = it },
                 shape = RoundedCornerShape(24.dp),
-                label = { androidx.compose.material3.Text(text = "Reply") },
+                label = { Text(text = "Reply") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 enabled = !viewModel.showProgress.value,
                 trailingIcon = {
@@ -173,7 +173,7 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
 
                         Column {
                             Row {
-                                androidx.compose.material3.Text(
+                                Text(
                                     text = viewModel.userMap[viewModel.replyList[viewModel.replyList.size - 1 - it].userID]!!.name,
                                     style = MaterialTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.SemiBold,
@@ -181,7 +181,7 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
                                     fontSize = 14.sp,
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
-                                androidx.compose.material3.Text(
+                                Text(
                                     text = viewModel.replyList[viewModel.replyList.size - it - 1].time.toTimeString(),
                                     style = MaterialTheme.typography.bodySmall,
                                     fontSize = 12.sp
@@ -190,7 +190,7 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
 
                             MarkdownText(
                                 markdown = viewModel.replyList[viewModel.replyList.size - it - 1].message,
-                                color = androidx.compose.material3.contentColorFor(backgroundColor = getColorScheme().background),
+                                color = contentColorFor(backgroundColor = getColorScheme().background),
                                 maxLines = 4,
                                 modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                                 disableLinkMovementMethod = true

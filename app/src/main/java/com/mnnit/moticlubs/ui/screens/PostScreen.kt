@@ -47,61 +47,63 @@ fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScree
                 modifier = Modifier.imePadding(),
                 sheetContent = { PostBottomSheetContent(viewModel = viewModel) },
                 content = {
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    Surface(modifier = Modifier.fillMaxSize(), color = colorScheme.background) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
 
-                        if (viewModel.showDialog.value) {
-                            ProgressDialog(progressMsg = "Replying...")
-                        }
+                            if (viewModel.showDialog.value) {
+                                ProgressDialog(progressMsg = "Replying...")
+                            }
 
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
-                            shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp),
-                            elevation = CardDefaults.cardElevation(0.dp),
-                        ) {
-                            Text(
-                                "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
-                            )
-                            Row(
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+                                shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp),
+                                elevation = CardDefaults.cardElevation(0.dp),
                             ) {
-                                ProfilePicture(url = viewModel.postNotificationModel.adminAvatar, size = 56.dp)
-                                Spacer(modifier = Modifier.width(10.dp))
-                                AdminNameTimestamp(
-                                    time = viewModel.postNotificationModel.time,
-                                    name = viewModel.postNotificationModel.adminName
+                                Text(
+                                    "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.padding(start = 16.dp, top = 16.dp)
                                 )
-                                Spacer(modifier = Modifier.weight(1f))
                                 Row(
                                     modifier = Modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(end = 16.dp, bottom = 16.dp)
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
                                 ) {
-                                    Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
-                                    Text(
-                                        modifier = Modifier.padding(start = 8.dp),
-                                        text = viewModel.viewCount,
-                                        fontSize = 14.sp
+                                    ProfilePicture(url = viewModel.postNotificationModel.adminAvatar, size = 56.dp)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    AdminNameTimestamp(
+                                        time = viewModel.postNotificationModel.time,
+                                        name = viewModel.postNotificationModel.adminName
                                     )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically)
+                                            .padding(end = 16.dp, bottom = 16.dp)
+                                    ) {
+                                        Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
+                                        Text(
+                                            modifier = Modifier.padding(start = 8.dp),
+                                            text = viewModel.viewCount,
+                                            fontSize = 14.sp
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        MarkdownRender(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp),
-                            mkd = viewModel.postNotificationModel.message,
-                            selectable = true,
-                            disableLinkMovementMethod = true,
-                            onImageClick = onNavigateImageClick
-                        )
+                            MarkdownRender(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp),
+                                mkd = viewModel.postNotificationModel.message,
+                                selectable = true,
+                                disableLinkMovementMethod = true,
+                                onImageClick = onNavigateImageClick
+                            )
+                        }
                     }
                 },
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
