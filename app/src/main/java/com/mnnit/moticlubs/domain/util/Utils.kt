@@ -21,7 +21,7 @@ object Constants {
 //    const val BASE_URL = "http://172.18.19.238:3000/api/"
 //    const val BASE_URL = "http://192.168.1.114:3000/api/"
 //    const val BASE_URL = "http://192.168.1.114:8002/api/"
-    const val BASE_URL = "http://210.212.49.10/api/"
+    const val BASE_URL = "https://sac.mnnit.ac.in/api/"
 
     // either "" or "/"
     const val URL_PREFIX = ""
