@@ -164,7 +164,7 @@ fun HomeScreen(
 fun ClubList(
     viewModel: HomeScreenViewModel,
     clubsList: SnapshotStateList<Club>,
-    channelMap: MutableMap<Int, SnapshotStateList<Channel>>,
+    channelMap: MutableMap<Long, SnapshotStateList<Channel>>,
     onNavigateChannelClick: (channel: Channel, club: Club) -> Unit
 ) {
     val colorScheme = getColorScheme()
@@ -174,14 +174,14 @@ fun ClubList(
         contentPadding = PaddingValues(bottom = 72.dp, top = 16.dp, start = 16.dp, end = 16.dp),
     ) {
         items(clubsList.size) { idx ->
-            var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].clubID)) }
+            var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].clubId)) }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 onClick = {
                     channelVisibility = !channelVisibility
-                    context.setExpandedChannel(clubsList[idx].clubID, channelVisibility)
+                    context.setExpandedChannel(clubsList[idx].clubId, channelVisibility)
                 },
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(if (channelVisibility) 8.dp else 0.dp),
@@ -210,7 +210,7 @@ fun ClubList(
 
                     AnimatedVisibility(
                         visible = context.clubHasUnreadPost(
-                            channelMap.getOrDefault(clubsList[idx].clubID, mutableListOf())
+                            channelMap.getOrDefault(clubsList[idx].clubId, mutableListOf())
                         ),
                         modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
@@ -222,7 +222,7 @@ fun ClubList(
 
                 AnimatedVisibility(visible = channelVisibility) {
                     ChannelList(
-                        list = channelMap.getOrDefault(clubsList[idx].clubID, mutableListOf()),
+                        list = channelMap.getOrDefault(clubsList[idx].clubId, mutableListOf()),
                         viewModel,
                         clubsList[idx],
                         onNavigateChannelClick
@@ -263,25 +263,25 @@ fun ChannelList(
                             .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 16.dp)
                             .align(Alignment.CenterVertically)
                             .fillMaxWidth(if (viewModel.adminList.any {
-                                    it.userID == viewModel.user.userID && it.clubID == clubModel.clubID
+                                    it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
                                 }) 0.8f else 0.9f)
                     )
 
                     AnimatedVisibility(
-                        visible = context.getUnreadPost(model.channelID).isNotEmpty(),
+                        visible = context.getUnreadPost(model.channelId).isNotEmpty(),
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                     ) {
                         BadgedBox(
                             badge = {
-                                Badge { Text(text = "${context.getUnreadPost(model.channelID).size}") }
+                                Badge { Text(text = "${context.getUnreadPost(model.channelId).size}") }
                             }, modifier = Modifier.align(Alignment.CenterVertically)
                         ) {}
                     }
 
                     AnimatedVisibility(
                         visible = viewModel.adminList.any {
-                            it.userID == viewModel.user.userID && it.clubID == clubModel.clubID
+                            it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
                         } && model.name != "General",
                         modifier = Modifier
                     ) {
@@ -311,14 +311,14 @@ fun ChannelList(
 
         AnimatedVisibility(
             visible = viewModel.adminList.any {
-                it.userID == viewModel.user.userID && it.clubID == clubModel.clubID
+                it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
             },
             enter = fadeIn(),
             exit = fadeOut()
         ) {
             Card(
                 onClick = {
-                    viewModel.eventChannel = Channel(-1L, clubModel.clubID, "")
+                    viewModel.eventChannel = Channel(-1L, clubModel.clubId, "")
                     viewModel.showAddChannelDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -381,7 +381,7 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                 Button(
                     onClick = {
                         viewModel.eventChannel = viewModel.eventChannel.copy(
-                            channelID = System.currentTimeMillis(),
+                            channelId = System.currentTimeMillis(),
                             name = viewModel.inputChannelName
                         )
                         onClick()

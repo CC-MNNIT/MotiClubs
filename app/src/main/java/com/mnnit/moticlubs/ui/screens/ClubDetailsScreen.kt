@@ -156,7 +156,7 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
                                                 viewModel.socialLinks[i].mapToSocialLinkModel()
                                                     .apply {
                                                         this.urlName = SocialLinkComposeModel.socialLinkNames[i]
-                                                        this.clubID = viewModel.clubModel.clubID
+                                                        this.clubID = viewModel.clubModel.clubId
                                                     }
                                             Log.d("TAG", "ClubDetailsScreen: ${viewModel.socialLinksLiveList[i]}")
                                         }
@@ -239,7 +239,7 @@ private fun updateClubProfilePicture(
 ) {
     val storageRef = Firebase.storage.reference
     val profilePicRef =
-        storageRef.child("profile_images").child(viewModel.clubModel.clubID.toString())
+        storageRef.child("profile_images").child(viewModel.clubModel.clubId.toString())
 
     val bitmap = compressBitmap(imageUri, context)
     bitmap ?: return

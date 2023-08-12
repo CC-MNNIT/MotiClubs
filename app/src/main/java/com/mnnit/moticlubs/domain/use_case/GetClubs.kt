@@ -9,18 +9,13 @@ import kotlinx.coroutines.flow.Flow
 
 class GetClubs(private val repository: Repository) {
 
-    private lateinit var cachedList: List<Club>
-
     operator fun invoke(): Flow<Resource<List<Club>>> = repository.networkResource(
         "Error getting clubs",
-        query = {
-            cachedList = repository.getClubs()
-            cachedList
-        },
+        query = { repository.getClubs() },
         apiCall = { apiService, auth -> apiService.getClubs(auth) },
-        saveResponse = {
-            cachedList.forEach { club -> repository.deleteClub(club) }
-            it.map { clubModel -> clubModel.mapToDomain() }
+        saveResponse = { old, new ->
+            old.forEach { club -> repository.deleteClub(club) }
+            new.map { clubModel -> clubModel.mapToDomain() }
                 .forEach { club -> repository.insertOrUpdateClub(club) }
         }
     )

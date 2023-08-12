@@ -8,7 +8,7 @@ data class UserDto(
     @Expose
     val uid: Long,
 
-    @SerializedName("regno")
+    @SerializedName("regNo")
     @Expose
     val regNo: String,
 
@@ -30,11 +30,11 @@ data class UserDto(
 
     @SerializedName("avatar")
     @Expose
-    val avatar: String = ""
+    val avatar: String = "",
 )
 
 data class SaveUserDto(
-    @SerializedName("regno")
+    @SerializedName("regNo")
     @Expose
     var regNo: String,
 
@@ -56,19 +56,29 @@ data class SaveUserDto(
 
     @SerializedName("avatar")
     @Expose
-    var avatar: String = ""
+    var avatar: String = "",
 )
 
 data class UpdateUserAvatarDto(
     @SerializedName("avatar")
     @Expose
-    var avatar: String
+    var avatar: String,
 )
 
 data class SubscribedClubDto(
-    @SerializedName("clubId")
+    @SerializedName("cid")
     @Expose
-    var clubID: Int
+    var clubId: Long,
+)
+
+data class FCMDto(
+    @SerializedName("uid")
+    @Expose
+    var userId: String,
+
+    @SerializedName("token")
+    @Expose
+    var token: String,
 )
 
 data class FCMTokenDto(
@@ -82,7 +92,7 @@ data class AdminDetailDto(
     @Expose
     var uid: Long,
 
-    @SerializedName("regno")
+    @SerializedName("regNo")
     @Expose
     var regNo: String,
 
@@ -108,5 +118,5 @@ data class AdminDetailDto(
 
     @SerializedName("cid")
     @Expose
-    var clubID: Int
+    var clubId: Long,
 )

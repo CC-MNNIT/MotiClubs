@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.navigation.NavType
 import com.google.gson.Gson
-import com.mnnit.moticlubs.data.network.dto.ClubDetailModel
 import com.mnnit.moticlubs.data.network.dto.ImageUrl
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club

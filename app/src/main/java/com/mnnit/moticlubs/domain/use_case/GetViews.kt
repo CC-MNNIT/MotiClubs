@@ -13,6 +13,6 @@ class GetViews(private val repository: Repository) {
         "Unable to get views",
         query = { repository.getViewsFromPost(postID) },
         apiCall = { apiService, auth -> apiService.getViews(auth, postID) },
-        saveResponse = { it.map { m -> m.mapToDomain() }.forEach { m -> repository.insertOrUpdateView(m) } }
+        saveResponse = { _, new -> new.map { m -> m.mapToDomain() }.forEach { m -> repository.insertOrUpdateView(m) } }
     )
 }

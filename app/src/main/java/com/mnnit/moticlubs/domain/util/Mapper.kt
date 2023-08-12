@@ -5,7 +5,6 @@ import com.mnnit.moticlubs.data.network.dto.ChannelDto
 import com.mnnit.moticlubs.data.network.dto.ClubModel
 import com.mnnit.moticlubs.data.network.dto.PostDto
 import com.mnnit.moticlubs.data.network.dto.ReplyDto
-import com.mnnit.moticlubs.data.network.dto.SendPostDto
 import com.mnnit.moticlubs.data.network.dto.UrlResponseModel
 import com.mnnit.moticlubs.data.network.dto.UserDto
 import com.mnnit.moticlubs.data.network.dto.ViewDto
@@ -19,7 +18,7 @@ import com.mnnit.moticlubs.domain.model.View
 
 fun UserDto.mapToDomain(): User =
     User(
-        userID = this.uid,
+        userId = this.uid,
         regNo = this.regNo,
         name = this.name,
         email = this.email,
@@ -30,7 +29,7 @@ fun UserDto.mapToDomain(): User =
 
 fun AdminDetailDto.mapToDomain(): User =
     User(
-        userID = this.uid,
+        userId = this.uid,
         regNo = this.regNo,
         name = this.name,
         email = this.email,
@@ -41,7 +40,7 @@ fun AdminDetailDto.mapToDomain(): User =
 
 fun ClubModel.mapToDomain(): Club =
     Club(
-        clubID = this.id,
+        clubId = this.clubId,
         name = this.name,
         description = this.description,
         avatar = this.avatar,
@@ -50,61 +49,56 @@ fun ClubModel.mapToDomain(): Club =
 
 fun ChannelDto.mapToDomain(): Channel =
     Channel(
-        channelID = this.channelID,
-        clubID = this.clubID,
+        channelId = this.channelId,
+        clubId = this.clubId,
         name = this.name
     )
 
 fun PostDto.mapToDomain(page: Int): Post =
     Post(
-        postID = this.postID,
-        channelID = this.channelID,
+        postId = this.postId,
+        channelId = this.channelId,
         pageNo = page,
         message = this.message,
-        time = this.time,
-        userID = this.userID
+        userId = this.userId
     )
 
-fun Post.mapFromDomain(clubID: Int, general: Int): SendPostDto =
-    SendPostDto(
-        postID = this.postID,
-        channelID = this.channelID,
-        clubID = clubID,
+fun Post.mapFromDomain(general: Int): PostDto =
+    PostDto(
+        postId = this.postId,
+        channelId = this.channelId,
         message = this.message,
-        time = this.time,
-        userID = this.userID,
+        userId = this.userId,
         general = general
     )
 
 fun ViewDto.mapToDomain(): View =
     View(
-        userID = this.userID,
-        postID = this.postID
+        userId = this.userId,
+        postId = this.postId
     )
 
 fun UrlResponseModel.mapToDomain(): Url =
     Url(
-        urlID = this.urlID,
-        clubID = this.clubID,
+        urlId = this.urlId,
         name = this.name,
         colorCode = this.color,
         url = this.url,
+        clubId = this.clubId,
     )
 
 fun ReplyDto.mapToDomain(): Reply =
     Reply(
-        postID = this.postID,
-        userID = this.userID,
-        repliedToUID = this.toUID,
+        postId = this.postId,
+        userId = this.userId,
         message = this.message,
         time = this.time
     )
 
 fun Reply.mapFromDomain(): ReplyDto =
     ReplyDto(
-        postID = this.postID,
-        userID = this.userID,
-        toUID = this.repliedToUID,
+        postId = this.postId,
+        userId = this.userId,
         message = this.message,
         time = this.time
     )

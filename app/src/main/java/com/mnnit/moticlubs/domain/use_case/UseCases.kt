@@ -15,7 +15,6 @@ data class SubscriberUseCases(
 
 data class UserUseCases(
     val getUser: GetUser,
-    val getAllUsers: GetAllUsers,
     val updateUser: UpdateUser
 )
 

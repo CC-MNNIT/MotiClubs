@@ -4,6 +4,7 @@ import com.mnnit.moticlubs.data.network.dto.UpdateUserAvatarDto
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.mapToDomain
 import com.mnnit.moticlubs.domain.util.networkResource
 import kotlinx.coroutines.flow.Flow
 
@@ -13,6 +14,6 @@ class UpdateUser(private val repository: Repository) {
         "Unable to update user",
         query = { user },
         apiCall = { apiService, auth -> apiService.setProfilePicUrl(auth, UpdateUserAvatarDto(user.avatar)) },
-        saveResponse = { repository.insertOrUpdateUser(user) }
+        saveResponse = {_, new -> repository.insertOrUpdateUser(new.mapToDomain()) }
     )
 }

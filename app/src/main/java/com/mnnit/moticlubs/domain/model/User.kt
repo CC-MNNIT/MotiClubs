@@ -11,9 +11,9 @@ import kotlinx.parcelize.Parcelize
 data class User(
     @PrimaryKey
     @ColumnInfo(name = "uid", index = true)
-    val userID: Long,
+    val userId: Long,
 
-    @ColumnInfo(name = "regno")
+    @ColumnInfo(name = "regNo")
     val regNo: String,
 
     @ColumnInfo(name = "name")
@@ -29,7 +29,7 @@ data class User(
     val phoneNumber: String,
 
     @ColumnInfo(name = "avatar")
-    val avatar: String
+    val avatar: String,
 ) : Parcelable {
     constructor() : this(-1, "", "", "", "", "", "")
 }

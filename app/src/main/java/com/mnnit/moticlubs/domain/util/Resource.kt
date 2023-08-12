@@ -1,7 +1,9 @@
 package com.mnnit.moticlubs.domain.util
 
 import android.util.Log
+import com.google.gson.Gson
 import com.mnnit.moticlubs.data.network.ApiService
+import com.mnnit.moticlubs.data.network.dto.ErrorDto
 import com.mnnit.moticlubs.domain.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +23,7 @@ inline fun <ReqT, ResT> Repository.networkResource(
     errorMsg: String,
     crossinline query: suspend () -> ResT,
     crossinline apiCall: suspend (apiService: ApiService, auth: String?) -> Response<ReqT?>,
-    crossinline saveResponse: suspend (ReqT) -> Unit,
+    crossinline saveResponse: suspend (ResT, ReqT) -> Unit,
     shouldFetch: Boolean = true
 ): Flow<Resource<ResT>> = flow {
     val data = query()
@@ -32,17 +34,15 @@ inline fun <ReqT, ResT> Repository.networkResource(
         return@flow
     }
 
-    if (!this@networkResource.getApplication().connectionAvailable()) {
+    if (!getApplication().connectionAvailable()) {
         emit(Resource.Success(data))
         return@flow
     }
 
     val flow = try {
-        val apiResponse = apiInvoker {
-            apiCall(this@networkResource.getAPIService(), this@networkResource.getApplication().getAuthToken())
-        }
+        val apiResponse = apiInvoker { apiCall(getAPIService(), getApplication().getAuthToken()) }
         if (apiResponse is Resource.Success) {
-            saveResponse(apiResponse.data)
+            saveResponse(data, apiResponse.data)
             Resource.Success(query())
         } else {
             Resource.Error(apiResponse.errorCode, apiResponse.errorMsg)
@@ -59,7 +59,11 @@ suspend inline fun <T> apiInvoker(crossinline invoke: (suspend () -> Response<T?
         val response = withContext(Dispatchers.IO) { invoke() }
         val body = response.body()
         if (!response.isSuccessful || body == null) {
-            return Resource.Error(response.code(), response.message())
+            val message = response.errorBody()?.string()
+                ?.let { error -> Gson().fromJson(error, ErrorDto::class.java) }
+                ?.getErrorMessage()
+                ?: response.message()
+            return Resource.Error(response.code(), message)
         }
         return Resource.Success(body)
     } catch (e: Exception) {

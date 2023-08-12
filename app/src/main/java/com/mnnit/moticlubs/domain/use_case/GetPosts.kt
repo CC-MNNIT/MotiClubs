@@ -9,18 +9,13 @@ import kotlinx.coroutines.flow.Flow
 
 class GetPosts(private val repository: Repository) {
 
-    private lateinit var cachedList: List<Post>
-
     operator fun invoke(channelID: Long, page: Int): Flow<Resource<List<Post>>> = repository.networkResource(
         "Error getting posts",
-        query = {
-            cachedList = repository.getPostsFromChannel(channelID, page)
-            cachedList
-        },
-        apiCall = { apiService, auth -> apiService.getPostsFromClubChannel(auth, channelID, page) },
-        saveResponse = {
-            cachedList.forEach { post -> repository.deletePost(post) }
-            it.map { postDto -> postDto.mapToDomain(page) }
+        query = { repository.getPostsFromChannel(channelID, page) },
+        apiCall = { apiService, auth -> apiService.getPostsFromChannel(auth, channelID, page) },
+        saveResponse = { old, new ->
+            old.forEach { post -> repository.deletePost(post) }
+            new.map { postDto -> postDto.mapToDomain(page) }
                 .forEach { post -> repository.insertOrUpdatePost(post) }
         }
     )

@@ -21,7 +21,7 @@ fun Context.getAuthToken(): String =
 fun Context.clubHasUnreadPost(channels: List<Channel>): Boolean {
     var has = false
     for (i in channels.indices) {
-        if (getUnreadPost(channels[i].channelID).isNotEmpty()) {
+        if (getUnreadPost(channels[i].channelId).isNotEmpty()) {
             has = true
             break
         }
@@ -41,10 +41,10 @@ fun Context.getUnreadPost(channelID: Long) =
         .getStringSet("ch$channelID", setOf())
         ?.toMutableSet() ?: setOf<String>().toMutableSet()
 
-fun Context.getExpandedChannel(clubID: Int): Boolean =
+fun Context.getExpandedChannel(clubID: Long): Boolean =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getBoolean("cl$clubID", false)
 
-fun Context.setExpandedChannel(clubID: Int, expanded: Boolean) {
+fun Context.setExpandedChannel(clubID: Long, expanded: Boolean) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
         .edit().putBoolean("cl$clubID", expanded).apply()
 }

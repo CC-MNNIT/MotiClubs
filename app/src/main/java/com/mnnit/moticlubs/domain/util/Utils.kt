@@ -17,14 +17,23 @@ object Constants {
     const val APP_SCHEME_URL = "app://moticlubs.mnnit.com"
     const val TOKEN = "token"
 
-//    const val BASE_URL = "https://api-moticlubs.up.railway.app/"
-//    const val BASE_URL = "http://172.18.19.238:3000/api/"
-//    const val BASE_URL = "http://192.168.1.114:3000/api/"
-//    const val BASE_URL = "http://192.168.1.114:8002/api/"
-    const val BASE_URL = "https://sac.mnnit.ac.in/api/"
+    const val AUTHORIZATION_HEADER = "Authorization"
 
-    // either "" or "/"
-    const val URL_PREFIX = ""
+    const val BASE_URL = "https://sac.mnnit.ac.in/moticlubs/"
+    private const val URL_PREFIX = "api/v1"
+    const val CHANNEL_ROUTE = "$BASE_URL$URL_PREFIX/channel"
+    const val CLUB_ROUTE = "$BASE_URL$URL_PREFIX/clubs"
+    const val POST_ROUTE = "$BASE_URL$URL_PREFIX/posts"
+    const val REPLY_ROUTE = "$BASE_URL$URL_PREFIX/reply"
+    const val URL_ROUTE = "$BASE_URL$URL_PREFIX/url"
+    const val USER_ROUTE = "$BASE_URL$URL_PREFIX/user"
+    const val VIEW_ROUTE = "$BASE_URL$URL_PREFIX/views"
+
+    const val USER_ID_CLAIM = "userId"
+    const val CLUB_ID_CLAIM = "clubId"
+    const val CHANNEL_ID_CLAIM = "channelId"
+    const val POST_ID_CLAIM = "postId"
+    const val REPLY_ID_CLAIM = "replyId"
 }
 
 fun Context.getMkdFormatter() = Markwon.builder(this)

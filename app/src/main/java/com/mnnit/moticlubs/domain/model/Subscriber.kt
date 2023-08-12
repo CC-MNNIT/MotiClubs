@@ -6,10 +6,10 @@ import androidx.room.Entity
 @Entity(tableName = "subscriber", primaryKeys = ["uid", "cid"])
 data class Subscriber(
     @ColumnInfo(name = "uid", index = true)
-    val userID: Long,
+    val userId: Long,
 
     @ColumnInfo(name = "cid", index = true)
-    val clubID: Int
+    val clubId: Long,
 ) {
     constructor() : this(-1, -1)
 }

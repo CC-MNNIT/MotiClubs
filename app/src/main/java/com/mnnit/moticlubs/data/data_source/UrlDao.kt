@@ -10,7 +10,7 @@ interface UrlDao {
     suspend fun insertOrUpdateUrl(url: Url)
 
     @Query("SELECT * FROM url WHERE url.cid = :clubID")
-    suspend fun getUrlsFromClub(clubID: Int): List<Url>
+    suspend fun getUrlsFromClub(clubID: Long): List<Url>
 
     @Delete
     suspend fun deleteUrl(url: Url)

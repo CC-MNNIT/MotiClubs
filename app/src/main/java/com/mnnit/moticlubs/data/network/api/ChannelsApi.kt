@@ -1,32 +1,36 @@
 package com.mnnit.moticlubs.data.network.api
 
 import com.mnnit.moticlubs.data.network.dto.ChannelDto
-import com.mnnit.moticlubs.domain.util.Constants.URL_PREFIX
+import com.mnnit.moticlubs.data.network.dto.UpdateChannelDto
+import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
+import com.mnnit.moticlubs.domain.util.Constants.CHANNEL_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.CHANNEL_ROUTE
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface ChannelsApi {
 
-    @GET("${URL_PREFIX}channel")
-    suspend fun getAllChannels(@Header("Authorization") auth: String?): Response<List<ChannelDto>?>
+    @GET(CHANNEL_ROUTE)
+    suspend fun getAllChannels(@Header(AUTHORIZATION_HEADER) auth: String?): Response<List<ChannelDto>?>
 
-    @POST("${URL_PREFIX}channel")
+    @POST(CHANNEL_ROUTE)
     suspend fun createChannel(
-        @Header("Authorization") auth: String?,
-        @Body channelDto: ChannelDto
-    ): Response<ResponseBody?>
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Body channelDto: ChannelDto,
+    ): Response<ChannelDto?>
 
-    @PUT("${URL_PREFIX}channel/{channelId}")
+    @PUT("$CHANNEL_ROUTE/{$CHANNEL_ID_CLAIM}")
     suspend fun updateChannelName(
         @Header("Authorization") auth: String?,
-        @Path("channelId") channelID: Long,
-        @Body channelDto: ChannelDto
-    ): Response<ResponseBody?>
+        @Path("channelId") channelId: Long,
+        @Body updateChannelDto: UpdateChannelDto,
+    ): Response<ChannelDto?>
 
-    @DELETE("${URL_PREFIX}channel/{channelId}")
+    @DELETE("$CHANNEL_ROUTE/{$CHANNEL_ID_CLAIM}")
     suspend fun deleteChannel(
         @Header("Authorization") auth: String?,
-        @Path("channelId") channelID: Long
+        @Path("channelId") channelId: Long,
+        @Query("clubId") clubId: Long,
     ): Response<ResponseBody?>
 }

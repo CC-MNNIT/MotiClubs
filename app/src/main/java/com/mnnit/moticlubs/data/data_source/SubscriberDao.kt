@@ -10,7 +10,7 @@ interface SubscriberDao {
     suspend fun insertOrUpdateSubscriber(subscriber: Subscriber)
 
     @Query("SELECT * FROM subscriber WHERE subscriber.cid = :clubID")
-    suspend fun getSubscribers(clubID: Int): List<Subscriber>
+    suspend fun getSubscribers(clubID: Long): List<Subscriber>
 
     @Delete
     suspend fun deleteSubscriber(subscriber: Subscriber)

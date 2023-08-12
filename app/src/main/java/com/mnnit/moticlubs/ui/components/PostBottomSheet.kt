@@ -137,7 +137,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                         enabled = viewModel.showProgress.value || viewModel.replyMsg.value.isNotEmpty(),
                         onClick = {
                             if (viewModel.replyMsg.value.isEmpty()) return@IconButton
-                            viewModel.sendReply(-1)
+                            viewModel.sendReply()
                         }) {
                         Icon(imageVector = Icons.Rounded.Send, contentDescription = "")
                     }
@@ -154,6 +154,11 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
     Box(modifier = modifier) {
         LazyColumn(state = scrollState, modifier = Modifier.fillMaxSize(), reverseLayout = true) {
             items(viewModel.replyList.size) {
+                val reply = viewModel.replyList[viewModel.replyList.size - 1 - it]
+                if (!viewModel.userMap.containsKey(reply.userId)) {
+                    viewModel.getUser(reply.userId)
+                }
+
                 Card(
                     modifier = Modifier.padding(bottom = 16.dp),
                     elevation = CardDefaults.cardElevation(0.dp),
@@ -167,14 +172,14 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
                     ) {
                         ProfilePicture(
                             modifier = Modifier.align(Alignment.Top),
-                            url = viewModel.userMap[viewModel.replyList[viewModel.replyList.size - 1 - it].userID]!!.avatar,
+                            url = viewModel.userMap[reply.userId]?.avatar ?: "",
                             size = 42.dp
                         )
 
                         Column {
                             Row {
                                 Text(
-                                    text = viewModel.userMap[viewModel.replyList[viewModel.replyList.size - 1 - it].userID]!!.name,
+                                    text = viewModel.userMap[reply.userId]?.name ?: "",
                                     style = MaterialTheme.typography.headlineMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.padding(start = 8.dp),
@@ -182,14 +187,14 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Text(
-                                    text = viewModel.replyList[viewModel.replyList.size - it - 1].time.toTimeString(),
+                                    text = reply.time.toTimeString(),
                                     style = MaterialTheme.typography.bodySmall,
                                     fontSize = 12.sp
                                 )
                             }
 
                             MarkdownText(
-                                markdown = viewModel.replyList[viewModel.replyList.size - it - 1].message,
+                                markdown = reply.message,
                                 color = contentColorFor(backgroundColor = getColorScheme().background),
                                 maxLines = 4,
                                 modifier = Modifier.padding(start = 8.dp, end = 8.dp),

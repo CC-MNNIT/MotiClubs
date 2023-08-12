@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class ClubModel(
     @SerializedName("cid")
     @Expose
-    var id: Int,
+    var clubId: Long,
 
     @SerializedName("name")
     @Expose
@@ -26,45 +26,6 @@ data class ClubModel(
     @SerializedName("summary")
     @Expose
     var summary: String,
-
-    @SerializedName("admins")
-    @Expose
-    var admins: List<ClubUserDto>,
-
-    @SerializedName("channels")
-    @Expose
-    var channels: List<ChannelDto>
-) : Parcelable
-
-@Parcelize
-data class ClubDetailModel(
-    @SerializedName("cid")
-    @Expose
-    var clubID: Int,
-
-    @SerializedName("name")
-    @Expose
-    var name: String,
-
-    @SerializedName("description")
-    @Expose
-    var description: String,
-
-    @SerializedName("avatar")
-    @Expose
-    var avatar: String,
-
-    @SerializedName("summary")
-    @Expose
-    var summary: String,
-
-    @SerializedName("admins")
-    @Expose
-    var admins: List<ClubUserDto>,
-
-    @SerializedName("subscribers")
-    @Expose
-    var subscribers: Int
 ) : Parcelable
 
 data class UpdateClubDto(
@@ -84,16 +45,9 @@ data class UpdateClubDto(
 data class SubscriberDto(
     @SerializedName("uid")
     @Expose
-    var userID: Long,
+    var userId: Long,
 
     @SerializedName("cid")
     @Expose
-    var clubID: Int
+    var clubId: Long,
 )
-
-@Parcelize
-data class ClubUserDto(
-    @SerializedName("userId")
-    @Expose
-    var userID: Long
-) : Parcelable

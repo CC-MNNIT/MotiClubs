@@ -29,7 +29,6 @@ import com.mnnit.moticlubs.domain.util.getAuthToken
 import com.mnnit.moticlubs.domain.util.getMkdFormatter
 import com.mnnit.moticlubs.domain.util.getUserID
 import com.mnnit.moticlubs.domain.util.postRead
-import com.mnnit.moticlubs.domain.util.toTimeString
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +60,7 @@ class AppFCMService : FirebaseMessagingService() {
 
         val user = FirebaseAuth.getInstance().currentUser
         user ?: return
-        Log.d(TAG, "onMessageReceived")
+        Log.d(TAG, "onMessageReceived: user present")
 
         Handler(mainLooper).post { handleData(message.data) }
     }
@@ -146,8 +145,7 @@ class AppFCMService : FirebaseMessagingService() {
         val message = data["message"] ?: ""
         val adminName = data["adminName"] ?: ""
         val url = data["adminAvatar"] ?: ""
-        val updated = (data["updated"]?.toInt() ?: 0) == 1
-        val time = data["time"]!!.toLong()
+        val updated = data["updated"]?.toBoolean() ?: false
 
         LocalBroadcastManager.getInstance(this)
             .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.post"))
@@ -160,7 +158,7 @@ class AppFCMService : FirebaseMessagingService() {
         val post = PostNotificationModel(
             clubName, channelName,
             channelID, postID, userID, adminName, url,
-            message, time.toTimeString()
+            message
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(
@@ -196,10 +194,8 @@ class AppFCMService : FirebaseMessagingService() {
         val postID = data["pid"]?.toLong() ?: -1
         val clubID = data["cid"]?.toInt() ?: -1
         val userID = data["uid"]?.toLong() ?: -1
-//        val toUserID = data["to_uid"]?.toLong() ?: -1
         val message = data["message"] ?: ""
         val postMessage = data["postMessage"] ?: ""
-        val time = data["time"]!!.toLong()
         val userName = data["userName"] ?: ""
         val url = data["userAvatar"] ?: ""
 
@@ -214,7 +210,7 @@ class AppFCMService : FirebaseMessagingService() {
         val post = PostNotificationModel(
             clubName, channelName,
             channelID, postID, userID, userName, url,
-            postMessage, time.toTimeString()
+            postMessage,
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(
@@ -230,7 +226,7 @@ class AppFCMService : FirebaseMessagingService() {
 
         notificationCompat(
             notificationManager,
-            notificationStamp = time,
+            notificationStamp = postID,
             clubID.toString(),
             clubName,
             "$userName replied in $clubName",

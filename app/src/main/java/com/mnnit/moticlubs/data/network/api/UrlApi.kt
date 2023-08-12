@@ -2,23 +2,24 @@ package com.mnnit.moticlubs.data.network.api
 
 import com.mnnit.moticlubs.data.network.dto.UrlDto
 import com.mnnit.moticlubs.data.network.dto.UrlResponseModel
-import com.mnnit.moticlubs.domain.util.Constants.URL_PREFIX
-import okhttp3.ResponseBody
+import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
+import com.mnnit.moticlubs.domain.util.Constants.CLUB_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.URL_ROUTE
 import retrofit2.Response
 import retrofit2.http.*
 
 interface UrlApi {
 
-    @GET("${URL_PREFIX}url")
+    @GET(URL_ROUTE)
     suspend fun getUrls(
-        @Header("Authorization") auth: String?,
-        @Query("clubId") clubID: Int
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Query(CLUB_ID_CLAIM) clubId: Long
     ): Response<List<UrlResponseModel>?>
 
-    @POST("${URL_PREFIX}url")
+    @POST(URL_ROUTE)
     suspend fun pushUrls(
-        @Header("Authorization") auth: String?,
-        @Query("clubId") clubID: Int,
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Query(CLUB_ID_CLAIM) clubId: Long,
         @Body urlDto: UrlDto
-    ): Response<ResponseBody?>
+    ): Response<List<UrlResponseModel>?>
 }

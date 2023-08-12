@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -60,7 +61,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
 
     val otherLinks = mutableStateListOf<Url>()
     val otherLinksLiveList = mutableStateListOf<OtherLinkComposeModel>()
-    val otherLinkIdx = mutableStateOf(0)
+    val otherLinkIdx = mutableIntStateOf(0)
 
     val socialLinksLiveList = mutableStateListOf(
         SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel()
@@ -80,15 +81,15 @@ class ClubDetailsScreenViewModel @Inject constructor(
             }
 
             resource.d?.let { list ->
-                val admins = list.filter { admin -> admin.clubID == clubModel.clubID }
-                isAdmin = admins.any { admin -> admin.userID == userModel.userID }
+                val admins = list.filter { admin -> admin.clubId == clubModel.clubId }
+                isAdmin = admins.any { admin -> admin.userId == userModel.userId }
             }
         }
     }
 
     private fun getSubscribers() {
         getSubscribersJob?.cancel()
-        getSubscribersJob = subscriberUseCases.getSubscribers(clubModel.clubID).onEach { resource ->
+        getSubscribersJob = subscriberUseCases.getSubscribers(clubModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
@@ -96,12 +97,14 @@ class ClubDetailsScreenViewModel @Inject constructor(
                         subscriberList.addAll(list)
                     }
                 }
+
                 is Resource.Success -> {
                     subscriberList.clear()
                     subscriberList.addAll(resource.data)
 
                     Log.d("TAG", "getSubscribers: ${subscriberList.size}")
                 }
+
                 is Resource.Error -> {
                     Log.d("TAG", "getSubscribers: error: ${resource.errCode} : ${resource.errMsg}")
                 }
@@ -116,19 +119,21 @@ class ClubDetailsScreenViewModel @Inject constructor(
         showOtherLinkDialog.value = false
 
         addUrlsJob?.cancel()
-        addUrlsJob = urlUseCases.addUrls(clubID = clubModel.clubID, list)
+        addUrlsJob = urlUseCases.addUrls(clubId = clubModel.clubId, list)
             .onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> {
                         isFetching = true
                         resource.data?.let { list -> mapUrlList(list) }
                     }
+
                     is Resource.Success -> {
                         isFetching = false
                         showProgressDialog.value = false
                         mapUrlList(resource.data)
                         Toast.makeText(application, "Links updated", Toast.LENGTH_SHORT).show()
                     }
+
                     is Resource.Error -> {
                         isFetching = false
                         showProgressDialog.value = false
@@ -155,12 +160,14 @@ class ClubDetailsScreenViewModel @Inject constructor(
                             displayedDescription = clubModel.description
                         }
                     }
+
                     is Resource.Success -> {
                         isFetching = false
                         clubModel = resource.data
                         displayedDescription = clubModel.description
                         onResponse()
                     }
+
                     is Resource.Error -> {
                         isFetching = false
                         onFailure(resource.errCode)
@@ -173,16 +180,18 @@ class ClubDetailsScreenViewModel @Inject constructor(
         isFetching = true
 
         getUrlsJob?.cancel()
-        getUrlsJob = urlUseCases.getUrls(clubID = clubModel.clubID).onEach { resource ->
+        getUrlsJob = urlUseCases.getUrls(clubId = clubModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     isFetching = true
                     resource.data?.let { list -> mapUrlList(list) }
                 }
+
                 is Resource.Success -> {
                     isFetching = false
                     mapUrlList(resource.data)
                 }
+
                 is Resource.Error -> {
                     isFetching = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
@@ -208,7 +217,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
         for (i in socialLinks.indices) {
             socialLinksLiveList[i] = socialLinks[i].mapToSocialLinkModel().apply {
                 this.urlName = SocialLinkComposeModel.socialLinkNames[i]
-                this.clubID = clubModel.clubID
+                this.clubID = clubModel.clubId
             }
         }
 

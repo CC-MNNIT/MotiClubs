@@ -1,7 +1,10 @@
 package com.mnnit.moticlubs.data.network.api
 
 import com.mnnit.moticlubs.data.network.dto.ReplyDto
-import com.mnnit.moticlubs.domain.util.Constants.URL_PREFIX
+import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
+import com.mnnit.moticlubs.domain.util.Constants.POST_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.REPLY_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.REPLY_ROUTE
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -13,21 +16,21 @@ import retrofit2.http.Query
 
 interface ReplyApi {
 
-    @GET("${URL_PREFIX}reply")
+    @GET(REPLY_ROUTE)
     suspend fun getReplies(
-        @Header("Authorization") auth: String?,
-        @Query("postId") postID: Long
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Query(POST_ID_CLAIM) postId: Long,
     ): Response<List<ReplyDto>?>
 
-    @POST("${URL_PREFIX}reply")
+    @POST(REPLY_ROUTE)
     suspend fun postReply(
-        @Header("Authorization") auth: String?,
-        @Body replyDto: ReplyDto
-    ): Response<ResponseBody?>
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Body replyDto: ReplyDto,
+    ): Response<ReplyDto?>
 
-    @DELETE("${URL_PREFIX}reply")
+    @DELETE(REPLY_ROUTE)
     suspend fun deleteReply(
-        @Header("Authorization") auth: String?,
-        @Query("replyId") replyID: Long
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Query(REPLY_ID_CLAIM) replyId: Long,
     ): Response<ResponseBody?>
 }

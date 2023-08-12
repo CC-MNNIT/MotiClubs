@@ -58,13 +58,12 @@ fun PostItem(
                 PostNotificationModel(
                     clubModel.name,
                     channelModel.name,
-                    channelModel.channelID,
-                    postsList[idx].postID,
+                    channelModel.channelId,
+                    postsList[idx].postId,
                     userID,
                     admin.name,
                     admin.avatar,
                     postsList[idx].message,
-                    postsList[idx].time.toTimeString()
                 )
             )
         },
@@ -86,12 +85,12 @@ fun PostItem(
                     size = 42.dp
                 )
 
-                AuthorNameTimestamp(postsList[idx].time, admin.name)
+                AuthorNameTimestamp(postsList[idx].postId, admin.name)
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(
-                    visible = LocalContext.current.getUnreadPost(channelModel.channelID)
-                        .contains(postsList[idx].postID.toString()),
+                    visible = LocalContext.current.getUnreadPost(channelModel.channelId)
+                        .contains(postsList[idx].postId.toString()),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .padding(16.dp)
@@ -101,7 +100,7 @@ fun PostItem(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                AnimatedVisibility(visible = postsList[idx].userID == userID) {
+                AnimatedVisibility(visible = postsList[idx].userId == userID) {
                     IconButton(onClick = {
                         eventUpdatePost.value = postsList[idx]
                         editMode.value = true
@@ -129,7 +128,7 @@ fun PostItem(
                         )
                     }
                 }
-                AnimatedVisibility(visible = postsList[idx].userID == userID) {
+                AnimatedVisibility(visible = postsList[idx].userId == userID) {
                     IconButton(onClick = {
                         eventDeletePost.value = postsList[idx]
                         showDelPostDialog.value = true

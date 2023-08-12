@@ -111,7 +111,7 @@ class ClubScreenViewModel @Inject constructor(
         }
 
         getPostsJob?.cancel()
-        getPostsJob = postUseCases.getPosts(channelModel.channelID, postPage).onEach { resource ->
+        getPostsJob = postUseCases.getPosts(channelModel.channelId, postPage).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
@@ -155,7 +155,7 @@ class ClubScreenViewModel @Inject constructor(
 
     private fun getSubscribers() {
         getSubscribersJob?.cancel()
-        getSubscribersJob = subscriberUseCases.getSubscribers(clubModel.clubID).onEach { resource ->
+        getSubscribersJob = subscriberUseCases.getSubscribers(clubModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
@@ -169,7 +169,7 @@ class ClubScreenViewModel @Inject constructor(
                     subscriberList.addAll(resource.data)
 
                     userSubscribed.value = subscriberList.any { s ->
-                        s.userID == userModel.userID && s.clubID == clubModel.clubID
+                        s.userId == userModel.userId && s.clubId == clubModel.clubId
                     }
 
                     Log.d("TAG", "fetchSubscribers: ${subscriberList.size}")
@@ -190,14 +190,14 @@ class ClubScreenViewModel @Inject constructor(
             }
 
             resource.d?.let { list ->
-                val admins = list.filter { admin -> admin.clubID == clubModel.clubID }
-                isAdmin = admins.any { admin -> admin.userID == userModel.userID }
+                val admins = list.filter { admin -> admin.clubId == clubModel.clubId }
+                isAdmin = admins.any { admin -> admin.userId == userModel.userId }
 
                 admins.forEach { admin ->
-                    val adminUserRes = userUseCases.getUser(admin.userID).first()
+                    val adminUserRes = userUseCases.getUser(admin.userId).first()
 
                     if (adminUserRes !is Resource.Error) {
-                        adminUserRes.d?.let { adminUser -> adminMap[admin.userID] = adminUser }
+                        adminUserRes.d?.let { adminUser -> adminMap[admin.userId] = adminUser }
                     }
                 }
             }
@@ -209,7 +209,7 @@ class ClubScreenViewModel @Inject constructor(
 
         subscriberJob?.cancel()
         subscriberJob = if (subscribe) {
-            subscriberUseCases.subscribeClub(Subscriber(userModel.userID, clubModel.clubID)).onEach { resource ->
+            subscriberUseCases.subscribeClub(Subscriber(userModel.userId, clubModel.clubId)).onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> showProgress.value = true
                     is Resource.Success -> {
@@ -226,7 +226,7 @@ class ClubScreenViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
         } else {
-            subscriberUseCases.unsubscribeClub(Subscriber(userModel.userID, clubModel.clubID)).onEach { resource ->
+            subscriberUseCases.unsubscribeClub(Subscriber(userModel.userId, clubModel.clubId)).onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> showProgress.value = true
                     is Resource.Success -> {
@@ -253,12 +253,12 @@ class ClubScreenViewModel @Inject constructor(
             text = text.replace(key.replace("\n", ""), value)
         }
 
-        val channelID = channelModel.channelID
+        val channelID = channelModel.channelId
         val time = System.currentTimeMillis()
         crudPostJob?.cancel()
         crudPostJob = postUseCases.sendPost(
-            Post(time, channelID, pageNo = 1, text, time, userModel.userID),
-            clubModel.clubID, 1
+            Post(time, channelID, pageNo = 1, text, userModel.userId),
+            clubModel.clubId, 1
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
@@ -289,13 +289,13 @@ class ClubScreenViewModel @Inject constructor(
 
         crudPostJob?.cancel()
         val post = eventUpdatePost.value.copy(message = text)
-        crudPostJob = postUseCases.updatePost(post).onEach { resource ->
+        crudPostJob = postUseCases.updatePost(post, channelModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
                     Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
 
-                    postsList.replaceAll { p -> if (p.postID == post.postID) post else p }
+                    postsList.replaceAll { p -> if (p.postId == post.postId) post else p }
                     clearEditor()
                 }
 
@@ -308,18 +308,18 @@ class ClubScreenViewModel @Inject constructor(
     }
 
     fun deletePost() {
-        if (eventDeletePost.value.time == 0L) return
+        if (eventDeletePost.value.postId == 0L) return
         progressText.value = "Deleting ..."
         showProgress.value = true
 
         crudPostJob?.cancel()
-        crudPostJob = postUseCases.deletePost(eventDeletePost.value).onEach { resource ->
+        crudPostJob = postUseCases.deletePost(eventDeletePost.value, clubModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
                     Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
 
-                    postsList.removeIf { post -> post.postID == eventDeletePost.value.postID }
+                    postsList.removeIf { post -> post.postId == eventDeletePost.value.postId }
                     showProgress.value = false
                 }
 

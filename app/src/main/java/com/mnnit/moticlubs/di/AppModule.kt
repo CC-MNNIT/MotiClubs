@@ -76,7 +76,6 @@ object AppModule {
     fun provideUserUseCases(repository: Repository): UserUseCases =
         UserUseCases(
             getUser = GetUser(repository),
-            getAllUsers = GetAllUsers(repository),
             updateUser = UpdateUser(repository)
         )
 

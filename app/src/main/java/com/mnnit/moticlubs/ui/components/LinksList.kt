@@ -32,7 +32,7 @@ abstract class LinkComposeModel {
 
 data class SocialLinkComposeModel(
     val urlID: Long = -1L,
-    var clubID: Int,
+    var clubID: Long,
     var urlName: String,
     val urlFieldValue: MutableState<TextFieldValue>,
     val colorCode: MutableState<String>,
@@ -55,7 +55,7 @@ data class SocialLinkComposeModel(
 
     fun mapToUrlModel(): UrlModel {
         return UrlModel(
-            urlID = if (urlID == -1L) System.currentTimeMillis() else urlID,
+            urlId = if (urlID == -1L) System.currentTimeMillis() else urlID,
             name = urlName.trim(),
             color = socialColors[socialLinkNames.indexOf(urlName.trim())],
             url = urlFieldValue.value.text.toLowerCase(LocaleList.current).trim()
@@ -69,7 +69,7 @@ data class SocialLinkComposeModel(
 
 data class OtherLinkComposeModel(
     val urlID: Long = -1L,
-    val clubID: Int,
+    val clubID: Long,
     val fieldValue: MutableState<TextFieldValue>,
     val colorCode: MutableState<String>,
     val color: MutableState<Color>,
@@ -86,7 +86,7 @@ data class OtherLinkComposeModel(
     fun mapToUrlModel(): UrlModel {
         val tokens = fieldValue.value.text.split("\\")
         return UrlModel(
-            urlID = if (urlID == -1L) System.currentTimeMillis() else urlID,
+            urlId = if (urlID == -1L) System.currentTimeMillis() else urlID,
             name = tokens[0].trim(),
             color = colorCode.value.replace("#", ""),
             url = tokens[1].toLowerCase(LocaleList.current).trim()

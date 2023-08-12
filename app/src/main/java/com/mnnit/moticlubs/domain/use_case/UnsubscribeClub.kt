@@ -12,7 +12,7 @@ class UnsubscribeClub(private val repository: Repository) {
     operator fun invoke(subscriber: Subscriber): Flow<Resource<Unit>> = repository.networkResource(
         "Unable to unsubscribe club",
         query = {},
-        apiCall = { apiService, auth -> apiService.unsubscribeToClub(auth, SubscribedClubDto(subscriber.clubID)) },
-        saveResponse = { repository.deleteSubscriber(subscriber) }
+        apiCall = { apiService, auth -> apiService.unsubscribeToClub(auth, SubscribedClubDto(subscriber.clubId)) },
+        saveResponse = { _, _ -> repository.deleteSubscriber(subscriber) }
     )
 }

@@ -8,11 +8,11 @@ import kotlinx.parcelize.Parcelize
 data class UrlResponseModel(
     @SerializedName("urlId")
     @Expose
-    var urlID: Long,
+    var urlId: Long,
 
     @SerializedName("cid")
     @Expose
-    var clubID: Int,
+    var clubId: Long,
 
     @SerializedName("name")
     @Expose
@@ -30,13 +30,13 @@ data class UrlResponseModel(
 data class UrlDto(
     @SerializedName("urls")
     @Expose
-    var list: List<UrlModel>
+    var list: List<UrlModel>,
 )
 
 data class UrlModel(
     @SerializedName("urlId")
     @Expose
-    var urlID: Long,
+    var urlId: Long,
 
     @SerializedName("name")
     @Expose

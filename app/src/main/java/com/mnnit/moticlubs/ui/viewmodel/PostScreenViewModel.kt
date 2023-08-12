@@ -77,25 +77,25 @@ class PostScreenViewModel @Inject constructor(
         )
     )
 
-    private fun getUsers() {
+    private var getRepliesJob: Job? = null
+    private var getViewJob: Job? = null
+    private var sendReplyJob: Job? = null
+    private var viewPostJob: Job? = null
+
+    fun getUser(userId: Long) {
         viewModelScope.launch {
-            val users = userUseCases.getAllUsers().first()
-            if (users is Resource.Error) {
+            val user = userUseCases.getUser(userId).first()
+            if (user is Resource.Error) {
                 return@launch
             }
 
-            users.d?.let { list -> list.forEach { user -> userMap[user.userID] = user } }
+            user.d?.let { userMap[userId] = it }
         }
     }
 
-    private var getRepliesJob: Job? = null
-    private var sendReplyJob: Job? = null
-    private var viewPostJob: Job? = null
-    private var getViewJob: Job? = null
-
     fun getReplies() {
         getRepliesJob?.cancel()
-        getRepliesJob = replyUseCases.getReplies(postNotificationModel.postID).onEach { resource ->
+        getRepliesJob = replyUseCases.getReplies(postNotificationModel.postId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     loadingReplies.value = true
@@ -123,16 +123,15 @@ class PostScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun sendReply(to_uid: Long) {
+    fun sendReply() {
         showProgress.value = true
         showDialog.value = true
 
         sendReplyJob?.cancel()
         sendReplyJob = replyUseCases.sendReply(
             Reply(
-                postNotificationModel.postID,
+                postNotificationModel.postId,
                 application.getUserID(),
-                to_uid,
                 replyMsg.value,
                 System.currentTimeMillis()
             )
@@ -158,7 +157,7 @@ class PostScreenViewModel @Inject constructor(
     private fun viewPost() {
         viewPostJob?.cancel()
         viewPostJob =
-            viewUseCases.addViews(View(postNotificationModel.userID, postNotificationModel.postID))
+            viewUseCases.addViews(View(postNotificationModel.userId, postNotificationModel.postId))
                 .onEach { resource ->
                     when (resource) {
                         is Resource.Loading -> resource.data?.let { list ->
@@ -176,7 +175,7 @@ class PostScreenViewModel @Inject constructor(
 
     private fun getViews() {
         getViewJob?.cancel()
-        getViewJob = viewUseCases.getViews(postNotificationModel.postID).onEach { resource ->
+        getViewJob = viewUseCases.getViews(postNotificationModel.postId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> resource.data?.let { list -> viewCount = list.size.toString() }
                 is Resource.Success -> viewCount = resource.data.size.toString()
@@ -200,6 +199,5 @@ class PostScreenViewModel @Inject constructor(
         viewPost()
         getViews()
         getReplies()
-        getUsers()
     }
 }

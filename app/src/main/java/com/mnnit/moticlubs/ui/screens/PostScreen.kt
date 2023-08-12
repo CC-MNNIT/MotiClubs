@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.domain.util.postRead
+import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -31,8 +32,8 @@ import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 @Composable
 fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScreenViewModel = hiltViewModel()) {
     LocalContext.current.postRead(
-        viewModel.postNotificationModel.channelID,
-        viewModel.postNotificationModel.postID,
+        viewModel.postNotificationModel.channelId,
+        viewModel.postNotificationModel.postId,
         true
     )
 
@@ -75,7 +76,7 @@ fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScree
                                     ProfilePicture(url = viewModel.postNotificationModel.adminAvatar, size = 56.dp)
                                     Spacer(modifier = Modifier.width(10.dp))
                                     AdminNameTimestamp(
-                                        time = viewModel.postNotificationModel.time,
+                                        time = viewModel.postNotificationModel.postId.toTimeString(),
                                         name = viewModel.postNotificationModel.adminName
                                     )
                                     Spacer(modifier = Modifier.weight(1f))

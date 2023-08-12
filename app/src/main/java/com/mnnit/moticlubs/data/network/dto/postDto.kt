@@ -6,57 +6,23 @@ import com.google.gson.annotations.SerializedName
 data class PostDto(
     @SerializedName("pid")
     @Expose
-    var postID: Long,
+    var postId: Long,
 
     @SerializedName("chid")
     @Expose
-    var channelID: Long,
+    var channelId: Long,
 
     @SerializedName("message")
     @Expose
     var message: String,
 
-    @SerializedName("time")
-    @Expose
-    var time: Long,
-
     @SerializedName("uid")
     @Expose
-    var userID: Long,
+    var userId: Long,
 
     @SerializedName("general")
     @Expose
-    var general: Int
-)
-
-data class SendPostDto(
-    @SerializedName("pid")
-    @Expose
-    var postID: Long,
-
-    @SerializedName("chid")
-    @Expose
-    var channelID: Long,
-
-    @SerializedName("clubId")
-    @Expose
-    var clubID: Int,
-
-    @SerializedName("message")
-    @Expose
-    var message: String,
-
-    @SerializedName("time")
-    @Expose
-    var time: Long,
-
-    @SerializedName("uid")
-    @Expose
-    var userID: Long,
-
-    @SerializedName("general")
-    @Expose
-    var general: Int
+    var general: Int,
 )
 
 data class UpdatePostModel(

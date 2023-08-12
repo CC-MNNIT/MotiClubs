@@ -25,7 +25,7 @@ interface Repository {
 
     suspend fun getClubs(): List<Club>
 
-    suspend fun getClub(clubID: Int): Club
+    suspend fun getClub(clubID: Long): Club
 
     suspend fun deleteClub(club: Club)
 
@@ -59,7 +59,7 @@ interface Repository {
 
     suspend fun insertOrUpdateSubscriber(subscriber: Subscriber)
 
-    suspend fun getSubscribers(clubID: Int): List<Subscriber>
+    suspend fun getSubscribers(clubID: Long): List<Subscriber>
 
     suspend fun deleteSubscriber(subscriber: Subscriber)
 
@@ -67,7 +67,7 @@ interface Repository {
 
     suspend fun insertOrUpdateUrl(url: Url)
 
-    suspend fun getUrlsFromClub(clubID: Int): List<Url>
+    suspend fun getUrlsFromClub(clubID: Long): List<Url>
 
     suspend fun deleteUrl(url: Url)
 

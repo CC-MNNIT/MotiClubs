@@ -16,9 +16,10 @@ fun Context.connectionAvailable(): Boolean {
     val nwCap = connectivityManager.activeNetwork
     val activeNw = connectivityManager.getNetworkCapabilities(nwCap) ?: return false
     return when {
-        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        activeNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                activeNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                activeNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+
         else -> false
     }
 }

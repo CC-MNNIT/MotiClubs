@@ -9,11 +9,22 @@ import kotlinx.parcelize.Parcelize
 data class ChannelDto(
     @SerializedName("chid")
     @Expose
-    var channelID: Long,
+    var channelId: Long,
 
     @SerializedName("cid")
     @Expose
-    var clubID: Int,
+    var clubId: Long,
+
+    @SerializedName("name")
+    @Expose
+    var name: String
+) : Parcelable
+
+@Parcelize
+data class UpdateChannelDto(
+    @SerializedName("cid")
+    @Expose
+    var clubId: Long,
 
     @SerializedName("name")
     @Expose
@@ -24,7 +35,7 @@ data class ChannelDto(
 data class ChannelNavModel(
     @SerializedName("chid")
     @Expose
-    var id: Long,
+    var channelId: Long,
 
     @SerializedName("name")
     @Expose

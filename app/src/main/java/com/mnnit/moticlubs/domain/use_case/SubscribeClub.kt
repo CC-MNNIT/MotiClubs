@@ -12,7 +12,7 @@ class SubscribeClub(private val repository: Repository) {
     operator fun invoke(subscriber: Subscriber): Flow<Resource<Unit>> = repository.networkResource(
         "Unable to subscribe club",
         query = {},
-        apiCall = { apiService, auth -> apiService.subscribeToClub(auth, SubscribedClubDto(subscriber.clubID)) },
-        saveResponse = { repository.insertOrUpdateSubscriber(subscriber) }
+        apiCall = { apiService, auth -> apiService.subscribeToClub(auth, SubscribedClubDto(subscriber.clubId)) },
+        saveResponse = { _, new -> repository.insertOrUpdateSubscriber(Subscriber(new.userId, new.clubId)) }
     )
 }

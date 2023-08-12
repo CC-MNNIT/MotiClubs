@@ -43,7 +43,7 @@ class HomeScreenViewModel @Inject constructor(
     var user by mutableStateOf(User())
     val adminList = mutableStateListOf<Admin>()
     val clubsList = mutableStateListOf<Club>()
-    val channelMap = mutableMapOf<Int, SnapshotStateList<Channel>>()
+    val channelMap = mutableMapOf<Long, SnapshotStateList<Channel>>()
 
     var isFetchingAdmins by mutableStateOf(false)
     var isFetchingChannels by mutableStateOf(false)
@@ -77,8 +77,8 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
-                    channelMap[eventChannel.clubID]?.add(eventChannel)
+                    channelMap[eventChannel.clubId]?.removeIf { m -> m.channelId == eventChannel.channelId }
+                    channelMap[eventChannel.clubId]?.add(eventChannel)
                     showProgressDialog = false
 
                     Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
@@ -103,8 +103,8 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
-                    channelMap[eventChannel.clubID]?.add(eventChannel)
+                    channelMap[eventChannel.clubId]?.removeIf { m -> m.channelId == eventChannel.channelId }
+                    channelMap[eventChannel.clubId]?.add(eventChannel)
                     showProgressDialog = false
 
                     Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
@@ -129,7 +129,7 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    channelMap[eventChannel.clubID]?.removeIf { m -> m.channelID == eventChannel.channelID }
+                    channelMap[eventChannel.clubId]?.removeIf { m -> m.channelId == eventChannel.channelId }
                     showProgressDialog = false
 
                     Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
@@ -241,15 +241,15 @@ class HomeScreenViewModel @Inject constructor(
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
-                        list.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
-                        list.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
+                        list.forEach { channel -> channelMap[channel.clubId] = mutableStateListOf() }
+                        list.forEach { channel -> channelMap[channel.clubId]?.add(channel) }
                     }
                     isFetchingChannels = true
                 }
 
                 is Resource.Success -> {
-                    resource.data.forEach { channel -> channelMap[channel.clubID] = mutableStateListOf() }
-                    resource.data.forEach { channel -> channelMap[channel.clubID]?.add(channel) }
+                    resource.data.forEach { channel -> channelMap[channel.clubId] = mutableStateListOf() }
+                    resource.data.forEach { channel -> channelMap[channel.clubId]?.add(channel) }
                     isFetchingChannels = false
                 }
 

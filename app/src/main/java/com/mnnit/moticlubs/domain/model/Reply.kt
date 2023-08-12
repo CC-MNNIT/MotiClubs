@@ -10,13 +10,10 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "reply")
 data class Reply(
     @ColumnInfo(name = "pid", index = true)
-    val postID: Long,
+    val postId: Long,
 
     @ColumnInfo(name = "uid", index = true)
-    val userID: Long,
-
-    @ColumnInfo(name = "to_uid", index = true)
-    val repliedToUID: Long,
+    val userId: Long,
 
     @ColumnInfo(name = "message")
     val message: String,

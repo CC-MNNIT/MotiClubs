@@ -11,7 +11,7 @@ class DeleteChannel(private val repository: Repository) {
     operator fun invoke(channel: Channel): Flow<Resource<Unit>> = repository.networkResource(
         "Error deleting channel",
         query = {},
-        apiCall = { apiService, auth -> apiService.deleteChannel(auth, channel.channelID) },
-        saveResponse = { repository.deleteChannel(channel) }
+        apiCall = { apiService, auth -> apiService.deleteChannel(auth, channel.channelId, channel.clubId) },
+        saveResponse = { _, _ -> repository.deleteChannel(channel) }
     )
 }

@@ -10,10 +10,10 @@ import kotlinx.parcelize.Parcelize
 data class Post(
     @PrimaryKey
     @ColumnInfo(name = "pid", index = true)
-    val postID: Long,
+    val postId: Long,
 
     @ColumnInfo(name = "chid", index = true)
-    val channelID: Long,
+    val channelId: Long,
 
     @ColumnInfo(name = "page")
     val pageNo: Int,
@@ -21,26 +21,22 @@ data class Post(
     @ColumnInfo(name = "message")
     val message: String,
 
-    @ColumnInfo(name = "time")
-    val time: Long,
-
     @ColumnInfo(name = "uid", index = true)
-    val userID: Long
+    val userId: Long,
 ) {
-    constructor() : this(-1L, -1L, 0, "", 0L, -1)
+    constructor() : this(-1L, -1L, 0, "", 0L)
 }
 
 @Parcelize
 data class PostNotificationModel(
     val clubName: String,
     val channelName: String,
-    val channelID: Long,
-    val postID: Long,
-    val userID: Long,
+    val channelId: Long,
+    val postId: Long,
+    val userId: Long,
     val adminName: String,
     val adminAvatar: String,
     val message: String,
-    val time: String,
 ) : Parcelable {
-    constructor() : this("", "", -1, -1, -1, "", "", "", "")
+    constructor() : this("", "", -1, -1, -1, "", "", "")
 }

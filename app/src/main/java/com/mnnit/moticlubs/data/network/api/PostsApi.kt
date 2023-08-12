@@ -1,40 +1,45 @@
 package com.mnnit.moticlubs.data.network.api
 
 import com.mnnit.moticlubs.data.network.dto.PostDto
-import com.mnnit.moticlubs.data.network.dto.SendPostDto
 import com.mnnit.moticlubs.data.network.dto.UpdatePostModel
-import com.mnnit.moticlubs.domain.util.Constants.URL_PREFIX
+import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
+import com.mnnit.moticlubs.domain.util.Constants.CHANNEL_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.CLUB_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.POST_ID_CLAIM
+import com.mnnit.moticlubs.domain.util.Constants.POST_ROUTE
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface PostsApi {
 
-    @GET("${URL_PREFIX}posts")
-    suspend fun getPostsFromClubChannel(
-        @Header("Authorization") auth: String?,
-        @Query("channelId") channelID: Long,
+    @GET(POST_ROUTE)
+    suspend fun getPostsFromChannel(
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Query(CHANNEL_ID_CLAIM) channelId: Long,
         @Query("page") page: Int,
-        @Query("items") items: Int = 10
+        @Query("items") items: Int = 10,
     ): Response<List<PostDto>?>
 
-    @POST("${URL_PREFIX}posts")
+    @POST(POST_ROUTE)
     suspend fun sendPost(
-        @Header("Authorization") auth: String?,
-        @Body postModel: SendPostDto
-    ): Response<ResponseBody?>
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Query(CLUB_ID_CLAIM) clubId: Long,
+        @Body postDto: PostDto,
+    ): Response<PostDto?>
 
-    @PUT("${URL_PREFIX}posts/{postId}")
+    @PUT("$POST_ROUTE/{$POST_ID_CLAIM}")
     suspend fun updatePost(
-        @Header("Authorization") auth: String?,
-        @Path("postId") postID: Long,
-        @Body postModel: UpdatePostModel
-    ): Response<ResponseBody?>
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Path(POST_ID_CLAIM) postId: Long,
+        @Query(CLUB_ID_CLAIM) clubId: Long,
+        @Body postModel: UpdatePostModel,
+    ): Response<PostDto?>
 
-    @DELETE("${URL_PREFIX}posts/{postId}")
+    @DELETE("$POST_ROUTE/{$POST_ID_CLAIM}")
     suspend fun deletePost(
-        @Header("Authorization") auth: String?,
-        @Path("postId") postID: Long,
-        @Query("channelId") channelID: Long
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Path(POST_ID_CLAIM) postId: Long,
+        @Query(CLUB_ID_CLAIM) clubId: Long,
     ): Response<ResponseBody?>
 }

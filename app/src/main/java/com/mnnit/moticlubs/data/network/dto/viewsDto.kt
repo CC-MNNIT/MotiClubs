@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 data class ViewDto(
     @SerializedName("pid")
     @Expose
-    var postID: Long,
+    var postId: Long,
 
     @SerializedName("uid")
     @Expose
-    var userID: Long
+    var userId: Long
 )

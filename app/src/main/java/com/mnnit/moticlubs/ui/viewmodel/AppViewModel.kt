@@ -60,10 +60,10 @@ class AppViewModel @Inject constructor(
             application.setAuthToken(it.token ?: "")
 
             getUserJob?.cancel()
-            getUserJob = userUseCases.getAllUsers().onEach { resource ->
+            getUserJob = userUseCases.getUser(currentUserID).onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        resource.data?.let { list -> user = list.find { usr -> usr.userID == currentUserID } ?: User() }
+                        resource.data?.let { user -> this.user = user }
                         fetchingState = true
                         showErrorScreen = false
                     }
@@ -73,7 +73,7 @@ class AppViewModel @Inject constructor(
                         showErrorScreen = false
                         showSplashScreen = false
 
-                        user = resource.data.find { usr -> usr.userID == currentUserID } ?: User()
+                        user = resource.data
                         onResponse()
                     }
 

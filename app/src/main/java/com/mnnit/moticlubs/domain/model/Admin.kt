@@ -6,8 +6,8 @@ import androidx.room.Entity
 @Entity(tableName = "admin", primaryKeys = ["uid", "cid"])
 data class Admin(
     @ColumnInfo(name = "uid", index = true)
-    val userID: Long,
+    val userId: Long,
 
     @ColumnInfo(name = "cid", index = true)
-    val clubID: Int
+    val clubId: Long,
 )

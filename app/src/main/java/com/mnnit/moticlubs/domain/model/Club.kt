@@ -3,7 +3,6 @@ package com.mnnit.moticlubs.domain.model
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
@@ -12,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 data class Club(
     @PrimaryKey
     @ColumnInfo(name = "cid", index = true)
-    val clubID: Int,
+    val clubId: Long,
 
     @ColumnInfo(name = "name")
     val name: String,
@@ -24,7 +23,7 @@ data class Club(
     val avatar: String,
 
     @ColumnInfo(name = "summary")
-    val summary: String
+    val summary: String,
 ) : Parcelable {
     constructor() : this(-1, "", "", "", "")
 }

@@ -17,7 +17,7 @@ interface ClubDao {
     suspend fun getClubs(): List<Club>
 
     @Query("SELECT * FROM club WHERE club.cid = :clubID")
-    suspend fun getClub(clubID: Int): Club
+    suspend fun getClub(clubID: Long): Club
 
     @Delete
     suspend fun deleteClub(club: Club)

@@ -6,15 +6,11 @@ import com.google.gson.annotations.SerializedName
 data class ReplyDto(
     @SerializedName("pid")
     @Expose
-    var postID: Long,
+    var postId: Long,
 
     @SerializedName("uid")
     @Expose
-    var userID: Long,
-
-    @SerializedName("to_uid")
-    @Expose
-    var toUID: Long,
+    var userId: Long,
 
     @SerializedName("message")
     @Expose

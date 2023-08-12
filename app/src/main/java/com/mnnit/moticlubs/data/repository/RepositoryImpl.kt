@@ -54,7 +54,7 @@ class RepositoryImpl(
         return dao.getClubs()
     }
 
-    override suspend fun getClub(clubID: Int): Club {
+    override suspend fun getClub(clubID: Long): Club {
         return dao.getClub(clubID)
     }
 
@@ -114,7 +114,7 @@ class RepositoryImpl(
         db.withTransaction { dao.insertOrUpdateSubscriber(subscriber) }
     }
 
-    override suspend fun getSubscribers(clubID: Int): List<Subscriber> {
+    override suspend fun getSubscribers(clubID: Long): List<Subscriber> {
         return dao.getSubscribers(clubID)
     }
 
@@ -128,7 +128,7 @@ class RepositoryImpl(
         db.withTransaction { dao.insertOrUpdateUrl(url) }
     }
 
-    override suspend fun getUrlsFromClub(clubID: Int): List<Url> {
+    override suspend fun getUrlsFromClub(clubID: Long): List<Url> {
         return dao.getUrlsFromClub(clubID)
     }
 

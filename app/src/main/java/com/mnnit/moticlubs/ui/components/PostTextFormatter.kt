@@ -141,7 +141,7 @@ private fun uploadPostPic(
 
     val storageRef = Firebase.storage.reference
     val profilePicRef =
-        storageRef.child("post_images").child(viewModel.channelModel.channelID.toString())
+        storageRef.child("post_images").child(viewModel.channelModel.channelId.toString())
             .child(System.currentTimeMillis().toString())
 
     val bitmap = compressBitmap(imageUri, context)

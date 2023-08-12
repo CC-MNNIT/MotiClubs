@@ -1,9 +1,10 @@
 package com.mnnit.moticlubs.domain.use_case
 
-import com.mnnit.moticlubs.data.network.dto.ChannelDto
+import com.mnnit.moticlubs.data.network.dto.UpdateChannelDto
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.mapToDomain
 import com.mnnit.moticlubs.domain.util.networkResource
 import kotlinx.coroutines.flow.Flow
 
@@ -15,10 +16,10 @@ class UpdateChannel(private val repository: Repository) {
         apiCall = { apiService, auth ->
             apiService.updateChannelName(
                 auth,
-                channel.channelID,
-                ChannelDto(channel.channelID, channel.clubID, channel.name)
+                channel.channelId,
+                UpdateChannelDto(channel.clubId, channel.name)
             )
         },
-        saveResponse = { repository.insertOrUpdateChannel(channel) }
+        saveResponse = { _, new -> repository.insertOrUpdateChannel(new.mapToDomain()) }
     )
 }
