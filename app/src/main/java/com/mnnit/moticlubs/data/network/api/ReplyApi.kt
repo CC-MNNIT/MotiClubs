@@ -20,6 +20,8 @@ interface ReplyApi {
     suspend fun getReplies(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Query(POST_ID_CLAIM) postId: Long,
+        @Query("page") page: Int,
+        @Query("items") items: Int = 15,
     ): Response<List<ReplyDto>?>
 
     @POST(REPLY_ROUTE)

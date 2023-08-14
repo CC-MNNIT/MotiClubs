@@ -195,7 +195,6 @@ class ClubScreenViewModel @Inject constructor(
 
                 admins.forEach { admin ->
                     val adminUserRes = userUseCases.getUser(admin.userId).first()
-
                     if (adminUserRes !is Resource.Error) {
                         adminUserRes.d?.let { adminUser -> adminMap[admin.userId] = adminUser }
                     }

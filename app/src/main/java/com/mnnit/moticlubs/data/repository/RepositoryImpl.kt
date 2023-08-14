@@ -152,8 +152,8 @@ class RepositoryImpl(
         db.withTransaction { dao.insertOrUpdateReply(reply) }
     }
 
-    override suspend fun getRepliesByPost(postID: Long): List<Reply> {
-        return dao.getRepliesByPost(postID)
+    override suspend fun getRepliesByPost(postID: Long, page: Int): List<Reply> {
+        return dao.getRepliesByPost(postID, page)
     }
 
     override suspend fun deleteReply(reply: Reply) {

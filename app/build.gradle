@@ -60,7 +60,6 @@ android {
 
 dependencies {
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
-    implementation 'com.google.accompanist:accompanist-pager:0.24.9-beta'
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'

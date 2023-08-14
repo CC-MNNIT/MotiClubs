@@ -35,10 +35,8 @@ import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,6 +62,10 @@ class PostScreenViewModel @Inject constructor(
     val replyList = mutableListOf<Reply>()
     val replyMsg = mutableStateOf("")
 
+    var pageEnded by mutableStateOf(false)
+    var paging by mutableStateOf(false)
+    private var postPage = 1
+
     val showProgress = mutableStateOf(false)
     val loadingReplies = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
@@ -77,42 +79,75 @@ class PostScreenViewModel @Inject constructor(
         )
     )
 
-    private var getRepliesJob: Job? = null
+    private var getReplyJob: Job? = null
     private var getViewJob: Job? = null
     private var sendReplyJob: Job? = null
     private var viewPostJob: Job? = null
 
     fun getUser(userId: Long) {
-        viewModelScope.launch {
-            val user = userUseCases.getUser(userId).first()
-            if (user is Resource.Error) {
-                return@launch
-            }
+        userUseCases.getUser(userId).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> resource.data?.let { user -> userMap[user.userId] = user }
+                is Resource.Success -> userMap[resource.data.userId] = resource.data
 
-            user.d?.let { userMap[userId] = it }
-        }
+                is Resource.Error -> {
+                    Log.d(TAG, "getUser: error fetching $userId; ${resource.errCode}: ${resource.errMsg}")
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
-    fun getReplies() {
-        getRepliesJob?.cancel()
-        getRepliesJob = replyUseCases.getReplies(postNotificationModel.postId).onEach { resource ->
+    fun getReplies(refresh: Boolean = true) {
+        if (refresh) {
+            Log.d(TAG, "getReplies: refresh")
+            postPage = 1
+            pageEnded = false
+            loadingReplies.value = true
+        } else {
+            if (pageEnded || paging) return
+            paging = true
+        }
+
+        Log.d(TAG, "getReplies: page: $postPage")
+        getReplyJob?.cancel()
+        getReplyJob = replyUseCases.getReplies(postNotificationModel.postId, postPage).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     loadingReplies.value = true
                     resource.data?.let { list ->
-                        replyList.clear()
+                        when (refresh) {
+                            true -> {
+                                loadingReplies.value = true
+                                replyList.clear()
+                            }
+
+                            else -> {
+                                paging = true
+                                replyList.removeIf { reply -> reply.pageNo == postPage }
+                            }
+                        }
                         replyList.addAll(list)
                     }
                 }
 
                 is Resource.Success -> {
-                    loadingReplies.value = false
-                    replyList.clear()
+                    when (refresh) {
+                        true -> replyList.clear()
+                        else -> replyList.removeIf { reply -> reply.pageNo == postPage }
+                    }
+                    when (resource.data.isEmpty()) {
+                        true -> pageEnded = true
+                        else -> postPage++
+                    }
                     replyList.addAll(resource.data)
+                    Log.d(TAG, "getReplies: Success: $replyList")
+                    loadingReplies.value = false
+                    paging = false
                 }
 
                 is Resource.Error -> {
                     loadingReplies.value = false
+                    paging = false
                     Toast.makeText(
                         application,
                         "Error ${resource.errCode}: ${resource.errMsg}",
@@ -133,7 +168,8 @@ class PostScreenViewModel @Inject constructor(
                 postNotificationModel.postId,
                 application.getUserID(),
                 replyMsg.value,
-                System.currentTimeMillis()
+                pageNo = 1,
+                System.currentTimeMillis(),
             )
         ).onEach { resource ->
             when (resource) {

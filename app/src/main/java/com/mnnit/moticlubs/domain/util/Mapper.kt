@@ -87,12 +87,13 @@ fun UrlResponseModel.mapToDomain(): Url =
         clubId = this.clubId,
     )
 
-fun ReplyDto.mapToDomain(): Reply =
+fun ReplyDto.mapToDomain(page: Int): Reply =
     Reply(
         postId = this.postId,
         userId = this.userId,
         message = this.message,
-        time = this.time
+        time = this.time,
+        pageNo = page
     )
 
 fun Reply.mapFromDomain(): ReplyDto =

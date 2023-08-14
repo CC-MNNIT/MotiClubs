@@ -109,7 +109,8 @@ fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScree
                 },
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = 72.dp,
-                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp)
+                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
+                sheetGesturesEnabled = false
             )
         }
     }

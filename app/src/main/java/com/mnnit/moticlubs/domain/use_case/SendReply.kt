@@ -10,8 +10,8 @@ class SendReply(private val repository: Repository) {
 
     operator fun invoke(reply: Reply) = repository.networkResource(
         "Error sending reply",
-        query = { repository.getRepliesByPost(reply.postId) },
+        query = { repository.getRepliesByPost(reply.postId, reply.pageNo) },
         apiCall = { apiService, auth -> apiService.postReply(auth, reply.mapFromDomain()) },
-        saveResponse = { _, new -> repository.insertOrUpdateReply(new.mapToDomain()) }
+        saveResponse = { _, new -> repository.insertOrUpdateReply(new.mapToDomain(reply.pageNo)) }
     )
 }

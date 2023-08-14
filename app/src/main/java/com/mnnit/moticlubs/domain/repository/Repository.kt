@@ -81,7 +81,7 @@ interface Repository {
 
     suspend fun insertOrUpdateReply(reply: Reply)
 
-    suspend fun getRepliesByPost(postID: Long): List<Reply>
+    suspend fun getRepliesByPost(postID: Long, page: Int): List<Reply>
 
     suspend fun deleteReply(reply: Reply)
 

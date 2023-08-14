@@ -8,7 +8,7 @@ class DeleteReply(private val repository: Repository) {
 
     operator fun invoke(reply: Reply) = repository.networkResource(
         "Error deleting reply",
-        query = { repository.getRepliesByPost(reply.postId) },
+        query = { repository.getRepliesByPost(reply.postId, reply.pageNo) },
         apiCall = { apiService, auth -> apiService.deleteReply(auth, reply.time) },
         saveResponse = { _, _ -> repository.deleteReply(reply) }
     )

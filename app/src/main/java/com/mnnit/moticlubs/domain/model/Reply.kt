@@ -18,6 +18,9 @@ data class Reply(
     @ColumnInfo(name = "message")
     val message: String,
 
+    @ColumnInfo(name = "page")
+    val pageNo: Int,
+
     @PrimaryKey
     @ColumnInfo(name = "time")
     val time: Long,

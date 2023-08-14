@@ -1,16 +1,12 @@
 package com.mnnit.moticlubs.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,8 +15,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,10 +30,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +63,8 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
         onRefresh = viewModel::getReplies
     )
 
+    var sheetToggleIcon by remember { mutableStateOf(Icons.Rounded.KeyboardArrowUp) }
+
     Surface(
         color = colorScheme.background,
         tonalElevation = 2.dp,
@@ -77,18 +81,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                 .imePadding()
                 .fillMaxWidth()
         ) {
-            Box(
-                modifier = Modifier
-                    .width(56.dp)
-                    .height(4.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(contentColorFor(backgroundColor = colorScheme.background))
-            ) {
-                Text(text = "", modifier = Modifier.padding(12.dp))
-            }
-
-            Row(modifier = Modifier.padding(bottom = 20.dp)) {
+            Row(modifier = Modifier.padding(bottom = 12.dp)) {
                 Text(
                     text = "Replies",
                     fontSize = 20.sp,
@@ -101,13 +94,16 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                     keyboardController?.hide()
                     focusManager.clearFocus()
 
-                    scope.launch {
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                        }
+                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                        scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse() }
+                        sheetToggleIcon = Icons.Rounded.KeyboardArrowUp
+                    }
+                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                        scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
+                        sheetToggleIcon = Icons.Rounded.KeyboardArrowDown
                     }
                 }, modifier = Modifier.align(Alignment.CenterVertically)) {
-                    Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
+                    Icon(sheetToggleIcon, contentDescription = "", tint = colorScheme.primary)
                 }
             }
 
@@ -116,45 +112,35 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                     .weight(1f)
                     .imePadding(),
                 viewModel,
+                refreshState,
                 scrollState
-            )
-
-            PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .imePadding()
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                value = viewModel.replyMsg.value,
-                onValueChange = { viewModel.replyMsg.value = it },
-                shape = RoundedCornerShape(24.dp),
-                label = { Text(text = "Reply") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                enabled = !viewModel.showProgress.value,
-                trailingIcon = {
-                    IconButton(
-                        enabled = viewModel.showProgress.value || viewModel.replyMsg.value.isNotEmpty(),
-                        onClick = {
-                            if (viewModel.replyMsg.value.isEmpty()) return@IconButton
-                            viewModel.sendReply()
-                        }) {
-                        Icon(imageVector = Icons.Rounded.Send, contentDescription = "")
-                    }
-                }
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewModel, scrollState: LazyListState) {
+private fun Replies(
+    modifier: Modifier = Modifier,
+    viewModel: PostScreenViewModel,
+    refreshState: PullRefreshState,
+    scrollState: LazyListState
+) {
     val colorScheme = getColorScheme()
 
-    Box(modifier = modifier) {
-        LazyColumn(state = scrollState, modifier = Modifier.fillMaxSize(), reverseLayout = true) {
+    Column(
+        modifier = modifier
+    ) {
+
+        LazyColumn(
+            state = scrollState,
+            modifier = Modifier.weight(1f),
+            reverseLayout = true,
+            contentPadding = PaddingValues(top = 8.dp)
+        ) {
             items(viewModel.replyList.size) {
-                val reply = viewModel.replyList[viewModel.replyList.size - 1 - it]
+                val reply = viewModel.replyList[it]
                 if (!viewModel.userMap.containsKey(reply.userId)) {
                     viewModel.getUser(reply.userId)
                 }
@@ -168,7 +154,6 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 8.dp)
                     ) {
                         ProfilePicture(
                             modifier = Modifier.align(Alignment.Top),
@@ -204,6 +189,39 @@ private fun Replies(modifier: Modifier = Modifier, viewModel: PostScreenViewMode
                     }
                 }
             }
+
+            item {
+                LaunchedEffect(scrollState.canScrollForward) {
+                    if (!scrollState.canScrollForward && !viewModel.loadingReplies.value && !viewModel.pageEnded) {
+                        viewModel.getReplies(refresh = false)
+                    }
+                }
+            }
         }
+
+        PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
+
+        OutlinedTextField(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxWidth()
+                .padding(16.dp),
+            value = viewModel.replyMsg.value,
+            onValueChange = { viewModel.replyMsg.value = it },
+            shape = RoundedCornerShape(24.dp),
+            label = { Text(text = "Reply") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+            enabled = !viewModel.showProgress.value,
+            trailingIcon = {
+                IconButton(
+                    enabled = viewModel.showProgress.value || viewModel.replyMsg.value.isNotEmpty(),
+                    onClick = {
+                        if (viewModel.replyMsg.value.isEmpty()) return@IconButton
+                        viewModel.sendReply()
+                    }) {
+                    Icon(imageVector = Icons.Rounded.Send, contentDescription = "")
+                }
+            }
+        )
     }
 }

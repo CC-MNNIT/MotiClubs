@@ -13,8 +13,8 @@ interface ReplyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateReply(reply: Reply)
 
-    @Query("SELECT * FROM reply WHERE pid = :postID")
-    suspend fun getRepliesByPost(postID: Long): List<Reply>
+    @Query("SELECT * FROM reply WHERE pid = :postID AND page = :page ORDER BY time DESC")
+    suspend fun getRepliesByPost(postID: Long, page: Int): List<Reply>
 
     @Delete
     suspend fun deleteReply(reply: Reply)
