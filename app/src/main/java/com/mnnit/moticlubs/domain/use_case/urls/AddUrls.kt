@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.domain.use_case
+package com.mnnit.moticlubs.domain.use_case.urls
 
 import com.mnnit.moticlubs.data.network.dto.UrlDto
 import com.mnnit.moticlubs.data.network.dto.UrlModel

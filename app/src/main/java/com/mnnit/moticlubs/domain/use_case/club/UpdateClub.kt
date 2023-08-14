@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.domain.use_case
+package com.mnnit.moticlubs.domain.use_case.club
 
 import com.mnnit.moticlubs.data.network.dto.UpdateClubDto
 import com.mnnit.moticlubs.domain.model.Club

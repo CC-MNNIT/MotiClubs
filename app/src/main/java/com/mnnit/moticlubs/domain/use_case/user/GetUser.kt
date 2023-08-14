@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.domain.use_case
+package com.mnnit.moticlubs.domain.use_case.user
 
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.repository.Repository

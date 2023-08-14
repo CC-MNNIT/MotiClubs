@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.domain.use_case
+package com.mnnit.moticlubs.domain.use_case.views
 
 import com.mnnit.moticlubs.domain.model.View
 import com.mnnit.moticlubs.domain.repository.Repository
