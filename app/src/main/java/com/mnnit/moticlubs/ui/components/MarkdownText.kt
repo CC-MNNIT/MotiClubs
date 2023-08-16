@@ -27,7 +27,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
-import io.noties.markwon.*
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonConfiguration
+import io.noties.markwon.MarkwonVisitor
+import io.noties.markwon.RenderProps
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.html.HtmlPlugin
@@ -45,7 +49,7 @@ import io.noties.markwon.image.svg.SvgMediaDecoder
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import org.commonmark.node.SoftLineBreak
-import java.util.*
+import java.util.Collections
 
 /**
  * Modified from and Credits to : https://github.com/jeziellago/compose-markdown

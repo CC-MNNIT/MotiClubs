@@ -2,7 +2,15 @@ package com.mnnit.moticlubs.data.data_source
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Post
+import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.Subscriber
+import com.mnnit.moticlubs.domain.model.Url
+import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.model.View
 
 @Database(
     entities = [

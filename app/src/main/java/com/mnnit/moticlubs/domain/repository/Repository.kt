@@ -2,7 +2,15 @@ package com.mnnit.moticlubs.domain.repository
 
 import android.app.Application
 import com.mnnit.moticlubs.data.network.ApiService
-import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Post
+import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.Subscriber
+import com.mnnit.moticlubs.domain.model.Url
+import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.model.View
 
 interface Repository {
 
