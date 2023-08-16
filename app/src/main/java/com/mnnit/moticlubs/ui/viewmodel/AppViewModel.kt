@@ -104,7 +104,10 @@ class AppViewModel @Inject constructor(
                     onResponse()
                 }
 
-                is Resource.Error -> onFailure()
+                is Resource.Error -> {
+                    Log.d(TAG, "updateProfilePic: ${resource.errCode}: ${resource.errMsg}")
+                    onFailure()
+                }
             }
         }.launchIn(viewModelScope)
     }
