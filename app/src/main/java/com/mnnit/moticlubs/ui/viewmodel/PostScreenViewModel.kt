@@ -99,7 +99,6 @@ class PostScreenViewModel @Inject constructor(
 
     fun getReplies(refresh: Boolean = true) {
         if (refresh) {
-            Log.d(TAG, "getReplies: refresh")
             postPage = 1
             pageEnded = false
             loadingReplies.value = true
@@ -108,7 +107,6 @@ class PostScreenViewModel @Inject constructor(
             paging = true
         }
 
-        Log.d(TAG, "getReplies: page: $postPage")
         getReplyJob?.cancel()
         getReplyJob = replyUseCases.getReplies(postNotificationModel.postId, postPage).onEach { resource ->
             when (resource) {
@@ -140,7 +138,6 @@ class PostScreenViewModel @Inject constructor(
                         else -> postPage++
                     }
                     replyList.addAll(resource.data)
-                    Log.d(TAG, "getReplies: Success: $replyList")
                     loadingReplies.value = false
                     paging = false
                 }
