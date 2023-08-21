@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddAPhoto
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
@@ -45,7 +46,10 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
+fun ClubDetailsScreen(
+    onNavigateBackPressed: () -> Unit,
+    viewModel: ClubDetailsScreenViewModel = hiltViewModel()
+) {
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
 
@@ -122,6 +126,7 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
                                 .padding(16.dp)
                         ) {
                             ClubProfilePic(
+                                onNavigateBackPressed,
                                 viewModel = viewModel,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             )
@@ -190,7 +195,11 @@ fun ClubDetailsScreen(viewModel: ClubDetailsScreenViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
+private fun ClubProfilePic(
+    onNavigateBackPressed: () -> Unit,
+    viewModel: ClubDetailsScreenViewModel,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -210,8 +219,20 @@ private fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modi
     }
 
     Row(modifier = modifier) {
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .size(24.dp),
+            onClick = { onNavigateBackPressed() }
+        ) {
+            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+        }
+
         ProfilePicture(
-            modifier = Modifier.padding(start = if (viewModel.isAdmin) 46.dp else 0.dp),
+            modifier = Modifier.padding(
+                start = 86.dp,
+                end = if (viewModel.isAdmin) 0.dp else 108.dp
+            ),
             url = viewModel.clubModel.avatar,
             size = 156.dp
         )
@@ -223,6 +244,7 @@ private fun ClubProfilePic(viewModel: ClubDetailsScreenViewModel, modifier: Modi
                 },
                 modifier = Modifier
                     .align(Alignment.Bottom)
+                    .padding(end = 56.dp)
                     .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
             ) {
                 Icon(painter = rememberVectorPainter(image = Icons.Rounded.AddAPhoto), contentDescription = "")

@@ -222,7 +222,9 @@ class MainActivity : ComponentActivity() {
                             navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
                         )
                     ) {
-                        ClubDetailsScreen()
+                        ClubDetailsScreen(onNavigateBackPressed = {
+                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                        })
                     }
 
                     // CLUB POST
