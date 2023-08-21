@@ -209,6 +209,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         PostScreen(onNavigateImageClick = {
                             navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
+                        }, onNavigateBackPressed = {
+                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                         })
                     }
 

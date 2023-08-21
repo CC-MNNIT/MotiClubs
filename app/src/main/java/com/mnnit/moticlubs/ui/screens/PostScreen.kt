@@ -6,6 +6,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +31,11 @@ import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScreenViewModel = hiltViewModel()) {
+fun PostScreen(
+    onNavigateImageClick: (url: String) -> Unit,
+    onNavigateBackPressed: () -> Unit,
+    viewModel: PostScreenViewModel = hiltViewModel()
+) {
     LocalContext.current.postRead(
         viewModel.postNotificationModel.channelId,
         viewModel.postNotificationModel.postId,
@@ -62,12 +67,26 @@ fun PostScreen(onNavigateImageClick: (url: String) -> Unit, viewModel: PostScree
                                 shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp),
                                 elevation = CardDefaults.cardElevation(0.dp),
                             ) {
-                                Text(
-                                    "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(start = 16.dp, top = 16.dp)
-                                )
+                                Row(modifier = Modifier.padding(top = 16.dp)) {
+                                    IconButton(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically)
+                                            .padding(start = 16.dp)
+                                            .size(24.dp),
+                                        onClick = { onNavigateBackPressed() }
+                                    ) {
+                                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+                                    }
+
+                                    Text(
+                                        "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier
+                                            .padding(start = 16.dp)
+                                            .align(Alignment.CenterVertically)
+                                    )
+                                }
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
