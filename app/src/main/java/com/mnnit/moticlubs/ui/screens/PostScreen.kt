@@ -24,7 +24,7 @@ import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
-import com.mnnit.moticlubs.ui.components.PostBottomSheetContent
+import com.mnnit.moticlubs.ui.components.postscreen.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme

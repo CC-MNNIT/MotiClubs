@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.clubscreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.*
 import com.mnnit.moticlubs.domain.util.getUnreadPost
 import com.mnnit.moticlubs.domain.util.toTimeString
+import com.mnnit.moticlubs.ui.components.MarkdownText
+import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
 

@@ -34,6 +34,9 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.*
+import com.mnnit.moticlubs.ui.components.clubscreen.PostCreateUpdateBottomSheet
+import com.mnnit.moticlubs.ui.components.clubscreen.ChannelNameBar
+import com.mnnit.moticlubs.ui.components.clubscreen.PostItem
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -63,7 +66,7 @@ fun ClubScreen(
             BottomSheetScaffold(
                 modifier = Modifier.imePadding(),
                 sheetContent = {
-                    BottomSheetContent(viewModel, onNavigateToImageScreen)
+                    PostCreateUpdateBottomSheet(viewModel, onNavigateToImageScreen)
                 },
                 topBar = {
                     Surface(color = colorScheme.background, tonalElevation = 2.dp) {
@@ -165,7 +168,11 @@ fun TopBar(
     onBackPressed: () -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
-        SearchBar(viewModel.searchMode, viewModel.searchValue, modifier = modifier)
+        com.mnnit.moticlubs.ui.components.clubscreen.SearchBar(
+            viewModel.searchMode,
+            viewModel.searchValue,
+            modifier = modifier
+        )
     }
     AnimatedVisibility(visible = !viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         ChannelNameBar(

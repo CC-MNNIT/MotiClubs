@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.clubscreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.ui.components.ConfirmationDialog
+import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
 @Composable

@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.clubscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.data.network.dto.UrlModel
+import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
 

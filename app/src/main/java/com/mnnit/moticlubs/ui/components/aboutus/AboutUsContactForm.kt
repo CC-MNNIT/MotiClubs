@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.aboutus
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun BottomSheetForm() {
+fun AboutUsContactForm() {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 

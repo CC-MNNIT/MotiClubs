@@ -6,8 +6,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.mnnit.moticlubs.ui.components.OtherLinkComposeModel
-import com.mnnit.moticlubs.ui.components.SocialLinkComposeModel
+import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 
 @Entity(tableName = "url")
 data class Url(

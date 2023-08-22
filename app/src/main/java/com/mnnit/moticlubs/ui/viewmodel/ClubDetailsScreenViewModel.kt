@@ -23,8 +23,8 @@ import com.mnnit.moticlubs.domain.use_case.SubscriberUseCases
 import com.mnnit.moticlubs.domain.use_case.UrlUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
-import com.mnnit.moticlubs.ui.components.OtherLinkComposeModel
-import com.mnnit.moticlubs.ui.components.SocialLinkComposeModel
+import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first

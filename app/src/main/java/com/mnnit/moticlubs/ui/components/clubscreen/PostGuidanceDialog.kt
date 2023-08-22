@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.clubscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable

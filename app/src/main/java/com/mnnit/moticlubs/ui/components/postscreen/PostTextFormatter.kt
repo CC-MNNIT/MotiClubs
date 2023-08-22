@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.postscreen
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -37,6 +37,8 @@ import com.canhub.cropper.CropImageView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.compressBitmap
+import com.mnnit.moticlubs.ui.components.clubscreen.InputLinkDialog
+import com.mnnit.moticlubs.ui.components.clubscreen.PostGuidanceDialog
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import java.io.ByteArrayOutputStream
 

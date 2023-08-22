@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.clubscreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -26,13 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.ui.components.ConfirmationDialog
+import com.mnnit.moticlubs.ui.components.MarkdownRender
+import com.mnnit.moticlubs.ui.components.postscreen.PostTextFormatter
+import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomSheetContent(viewModel: ClubScreenViewModel, onNavigateImageClick: (url: String) -> Unit) {
+fun PostCreateUpdateBottomSheet(
+    viewModel: ClubScreenViewModel,
+    onNavigateImageClick: (url: String) -> Unit,
+) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()

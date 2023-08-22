@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.postscreen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.combinedClickable
@@ -52,6 +52,9 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.util.getUserID
 import com.mnnit.moticlubs.domain.util.toTimeString
+import com.mnnit.moticlubs.ui.components.MarkdownText
+import com.mnnit.moticlubs.ui.components.ProfilePicture
+import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 import kotlinx.coroutines.launch

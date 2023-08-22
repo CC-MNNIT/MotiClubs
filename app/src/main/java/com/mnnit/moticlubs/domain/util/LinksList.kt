@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.domain.util
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.model.Url
+import com.mnnit.moticlubs.ui.components.MarkdownText
 
 abstract class LinkComposeModel {
     abstract fun getUrl(): String
