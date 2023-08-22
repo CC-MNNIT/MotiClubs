@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.ui.components
 
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -133,6 +134,8 @@ private fun Replies(
         modifier = modifier
     ) {
 
+        PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
+
         LazyColumn(
             state = scrollState,
             modifier = Modifier.weight(1f),
@@ -146,7 +149,11 @@ private fun Replies(
                 }
 
                 Card(
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .combinedClickable(onLongClick = {
+
+                        }, onClick = {}),
                     elevation = CardDefaults.cardElevation(0.dp),
                     shape = RoundedCornerShape(0.dp),
                     colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
@@ -198,8 +205,6 @@ private fun Replies(
                 }
             }
         }
-
-        PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
 
         OutlinedTextField(
             modifier = Modifier
