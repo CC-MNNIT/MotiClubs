@@ -1,13 +1,14 @@
 package com.mnnit.moticlubs.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,6 +24,7 @@ import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -39,12 +41,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.util.getUserID
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
@@ -130,71 +136,22 @@ private fun Replies(
 ) {
     val colorScheme = getColorScheme()
 
-    Column(
-        modifier = modifier
-    ) {
+    Column(modifier = modifier) {
 
         PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
 
         LazyColumn(
             state = scrollState,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f)
+                .animateContentSize(),
             reverseLayout = true,
-            contentPadding = PaddingValues(top = 8.dp)
         ) {
             items(viewModel.replyList.size) {
-                val reply = viewModel.replyList[it]
-                if (!viewModel.userMap.containsKey(reply.userId)) {
-                    viewModel.getUser(reply.userId)
+                if (!viewModel.userMap.containsKey(viewModel.replyList[it].userId)) {
+                    viewModel.getUser(viewModel.replyList[it].userId)
                 }
 
-                Card(
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .combinedClickable(onLongClick = {
-
-                        }, onClick = {}),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                    shape = RoundedCornerShape(0.dp),
-                    colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        ProfilePicture(
-                            modifier = Modifier.align(Alignment.Top),
-                            url = viewModel.userMap[reply.userId]?.avatar ?: "",
-                            size = 42.dp
-                        )
-
-                        Column {
-                            Row {
-                                Text(
-                                    text = viewModel.userMap[reply.userId]?.name ?: "",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(start = 8.dp),
-                                    fontSize = 14.sp,
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = reply.time.toTimeString(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontSize = 12.sp
-                                )
-                            }
-
-                            MarkdownText(
-                                markdown = reply.message,
-                                color = contentColorFor(backgroundColor = getColorScheme().background),
-                                maxLines = 4,
-                                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                                disableLinkMovementMethod = true
-                            )
-                        }
-                    }
-                }
+                Reply(viewModel, viewModel.replyList[it], colorScheme)
             }
 
             item {
@@ -228,5 +185,67 @@ private fun Replies(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun Reply(
+    viewModel: PostScreenViewModel,
+    reply: Reply,
+    colorScheme: ColorScheme
+) {
+    val context = LocalContext.current
+
+    Card(
+        modifier = Modifier
+            .safeContentPadding()
+            .clip(RoundedCornerShape(24.dp))
+            .combinedClickable(onLongClick = {
+                if (reply.userId == context.getUserID()) {
+                    viewModel.replyDeleteItem.value = reply
+                    viewModel.showConfirmationDeleteDialog.value = true
+                }
+            }, onClick = {}),
+        elevation = CardDefaults.cardElevation(0.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+        ) {
+            ProfilePicture(
+                modifier = Modifier.align(Alignment.Top),
+                url = viewModel.userMap[reply.userId]?.avatar ?: "",
+                size = 42.dp
+            )
+
+            Column {
+                Row {
+                    Text(
+                        text = viewModel.userMap[reply.userId]?.name ?: "",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontSize = 14.sp,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = reply.time.toTimeString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 12.sp
+                    )
+                }
+
+                MarkdownText(
+                    markdown = reply.message,
+                    color = contentColorFor(backgroundColor = getColorScheme().background),
+                    maxLines = 4,
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                    disableLinkMovementMethod = true
+                )
+            }
+        }
     }
 }

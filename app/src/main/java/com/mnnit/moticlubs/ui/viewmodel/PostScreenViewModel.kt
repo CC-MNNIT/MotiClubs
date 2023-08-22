@@ -15,6 +15,7 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -59,7 +60,7 @@ class PostScreenViewModel @Inject constructor(
 
     val userMap = mutableStateMapOf<Long, User>()
     var viewCount by mutableStateOf("-")
-    val replyList = mutableListOf<Reply>()
+    val replyList = mutableStateListOf<Reply>()
     val replyMsg = mutableStateOf("")
 
     var pageEnded by mutableStateOf(false)
@@ -69,6 +70,10 @@ class PostScreenViewModel @Inject constructor(
     val showProgress = mutableStateOf(false)
     val loadingReplies = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
+
+    val showDeleteDialog = mutableStateOf(false)
+    val showConfirmationDeleteDialog = mutableStateOf(false)
+    val replyDeleteItem = mutableStateOf(Reply())
 
     @OptIn(ExperimentalMaterialApi::class)
     val bottomSheetScaffoldState = mutableStateOf(
@@ -82,6 +87,7 @@ class PostScreenViewModel @Inject constructor(
     private var getReplyJob: Job? = null
     private var getViewJob: Job? = null
     private var sendReplyJob: Job? = null
+    private var deleteReplyJob: Job? = null
     private var viewPostJob: Job? = null
 
     fun getUser(userId: Long) {
@@ -182,6 +188,27 @@ class PostScreenViewModel @Inject constructor(
                     showDialog.value = false
                     showProgress.value = false
                     Toast.makeText(application, "Error: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun deleteReply() {
+        deleteReplyJob?.cancel()
+        deleteReplyJob = replyUseCases.deleteReply(replyDeleteItem.value).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> showDeleteDialog.value = true
+                is Resource.Success -> {
+                    Toast.makeText(application, "Reply deleted", Toast.LENGTH_SHORT).show()
+
+                    replyList.removeIf { it.time == replyDeleteItem.value.time }
+                    showDeleteDialog.value = false
+                    replyDeleteItem.value = Reply()
+                }
+
+                is Resource.Error -> {
+                    showDeleteDialog.value = false
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
                 }
             }
         }.launchIn(viewModelScope)

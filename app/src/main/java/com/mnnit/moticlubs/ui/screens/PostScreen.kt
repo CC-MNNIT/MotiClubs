@@ -7,6 +7,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,8 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.domain.util.toTimeString
+import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -58,6 +61,21 @@ fun PostScreen(
 
                             if (viewModel.showDialog.value) {
                                 ProgressDialog(progressMsg = "Replying...")
+                            }
+
+                            if (viewModel.showDeleteDialog.value) {
+                                ProgressDialog(progressMsg = "Deleting...")
+                            }
+
+                            if (viewModel.showConfirmationDeleteDialog.value) {
+                                ConfirmationDialog(
+                                    showDialog = viewModel.showConfirmationDeleteDialog,
+                                    message = "Are you sure you want to delete this reply ?",
+                                    positiveBtnText = "Delete",
+                                    imageVector = Icons.Rounded.DeleteForever,
+                                    onPositive = viewModel::deleteReply,
+                                    onNegative = { viewModel.replyDeleteItem.value = Reply() }
+                                )
                             }
 
                             Card(

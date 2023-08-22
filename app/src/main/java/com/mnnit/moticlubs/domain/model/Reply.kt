@@ -24,4 +24,6 @@ data class Reply(
     @PrimaryKey
     @ColumnInfo(name = "time")
     val time: Long,
-) : Parcelable
+) : Parcelable {
+    constructor(): this(-1L, -1L, "", 0, -1L)
+}
