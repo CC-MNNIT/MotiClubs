@@ -48,7 +48,11 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme()
+        if (scrollBehavior.state.collapsedFraction > 0.6f) {
+            SetNavBarsTheme(2.dp, false)
+        } else {
+            SetNavBarsTheme()
+        }
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -62,7 +66,9 @@ fun HomeScreen(
                             onClick = { onNavigateProfile(viewModel) })
                     },
                     scrollBehavior = scrollBehavior,
-                    colors = TopAppBarDefaults.largeTopAppBarColors(scrolledContainerColor = colorScheme.background)
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        scrolledContainerColor = colorScheme.surfaceColorAtElevation(2.dp)
+                    )
                 )
             },
             content = {

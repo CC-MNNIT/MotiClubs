@@ -7,13 +7,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,12 +30,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
 fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, onDelete: () -> Unit) {
     val colorScheme = getColorScheme()
+    val showConfirmation = remember { mutableStateOf(false) }
+
+    if (showConfirmation.value) {
+        ConfirmationDialog(
+            showDialog = showConfirmation,
+            message = "Are you sure you want to delete the channel ?\nThis will delete all the posts in the channel",
+            positiveBtnText = "Delete",
+            onPositive = onDelete
+        )
+    }
+
     Dialog(onDismissRequest = { viewModel.showUpdateChannelDialog = false }, DialogProperties()) {
         Box(
             modifier = Modifier
@@ -44,17 +63,37 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                     fontWeight = FontWeight.SemiBold
                 )
 
-                OutlinedTextField(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    value = viewModel.updateChannelName,
-                    onValueChange = { viewModel.updateChannelName = it },
-                    shape = RoundedCornerShape(24.dp),
-                    label = { Text(text = "Channel Name") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                )
+                        .padding(top = 16.dp)
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
+                        value = viewModel.updateChannelName,
+                        onValueChange = { viewModel.updateChannelName = it },
+                        shape = RoundedCornerShape(24.dp),
+                        label = { Text(text = "Channel Name") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                    )
+
+                    IconButton(
+                        modifier = Modifier
+                            .weight(0.2f)
+                            .align(Alignment.CenterVertically),
+                        onClick = { showConfirmation.value = true }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = "",
+                            tint = colorScheme.error
+                        )
+                    }
+                }
 
                 Row(
                     modifier = Modifier
@@ -63,13 +102,13 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
-                        onClick = { onDelete() },
+                        onClick = { viewModel.showUpdateChannelDialog = false },
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
                         colors = ButtonDefaults.buttonColors(colorScheme.error)
                     ) {
-                        Text(text = "Delete", fontSize = 14.sp)
+                        Text(text = "Cancel", fontSize = 14.sp)
                     }
 
                     Button(
