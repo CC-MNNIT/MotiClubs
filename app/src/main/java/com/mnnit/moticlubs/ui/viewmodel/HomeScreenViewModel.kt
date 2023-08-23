@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -43,7 +44,7 @@ class HomeScreenViewModel @Inject constructor(
     var user by mutableStateOf(User())
     val adminList = mutableStateListOf<Admin>()
     val clubsList = mutableStateListOf<Club>()
-    val channelMap = mutableMapOf<Long, SnapshotStateList<Channel>>()
+    val channelMap = mutableStateMapOf<Long, SnapshotStateList<Channel>>()
 
     var isFetchingAdmins by mutableStateOf(false)
     var isFetchingChannels by mutableStateOf(false)
@@ -152,9 +153,9 @@ class HomeScreenViewModel @Inject constructor(
             application.setAuthToken(it.token ?: "")
 
             getUser()
-            getAdmins()
             getClubs()
             getChannels()
+            getAdmins()
         }?.addOnCompleteListener {
             isFetchingAdmins = false
             isFetchingChannels = false

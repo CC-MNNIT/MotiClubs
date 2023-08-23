@@ -42,7 +42,7 @@ fun PostGuidanceDialog(
                     .heightIn(128.dp, 512.dp)
             ) {
                 MarkdownText(
-                    markdown = guideMkd, modifier = Modifier
+                    markdown = MKD_GUIDE, modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(scrollState),
                     color = contentColorFor(backgroundColor = colorScheme.background)
@@ -52,7 +52,7 @@ fun PostGuidanceDialog(
     }
 }
 
-private const val guideMkd = "<align><h2>Markdown Formatting</h2></align>\n\n" +
+private const val MKD_GUIDE = "<align><h2>Markdown Formatting</h2></align>\n\n" +
         "Here are some syntax you can use for formatting your post.\n\n" +
         "### Headers: \n" +
         "```\n" +

@@ -17,9 +17,9 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,9 +92,9 @@ fun AboutUsContactForm() {
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Name") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
-                        disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
+                        disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                     ),
                     singleLine = true
                 )
@@ -109,7 +109,7 @@ fun AboutUsContactForm() {
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Message") },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                    colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                         disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
                     )

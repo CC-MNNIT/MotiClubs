@@ -32,8 +32,11 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 @Composable
 fun ColumnScope.DeveloperProfile(
     modifier: Modifier = Modifier,
-    github: String = "", linkedin: String = "",
-    name: String, stream: String = "", year: String = "",
+    github: String = "",
+    linkedin: String = "",
+    name: String,
+    stream: String = "",
+    year: String = "",
     showIcons: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current

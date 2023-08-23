@@ -144,7 +144,6 @@ class MainActivity : ComponentActivity() {
                     // HOME
                     composable(AppNavigation.HOME) {
                         HomeScreen(
-                            appViewModel = viewModel,
                             onNavigateChannelClick = { channel, club ->
                                 navController.navigate(
                                     "${AppNavigation.CLUB_PAGE}?" +

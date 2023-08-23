@@ -26,7 +26,7 @@ class SignUpScreenViewModel @Inject constructor(
     val phoneNumber = mutableStateOf("")
     val password = mutableStateOf("")
 
-    val courseList = listOf("B.Tech", "M.Tech", "MBA", "MCA", "PhD")
+    val courseList = listOf("B.Tech", "M.Tech", "M.Sc", "MBA", "MCA", "PhD")
     val selectedCourse = mutableStateOf("")
 
     val isPasswordVisible = mutableStateOf(false)

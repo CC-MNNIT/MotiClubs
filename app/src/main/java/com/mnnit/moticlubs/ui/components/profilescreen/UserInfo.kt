@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,7 +35,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         enabled = false,
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
         )
@@ -60,7 +60,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background)
@@ -83,7 +83,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             enabled = false,
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
             )
@@ -98,7 +98,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             },
             shape = RoundedCornerShape(24.dp),
             enabled = false,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
             )
@@ -127,7 +127,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             )
         },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLeadingIconColor = contentColorFor(backgroundColor = colorScheme.background)

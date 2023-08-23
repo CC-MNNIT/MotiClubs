@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Density
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,7 +77,10 @@ class ClubScreenViewModel @Inject constructor(
     val bottomSheetScaffoldState = mutableStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
-            bottomSheetState = BottomSheetState(initialValue = BottomSheetValue.Collapsed),
+            bottomSheetState = BottomSheetState(
+                initialValue = BottomSheetValue.Collapsed,
+                density = Density(application),
+            ),
             snackbarHostState = SnackbarHostState()
         )
     )

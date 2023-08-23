@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.mnnit.moticlubs.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
@@ -42,6 +40,7 @@ import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ClubScreen(
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
@@ -111,7 +110,7 @@ fun ClubScreen(
                                 )
                             }
 
-                            Messages(
+                            Posts(
                                 viewModel = viewModel,
                                 modifier = Modifier.weight(1f),
                                 scrollState = listScrollState,
@@ -184,8 +183,9 @@ fun TopBar(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Messages(
+fun Posts(
     viewModel: ClubScreenViewModel,
     adminMap: MutableMap<Long, User>,
     scrollState: LazyListState,

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.mnnit.moticlubs.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
@@ -32,12 +30,11 @@ import com.mnnit.moticlubs.ui.components.homescreen.UpdateChannelDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
-    appViewModel: AppViewModel,
     onNavigateChannelClick: (channel: Channel, club: Club) -> Unit,
     onNavigateContactUs: () -> Unit,
     onNavigateProfile: (viewModel: HomeScreenViewModel) -> Unit,
@@ -61,7 +58,7 @@ fun HomeScreen(
                     actions = {
                         ProfilePicture(
                             modifier = Modifier.padding(end = 16.dp),
-                            url = appViewModel.user.avatar,
+                            url = viewModel.user.avatar,
                             onClick = { onNavigateProfile(viewModel) })
                     },
                     scrollBehavior = scrollBehavior,

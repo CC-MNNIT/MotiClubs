@@ -18,8 +18,8 @@ import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -133,7 +133,7 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel) {
             shape = RoundedCornerShape(24.dp),
             enabled = viewModel.editDescriptionMode,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledBorderColor = colorScheme.background,
