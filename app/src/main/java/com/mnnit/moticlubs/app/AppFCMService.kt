@@ -101,7 +101,7 @@ class AppFCMService : FirebaseMessagingService() {
             ).deletePostID(postID)
         }
         LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.post"))
+            .sendBroadcast(Intent(Constants.POST_BROADCAST_ACTION))
     }
 
     private fun deleteReplyNotification(data: Map<String, String>) {
@@ -129,7 +129,7 @@ class AppFCMService : FirebaseMessagingService() {
             ).deleteReplyID(replyID)
         }
         LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.reply"))
+            .sendBroadcast(Intent(Constants.REPLY_BROADCAST_ACTION))
     }
 
     private fun postNotification(data: Map<String, String>) {
@@ -148,7 +148,7 @@ class AppFCMService : FirebaseMessagingService() {
         val updated = data["updated"]?.toBoolean() ?: false
 
         LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.post"))
+            .sendBroadcast(Intent(Constants.POST_BROADCAST_ACTION))
 
         if (userID == getUserID()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
@@ -200,7 +200,7 @@ class AppFCMService : FirebaseMessagingService() {
         val url = data["userAvatar"] ?: ""
 
         LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent("${Constants.SHARED_PREFERENCE}.reply"))
+            .sendBroadcast(Intent(Constants.REPLY_BROADCAST_ACTION))
 
         if (userID == getUserID()) {
             Log.d(TAG, "replyNotification: reply sender and receiver same")

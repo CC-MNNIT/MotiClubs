@@ -245,13 +245,15 @@ class PostScreenViewModel @Inject constructor(
     }
 
     private fun registerReplyReceiver() {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                getReplies()
-            }
-        }
         LocalBroadcastManager.getInstance(application)
-            .registerReceiver(receiver, IntentFilter("${Constants.SHARED_PREFERENCE}.reply"))
+            .registerReceiver(
+                object : BroadcastReceiver() {
+                    override fun onReceive(context: Context?, intent: Intent?) {
+                        getReplies()
+                    }
+                },
+                IntentFilter(Constants.REPLY_BROADCAST_ACTION)
+            )
     }
 
     init {

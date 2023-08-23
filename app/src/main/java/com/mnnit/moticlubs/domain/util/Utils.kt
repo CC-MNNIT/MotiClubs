@@ -19,6 +19,9 @@ object Constants {
 
     const val AUTHORIZATION_HEADER = "Authorization"
 
+    const val POST_BROADCAST_ACTION = "$SHARED_PREFERENCE.post"
+    const val REPLY_BROADCAST_ACTION = "$SHARED_PREFERENCE.reply"
+
     const val BASE_URL = "https://sac.mnnit.ac.in/moticlubs/"
     private const val URL_PREFIX = "api/v1"
     const val CHANNEL_ROUTE = "$BASE_URL$URL_PREFIX/channel"

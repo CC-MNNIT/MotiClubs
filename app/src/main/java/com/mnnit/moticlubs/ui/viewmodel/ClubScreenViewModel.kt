@@ -331,13 +331,15 @@ class ClubScreenViewModel @Inject constructor(
     }
 
     private fun registerPostReceiver() {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                getPostsList()
-            }
-        }
         LocalBroadcastManager.getInstance(application)
-            .registerReceiver(receiver, IntentFilter("${Constants.SHARED_PREFERENCE}.post"))
+            .registerReceiver(
+                object : BroadcastReceiver() {
+                    override fun onReceive(context: Context?, intent: Intent?) {
+                        getPostsList()
+                    }
+                },
+                IntentFilter(Constants.POST_BROADCAST_ACTION)
+            )
     }
 
     init {
