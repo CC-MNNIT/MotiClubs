@@ -72,6 +72,7 @@ class ClubScreenViewModel @Inject constructor(
     val showDialog = mutableStateOf(false)
     val showSubsDialog = mutableStateOf(false)
     val showDelPostDialog = mutableStateOf(false)
+    val showClearDraftDialog = mutableStateOf(false)
 
     val userSubscribed = mutableStateOf(false)
     val bottomSheetScaffoldState = mutableStateOf(

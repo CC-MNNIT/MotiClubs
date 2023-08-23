@@ -78,6 +78,22 @@ fun PostCreateUpdateBottomSheet(
                 }
             }
         }
+
+        if (viewModel.showClearDraftDialog.value) {
+            ConfirmationDialog(
+                showDialog = viewModel.showClearDraftDialog,
+                message = "Are you sure you want to clear draft ?",
+                positiveBtnText = "Clear",
+                onPositive = {
+                    viewModel.clearEditor()
+                    scope.launch {
+                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                        }
+                    }
+                }
+            )
+        }
         Column(
             modifier = Modifier
                 .padding(
@@ -110,6 +126,11 @@ fun PostCreateUpdateBottomSheet(
                 IconButton(onClick = {
                     keyboardController?.hide()
                     focusManager.clearFocus()
+
+                    if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isNotEmpty()) {
+                        viewModel.showClearDraftDialog.value = true
+                        return@IconButton
+                    }
 
                     viewModel.clearEditor()
                     scope.launch {
