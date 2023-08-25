@@ -227,7 +227,7 @@ private fun ClubProfilePic(
         IconButton(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .size(24.dp),
+                .size(42.dp),
             onClick = { onNavigateBackPressed() }
         ) {
             Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
@@ -235,7 +235,7 @@ private fun ClubProfilePic(
 
         ProfilePicture(
             modifier = Modifier.padding(
-                start = 86.dp,
+                start = 66.dp,
                 end = if (viewModel.isAdmin) 0.dp else 108.dp
             ),
             url = viewModel.clubModel.avatar,
