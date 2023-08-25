@@ -1,14 +1,18 @@
 package com.mnnit.moticlubs.ui.components.postscreen
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -34,11 +38,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,8 +73,6 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
         onRefresh = viewModel::getReplies
     )
 
-    var sheetToggleIcon by remember { mutableStateOf(Icons.Rounded.KeyboardArrowUp) }
-
     Surface(
         color = colorScheme.background,
         tonalElevation = 2.dp,
@@ -91,6 +89,17 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                 .imePadding()
                 .fillMaxWidth()
         ) {
+            Box(
+                modifier = Modifier
+                    .width(56.dp)
+                    .height(4.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(contentColorFor(backgroundColor = colorScheme.background))
+            ) {
+                Text(text = "", modifier = Modifier.padding(12.dp))
+            }
+
             Row(modifier = Modifier.padding(bottom = 12.dp)) {
                 Text(
                     text = "Replies",
@@ -100,20 +109,28 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(onClick = {
-                    keyboardController?.hide()
-                    focusManager.clearFocus()
+                IconButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically),
+                    onClick = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
 
-                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                        scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse() }
-                        sheetToggleIcon = Icons.Rounded.KeyboardArrowUp
+                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                            scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse() }
+                        }
+                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                            scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
+                        }
                     }
-                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
-                        scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
-                        sheetToggleIcon = Icons.Rounded.KeyboardArrowDown
-                    }
-                }, modifier = Modifier.align(Alignment.CenterVertically)) {
-                    Icon(sheetToggleIcon, contentDescription = "", tint = colorScheme.primary)
+                ) {
+                    Icon(
+                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                            Icons.Rounded.KeyboardArrowDown
+                        } else {
+                            Icons.Rounded.KeyboardArrowUp
+                        }, contentDescription = "", tint = colorScheme.primary
+                    )
                 }
             }
 
@@ -145,7 +162,8 @@ private fun Replies(
 
         LazyColumn(
             state = scrollState,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
                 .animateContentSize(),
             reverseLayout = true,
         ) {

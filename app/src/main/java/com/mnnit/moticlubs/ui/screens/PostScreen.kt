@@ -24,9 +24,9 @@ import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
-import com.mnnit.moticlubs.ui.components.postscreen.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
+import com.mnnit.moticlubs.ui.components.postscreen.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -135,7 +135,7 @@ fun PostScreen(
                             MarkdownRender(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp),
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
                                 mkd = viewModel.postNotificationModel.message,
                                 selectable = true,
                                 disableLinkMovementMethod = true,
@@ -147,7 +147,7 @@ fun PostScreen(
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = 72.dp,
                 sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
-                sheetGesturesEnabled = false
+                sheetGesturesEnabled = viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed
             )
         }
     }
