@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.outlined.GroupAdd
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
-import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 
@@ -37,20 +35,6 @@ fun ChannelNameBar(
     onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
     onBackPressed: () -> Unit
 ) {
-    if (viewModel.showSubsDialog.value) {
-        val subscribe = !viewModel.userSubscribed.value
-        ConfirmationDialog(
-            showDialog = viewModel.showSubsDialog,
-            message = "Are you sure you want to ${if (subscribe) "subscribe" else "unsubscribe"} ?",
-            positiveBtnText = if (subscribe) "Subscribe" else "Unsubscribe",
-            imageVector = if (subscribe) Icons.Rounded.NotificationsActive else Icons.Outlined.NotificationsOff,
-            onPositive = {
-                viewModel.progressText.value = if (subscribe) "Subscribing ..." else "Unsubscribing ..."
-                viewModel.subscribeToClub(subscribe)
-            }
-        )
-    }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -86,7 +70,9 @@ fun ChannelNameBar(
 
             // Number of members
             Text(
-                text = "${viewModel.subscriberList.size} Members",
+                text = if (viewModel.memberCount.intValue == -1) "General" else {
+                    "${viewModel.memberCount.intValue} members"
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
@@ -104,21 +90,22 @@ fun ChannelNameBar(
                         viewModel.searchMode.value = true
                     }, contentDescription = ""
             )
-            // Info icon
-            Icon(
-                imageVector = if (viewModel.userSubscribed.value) {
-                    Icons.Rounded.NotificationsActive
-                } else Icons.Outlined.NotificationsOff,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(start = 16.dp)
-                    .height(64.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        viewModel.showSubsDialog.value = true
-                    },
-                contentDescription = ""
-            )
+
+            if (viewModel.isAdmin) {
+                // Info icon
+                Icon(
+                    imageVector = Icons.Outlined.GroupAdd,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 16.dp)
+                        .height(64.dp)
+                        .clip(CircleShape)
+                        .clickable {
+//                            viewModel.showSubsDialog.value = true
+                        },
+                    contentDescription = ""
+                )
+            }
         }
     }
 }

@@ -17,7 +17,11 @@ data class ChannelDto(
 
     @SerializedName("name")
     @Expose
-    var name: String
+    var name: String,
+
+    @SerializedName("private")
+    @Expose
+    var private: Boolean,
 ) : Parcelable
 
 @Parcelize
@@ -28,7 +32,11 @@ data class UpdateChannelDto(
 
     @SerializedName("name")
     @Expose
-    var name: String
+    var name: String,
+
+    @SerializedName("private")
+    @Expose
+    var private: Boolean,
 ) : Parcelable
 
 @Parcelize

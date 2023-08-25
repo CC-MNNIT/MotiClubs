@@ -13,12 +13,12 @@ interface ReplyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateReply(reply: Reply)
 
-    @Query("SELECT * FROM reply WHERE pid = :postID AND page = :page ORDER BY time DESC")
-    suspend fun getRepliesByPost(postID: Long, page: Int): List<Reply>
+    @Query("SELECT * FROM reply WHERE pid = :postId AND page = :page ORDER BY time DESC")
+    suspend fun getRepliesByPost(postId: Long, page: Int): List<Reply>
 
     @Delete
     suspend fun deleteReply(reply: Reply)
 
-    @Query("DELETE FROM reply WHERE time = :replyID")
-    suspend fun deleteReplyID(replyID: Long)
+    @Query("DELETE FROM reply WHERE time = :replyId")
+    suspend fun deleteReplyID(replyId: Long)
 }

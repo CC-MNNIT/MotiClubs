@@ -9,8 +9,8 @@ interface UrlDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateUrl(url: Url)
 
-    @Query("SELECT * FROM url WHERE url.cid = :clubID")
-    suspend fun getUrlsFromClub(clubID: Long): List<Url>
+    @Query("SELECT * FROM url WHERE url.cid = :clubId")
+    suspend fun getUrlsFromClub(clubId: Long): List<Url>
 
     @Delete
     suspend fun deleteUrl(url: Url)

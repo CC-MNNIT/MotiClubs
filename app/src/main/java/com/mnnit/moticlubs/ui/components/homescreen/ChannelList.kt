@@ -93,6 +93,7 @@ fun ChannelList(
                             onClick = {
                                 viewModel.eventChannel = model
                                 viewModel.updateChannelName = model.name
+                                viewModel.updateChannelPrivate = model.private
                                 viewModel.showUpdateChannelDialog = true
                             }
                         ) {
@@ -118,7 +119,7 @@ fun ChannelList(
         ) {
             Card(
                 onClick = {
-                    viewModel.eventChannel = Channel(-1L, clubModel.clubId, "")
+                    viewModel.eventChannel = Channel(-1L, clubModel.clubId, "", 0)
                     viewModel.showAddChannelDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),

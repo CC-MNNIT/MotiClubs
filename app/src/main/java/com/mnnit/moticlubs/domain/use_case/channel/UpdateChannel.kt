@@ -14,10 +14,10 @@ class UpdateChannel(private val repository: Repository) {
         "Unable to update channel",
         query = { channel },
         apiCall = { apiService, auth ->
-            apiService.updateChannelName(
+            apiService.updateChannel(
                 auth,
                 channel.channelId,
-                UpdateChannelDto(channel.clubId, channel.name)
+                UpdateChannelDto(channel.clubId, channel.name, channel.private == 1)
             )
         },
         saveResponse = { _, new -> repository.insertOrUpdateChannel(new.mapToDomain()) }

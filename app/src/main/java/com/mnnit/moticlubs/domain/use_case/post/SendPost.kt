@@ -10,11 +10,14 @@ import kotlinx.coroutines.flow.Flow
 
 class SendPost(private val repository: Repository) {
 
-    operator fun invoke(post: Post, clubId: Long, general: Int): Flow<Resource<List<Post>>> =
-        repository.networkResource(
-            "Error sending post",
-            query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
-            apiCall = { apiService, auth -> apiService.sendPost(auth, clubId, post.mapFromDomain(general)) },
-            saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) }
-        )
+    operator fun invoke(
+        post: Post,
+        clubId: Long,
+        general: Int
+    ): Flow<Resource<List<Post>>> = repository.networkResource(
+        "Error sending post",
+        query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
+        apiCall = { apiService, auth -> apiService.sendPost(auth, clubId, post.mapFromDomain(general)) },
+        saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) }
+    )
 }

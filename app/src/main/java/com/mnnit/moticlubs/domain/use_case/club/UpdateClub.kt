@@ -15,7 +15,9 @@ class UpdateClub(private val repository: Repository) {
         query = { repository.getClub(clubID = club.clubId) },
         apiCall = { apiService, auth ->
             apiService.updateClub(
-                auth, club.clubId, UpdateClubDto(
+                auth,
+                club.clubId,
+                UpdateClubDto(
                     description = club.description,
                     avatar = club.avatar,
                     summary = club.summary

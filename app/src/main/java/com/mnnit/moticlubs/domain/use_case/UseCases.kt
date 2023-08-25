@@ -7,6 +7,9 @@ import com.mnnit.moticlubs.domain.use_case.channel.UpdateChannel
 import com.mnnit.moticlubs.domain.use_case.club.GetAdmins
 import com.mnnit.moticlubs.domain.use_case.club.GetClubs
 import com.mnnit.moticlubs.domain.use_case.club.UpdateClub
+import com.mnnit.moticlubs.domain.use_case.member.AddMembers
+import com.mnnit.moticlubs.domain.use_case.member.GetMembers
+import com.mnnit.moticlubs.domain.use_case.member.RemoveMembers
 import com.mnnit.moticlubs.domain.use_case.post.DeletePost
 import com.mnnit.moticlubs.domain.use_case.post.GetPosts
 import com.mnnit.moticlubs.domain.use_case.post.SendPost
@@ -14,9 +17,6 @@ import com.mnnit.moticlubs.domain.use_case.post.UpdatePost
 import com.mnnit.moticlubs.domain.use_case.reply.DeleteReply
 import com.mnnit.moticlubs.domain.use_case.reply.GetReplies
 import com.mnnit.moticlubs.domain.use_case.reply.SendReply
-import com.mnnit.moticlubs.domain.use_case.subscribe.GetSubscribers
-import com.mnnit.moticlubs.domain.use_case.subscribe.SubscribeClub
-import com.mnnit.moticlubs.domain.use_case.subscribe.UnsubscribeClub
 import com.mnnit.moticlubs.domain.use_case.urls.AddUrls
 import com.mnnit.moticlubs.domain.use_case.urls.GetUrls
 import com.mnnit.moticlubs.domain.use_case.user.GetUser
@@ -31,10 +31,10 @@ data class PostUseCases(
     val deletePost: DeletePost
 )
 
-data class SubscriberUseCases(
-    val getSubscribers: GetSubscribers,
-    val subscribeClub: SubscribeClub,
-    val unsubscribeClub: UnsubscribeClub
+data class MemberUseCases(
+    val getMembers: GetMembers,
+    val addMembers: AddMembers,
+    val removeMembers: RemoveMembers
 )
 
 data class UserUseCases(

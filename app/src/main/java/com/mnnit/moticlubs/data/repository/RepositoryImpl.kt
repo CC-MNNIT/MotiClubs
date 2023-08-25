@@ -9,7 +9,7 @@ import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
-import com.mnnit.moticlubs.domain.model.Subscriber
+import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
@@ -105,21 +105,21 @@ class RepositoryImpl(
     }
 
     override suspend fun deletePostID(postID: Long) {
-        db.withTransaction { dao.deletePostID(postID) }
+        db.withTransaction { dao.deletePostId(postID) }
     }
 
     // ----------- SUBSCRIBER
 
-    override suspend fun insertOrUpdateSubscriber(subscriber: Subscriber) {
-        db.withTransaction { dao.insertOrUpdateSubscriber(subscriber) }
+    override suspend fun insertOrUpdateMember(member: Member) {
+        db.withTransaction { dao.insertOrUpdateMember(member) }
     }
 
-    override suspend fun getSubscribers(clubID: Long): List<Subscriber> {
-        return dao.getSubscribers(clubID)
+    override suspend fun getMembers(channelId: Long): List<Member> {
+        return dao.getMembers(channelId)
     }
 
-    override suspend fun deleteSubscriber(subscriber: Subscriber) {
-        db.withTransaction { dao.deleteSubscriber(subscriber) }
+    override suspend fun deleteMember(member: Member) {
+        db.withTransaction { dao.deleteMember(member) }
     }
 
     // ----------- URL

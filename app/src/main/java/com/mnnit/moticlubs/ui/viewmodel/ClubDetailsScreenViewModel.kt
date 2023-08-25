@@ -15,11 +15,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.model.Club
-import com.mnnit.moticlubs.domain.model.Subscriber
+import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
-import com.mnnit.moticlubs.domain.use_case.SubscriberUseCases
+import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.UrlUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
@@ -38,14 +38,14 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private val application: Application,
     private val urlUseCases: UrlUseCases,
     private val clubUseCases: ClubUseCases,
-    private val subscriberUseCases: SubscriberUseCases,
+    private val memberUseCases: MemberUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     var clubModel by mutableStateOf(savedStateHandle.get<Club>(NavigationArgs.CLUB_ARG) ?: Club())
     private var userModel by mutableStateOf(savedStateHandle.get<User>(NavigationArgs.USER_ARG) ?: User())
 
-    val subscriberList = mutableStateListOf<Subscriber>()
+    val memberList = mutableStateListOf<Member>()
     var isAdmin by mutableStateOf(false)
 
     var isFetching by mutableStateOf(false)
@@ -89,20 +89,20 @@ class ClubDetailsScreenViewModel @Inject constructor(
 
     private fun getSubscribers() {
         getSubscribersJob?.cancel()
-        getSubscribersJob = subscriberUseCases.getSubscribers(clubModel.clubId).onEach { resource ->
+        getSubscribersJob = memberUseCases.getMembers(clubModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
-                        subscriberList.clear()
-                        subscriberList.addAll(list)
+                        memberList.clear()
+                        memberList.addAll(list)
                     }
                 }
 
                 is Resource.Success -> {
-                    subscriberList.clear()
-                    subscriberList.addAll(resource.data)
+                    memberList.clear()
+                    memberList.addAll(resource.data)
 
-                    Log.d("TAG", "getSubscribers: ${subscriberList.size}")
+                    Log.d("TAG", "getSubscribers: ${memberList.size}")
                 }
 
                 is Resource.Error -> {

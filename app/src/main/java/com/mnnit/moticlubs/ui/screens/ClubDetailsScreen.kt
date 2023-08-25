@@ -150,7 +150,7 @@ fun ClubDetailsScreen(
                             )
                             Text(
                                 modifier = Modifier.padding(),
-                                text = "${viewModel.subscriberList.size} Members",
+                                text = "${viewModel.memberList.size} Members",
                                 fontSize = 12.sp
                             )
 

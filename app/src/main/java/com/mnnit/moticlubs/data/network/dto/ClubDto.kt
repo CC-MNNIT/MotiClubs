@@ -41,13 +41,3 @@ data class UpdateClubDto(
     @Expose
     var summary: String,
 )
-
-data class SubscriberDto(
-    @SerializedName("uid")
-    @Expose
-    var userId: Long,
-
-    @SerializedName("cid")
-    @Expose
-    var clubId: Long,
-)

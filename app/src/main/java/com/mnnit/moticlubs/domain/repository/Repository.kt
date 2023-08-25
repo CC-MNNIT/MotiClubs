@@ -7,7 +7,7 @@ import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
-import com.mnnit.moticlubs.domain.model.Subscriber
+import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
@@ -63,13 +63,13 @@ interface Repository {
 
     suspend fun deletePostID(postID: Long)
 
-    // ----------- SUBSCRIBER
+    // ----------- MEMBER
 
-    suspend fun insertOrUpdateSubscriber(subscriber: Subscriber)
+    suspend fun insertOrUpdateMember(member: Member)
 
-    suspend fun getSubscribers(clubID: Long): List<Subscriber>
+    suspend fun getMembers(channelId: Long): List<Member>
 
-    suspend fun deleteSubscriber(subscriber: Subscriber)
+    suspend fun deleteMember(member: Member)
 
     // ----------- URL
 

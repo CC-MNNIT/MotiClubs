@@ -51,7 +51,16 @@ fun ChannelDto.mapToDomain(): Channel =
     Channel(
         channelId = this.channelId,
         clubId = this.clubId,
-        name = this.name
+        name = this.name,
+        private = if (this.private) 1 else 0
+    )
+
+fun Channel.mapFromDomain(): ChannelDto =
+    ChannelDto(
+        channelId = this.channelId,
+        clubId = this.clubId,
+        name = this.name,
+        private = this.private == 1
     )
 
 fun PostDto.mapToDomain(page: Int): Post =

@@ -13,13 +13,13 @@ interface UrlApi {
     @GET(URL_ROUTE)
     suspend fun getUrls(
         @Header(AUTHORIZATION_HEADER) auth: String?,
-        @Query(CLUB_ID_CLAIM) clubId: Long
+        @Query(CLUB_ID_CLAIM) clubId: Long,
     ): Response<List<UrlResponseModel>?>
 
     @POST(URL_ROUTE)
     suspend fun pushUrls(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Query(CLUB_ID_CLAIM) clubId: Long,
-        @Body urlDto: UrlDto
+        @Body urlDto: UrlDto,
     ): Response<List<UrlResponseModel>?>
 }

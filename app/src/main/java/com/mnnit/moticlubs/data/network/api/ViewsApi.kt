@@ -18,6 +18,6 @@ interface ViewsApi {
     @POST(VIEW_ROUTE)
     suspend fun addView(
         @Header(AUTHORIZATION_HEADER) auth: String?,
-        @Body viewDto: ViewDto
+        @Body viewDto: ViewDto,
     ): Response<ViewDto?>
 }

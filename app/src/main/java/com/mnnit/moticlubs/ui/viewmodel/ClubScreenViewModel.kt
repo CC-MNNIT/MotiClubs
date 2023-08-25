@@ -17,8 +17,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.mnnit.moticlubs.domain.model.*
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
+import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.PostUseCases
-import com.mnnit.moticlubs.domain.use_case.SubscriberUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
@@ -36,7 +36,7 @@ class ClubScreenViewModel @Inject constructor(
     private val userUseCases: UserUseCases,
     private val clubUseCases: ClubUseCases,
     private val postUseCases: PostUseCases,
-    private val subscriberUseCases: SubscriberUseCases,
+    private val memberUseCases: MemberUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -52,7 +52,7 @@ class ClubScreenViewModel @Inject constructor(
     val adminMap = mutableStateMapOf<Long, User>()
     val postsList = mutableStateListOf<Post>()
     val loadingPosts = mutableStateOf(false)
-    val subscriberList = mutableStateListOf<Subscriber>()
+    val memberCount = mutableIntStateOf(-1)
 
     val editMode = mutableStateOf(false)
     val showEditDialog = mutableStateOf(false)
@@ -70,11 +70,9 @@ class ClubScreenViewModel @Inject constructor(
     val progressText = mutableStateOf("Loading ...")
     val showProgress = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
-    val showSubsDialog = mutableStateOf(false)
     val showDelPostDialog = mutableStateOf(false)
     val showClearDraftDialog = mutableStateOf(false)
 
-    val userSubscribed = mutableStateOf(false)
     val bottomSheetScaffoldState = mutableStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
@@ -95,8 +93,7 @@ class ClubScreenViewModel @Inject constructor(
     private var crudPostJob: Job? = null
     private var getPostsJob: Job? = null
 
-    private var getSubscribersJob: Job? = null
-    private var subscriberJob: Job? = null
+    private var getMembersJob: Job? = null
 
     fun clearEditor() {
         eventPostMsg.value = TextFieldValue("")
@@ -158,31 +155,23 @@ class ClubScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getSubscribers() {
-        getSubscribersJob?.cancel()
-        getSubscribersJob = subscriberUseCases.getSubscribers(clubModel.clubId).onEach { resource ->
+    private fun getMembers() {
+        if (channelModel.private == 0) {
+            memberCount.intValue = -1
+            return
+        }
+
+        getMembersJob?.cancel()
+        getMembersJob = memberUseCases.getMembers(clubModel.clubId).onEach { resource ->
             when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        subscriberList.clear()
-                        subscriberList.addAll(list)
-                    }
-                }
+                is Resource.Loading -> resource.data?.let { list -> memberCount.intValue = list.size }
 
                 is Resource.Success -> {
-                    subscriberList.clear()
-                    subscriberList.addAll(resource.data)
-
-                    userSubscribed.value = subscriberList.any { s ->
-                        s.userId == userModel.userId && s.clubId == clubModel.clubId
-                    }
-
-                    Log.d("TAG", "fetchSubscribers: ${subscriberList.size}")
+                    memberCount.intValue = resource.data.size
+                    Log.d("TAG", "getMembers: ${memberCount.intValue}")
                 }
 
-                is Resource.Error -> {
-                    Log.d("TAG", "fetchSubscribers: error: ${resource.errCode} : ${resource.errMsg}")
-                }
+                is Resource.Error -> Log.d("TAG", "getMembers: error: ${resource.errCode} : ${resource.errMsg}")
             }
         }.launchIn(viewModelScope)
     }
@@ -205,47 +194,6 @@ class ClubScreenViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    }
-
-    fun subscribeToClub(subscribe: Boolean) {
-        showProgress.value = true
-
-        subscriberJob?.cancel()
-        subscriberJob = if (subscribe) {
-            subscriberUseCases.subscribeClub(Subscriber(userModel.userId, clubModel.clubId)).onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> showProgress.value = true
-                    is Resource.Success -> {
-                        showProgress.value = false
-                        getSubscribers()
-                        Toast.makeText(application, "Subscribed", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is Resource.Error -> {
-                        showProgress.value = false
-                        Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-            }.launchIn(viewModelScope)
-        } else {
-            subscriberUseCases.unsubscribeClub(Subscriber(userModel.userId, clubModel.clubId)).onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> showProgress.value = true
-                    is Resource.Success -> {
-                        showProgress.value = false
-                        getSubscribers()
-                        Toast.makeText(application, "Unsubscribed", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is Resource.Error -> {
-                        showProgress.value = false
-                        Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
-            }.launchIn(viewModelScope)
         }
     }
 
@@ -276,8 +224,7 @@ class ClubScreenViewModel @Inject constructor(
 
                 is Resource.Error -> {
                     showProgress.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
                 }
             }
         }.launchIn(viewModelScope)
@@ -349,7 +296,7 @@ class ClubScreenViewModel @Inject constructor(
 
     init {
         registerPostReceiver()
-        getSubscribers()
+        getMembers()
         getAdmins()
         getPostsList()
     }

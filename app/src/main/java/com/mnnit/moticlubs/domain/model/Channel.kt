@@ -18,6 +18,9 @@ data class Channel(
 
     @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "private")
+    val private: Int,
 ) : Parcelable {
-    constructor() : this(-1L, -1, "")
+    constructor() : this(-1L, -1, "", 0)
 }

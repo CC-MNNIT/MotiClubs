@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +59,7 @@ class HomeScreenViewModel @Inject constructor(
     var eventChannel by mutableStateOf(Channel())
     var inputChannelName by mutableStateOf("")
     var updateChannelName by mutableStateOf("")
+    var updateChannelPrivate by mutableIntStateOf(0)
 
     private var getUserJob: Job? = null
     private var getAdminJob: Job? = null
@@ -104,8 +106,13 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    channelMap[eventChannel.clubId]?.removeIf { m -> m.channelId == eventChannel.channelId }
-                    channelMap[eventChannel.clubId]?.add(eventChannel)
+                    channelMap[eventChannel.clubId]?.replaceAll { item ->
+                        if (item.channelId == eventChannel.channelId) {
+                            eventChannel
+                        } else {
+                            item
+                        }
+                    }
                     showProgressDialog = false
 
                     Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()

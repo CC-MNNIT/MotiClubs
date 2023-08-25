@@ -17,6 +17,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -99,6 +100,21 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Text(text = "Private", modifier = Modifier.align(Alignment.CenterVertically))
+                    Switch(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically),
+                        checked = viewModel.updateChannelPrivate == 1,
+                        onCheckedChange = { viewModel.updateChannelPrivate = if (it) 1 else 0 },
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
@@ -113,7 +129,10 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
 
                     Button(
                         onClick = {
-                            viewModel.eventChannel = viewModel.eventChannel.copy(name = viewModel.updateChannelName)
+                            viewModel.eventChannel = viewModel.eventChannel.copy(
+                                name = viewModel.updateChannelName,
+                                private = viewModel.updateChannelPrivate,
+                            )
                             onUpdate()
                         },
                         modifier = Modifier

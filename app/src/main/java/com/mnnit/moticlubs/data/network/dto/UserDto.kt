@@ -65,12 +65,6 @@ data class UpdateUserAvatarDto(
     var avatar: String,
 )
 
-data class SubscribedClubDto(
-    @SerializedName("cid")
-    @Expose
-    var clubId: Long,
-)
-
 data class FCMDto(
     @SerializedName("uid")
     @Expose
