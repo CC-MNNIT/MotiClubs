@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -136,13 +135,13 @@ fun HomeScreen(
                 }
             },
             floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    text = { Text(text = "About Us", fontSize = 15.sp, textAlign = TextAlign.Center) },
-                    icon = { Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "") },
+                FloatingActionButton(
                     onClick = { onNavigateContactUs() },
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.padding()
-                )
+                ) {
+                    Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "")
+                }
             }
         )
     }
