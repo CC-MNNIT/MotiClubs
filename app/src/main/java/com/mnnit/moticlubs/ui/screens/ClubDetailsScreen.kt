@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +25,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -96,7 +94,7 @@ fun ClubDetailsScreen(
 
                 if (viewModel.showColorPaletteDialog.value) {
                     ColorPaletteDialog(
-                        otherLinkComposeModel = viewModel.otherLinksLiveList[viewModel.otherLinkIdx.value],
+                        otherLinkComposeModel = viewModel.otherLinksLiveList[viewModel.otherLinkIdx.intValue],
                         viewModel.showColorPaletteDialog
                     )
                 }
@@ -223,38 +221,36 @@ private fun ClubProfilePic(
         imageCropLauncher.launch(cropOptions)
     }
 
-    Row(modifier = modifier) {
-        IconButton(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .size(42.dp),
-            onClick = { onNavigateBackPressed() }
-        ) {
-            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+    Column(modifier = modifier) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .size(42.dp),
+                onClick = { onNavigateBackPressed() }
+            ) {
+                Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (viewModel.isAdmin) {
+                IconButton(
+                    onClick = { launcher.launch("image/*") },
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .size(42.dp),
+                ) {
+                    Icon(imageVector = Icons.Rounded.AddAPhoto, contentDescription = "")
+                }
+            }
         }
 
         ProfilePicture(
-            modifier = Modifier.padding(
-                start = 66.dp,
-                end = if (viewModel.isAdmin) 0.dp else 108.dp
-            ),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             url = viewModel.clubModel.avatar,
             size = 156.dp
         )
-
-        if (viewModel.isAdmin) {
-            IconButton(
-                onClick = {
-                    launcher.launch("image/*")
-                },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
-                    .padding(end = 56.dp)
-                    .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-            ) {
-                Icon(painter = rememberVectorPainter(image = Icons.Rounded.AddAPhoto), contentDescription = "")
-            }
-        }
     }
 }
 
