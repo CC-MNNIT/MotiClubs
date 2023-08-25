@@ -24,6 +24,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
@@ -73,13 +74,18 @@ fun ClubList(
                             .padding(start = 16.dp)
                             .fillMaxWidth(0.9f)
                     ) {
-                        Text(text = clubsList[idx].name, fontSize = 16.sp)
+                        Text(
+                            text = clubsList[idx].name,
+                            fontSize = 16.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                         Text(
                             text = clubsList[idx].summary,
                             fontSize = 14.sp,
                             modifier = Modifier.fillMaxWidth(0.9f),
-                            softWrap = true,
-                            maxLines = 2
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 

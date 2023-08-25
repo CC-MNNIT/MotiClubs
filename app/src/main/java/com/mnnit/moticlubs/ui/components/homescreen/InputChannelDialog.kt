@@ -1,14 +1,17 @@
 package com.mnnit.moticlubs.ui.components.homescreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,9 +29,13 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 @Composable
 fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
     val colorScheme = getColorScheme()
-    Dialog(onDismissRequest = { viewModel.showAddChannelDialog = false }, DialogProperties()) {
+    Dialog(
+        onDismissRequest = { viewModel.showAddChannelDialog = false },
+        DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(colorScheme.background)
@@ -40,6 +47,22 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     fontWeight = FontWeight.SemiBold
                 )
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Private channel", modifier = Modifier.align(Alignment.CenterVertically))
+                    Switch(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically),
+                        checked = viewModel.inputChannelPrivate == 1,
+                        onCheckedChange = { viewModel.inputChannelPrivate = if (it) 1 else 0 },
+                    )
+                }
 
                 OutlinedTextField(
                     modifier = Modifier
@@ -57,7 +80,8 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                     onClick = {
                         viewModel.eventChannel = viewModel.eventChannel.copy(
                             channelId = System.currentTimeMillis(),
-                            name = viewModel.inputChannelName
+                            name = viewModel.inputChannelName,
+                            private = viewModel.inputChannelPrivate
                         )
                         onClick()
                     },

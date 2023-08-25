@@ -32,8 +32,8 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.*
-import com.mnnit.moticlubs.ui.components.clubscreen.PostCreateUpdateBottomSheet
 import com.mnnit.moticlubs.ui.components.clubscreen.ChannelNameBar
+import com.mnnit.moticlubs.ui.components.clubscreen.PostCreateUpdateBottomSheet
 import com.mnnit.moticlubs.ui.components.clubscreen.PostItem
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme

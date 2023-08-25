@@ -34,9 +34,10 @@ fun InputLinkDialog(
     postMsg: MutableState<TextFieldValue>
 ) {
     val colorScheme = getColorScheme()
-    Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties()) {
+    Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
             modifier = Modifier
+                .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(colorScheme.background)

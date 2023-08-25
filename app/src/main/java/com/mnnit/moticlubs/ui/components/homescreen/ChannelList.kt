@@ -3,6 +3,7 @@ package com.mnnit.moticlubs.ui.components.homescreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,18 +14,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
@@ -55,16 +59,29 @@ fun ChannelList(
                 shape = RoundedCornerShape(0.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
             ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Icon(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .padding(horizontal = 16.dp)
+                            .weight(0.2f)
+                            .align(Alignment.CenterVertically),
+                        imageVector = Icons.Rounded.Lock,
+                        contentDescription = "",
+                        tint = if (model.private == 1) {
+                            LocalContentColor.current
+                        } else colorScheme.surfaceColorAtElevation(8.dp)
+                    )
+
                     Text(
                         model.name,
                         fontSize = 14.sp,
                         modifier = Modifier
-                            .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 16.dp)
+                            .padding(top = 12.dp, bottom = 12.dp, end = 16.dp)
                             .align(Alignment.CenterVertically)
-                            .fillMaxWidth(if (viewModel.adminList.any {
-                                    it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
-                                }) 0.8f else 0.9f)
+                            .weight(1f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
 
                     AnimatedVisibility(
@@ -75,21 +92,22 @@ fun ChannelList(
                         BadgedBox(
                             badge = {
                                 Badge { Text(text = "${context.getUnreadPost(model.channelId).size}") }
-                            }, modifier = Modifier.align(Alignment.CenterVertically)
+                            }, modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .weight(0.2f)
                         ) {}
                     }
 
-                    AnimatedVisibility(
-                        visible = viewModel.adminList.any {
+                    if (viewModel.adminList.any {
                             it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
-                        } && model.name != "General",
-                        modifier = Modifier
+                        } && model.name != "General"
                     ) {
                         IconButton(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
-                                .padding(top = 1.dp, start = 16.dp)
-                                .height(36.dp),
+                                .padding(top = 1.dp, bottom = 1.dp, start = 16.dp)
+                                .height(42.dp)
+                                .weight(0.3f),
                             onClick = {
                                 viewModel.eventChannel = model
                                 viewModel.updateChannelName = model.name
@@ -105,6 +123,16 @@ fun ChannelList(
                                 contentDescription = ""
                             )
                         }
+                    } else {
+                        Icon(
+                            modifier = Modifier
+                                .size(18.dp)
+                                .weight(0.3f)
+                                .align(Alignment.CenterVertically),
+                            imageVector = Icons.Rounded.Edit,
+                            contentDescription = "",
+                            tint = colorScheme.surfaceColorAtElevation(8.dp)
+                        )
                     }
                 }
             }
@@ -120,6 +148,8 @@ fun ChannelList(
             Card(
                 onClick = {
                     viewModel.eventChannel = Channel(-1L, clubModel.clubId, "", 0)
+                    viewModel.inputChannelName = ""
+                    viewModel.inputChannelPrivate = 0
                     viewModel.showAddChannelDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),

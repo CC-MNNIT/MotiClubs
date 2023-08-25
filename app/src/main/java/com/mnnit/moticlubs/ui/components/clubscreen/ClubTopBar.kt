@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.GroupAdd
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Card
@@ -25,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
@@ -69,7 +69,7 @@ fun ChannelNameBar(
                     Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                 }
 
-                Spacer(modifier = Modifier.padding(4.dp))
+                Spacer(modifier = Modifier.padding(8.dp))
 
                 ProfilePicture(
                     modifier = Modifier
@@ -95,6 +95,8 @@ fun ChannelNameBar(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 // Number of members
@@ -115,33 +117,16 @@ fun ChannelNameBar(
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.4f)
+                    .weight(0.2f)
             ) {
-                Row(
+                // Search icon
+                IconButton(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
+                        .size(42.dp),
+                    onClick = { viewModel.searchMode.value = true }
                 ) {
-                    // Search icon
-                    IconButton(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .size(42.dp),
-                        onClick = { viewModel.searchMode.value = true }
-                    ) {
-                        Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
-                    }
-
-                    if (viewModel.isAdmin && viewModel.channelModel.private == 1) {
-                        // Info icon
-                        IconButton(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .size(42.dp),
-                            onClick = { onBackPressed() }
-                        ) {
-                            Icon(imageVector = Icons.Outlined.GroupAdd, contentDescription = "")
-                        }
-                    }
+                    Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
                 }
             }
         }

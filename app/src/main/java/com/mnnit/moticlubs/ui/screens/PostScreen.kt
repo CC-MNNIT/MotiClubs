@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -101,8 +102,10 @@ fun PostScreen(
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier
-                                            .padding(start = 16.dp)
-                                            .align(Alignment.CenterVertically)
+                                            .padding(horizontal = 16.dp)
+                                            .align(Alignment.CenterVertically),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
                                 Row(

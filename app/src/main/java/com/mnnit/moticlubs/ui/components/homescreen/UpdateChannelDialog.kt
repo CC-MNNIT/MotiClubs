@@ -49,9 +49,13 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
         )
     }
 
-    Dialog(onDismissRequest = { viewModel.showUpdateChannelDialog = false }, DialogProperties()) {
+    Dialog(
+        onDismissRequest = { viewModel.showUpdateChannelDialog = false },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth(0.9f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(colorScheme.background)
@@ -66,8 +70,23 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
 
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Private channel", modifier = Modifier.align(Alignment.CenterVertically))
+                    Switch(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically),
+                        checked = viewModel.updateChannelPrivate == 1,
+                        onCheckedChange = { viewModel.updateChannelPrivate = if (it) 1 else 0 },
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
                     OutlinedTextField(
                         modifier = Modifier
@@ -94,21 +113,6 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                             tint = colorScheme.error
                         )
                     }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Text(text = "Private", modifier = Modifier.align(Alignment.CenterVertically))
-                    Switch(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically),
-                        checked = viewModel.updateChannelPrivate == 1,
-                        onCheckedChange = { viewModel.updateChannelPrivate = if (it) 1 else 0 },
-                    )
                 }
 
                 Row(

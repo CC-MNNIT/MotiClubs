@@ -58,6 +58,7 @@ class HomeScreenViewModel @Inject constructor(
 
     var eventChannel by mutableStateOf(Channel())
     var inputChannelName by mutableStateOf("")
+    var inputChannelPrivate by mutableIntStateOf(0)
     var updateChannelName by mutableStateOf("")
     var updateChannelPrivate by mutableIntStateOf(0)
 

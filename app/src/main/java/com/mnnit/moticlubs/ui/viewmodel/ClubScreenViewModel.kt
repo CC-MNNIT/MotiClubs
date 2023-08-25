@@ -184,7 +184,7 @@ class ClubScreenViewModel @Inject constructor(
             }
 
             resource.d?.let { list ->
-                val admins = list.filter { admin -> admin.clubId == clubModel.clubId }
+                val admins = list.filter { admin -> admin.clubId == channelModel.clubId }
                 isAdmin = admins.any { admin -> admin.userId == userModel.userId }
 
                 admins.forEach { admin ->
@@ -210,7 +210,7 @@ class ClubScreenViewModel @Inject constructor(
         crudPostJob?.cancel()
         crudPostJob = postUseCases.sendPost(
             Post(time, channelID, pageNo = 1, text, userModel.userId),
-            clubModel.clubId, 1
+            channelModel.clubId, 1
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
@@ -264,7 +264,7 @@ class ClubScreenViewModel @Inject constructor(
         showProgress.value = true
 
         crudPostJob?.cancel()
-        crudPostJob = postUseCases.deletePost(eventDeletePost.value, clubModel.clubId).onEach { resource ->
+        crudPostJob = postUseCases.deletePost(eventDeletePost.value, channelModel.clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
