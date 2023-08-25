@@ -162,7 +162,7 @@ class ClubScreenViewModel @Inject constructor(
         }
 
         getMembersJob?.cancel()
-        getMembersJob = memberUseCases.getMembers(clubModel.clubId).onEach { resource ->
+        getMembersJob = memberUseCases.getMembers(channelModel.channelId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> resource.data?.let { list -> memberCount.intValue = list.size }
 
