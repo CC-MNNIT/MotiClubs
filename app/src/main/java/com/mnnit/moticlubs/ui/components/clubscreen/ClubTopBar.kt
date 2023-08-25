@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
@@ -58,18 +59,18 @@ fun ChannelNameBar(
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.4f)
+                    .wrapContentSize()
             ) {
                 IconButton(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .size(28.dp),
-                    onClick = { onBackPressed() }
+                        .size(42.dp),
+                    onClick = onBackPressed
                 ) {
                     Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                 }
 
-                Spacer(modifier = Modifier.padding(8.dp))
+                Spacer(modifier = Modifier.padding(4.dp))
 
                 ProfilePicture(
                     modifier = Modifier
@@ -79,7 +80,7 @@ fun ChannelNameBar(
                 )
             }
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(8.dp))
 
             Column(
                 modifier = Modifier
@@ -112,12 +113,12 @@ fun ChannelNameBar(
                 )
             }
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(8.dp))
 
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.2f)
+                    .wrapContentSize()
             ) {
                 // Search icon
                 IconButton(
