@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Reply
@@ -245,11 +246,13 @@ private fun Reply(
             Column {
                 Row {
                     Text(
-                        text = viewModel.userMap[reply.userId]?.name ?: "",
+                        text = viewModel.userMap[reply.userId]?.name ?: "Random User",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 8.dp),
                         fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(

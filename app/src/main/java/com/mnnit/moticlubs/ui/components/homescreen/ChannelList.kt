@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -59,44 +59,58 @@ fun ChannelList(
                 shape = RoundedCornerShape(0.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
             ) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Icon(
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(
                         modifier = Modifier
-                            .size(42.dp)
-                            .padding(horizontal = 16.dp)
-                            .weight(0.2f)
-                            .align(Alignment.CenterVertically),
-                        imageVector = Icons.Rounded.Lock,
-                        contentDescription = "",
-                        tint = if (model.private == 1) {
-                            LocalContentColor.current
-                        } else colorScheme.surfaceColorAtElevation(8.dp)
-                    )
+                            .align(Alignment.CenterVertically)
+                            .height(42.dp)
+                            .wrapContentSize(),
+                        onClick = {}
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .size(18.dp)
+                                .align(Alignment.CenterVertically),
+                            imageVector = Icons.Rounded.Lock,
+                            contentDescription = "",
+                            tint = if (model.private == 1) {
+                                LocalContentColor.current
+                            } else colorScheme.surfaceColorAtElevation(8.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.padding(4.dp))
 
                     Text(
                         model.name,
                         fontSize = 14.sp,
                         modifier = Modifier
-                            .padding(top = 12.dp, bottom = 12.dp, end = 16.dp)
                             .align(Alignment.CenterVertically)
                             .weight(1f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
 
+                    Spacer(modifier = Modifier.padding(4.dp))
+
                     AnimatedVisibility(
                         visible = context.getUnreadPost(model.channelId).isNotEmpty(),
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                     ) {
-                        BadgedBox(
-                            badge = {
-                                Badge { Text(text = "${context.getUnreadPost(model.channelId).size}") }
-                            }, modifier = Modifier
+                        Badge(
+                            Modifier
                                 .align(Alignment.CenterVertically)
-                                .weight(0.2f)
-                        ) {}
+                                .wrapContentSize()
+                        ) { Text(text = "${context.getUnreadPost(model.channelId).size}") }
                     }
+
+                    Spacer(modifier = Modifier.padding(4.dp))
 
                     if (viewModel.adminList.any {
                             it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
@@ -105,9 +119,8 @@ fun ChannelList(
                         IconButton(
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
-                                .padding(top = 1.dp, bottom = 1.dp, start = 16.dp)
                                 .height(42.dp)
-                                .weight(0.3f),
+                                .wrapContentSize(),
                             onClick = {
                                 viewModel.eventChannel = model
                                 viewModel.updateChannelName = model.name
@@ -123,16 +136,9 @@ fun ChannelList(
                                 contentDescription = ""
                             )
                         }
+                        Spacer(modifier = Modifier.padding(4.dp))
                     } else {
-                        Icon(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .weight(0.3f)
-                                .align(Alignment.CenterVertically),
-                            imageVector = Icons.Rounded.Edit,
-                            contentDescription = "",
-                            tint = colorScheme.surfaceColorAtElevation(8.dp)
-                        )
+                        Spacer(modifier = Modifier.weight(0.2f))
                     }
                 }
             }

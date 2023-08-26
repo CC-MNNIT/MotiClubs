@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.*
@@ -97,7 +98,7 @@ fun PostItem(
                         .align(Alignment.CenterVertically)
                         .padding(16.dp)
                 ) {
-                    BadgedBox(badge = { Badge { } }) {}
+                    Badge { }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -124,7 +125,7 @@ fun PostItem(
                         }
                     }) {
                         Icon(
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                             imageVector = Icons.Rounded.Edit,
                             contentDescription = ""
                         )
@@ -136,7 +137,7 @@ fun PostItem(
                         showDelPostDialog.value = true
                     }) {
                         Icon(
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                             imageVector = Icons.Rounded.Delete,
                             contentDescription = ""
                         )
@@ -149,7 +150,7 @@ fun PostItem(
             color = contentColorFor(backgroundColor = getColorScheme().background),
             maxLines = 4,
             modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp),
-            disableLinkMovementMethod = true
+            disableLinkMovementMethod = true,
         )
     }
 }
@@ -158,13 +159,16 @@ fun PostItem(
 private fun AuthorNameTimestamp(time: Long, name: String) {
     Column(modifier = Modifier
         .padding(start = 16.dp)
-        .semantics(mergeDescendants = true) {}) {
+        .semantics(mergeDescendants = true) {}
+    ) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
             fontSize = 14.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(

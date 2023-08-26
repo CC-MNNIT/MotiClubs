@@ -69,14 +69,14 @@ fun Long.toTimeString(): String {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = this
 
-            val hour = calendar.get(Calendar.HOUR)
+            val hour24 = calendar.get(Calendar.HOUR_OF_DAY)
+            val hour = if (hour24 > 12) hour24 - 12 else hour24
             val min = calendar.get(Calendar.MINUTE)
-            val amPm = calendar.get(Calendar.AM_PM)
             val day = calendar.get(Calendar.DAY_OF_MONTH)
             val month = calendar.get(Calendar.MONTH)
 
             "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
-                    "${if (amPm == Calendar.AM) "AM" else "PM"}, $day ${mMonthsList[month]}"
+                    "${if (hour24 < 12) "AM" else "PM"}, $day ${mMonthsList[month]}"
         }
     }
 }
