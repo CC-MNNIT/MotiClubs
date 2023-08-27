@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -254,6 +255,30 @@ private fun Reply(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
+                    if (reply.userId == viewModel.postNotificationModel.userId) {
+                        Card(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .height(16.dp)
+                                .align(Alignment.CenterVertically),
+                            colors = CardDefaults.cardColors(colorScheme.primary),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(0.dp),
+                        ) {
+                            Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                                Text(
+                                    text = "OP",
+                                    fontSize = 10.sp,
+                                    modifier = Modifier
+                                        .padding(horizontal = 4.dp)
+                                        .align(Alignment.CenterVertically),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = reply.time.toTimeString(),

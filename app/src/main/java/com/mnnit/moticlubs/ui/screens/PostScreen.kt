@@ -136,9 +136,7 @@ fun PostScreen(
                             }
 
                             MarkdownRender(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
+                                modifier = Modifier.fillMaxWidth(),
                                 mkd = viewModel.postNotificationModel.message,
                                 selectable = true,
                                 disableLinkMovementMethod = true,

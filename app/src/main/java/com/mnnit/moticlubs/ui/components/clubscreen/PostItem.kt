@@ -63,7 +63,7 @@ fun PostItem(
                     channelModel.name,
                     channelModel.channelId,
                     postsList[idx].postId,
-                    userID,
+                    postsList[idx].userId,
                     admin.name,
                     admin.avatar,
                     postsList[idx].message,

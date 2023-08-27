@@ -8,8 +8,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddAPhoto
@@ -29,13 +29,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.compressBitmap
-import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loading: MutableState<Boolean>) {
+fun RowScope.UpdateProfileIcon(
+    appViewModel: AppViewModel,
+    modifier: Modifier = Modifier,
+    loading: MutableState<Boolean>
+) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -53,17 +56,11 @@ fun ProfileIcon(appViewModel: AppViewModel, modifier: Modifier = Modifier, loadi
         imageCropLauncher.launch(cropOptions)
     }
 
-    Row(modifier = modifier) {
-        ProfilePicture(modifier = modifier.padding(start = 46.dp), url = appViewModel.user.avatar, size = 156.dp)
-
-        IconButton(
-            onClick = { launcher.launch("image/*") },
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .border(1.dp, getColorScheme().onSurface, shape = RoundedCornerShape(24.dp))
-        ) {
-            Icon(painter = rememberVectorPainter(image = Icons.Rounded.AddAPhoto), contentDescription = "")
-        }
+    IconButton(
+        onClick = { launcher.launch("image/*") },
+        modifier = modifier.size(42.dp),
+    ) {
+        Icon(painter = rememberVectorPainter(image = Icons.Rounded.AddAPhoto), contentDescription = "")
     }
 }
 

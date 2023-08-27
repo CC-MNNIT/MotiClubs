@@ -4,6 +4,7 @@ import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -63,7 +64,10 @@ fun MarkdownRender(
     }
     if (sb.isNotEmpty()) list.add(PreviewMarkdown.Text(sb.toString()))
 
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(bottom = 88.dp, top = 16.dp, start = 16.dp, end = 16.dp)
+    ) {
         items(count = list.size) { idx ->
             if (list[idx] is PreviewMarkdown.Text) {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -72,14 +76,14 @@ fun MarkdownRender(
                         color = contentColorFor(backgroundColor = colorScheme.background),
                         selectable = selectable,
                         disableLinkMovementMethod = disableLinkMovementMethod,
-                        modifier = modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             } else {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                        .padding(vertical = 12.dp)
                 ) {
                     Image(
                         painter = LocalContext.current.getImageUrlPainter(url = list[idx].str), contentDescription = "",

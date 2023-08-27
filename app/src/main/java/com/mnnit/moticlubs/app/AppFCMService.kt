@@ -136,28 +136,31 @@ class AppFCMService : FirebaseMessagingService() {
         Log.d(TAG, "handleData: post notification")
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val postId = data["pid"]?.toLong() ?: -1
+        val userId = data["postUid"]?.toLong() ?: -1
+        val message = data["postMessage"] ?: ""
+        val adminName = data["postUserName"] ?: ""
+        val url = data["postUserAvatar"] ?: ""
+
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
         val channelID = data["chid"]?.toLong() ?: -1
-        val postID = data["pid"]?.toLong() ?: -1
         val clubID = data["cid"]?.toInt() ?: -1
-        val userID = data["uid"]?.toLong() ?: -1
-        val message = data["message"] ?: ""
-        val adminName = data["adminName"] ?: ""
-        val url = data["adminAvatar"] ?: ""
+
         val updated = data["updated"]?.toBoolean() ?: false
 
         LocalBroadcastManager.getInstance(this)
             .sendBroadcast(Intent(Constants.POST_BROADCAST_ACTION))
 
-        if (userID == getUserID()) {
+        if (userId == getUserID()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
             return
         }
 
         val post = PostNotificationModel(
             clubName, channelName,
-            channelID, postID, userID, adminName, url,
+            channelID, postId, userId, adminName, url,
             message
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
@@ -170,11 +173,11 @@ class AppFCMService : FirebaseMessagingService() {
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
-        postRead(channelID, postID)
+        postRead(channelID, postId)
 
         notificationCompat(
             notificationManager,
-            notificationStamp = postID,
+            notificationStamp = postId,
             clubID.toString(),
             clubName,
             "$adminName ${if (updated) "updated" else "posted"} in $clubName",
@@ -188,28 +191,33 @@ class AppFCMService : FirebaseMessagingService() {
         Log.d(TAG, "handleData: reply notification")
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val postId = data["pid"]?.toLong() ?: -1
+        val postUserId = data["postUid"]?.toLong() ?: -1
+        val postMessage = data["postMessage"] ?: ""
+        val postUserName = data["postUserName"] ?: ""
+        val postUserAvatar = data["postUserAvatar"] ?: ""
+
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
         val channelID = data["chid"]?.toLong() ?: -1
-        val postID = data["pid"]?.toLong() ?: -1
         val clubID = data["cid"]?.toInt() ?: -1
-        val userID = data["uid"]?.toLong() ?: -1
-        val message = data["message"] ?: ""
-        val postMessage = data["postMessage"] ?: ""
-        val userName = data["userName"] ?: ""
-        val url = data["userAvatar"] ?: ""
+
+        val replyUserId = data["replyUid"]?.toLong() ?: -1
+        val replyMessage = data["replyMessage"] ?: ""
+        val replyUserName = data["replyUserName"] ?: ""
+        val url = data["replyUserAvatar"] ?: ""
 
         LocalBroadcastManager.getInstance(this)
             .sendBroadcast(Intent(Constants.REPLY_BROADCAST_ACTION))
 
-        if (userID == getUserID()) {
+        if (replyUserId == getUserID()) {
             Log.d(TAG, "replyNotification: reply sender and receiver same")
             return
         }
 
         val post = PostNotificationModel(
             clubName, channelName,
-            channelID, postID, userID, userName, url,
+            channelID, postId, postUserId, postUserName, postUserAvatar,
             postMessage,
         )
         val pendingIntent = TaskStackBuilder.create(this).run {
@@ -222,15 +230,15 @@ class AppFCMService : FirebaseMessagingService() {
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
-        postRead(channelID, postID)
+        postRead(channelID, postId)
 
         notificationCompat(
             notificationManager,
-            notificationStamp = postID,
+            notificationStamp = System.currentTimeMillis(),
             clubID.toString(),
             clubName,
-            "$userName replied in $clubName",
-            message,
+            "$replyUserName replied in $channelName",
+            replyMessage,
             url,
             pendingIntent
         )

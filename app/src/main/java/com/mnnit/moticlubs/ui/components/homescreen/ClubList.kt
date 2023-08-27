@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
 import com.mnnit.moticlubs.domain.util.getExpandedChannel
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
@@ -41,7 +43,8 @@ fun ClubList(
     viewModel: HomeScreenViewModel,
     clubsList: SnapshotStateList<Club>,
     channelMap: MutableMap<Long, SnapshotStateList<Channel>>,
-    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit
+    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit,
+    onNavigateToClubDetails: (club: Club, user: User) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -66,13 +69,14 @@ fun ClubList(
                 Row(modifier = Modifier.padding(16.dp)) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        url = clubsList[idx].avatar
+                        url = clubsList[idx].avatar,
+                        onClick = { onNavigateToClubDetails(viewModel.clubsList[idx], viewModel.user) }
                     )
 
                     Column(
                         modifier = Modifier
                             .padding(start = 16.dp)
-                            .fillMaxWidth(0.9f)
+                            .weight(1f)
                     ) {
                         Text(
                             text = clubsList[idx].name,
@@ -83,11 +87,12 @@ fun ClubList(
                         Text(
                             text = clubsList[idx].summary,
                             fontSize = 14.sp,
-                            modifier = Modifier.fillMaxWidth(0.9f),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
+
+                    Spacer(modifier = Modifier.padding(8.dp))
 
                     AnimatedVisibility(
                         visible = context.clubHasUnreadPost(
@@ -99,6 +104,7 @@ fun ClubList(
                             Badge { Text(text = " ") }
                         }, modifier = Modifier.align(Alignment.CenterVertically)) {}
                     }
+                    Spacer(modifier = Modifier.padding(8.dp))
                 }
 
                 AnimatedVisibility(visible = channelVisibility) {

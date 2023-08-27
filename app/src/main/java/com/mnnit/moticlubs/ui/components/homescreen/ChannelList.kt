@@ -62,7 +62,7 @@ fun ChannelList(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(
@@ -137,8 +137,6 @@ fun ChannelList(
                             )
                         }
                         Spacer(modifier = Modifier.padding(4.dp))
-                    } else {
-                        Spacer(modifier = Modifier.weight(0.2f))
                     }
                 }
             }

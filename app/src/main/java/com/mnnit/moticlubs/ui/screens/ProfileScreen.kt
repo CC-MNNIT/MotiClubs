@@ -12,6 +12,7 @@ import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,8 +26,9 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
+import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.profilescreen.ProfileIcon
+import com.mnnit.moticlubs.ui.components.profilescreen.UpdateProfileIcon
 import com.mnnit.moticlubs.ui.components.profilescreen.UserInfo
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -51,19 +53,33 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit, on
             ) {
                 TopAppBar(
                     modifier = Modifier.padding(top = 16.dp),
-                    title = { Text(text = "Profile", fontSize = 28.sp) },
+                    title = {
+                        Text(
+                            text = "Profile",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = onBackPressed) {
                             Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                         }
                     },
-                    scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+                    scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+                    actions = {
+                        UpdateProfileIcon(
+                            appViewModel = appViewModel,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(end = 16.dp),
+                            loading
+                        )
+                    }
                 )
 
-                ProfileIcon(
-                    appViewModel = appViewModel,
+                ProfilePicture(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    loading
+                    url = appViewModel.user.avatar,
+                    size = 156.dp
                 )
                 UserInfo(appViewModel = appViewModel, modifier = Modifier.padding(top = 56.dp))
 

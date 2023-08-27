@@ -153,7 +153,15 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             onNavigateContactUs = { navController.navigate(AppNavigation.ABOUT_US) },
-                            onNavigateProfile = { navController.navigate(AppNavigation.PROFILE) })
+                            onNavigateProfile = { navController.navigate(AppNavigation.PROFILE) },
+                            onNavigateToClubDetails = { club, user ->
+                                navController.navigate(
+                                    "${AppNavigation.CLUB_DETAIL}?" +
+                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}&" +
+                                            "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(user))}"
+                                )
+                            }
+                        )
                     }
 
                     // CLUB PAGE
