@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
@@ -70,7 +71,7 @@ fun ColumnScope.DeveloperProfile(
                     textAlign = TextAlign.Center
                 )
 
-                if (stream.isNotEmpty()) {
+                if (stream.isTrimmedNotEmpty()) {
                     Text(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
@@ -81,7 +82,7 @@ fun ColumnScope.DeveloperProfile(
                     )
                 }
 
-                if (year.isNotEmpty()) {
+                if (year.isTrimmedNotEmpty()) {
                     Text(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
@@ -99,7 +100,7 @@ fun ColumnScope.DeveloperProfile(
                     .fillMaxHeight()
             ) {
                 if (showIcons) {
-                    if (github.isNotEmpty()) {
+                    if (github.isTrimmedNotEmpty()) {
                         IconButton(
                             modifier = Modifier
                                 .size(28.dp)
@@ -119,7 +120,7 @@ fun ColumnScope.DeveloperProfile(
                         }
                     }
 
-                    if (linkedin.isNotEmpty()) {
+                    if (linkedin.isTrimmedNotEmpty()) {
                         Spacer(modifier = Modifier.padding(8.dp))
                         IconButton(
                             modifier = Modifier

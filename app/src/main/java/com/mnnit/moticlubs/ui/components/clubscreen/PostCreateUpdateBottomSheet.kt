@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProgressDialog
@@ -127,7 +128,7 @@ fun PostCreateUpdateBottomSheet(
                     keyboardController?.hide()
                     focusManager.clearFocus()
 
-                    if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isNotEmpty()) {
+                    if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
                         viewModel.showClearDraftDialog.value = true
                         return@IconButton
                     }
@@ -250,7 +251,7 @@ fun PostCreateUpdateBottomSheet(
                                 text = if (viewModel.editMode.value) "Update" else "Send",
                                 fontSize = 14.sp,
                                 color = contentColorFor(
-                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isNotEmpty()) {
+                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
@@ -262,7 +263,7 @@ fun PostCreateUpdateBottomSheet(
                                 painter = rememberVectorPainter(image = Icons.Rounded.Send),
                                 contentDescription = "",
                                 tint = contentColorFor(
-                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isNotEmpty()) {
+                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
@@ -274,7 +275,7 @@ fun PostCreateUpdateBottomSheet(
                             .align(Alignment.CenterVertically),
                         shape = RoundedCornerShape(24.dp),
                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
-                        enabled = viewModel.eventPostMsg.value.text.isNotEmpty()
+                        enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
                     )
                 }
             }

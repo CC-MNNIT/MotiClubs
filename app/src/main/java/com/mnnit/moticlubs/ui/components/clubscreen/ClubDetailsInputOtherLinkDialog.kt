@@ -35,6 +35,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import kotlinx.coroutines.launch
 
@@ -125,7 +126,7 @@ fun InputOtherLinkDialog(
                                 .filter { it.validUrl() }.map { it.mapToUrlModel() }
                                 .toMutableList()
                             val others = otherLinksLiveList
-                                .filter { it.validUrl() && it.getName().isNotEmpty() }.map { it.mapToUrlModel() }
+                                .filter { it.validUrl() && it.getName().isTrimmedNotEmpty() }.map { it.mapToUrlModel() }
                             list.addAll(others)
                             onClick(list)
                         },

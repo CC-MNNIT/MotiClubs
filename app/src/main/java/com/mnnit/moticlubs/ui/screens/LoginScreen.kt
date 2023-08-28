@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.domain.util.getDomainMail
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setUserID
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -154,7 +155,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .align(Alignment.End),
-                    enabled = !viewModel.isLoading.value && viewModel.emailID.value.isNotEmpty()
+                    enabled = !viewModel.isLoading.value && viewModel.emailID.value.isTrimmedNotEmpty()
                 ) {
                     Text(text = "Forgot password", color = colorScheme.error, fontSize = 14.sp)
                 }

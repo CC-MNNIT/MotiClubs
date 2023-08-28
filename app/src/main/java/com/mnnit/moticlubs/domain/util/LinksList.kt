@@ -31,7 +31,7 @@ abstract class LinkComposeModel {
     abstract fun getName(): String
     fun validUrl(): Boolean {
         val url = getUrl()
-        return url.isNotEmpty() && url.matches(Patterns.WEB_URL.toRegex())
+        return url.isTrimmedNotEmpty() && url.matches(Patterns.WEB_URL.toRegex())
     }
 }
 

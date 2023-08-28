@@ -47,6 +47,7 @@ fun Context.getMkdFormatter() = Markwon.builder(this)
     .build()
 
 fun String.getDomainMail(): String = "$this@mnnit.ac.in"
+fun String.isTrimmedNotEmpty(): Boolean = this.trim().isNotEmpty()
 
 private val mMonthsList: List<String> = listOf(
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

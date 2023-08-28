@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.theme.textColorFor
 
 @Composable
@@ -87,7 +88,7 @@ fun OtherLinkItem(
                 }
             },
             singleLine = true,
-            isError = linksList[idx].getUrl().isNotEmpty() && !linksList[idx].validUrl(),
+            isError = linksList[idx].getUrl().isTrimmedNotEmpty() && !linksList[idx].validUrl(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
         )
     }

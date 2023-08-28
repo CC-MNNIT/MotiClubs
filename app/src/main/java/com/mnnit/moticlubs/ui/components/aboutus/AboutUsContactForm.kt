@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
@@ -125,7 +126,7 @@ fun AboutUsContactForm() {
                             text = "Send",
                             fontSize = 14.sp,
                             color = contentColorFor(
-                                backgroundColor = if (postMsg.isNotEmpty() && name.isNotEmpty()) {
+                                backgroundColor = if (postMsg.isTrimmedNotEmpty() && name.isTrimmedNotEmpty()) {
                                     colorScheme.primary
                                 } else {
                                     colorScheme.onSurface.copy(alpha = 0.38f)
@@ -138,7 +139,7 @@ fun AboutUsContactForm() {
                             painter = rememberVectorPainter(image = Icons.Rounded.Send),
                             contentDescription = "",
                             tint = contentColorFor(
-                                backgroundColor = if (postMsg.isNotEmpty() && name.isNotEmpty()) {
+                                backgroundColor = if (postMsg.isTrimmedNotEmpty() && name.isTrimmedNotEmpty()) {
                                     colorScheme.primary
                                 } else {
                                     colorScheme.onSurface.copy(alpha = 0.38f)
@@ -152,7 +153,7 @@ fun AboutUsContactForm() {
                         .align(Alignment.End),
                     shape = RoundedCornerShape(24.dp),
                     colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
-                    enabled = postMsg.isNotEmpty() && name.isNotEmpty()
+                    enabled = postMsg.isTrimmedNotEmpty() && name.isTrimmedNotEmpty()
                 )
             }
         }

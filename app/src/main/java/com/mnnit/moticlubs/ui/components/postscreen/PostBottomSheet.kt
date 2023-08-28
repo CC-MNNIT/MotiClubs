@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -199,7 +200,7 @@ private fun Replies(
             enabled = !viewModel.showProgress.value,
             trailingIcon = {
                 IconButton(
-                    enabled = viewModel.showProgress.value || viewModel.replyMsg.value.isNotEmpty(),
+                    enabled = viewModel.showProgress.value || viewModel.replyMsg.value.isTrimmedNotEmpty(),
                     onClick = {
                         if (viewModel.replyMsg.value.isEmpty()) return@IconButton
                         viewModel.sendReply()

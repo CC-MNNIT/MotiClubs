@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
@@ -142,7 +143,7 @@ fun UpdateChannelDialog(viewModel: HomeScreenViewModel, onUpdate: () -> Unit, on
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
-                        enabled = viewModel.updateChannelName.isNotEmpty()
+                        enabled = viewModel.updateChannelName.isTrimmedNotEmpty()
                     ) {
                         Text(text = "Save", fontSize = 14.sp)
                     }

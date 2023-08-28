@@ -38,6 +38,7 @@ import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.Links
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.compressBitmap
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.components.clubscreen.DescriptionComponent
 import com.mnnit.moticlubs.ui.components.clubscreen.InputOtherLinkDialog
@@ -147,7 +148,7 @@ fun ClubDetailsScreen(
                                 fontWeight = FontWeight.SemiBold
                             )
 
-                            val socials = viewModel.socialLinks.filter { f -> f.name.isNotEmpty() }
+                            val socials = viewModel.socialLinks.filter { f -> f.name.isTrimmedNotEmpty() }
                             if (socials.isNotEmpty() || viewModel.isAdmin) {
                                 Links(
                                     isAdmin = viewModel.isAdmin,

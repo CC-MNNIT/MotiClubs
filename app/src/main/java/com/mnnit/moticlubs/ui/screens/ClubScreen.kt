@@ -32,6 +32,7 @@ import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.components.clubscreen.ChannelNameBar
 import com.mnnit.moticlubs.ui.components.clubscreen.PostCreateUpdateBottomSheet
@@ -206,7 +207,7 @@ fun Posts(
                 .padding(horizontal = 16.dp)
         ) {
             items(viewModel.postsList.size) { index ->
-                if (viewModel.searchMode.value && viewModel.searchValue.value.isNotEmpty() &&
+                if (viewModel.searchMode.value && viewModel.searchValue.value.isTrimmedNotEmpty() &&
                     !viewModel.postsList[index].message.toLowerCase(LocaleList.current)
                         .contains(viewModel.searchValue.value.toLowerCase(LocaleList.current))
                 ) {

@@ -9,6 +9,7 @@ import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.apiInvoker
 import com.mnnit.moticlubs.domain.util.getAuthToken
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,13 +26,13 @@ class LoginScreenViewModel @Inject constructor(
     val isPasswordVisible = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
     val isPasswordInvalid
-        get() = password.value.isNotEmpty() && password.value.length <= 6
+        get() = password.value.isTrimmedNotEmpty() && password.value.length <= 6
 
     val isLoginButtonEnabled
         get() = !isLoading.value
                 && !isPasswordInvalid
-                && password.value.isNotEmpty()
-                && emailID.value.isNotEmpty()
+                && password.value.isTrimmedNotEmpty()
+                && emailID.value.isTrimmedNotEmpty()
 
     fun resetState() {
         emailID.value = ""
