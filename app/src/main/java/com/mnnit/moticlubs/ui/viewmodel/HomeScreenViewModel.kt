@@ -246,7 +246,7 @@ class HomeScreenViewModel @Inject constructor(
     private fun getChannels() {
         isFetchingChannels = true
         getChannelsJob?.cancel()
-        getChannelsJob = channelUseCases.getChannels().onEach { resource ->
+        getChannelsJob = channelUseCases.getAllChannels().onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->

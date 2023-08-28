@@ -49,7 +49,9 @@ interface Repository {
 
     suspend fun insertOrUpdateChannel(channel: Channel)
 
-    suspend fun getChannels(): List<Channel>
+    suspend fun getChannel(channelId: Long): Channel
+
+    suspend fun getAllChannels(): List<Channel>
 
     suspend fun deleteChannel(channel: Channel)
 

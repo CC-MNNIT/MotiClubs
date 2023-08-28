@@ -2,7 +2,8 @@ package com.mnnit.moticlubs.domain.use_case
 
 import com.mnnit.moticlubs.domain.use_case.channel.AddChannel
 import com.mnnit.moticlubs.domain.use_case.channel.DeleteChannel
-import com.mnnit.moticlubs.domain.use_case.channel.GetChannels
+import com.mnnit.moticlubs.domain.use_case.channel.GetAllChannels
+import com.mnnit.moticlubs.domain.use_case.channel.GetChannel
 import com.mnnit.moticlubs.domain.use_case.channel.UpdateChannel
 import com.mnnit.moticlubs.domain.use_case.club.GetAdmins
 import com.mnnit.moticlubs.domain.use_case.club.GetClubs
@@ -43,7 +44,8 @@ data class UserUseCases(
 )
 
 data class ChannelUseCases(
-    val getChannels: GetChannels,
+    val getAllChannels: GetAllChannels,
+    val getChannel: GetChannel,
     val updateChannel: UpdateChannel,
     val addChannel: AddChannel,
     val deleteChannel: DeleteChannel

@@ -82,8 +82,12 @@ class RepositoryImpl(
         db.withTransaction { dao.insertOrUpdateChannel(channel) }
     }
 
-    override suspend fun getChannels(): List<Channel> {
-        return dao.getChannels()
+    override suspend fun getChannel(channelId: Long): Channel {
+        return dao.getChannel(channelId)
+    }
+
+    override suspend fun getAllChannels(): List<Channel> {
+        return dao.getAllChannels()
     }
 
     override suspend fun deleteChannel(channel: Channel) {

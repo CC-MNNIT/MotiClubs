@@ -9,6 +9,7 @@ object AppNavigation {
     const val ABOUT_US = "about_us"
     const val POST_PAGE = "post_page"
     const val CLUB_DETAIL = "club_detail"
+    const val CHANNEL_DETAIL = "channel_detail"
     const val IMAGE_PAGE = "img_page"
 }
 

@@ -7,11 +7,11 @@ import com.mnnit.moticlubs.domain.util.mapToDomain
 import com.mnnit.moticlubs.domain.util.networkResource
 import kotlinx.coroutines.flow.Flow
 
-class GetChannels(private val repository: Repository) {
+class GetAllChannels(private val repository: Repository) {
 
     operator fun invoke(): Flow<Resource<List<Channel>>> = repository.networkResource(
         "Error getting channels",
-        query = { repository.getChannels() },
+        query = { repository.getAllChannels() },
         apiCall = { apiService, auth -> apiService.getAllChannels(auth) },
         saveResponse = { old, new ->
             old.forEach { channel -> repository.deleteChannel(channel) }

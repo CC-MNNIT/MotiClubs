@@ -186,9 +186,31 @@ class MainActivity : ComponentActivity() {
                             )
                         }, onNavigateToImageScreen = {
                             navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
+                        }, onNavigateToChannelDetails = { channel, user ->
+                            navController.navigate(
+                                "${AppNavigation.CHANNEL_DETAIL}?" +
+                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(Gson().toJson(channel))}&" +
+                                        "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(user))}"
+                            )
                         }, onBackPressed = {
                             localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                         })
+                    }
+
+                    composable(
+                        "${AppNavigation.CHANNEL_DETAIL}?" +
+                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
+                                "${NavigationArgs.USER_ARG}={${NavigationArgs.USER_ARG}}",
+                        arguments = listOf(
+                            navArgument(NavigationArgs.CHANNEL_ARG) { type = ChannelParamType() },
+                            navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
+                        )
+                    ) {
+                       ChannelDetailScreen(
+                           onBackPressed = {
+                               localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                           }
+                       )
                     }
 
                     // PROFILE

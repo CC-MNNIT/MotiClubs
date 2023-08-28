@@ -1,7 +1,6 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -15,15 +14,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.model.Club
-import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
-import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.UrlUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -38,14 +35,12 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private val application: Application,
     private val urlUseCases: UrlUseCases,
     private val clubUseCases: ClubUseCases,
-    private val memberUseCases: MemberUseCases,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     var clubModel by mutableStateOf(savedStateHandle.get<Club>(NavigationArgs.CLUB_ARG) ?: Club())
     private var userModel by mutableStateOf(savedStateHandle.get<User>(NavigationArgs.USER_ARG) ?: User())
 
-    val memberList = mutableStateListOf<Member>()
     var isAdmin by mutableStateOf(false)
 
     var isFetching by mutableStateOf(false)
@@ -71,7 +66,6 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private var getUrlsJob: Job? = null
     private var addUrlsJob: Job? = null
     private var updateClubJob: Job? = null
-    private var getSubscribersJob: Job? = null
 
     private fun getAdmins() {
         viewModelScope.launch {
@@ -85,31 +79,6 @@ class ClubDetailsScreenViewModel @Inject constructor(
                 isAdmin = admins.any { admin -> admin.userId == userModel.userId }
             }
         }
-    }
-
-    private fun getSubscribers() {
-        getSubscribersJob?.cancel()
-        getSubscribersJob = memberUseCases.getMembers(clubModel.clubId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        memberList.clear()
-                        memberList.addAll(list)
-                    }
-                }
-
-                is Resource.Success -> {
-                    memberList.clear()
-                    memberList.addAll(resource.data)
-
-                    Log.d("TAG", "getSubscribers: ${memberList.size}")
-                }
-
-                is Resource.Error -> {
-                    Log.d("TAG", "getSubscribers: error: ${resource.errCode} : ${resource.errMsg}")
-                }
-            }
-        }.launchIn(viewModelScope)
     }
 
     fun pushUrls(list: List<UrlModel>) {
@@ -231,7 +200,6 @@ class ClubDetailsScreenViewModel @Inject constructor(
 
     init {
         getAdmins()
-        getSubscribers()
         getUrls()
     }
 }

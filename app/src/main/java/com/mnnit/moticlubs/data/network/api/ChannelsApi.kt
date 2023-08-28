@@ -17,6 +17,12 @@ interface ChannelsApi {
     @GET(CHANNEL_ROUTE)
     suspend fun getAllChannels(@Header(AUTHORIZATION_HEADER) auth: String?): Response<List<ChannelDto>?>
 
+    @GET("$CHANNEL_ROUTE/{$CHANNEL_ID_CLAIM}")
+    suspend fun getChannel(
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Path(CHANNEL_ID_CLAIM) channelId: Long,
+    ): Response<ChannelDto?>
+
     @GET("$CHANNEL_ROUTE/members/{$CHANNEL_ID_CLAIM}")
     suspend fun getMembers(
         @Header(AUTHORIZATION_HEADER) auth: String?,

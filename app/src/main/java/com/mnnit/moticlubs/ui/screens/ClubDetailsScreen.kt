@@ -146,11 +146,6 @@ fun ClubDetailsScreen(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
-                            Text(
-                                modifier = Modifier.padding(),
-                                text = "${viewModel.memberList.size} Members",
-                                fontSize = 12.sp
-                            )
 
                             val socials = viewModel.socialLinks.filter { f -> f.name.isNotEmpty() }
                             if (socials.isNotEmpty() || viewModel.isAdmin) {

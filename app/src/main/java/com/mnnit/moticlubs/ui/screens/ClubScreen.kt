@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.model.User
@@ -45,6 +46,7 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 fun ClubScreen(
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
     onNavigateToClubDetails: (club: Club, user: User) -> Unit,
+    onNavigateToChannelDetails: (channel: Channel, user: User) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
     onBackPressed: () -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
@@ -73,7 +75,8 @@ fun ClubScreen(
                             viewModel,
                             modifier = Modifier.padding(),
                             onNavigateToClubDetails = onNavigateToClubDetails,
-                            onBackPressed = onBackPressed
+                            onBackPressed = onBackPressed,
+                            onNavigateToChannelDetails = onNavigateToChannelDetails
                         )
                     }
                 },
@@ -164,6 +167,7 @@ fun TopBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
+    onNavigateToChannelDetails: (channel: Channel, user: User) -> Unit,
     onBackPressed: () -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
@@ -178,7 +182,8 @@ fun TopBar(
             viewModel = viewModel,
             modifier = modifier,
             onNavigateToClubDetails = onNavigateToClubDetails,
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            onNavigateToChannelDetails = onNavigateToChannelDetails
         )
     }
 }

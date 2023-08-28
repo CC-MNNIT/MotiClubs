@@ -10,7 +10,8 @@ import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.*
 import com.mnnit.moticlubs.domain.use_case.channel.AddChannel
 import com.mnnit.moticlubs.domain.use_case.channel.DeleteChannel
-import com.mnnit.moticlubs.domain.use_case.channel.GetChannels
+import com.mnnit.moticlubs.domain.use_case.channel.GetAllChannels
+import com.mnnit.moticlubs.domain.use_case.channel.GetChannel
 import com.mnnit.moticlubs.domain.use_case.channel.UpdateChannel
 import com.mnnit.moticlubs.domain.use_case.club.GetAdmins
 import com.mnnit.moticlubs.domain.use_case.club.GetClubs
@@ -106,7 +107,8 @@ object AppModule {
     @Singleton
     fun provideChannelUseCases(repository: Repository): ChannelUseCases =
         ChannelUseCases(
-            getChannels = GetChannels(repository),
+            getAllChannels = GetAllChannels(repository),
+            getChannel = GetChannel(repository),
             addChannel = AddChannel(repository),
             updateChannel = UpdateChannel(repository),
             deleteChannel = DeleteChannel(repository)

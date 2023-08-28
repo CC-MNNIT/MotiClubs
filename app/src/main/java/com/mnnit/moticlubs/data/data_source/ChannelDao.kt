@@ -9,8 +9,11 @@ interface ChannelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateChannel(channel: Channel)
 
+    @Query("SELECT * FROM channel where channel.chid = :channelId")
+    suspend fun getChannel(channelId: Long): Channel
+
     @Query("SELECT * FROM channel")
-    suspend fun getChannels(): List<Channel>
+    suspend fun getAllChannels(): List<Channel>
 
     @Delete
     suspend fun deleteChannel(channel: Channel)

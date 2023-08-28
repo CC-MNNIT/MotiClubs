@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -38,6 +39,7 @@ fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
+    onNavigateToChannelDetails: (channel: Channel, user: User) -> Unit,
     onBackPressed: () -> Unit
 ) {
     val colorScheme = getColorScheme()
@@ -46,7 +48,7 @@ fun ChannelNameBar(
         modifier = modifier
             .fillMaxWidth()
             .safeContentPadding(),
-        onClick = { onNavigateToClubDetails(viewModel.clubModel, viewModel.userModel) },
+        onClick = { onNavigateToChannelDetails(viewModel.channelModel, viewModel.userModel) },
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
         shape = RoundedCornerShape(8.dp),
     ) {
@@ -76,7 +78,8 @@ fun ChannelNameBar(
                     modifier = Modifier
                         .align(Alignment.CenterVertically),
                     url = viewModel.clubModel.avatar,
-                    size = 42.dp
+                    size = 42.dp,
+                    onClick = { onNavigateToClubDetails(viewModel.clubModel, viewModel.userModel) }
                 )
             }
 
