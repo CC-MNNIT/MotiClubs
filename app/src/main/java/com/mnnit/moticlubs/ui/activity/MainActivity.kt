@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -32,9 +34,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
+import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.data.network.dto.ImageUrl
 import com.mnnit.moticlubs.domain.util.*
 import com.mnnit.moticlubs.ui.screens.*
@@ -49,7 +55,9 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: AppViewModel by viewModels()
 
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+    private val requestPermission: ActivityResultLauncher<String> = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
         if (it) {
             openApp()
         } else {
@@ -58,9 +66,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private lateinit var oneTapClient: SignInClient
+    private lateinit var signInRequest: BeginSignInRequest
+    private lateinit var googleSignInLauncher: ActivityResultLauncher<IntentSenderRequest>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen }
         super.onCreate(savedInstanceState)
+
+        oneTapClient = Identity.getSignInClient(this)
+        signInRequest = BeginSignInRequest.builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    .setServerClientId(getString(R.string.default_web_client_id))
+                    .setFilterByAuthorizedAccounts(false)
+                    .build()
+            )
+            .build()
+
+        googleSignInLauncher = registerForActivityResult(
+            ActivityResultContracts.StartIntentSenderForResult()
+        ) { result -> AuthHandler.onResult(result) }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             validateNotificationPermission()
@@ -123,15 +150,17 @@ class MainActivity : ComponentActivity() {
                 ) {
                     // LOGIN
                     composable(AppNavigation.LOGIN) {
-                        LoginScreen(viewModel, onNavigateToSignUp = {
-                            navController.navigate(AppNavigation.SIGN_UP)
-                            navController.graph.setStartDestination(AppNavigation.SIGN_UP)
-                        }, onNavigateToMain = {
-                            navController.navigate(AppNavigation.HOME) {
-                                popUpTo(AppNavigation.LOGIN) { inclusive = true }
-                            }
-                            navController.graph.setStartDestination(AppNavigation.HOME)
-                        })
+                        LoginScreen(
+                            oneTapClient,
+                            signInRequest,
+                            googleSignInLauncher,
+                            viewModel,
+                            onNavigateToMain = {
+                                navController.navigate(AppNavigation.HOME) {
+                                    popUpTo(AppNavigation.LOGIN) { inclusive = true }
+                                }
+                                navController.graph.setStartDestination(AppNavigation.HOME)
+                            })
                     }
 
                     // SIGN UP
@@ -206,11 +235,11 @@ class MainActivity : ComponentActivity() {
                             navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
                         )
                     ) {
-                       ChannelDetailScreen(
-                           onBackPressed = {
-                               localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                           }
-                       )
+                        ChannelDetailScreen(
+                            onBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            }
+                        )
                     }
 
                     // PROFILE

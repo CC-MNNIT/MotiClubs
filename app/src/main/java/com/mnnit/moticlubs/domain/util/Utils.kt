@@ -12,6 +12,9 @@ import io.noties.markwon.linkify.LinkifyPlugin
 import java.util.Calendar
 
 object Constants {
+    val EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@mnnit.ac.in$".toRegex()
+    val REG_NO_REGEX = "(?<=\\.)(.*?)(?=@)".toRegex()
+
     const val USER_ID = "userID"
     const val SHARED_PREFERENCE = "com.mnnit.moticlubs"
     const val APP_SCHEME_URL = "app://moticlubs.mnnit.com"
