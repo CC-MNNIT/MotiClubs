@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.clubscreen
+package com.mnnit.moticlubs.ui.components.channelscreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,11 +29,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 
 @Composable
-fun ChannelNameBar(
-    viewModel: ClubScreenViewModel,
+fun ChannelTopBar(
+    viewModel: ChannelScreenViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateToChannelDetails: (channelId: Long) -> Unit,

@@ -40,9 +40,9 @@ import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.compressBitmap
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
-import com.mnnit.moticlubs.ui.components.clubscreen.DescriptionComponent
-import com.mnnit.moticlubs.ui.components.clubscreen.InputOtherLinkDialog
-import com.mnnit.moticlubs.ui.components.clubscreen.InputSocialLinkDialog
+import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
+import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputOtherLinkDialog
+import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputSocialLinkDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme

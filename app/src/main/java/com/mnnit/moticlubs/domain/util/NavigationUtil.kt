@@ -4,7 +4,7 @@ object AppNavigation {
     const val LOGIN = "login"
     const val SIGN_UP = "sign_up"
     const val HOME = "home"
-    const val CLUB_PAGE = "club_page"
+    const val CHANNEL_PAGE = "channel_page"
     const val PROFILE = "profile"
     const val ABOUT_US = "about_us"
     const val POST_PAGE = "post_page"

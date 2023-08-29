@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.clubscreen
+package com.mnnit.moticlubs.ui.components.channelscreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

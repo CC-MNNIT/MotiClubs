@@ -29,27 +29,25 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.domain.model.AdminUser
-import com.mnnit.moticlubs.domain.model.Channel
-import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
-import com.mnnit.moticlubs.ui.components.clubscreen.ChannelNameBar
-import com.mnnit.moticlubs.ui.components.clubscreen.PostCreateUpdateBottomSheet
-import com.mnnit.moticlubs.ui.components.clubscreen.PostItem
+import com.mnnit.moticlubs.ui.components.channelscreen.ChannelTopBar
+import com.mnnit.moticlubs.ui.components.channelscreen.PostCreateUpdateBottomSheet
+import com.mnnit.moticlubs.ui.components.channelscreen.PostItem
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ClubScreen(
+fun ChannelScreen(
     onNavigateToPost: (postId: Long) -> Unit,
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateToChannelDetails: (channelId: Long) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
     onBackPressed: () -> Unit,
-    viewModel: ClubScreenViewModel = hiltViewModel()
+    viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
@@ -152,7 +150,7 @@ fun ClubScreen(
 }
 
 @Composable
-fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
+fun DeleteConfirmationDialog(viewModel: ChannelScreenViewModel) {
     ConfirmationDialog(
         showDialog = viewModel.showDelPostDialog,
         message = "Are you sure you want to delete this post ?",
@@ -164,21 +162,21 @@ fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
 
 @Composable
 fun TopBar(
-    viewModel: ClubScreenViewModel,
+    viewModel: ChannelScreenViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateToChannelDetails: (channelId: Long) -> Unit,
     onBackPressed: () -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
-        com.mnnit.moticlubs.ui.components.clubscreen.SearchBar(
+        com.mnnit.moticlubs.ui.components.channelscreen.SearchBar(
             viewModel.searchMode,
             viewModel.searchValue,
             modifier = modifier
         )
     }
     AnimatedVisibility(visible = !viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
-        ChannelNameBar(
+        ChannelTopBar(
             viewModel = viewModel,
             modifier = modifier,
             onNavigateToClubDetails = onNavigateToClubDetails,
@@ -191,7 +189,7 @@ fun TopBar(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Posts(
-    viewModel: ClubScreenViewModel,
+    viewModel: ChannelScreenViewModel,
     adminMap: MutableMap<Long, AdminUser>,
     scrollState: LazyListState,
     onNavigateToPost: (postId: Long) -> Unit,

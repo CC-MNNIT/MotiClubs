@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(
                             onNavigateChannelClick = { channelId, clubId ->
                                 navController.navigate(
-                                    "${AppNavigation.CLUB_PAGE}?" +
+                                    "${AppNavigation.CHANNEL_PAGE}?" +
                                             "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channelId.toString())}&" +
                                             "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
                                 )
@@ -204,9 +204,9 @@ class MainActivity : ComponentActivity() {
                     // ABOUT US
                     composable(AppNavigation.ABOUT_US) { AboutUsScreen() }
 
-                    // CLUB PAGE
+                    // CHANNEL PAGE
                     composable(
-                        "${AppNavigation.CLUB_PAGE}?" +
+                        "${AppNavigation.CHANNEL_PAGE}?" +
                                 "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
                                 "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
@@ -214,7 +214,7 @@ class MainActivity : ComponentActivity() {
                             navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
                         )
                     ) {
-                        ClubScreen(onNavigateToPost = { postId ->
+                        ChannelScreen(onNavigateToPost = { postId ->
                             navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(postId.toString())}")
                         }, onNavigateToClubDetails = { clubId ->
                             navController.navigate(

@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.clubscreen
+package com.mnnit.moticlubs.ui.components.clubdetailscreen
 
 import android.util.Patterns
 import androidx.compose.foundation.background

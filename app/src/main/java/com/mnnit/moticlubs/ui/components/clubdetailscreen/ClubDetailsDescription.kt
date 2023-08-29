@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.clubscreen
+package com.mnnit.moticlubs.ui.components.clubdetailscreen
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column

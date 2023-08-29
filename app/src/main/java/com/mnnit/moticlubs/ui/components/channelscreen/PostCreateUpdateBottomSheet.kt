@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.clubscreen
+package com.mnnit.moticlubs.ui.components.channelscreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -32,13 +32,13 @@ import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.postscreen.PostTextFormatter
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
+import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostCreateUpdateBottomSheet(
-    viewModel: ClubScreenViewModel,
+    viewModel: ChannelScreenViewModel,
     onNavigateImageClick: (url: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -284,7 +284,7 @@ fun PostCreateUpdateBottomSheet(
 }
 
 @Composable
-private fun PostConfirmationDialog(viewModel: ClubScreenViewModel, update: Boolean, onPost: () -> Unit) {
+private fun PostConfirmationDialog(viewModel: ChannelScreenViewModel, update: Boolean, onPost: () -> Unit) {
     ConfirmationDialog(
         showDialog = if (update) viewModel.showEditDialog else viewModel.showDialog,
         message = "${if (update) "Update post" else "Post"} message in ${viewModel.clubModel.name} ?",

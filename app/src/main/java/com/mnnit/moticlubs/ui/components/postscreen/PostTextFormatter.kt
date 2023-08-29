@@ -37,13 +37,13 @@ import com.canhub.cropper.CropImageView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.compressBitmap
-import com.mnnit.moticlubs.ui.components.clubscreen.InputLinkDialog
-import com.mnnit.moticlubs.ui.components.clubscreen.PostGuidanceDialog
-import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
+import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputLinkDialog
+import com.mnnit.moticlubs.ui.components.channelscreen.PostGuidanceDialog
+import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun PostTextFormatter(viewModel: ClubScreenViewModel) {
+fun PostTextFormatter(viewModel: ChannelScreenViewModel) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -127,7 +127,7 @@ fun PostTextFormatter(viewModel: ClubScreenViewModel) {
     }
 }
 
-private fun formatMsg(viewModel: ClubScreenViewModel, token: String) {
+private fun formatMsg(viewModel: ChannelScreenViewModel, token: String) {
     val str = viewModel.eventPostMsg.value.text
     val tr = viewModel.eventPostMsg.value.selection
     val subStr = str.substring(tr.start, tr.end)
@@ -143,7 +143,7 @@ private fun formatMsg(viewModel: ClubScreenViewModel, token: String) {
 private fun uploadPostPic(
     context: Context,
     imageUri: Uri,
-    viewModel: ClubScreenViewModel,
+    viewModel: ChannelScreenViewModel,
     onUploaded: (url: String) -> Unit
 ) {
     viewModel.showProgress.value = true

@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
-class ClubScreenViewModel @Inject constructor(
+class ChannelScreenViewModel @Inject constructor(
     private val application: Application,
     private val clubUseCases: ClubUseCases,
     private val memberUseCases: MemberUseCases,
