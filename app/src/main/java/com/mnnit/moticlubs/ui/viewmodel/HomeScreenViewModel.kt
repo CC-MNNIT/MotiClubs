@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -17,6 +19,7 @@ import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
@@ -27,6 +30,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,14 +38,23 @@ class HomeScreenViewModel @Inject constructor(
     private val application: Application,
     private val channelUseCases: ChannelUseCases,
     private val clubUseCases: ClubUseCases,
-    private val userUseCases: UserUseCases
-) : ViewModel() {
+    private val userUseCases: UserUseCases,
+    private val repository: Repository,
+) : ViewModel(), DefaultLifecycleObserver {
 
     companion object {
         private const val TAG = "HomeScreenViewModel"
     }
 
-    var user by mutableStateOf(User())
+    override fun onResume(owner: LifecycleOwner) {
+        Log.d(TAG, "onResume: $TAG")
+        getUser(loadLocal = true)
+        getClubs(loadLocal = true)
+        getChannels(loadLocal = true)
+        getAdmins()
+    }
+
+    var userModel by mutableStateOf(User())
     val adminList = mutableStateListOf<AdminUser>()
     val clubsList = mutableStateListOf<Club>()
     val channelMap = mutableStateMapOf<Long, SnapshotStateList<Channel>>()
@@ -72,11 +85,11 @@ class HomeScreenViewModel @Inject constructor(
 
     fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: () -> Unit) {
         updateUserJob?.cancel()
-        updateUserJob = userUseCases.updateUser(user.copy(avatar = url)).onEach { resource ->
+        updateUserJob = userUseCases.updateUser(userModel.copy(avatar = url)).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {}
                 is Resource.Success -> {
-                    user = resource.data
+                    userModel = resource.data
                     onResponse()
                 }
 
@@ -191,12 +204,20 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun getUser() {
+    private fun getUser(loadLocal: Boolean = false) {
+        if (loadLocal) {
+            Log.d(TAG, "getUser: loadLocal")
+            viewModelScope.launch {
+                userModel = repository.getUser(application.getUserID()) ?: User()
+            }
+            return
+        }
+
         getUserJob?.cancel()
         getUserJob = userUseCases.getUser(application.getUserID(), false).onEach { resource ->
             when (resource) {
-                is Resource.Loading -> resource.data?.let { user = it }
-                is Resource.Success -> user = resource.data
+                is Resource.Loading -> resource.data?.let { userModel = it }
+                is Resource.Success -> userModel = resource.data
                 is Resource.Error -> Log.d(TAG, "getUser: error: ${resource.errCode} : ${resource.errMsg}")
             }
         }.launchIn(viewModelScope)
@@ -231,7 +252,17 @@ class HomeScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getClubs() {
+    private fun getClubs(loadLocal: Boolean = false) {
+        if (loadLocal) {
+            Log.d(TAG, "getClubs: loadLocal")
+            viewModelScope.launch {
+                val list = repository.getClubs()
+                clubsList.clear()
+                clubsList.addAll(list)
+            }
+            return
+        }
+
         isFetchingClubs = true
         getClubJob?.cancel()
         getClubJob = clubUseCases.getClubs().onEach { resource ->
@@ -260,7 +291,17 @@ class HomeScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getChannels() {
+    private fun getChannels(loadLocal: Boolean = false) {
+        if (loadLocal) {
+            Log.d(TAG, "getChannels: loadLocal")
+            viewModelScope.launch {
+                val list = repository.getAllChannels()
+                list.forEach { channel -> channelMap[channel.clubId] = mutableStateListOf() }
+                list.forEach { channel -> channelMap[channel.clubId]?.add(channel) }
+            }
+            return
+        }
+
         isFetchingChannels = true
         getChannelsJob?.cancel()
         getChannelsJob = channelUseCases.getAllChannels().onEach { resource ->

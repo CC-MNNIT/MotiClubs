@@ -28,7 +28,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        value = viewModel.user.name,
+        value = viewModel.userModel.name,
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Name") },
@@ -46,7 +46,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = viewModel.user.email.replace("@mnnit.ac.in", ""),
+        value = viewModel.userModel.email.replace("@mnnit.ac.in", ""),
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "G-Suite ID") },
@@ -76,7 +76,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .padding(end = 8.dp),
-            value = viewModel.user.regNo,
+            value = viewModel.userModel.regNo,
             onValueChange = {},
             shape = RoundedCornerShape(24.dp),
             label = { Text(text = "Reg No") },
@@ -90,7 +90,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
         )
 
         OutlinedTextField(
-            value = viewModel.user.course,
+            value = viewModel.userModel.course,
             onValueChange = { },
             readOnly = true,
             label = { Text(text = "Course") },
@@ -110,7 +110,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = viewModel.user.phoneNumber,
+        value = viewModel.userModel.phoneNumber,
         onValueChange = {},
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Phone No") },

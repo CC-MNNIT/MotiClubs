@@ -57,7 +57,10 @@ fun ClubDetailsScreen(
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
 
-    val refreshState = rememberPullRefreshState(refreshing = viewModel.isFetching, onRefresh = viewModel::getUrls)
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isFetching,
+        onRefresh = viewModel::refresh
+    )
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetNavBarsTheme(2.dp, false)
 

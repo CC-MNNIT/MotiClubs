@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.app.Application
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -27,7 +28,6 @@ import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -41,6 +41,10 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private val repository: Repository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "ClubDetailsScreenViewModel"
+    }
 
     val clubId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.CLUB_ARG))
     var userId by mutableLongStateOf(-1)
@@ -72,29 +76,40 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private var getUrlsJob: Job? = null
     private var addUrlsJob: Job? = null
     private var updateClubJob: Job? = null
+    private var getClubJob: Job? = null
 
-    private fun getModels() {
-        viewModelScope.launch {
-            clubModel = repository.getClub(clubId)
-            displayedDescription = clubModel.description
+    private fun getClub(loadLocal: Boolean = true) {
+        getUrls()
 
-            userId = repository.getApplication().getUserID()
-            getAdmins()
+        if (loadLocal) {
+            Log.d(TAG, "getClub: loadLocal")
+            viewModelScope.launch {
+                clubModel = repository.getClub(clubId)
+                displayedDescription = clubModel.description
+
+                userId = application.getUserID()
+                isAdmin = repository.getAdmins().any { admin -> admin.userId == userId && admin.clubId == clubId }
+            }
+            return
         }
+
+        getClubJob?.cancel()
+        getClubJob = clubUseCases.getClubs().onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> resource.data?.let { list ->
+                    clubModel = list.find { it.clubId == clubId } ?: Club()
+                }
+
+                is Resource.Success -> clubModel = resource.data.find { it.clubId == clubId } ?: Club()
+                is Resource.Error -> {
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
-    private fun getAdmins() {
-        viewModelScope.launch {
-            val resource = clubUseCases.getAdmins(shouldFetch = false).first()
-            if (resource is Resource.Error) {
-                return@launch
-            }
-
-            resource.d?.let { list ->
-                val admins = list.filter { admin -> admin.clubId == clubId }
-                isAdmin = admins.any { admin -> admin.userId == userId }
-            }
-        }
+    fun refresh() {
+        getClub(loadLocal = false)
     }
 
     fun pushUrls(list: List<UrlModel>) {
@@ -161,7 +176,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun getUrls() {
+    private fun getUrls() {
         isFetching = true
 
         getUrlsJob?.cancel()
@@ -215,7 +230,6 @@ class ClubDetailsScreenViewModel @Inject constructor(
     }
 
     init {
-        getModels()
-        getUrls()
+        getClub()
     }
 }

@@ -11,13 +11,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.mnnit.moticlubs.domain.model.*
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.PostUseCases
 import com.mnnit.moticlubs.domain.util.Constants
@@ -36,12 +37,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ChannelScreenViewModel @Inject constructor(
     private val application: Application,
-    private val clubUseCases: ClubUseCases,
     private val memberUseCases: MemberUseCases,
     private val postUseCases: PostUseCases,
     private val repository: Repository,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     companion object {
         private const val TAG = "ClubScreenViewModel"
@@ -51,6 +51,12 @@ class ChannelScreenViewModel @Inject constructor(
         override fun onReceive(context: Context?, intent: Intent?) {
             getPostsList()
         }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        Log.d(TAG, "onResume: $TAG")
+        getModels()
+        getPostsList()
     }
 
     val clubId by mutableLongStateOf(savedStateHandle.getLongArg(CLUB_ARG))
@@ -109,7 +115,6 @@ class ChannelScreenViewModel @Inject constructor(
     private var crudPostJob: Job? = null
     private var getPostsJob: Job? = null
 
-    private var getAdminJob: Job? = null
     private var getMembersJob: Job? = null
 
     fun clearEditor() {
@@ -122,11 +127,15 @@ class ChannelScreenViewModel @Inject constructor(
     private fun getModels() {
         viewModelScope.launch {
             channelModel = repository.getChannel(channelId)
-            clubModel = repository.getClub(channelModel.clubId)
+            clubModel = repository.getClub(clubId)
 
             userId = application.getUserID()
+
+            val list = repository.getAdmins()
+            isAdmin = list.any { admin -> admin.userId == userId && admin.clubId == clubId }
+            list.forEach { admin -> adminMap[admin.userId] = admin }
+
             getMembers()
-            getAdmins()
         }
     }
 
@@ -147,31 +156,6 @@ class ChannelScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> Log.d("TAG", "getMembers: error: ${resource.errCode} : ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    private fun getAdmins() {
-        getAdminJob?.cancel()
-        getAdminJob = clubUseCases.getAdmins().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        isAdmin = list.any { admin -> admin.userId == userId }
-                        list.forEach { admin -> adminMap[admin.userId] = admin }
-                    }
-                }
-
-                is Resource.Success -> {
-                    val list = resource.data
-                    list.forEach { admin -> adminMap[admin.userId] = admin }
-
-                    isAdmin = list.any { admin -> admin.userId == userId }
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
-                }
             }
         }.launchIn(viewModelScope)
     }

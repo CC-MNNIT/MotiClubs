@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
@@ -60,6 +61,8 @@ fun ChannelScreen(
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
         SetNavBarsTheme(elevation = 2.dp, true)
+
+        LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 
         Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
             BottomSheetScaffold(

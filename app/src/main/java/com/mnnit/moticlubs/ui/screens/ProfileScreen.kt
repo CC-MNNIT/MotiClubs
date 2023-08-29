@@ -84,7 +84,7 @@ fun ProfileScreen(
 
                 ProfilePicture(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    url = viewModel.user.avatar,
+                    url = viewModel.userModel.avatar,
                     size = 156.dp
                 )
                 UserInfo(viewModel = viewModel, modifier = Modifier.padding(top = 56.dp))

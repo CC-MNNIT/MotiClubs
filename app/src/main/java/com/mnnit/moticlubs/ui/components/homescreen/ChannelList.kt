@@ -113,7 +113,7 @@ fun ChannelList(
                     Spacer(modifier = Modifier.padding(4.dp))
 
                     if (viewModel.adminList.any {
-                            it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
+                            it.userId == viewModel.userModel.userId && it.clubId == clubModel.clubId
                         } && model.name != "General"
                     ) {
                         IconButton(
@@ -144,7 +144,7 @@ fun ChannelList(
 
         AnimatedVisibility(
             visible = viewModel.adminList.any {
-                it.userId == viewModel.user.userId && it.clubId == clubModel.clubId
+                it.userId == viewModel.userModel.userId && it.clubId == clubModel.clubId
             },
             enter = fadeIn(),
             exit = fadeOut()
