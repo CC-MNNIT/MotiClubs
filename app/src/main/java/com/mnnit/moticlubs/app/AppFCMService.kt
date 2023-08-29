@@ -23,7 +23,9 @@ import com.google.gson.Gson
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.di.AppModule
+import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.PostNotificationModel
+import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.getAuthToken
 import com.mnnit.moticlubs.domain.util.getMkdFormatter
@@ -41,10 +43,20 @@ class AppFCMService : FirebaseMessagingService() {
         private const val TAG = "AppFCMService"
     }
 
+    private val apiService
+        get() = AppModule.provideApiService()
+
+    private val repository
+        get() = AppModule.provideRepository(
+            application,
+            apiService,
+            AppModule.provideLocalDatabase(application)
+        )
+
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
         CoroutineScope(Dispatchers.IO).launch {
-            val response = AppModule.provideApiService().setFCMToken(getAuthToken(), FCMTokenDto(token))
+            val response = apiService.setFCMToken(getAuthToken(), FCMTokenDto(token))
 
             if (response.isSuccessful && response.body() != null) {
                 Log.d(TAG, "onNewToken: pushed")
@@ -150,8 +162,15 @@ class AppFCMService : FirebaseMessagingService() {
 
         val updated = data["updated"]?.toBoolean() ?: false
 
-        LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent(Constants.POST_BROADCAST_ACTION))
+        prePost(
+            Post(
+                postId = postId,
+                channelId = channelID,
+                pageNo = 1,
+                message = message,
+                userId = userId
+            )
+        )
 
         if (userId == getUserID()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
@@ -163,15 +182,6 @@ class AppFCMService : FirebaseMessagingService() {
             channelID, postId, userId, adminName, url,
             message
         )
-        val pendingIntent = TaskStackBuilder.create(this).run {
-            addNextIntentWithParentStack(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    "${Constants.APP_SCHEME_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
-                )
-            )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
 
         postRead(channelID, postId)
 
@@ -183,7 +193,7 @@ class AppFCMService : FirebaseMessagingService() {
             "$adminName ${if (updated) "updated" else "posted"} in $clubName",
             message,
             url,
-            pendingIntent
+            getPendingIntent(post)
         )
     }
 
@@ -203,12 +213,20 @@ class AppFCMService : FirebaseMessagingService() {
         val clubID = data["cid"]?.toInt() ?: -1
 
         val replyUserId = data["replyUid"]?.toLong() ?: -1
+        val replyId = data["replyTime"]?.toLong() ?: -1
         val replyMessage = data["replyMessage"] ?: ""
         val replyUserName = data["replyUserName"] ?: ""
         val url = data["replyUserAvatar"] ?: ""
 
-        LocalBroadcastManager.getInstance(this)
-            .sendBroadcast(Intent(Constants.REPLY_BROADCAST_ACTION))
+        preReply(
+            Reply(
+                postId = postId,
+                userId = replyUserId,
+                message = replyMessage,
+                pageNo = 1,
+                time = replyId
+            )
+        )
 
         if (replyUserId == getUserID()) {
             Log.d(TAG, "replyNotification: reply sender and receiver same")
@@ -220,15 +238,6 @@ class AppFCMService : FirebaseMessagingService() {
             channelID, postId, postUserId, postUserName, postUserAvatar,
             postMessage,
         )
-        val pendingIntent = TaskStackBuilder.create(this).run {
-            addNextIntentWithParentStack(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    "${Constants.APP_SCHEME_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
-                )
-            )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
 
         postRead(channelID, postId)
 
@@ -240,7 +249,7 @@ class AppFCMService : FirebaseMessagingService() {
             "$replyUserName replied in $channelName",
             replyMessage,
             url,
-            pendingIntent
+            getPendingIntent(post)
         )
     }
 
@@ -269,6 +278,7 @@ class AppFCMService : FirebaseMessagingService() {
             .setContentTitle(title)
             .setContentText(getMkdFormatter().toMarkdown(message))
             .setColorized(true)
+            .setAutoCancel(true)
             .setColor(ContextCompat.getColor(applicationContext, R.color.backGroundColor))
             .setSmallIcon(R.drawable.round_notifications_active_24)
             .setStyle(NotificationCompat.BigTextStyle())
@@ -288,5 +298,29 @@ class AppFCMService : FirebaseMessagingService() {
         notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
     }
 
+    private fun getPendingIntent(post: PostNotificationModel) = TaskStackBuilder.create(this).run {
+        addNextIntentWithParentStack(
+            Intent(
+                Intent.ACTION_VIEW,
+                "${Constants.APP_SCHEME_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
+            )
+        )
+        getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
     private fun Long.toNotificationID(): Int = (this % 1000000L).toInt()
+
+    private fun prePost(post: Post) {
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(Intent(Constants.POST_BROADCAST_ACTION))
+
+        CoroutineScope(Dispatchers.IO).launch { repository.insertOrUpdatePost(post) }
+    }
+
+    private fun preReply(reply: Reply) {
+        LocalBroadcastManager.getInstance(this)
+            .sendBroadcast(Intent(Constants.REPLY_BROADCAST_ACTION))
+
+        CoroutineScope(Dispatchers.IO).launch { repository.insertOrUpdateReply(reply) }
+    }
 }
