@@ -215,11 +215,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }, onNavigateToImageScreen = {
                             navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
-                        }, onNavigateToChannelDetails = { channel, user ->
+                        }, onNavigateToChannelDetails = { club, channel ->
                             navController.navigate(
                                 "${AppNavigation.CHANNEL_DETAIL}?" +
                                         "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(Gson().toJson(channel))}&" +
-                                        "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(user))}"
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}"
                             )
                         }, onBackPressed = {
                             localBackPressed?.onBackPressedDispatcher?.onBackPressed()
@@ -229,10 +229,10 @@ class MainActivity : ComponentActivity() {
                     composable(
                         "${AppNavigation.CHANNEL_DETAIL}?" +
                                 "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
-                                "${NavigationArgs.USER_ARG}={${NavigationArgs.USER_ARG}}",
+                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CHANNEL_ARG) { type = ChannelParamType() },
-                            navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
+                            navArgument(NavigationArgs.CLUB_ARG) { type = ClubParamType() }
                         )
                     ) {
                         ChannelDetailScreen(

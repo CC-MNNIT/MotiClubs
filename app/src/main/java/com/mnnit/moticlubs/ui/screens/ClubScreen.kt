@@ -47,7 +47,7 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 fun ClubScreen(
     onNavigateToPost: (post: PostNotificationModel) -> Unit,
     onNavigateToClubDetails: (club: Club, user: User) -> Unit,
-    onNavigateToChannelDetails: (channel: Channel, user: User) -> Unit,
+    onNavigateToChannelDetails: (club: Club, channel: Channel) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
     onBackPressed: () -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
@@ -168,7 +168,7 @@ fun TopBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
-    onNavigateToChannelDetails: (channel: Channel, user: User) -> Unit,
+    onNavigateToChannelDetails: (club: Club, channel: Channel) -> Unit,
     onBackPressed: () -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {

@@ -39,7 +39,7 @@ fun ChannelNameBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
-    onNavigateToChannelDetails: (channel: Channel, user: User) -> Unit,
+    onNavigateToChannelDetails: (club: Club, channel: Channel) -> Unit,
     onBackPressed: () -> Unit
 ) {
     val colorScheme = getColorScheme()
@@ -48,7 +48,7 @@ fun ChannelNameBar(
         modifier = modifier
             .fillMaxWidth()
             .safeContentPadding(),
-        onClick = { onNavigateToChannelDetails(viewModel.channelModel, viewModel.userModel) },
+        onClick = { onNavigateToChannelDetails(viewModel.clubModel, viewModel.channelModel) },
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
         shape = RoundedCornerShape(8.dp),
     ) {

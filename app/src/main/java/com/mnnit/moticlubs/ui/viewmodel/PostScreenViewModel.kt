@@ -95,6 +95,7 @@ class PostScreenViewModel @Inject constructor(
     private var viewPostJob: Job? = null
 
     fun getUser(userId: Long) {
+        userMap[userId] = User()
         userUseCases.getUser(userId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> resource.data?.let { user -> userMap[user.userId] = user }
