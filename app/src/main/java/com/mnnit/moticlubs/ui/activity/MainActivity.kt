@@ -255,6 +255,12 @@ class MainActivity : ComponentActivity() {
                         )
                     ) {
                         ChannelDetailScreen(
+                            onDeleteChannel = {
+                                navController.navigate(AppNavigation.HOME) {
+                                    popUpTo(AppNavigation.HOME) { inclusive = true }
+                                }
+                                navController.graph.setStartDestination(AppNavigation.HOME)
+                            },
                             onBackPressed = {
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                             }

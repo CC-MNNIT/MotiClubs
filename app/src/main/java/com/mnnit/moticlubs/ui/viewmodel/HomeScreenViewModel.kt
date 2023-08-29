@@ -64,23 +64,18 @@ class HomeScreenViewModel @Inject constructor(
     var isFetchingClubs by mutableStateOf(false)
 
     var showAddChannelDialog by mutableStateOf(false)
-    var showUpdateChannelDialog by mutableStateOf(false)
     var showProgressDialog by mutableStateOf(false)
     var progressMsg by mutableStateOf("")
 
     var eventChannel by mutableStateOf(Channel())
     var inputChannelName by mutableStateOf("")
     var inputChannelPrivate by mutableIntStateOf(0)
-    var updateChannelName by mutableStateOf("")
-    var updateChannelPrivate by mutableIntStateOf(0)
 
     private var getUserJob: Job? = null
     private var getAdminJob: Job? = null
     private var getClubJob: Job? = null
     private var getChannelsJob: Job? = null
     private var addChannelJob: Job? = null
-    private var updateChannelJob: Job? = null
-    private var deleteChannelJob: Job? = null
     private var updateUserJob: Job? = null
 
     fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: () -> Unit) {
@@ -117,62 +112,6 @@ class HomeScreenViewModel @Inject constructor(
                     showProgressDialog = false
 
                     Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
-                }
-
-                is Resource.Error -> {
-                    showProgressDialog = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun updateChannel() {
-        updateChannelJob?.cancel()
-        updateChannelJob = channelUseCases.updateChannel(eventChannel).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    showUpdateChannelDialog = false
-                    progressMsg = "Updating"
-                    showProgressDialog = true
-                }
-
-                is Resource.Success -> {
-                    channelMap[eventChannel.clubId]?.replaceAll { item ->
-                        if (item.channelId == eventChannel.channelId) {
-                            eventChannel
-                        } else {
-                            item
-                        }
-                    }
-                    showProgressDialog = false
-
-                    Toast.makeText(application, "Channel Updated", Toast.LENGTH_SHORT).show()
-                }
-
-                is Resource.Error -> {
-                    showProgressDialog = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun deleteChannel() {
-        deleteChannelJob?.cancel()
-        deleteChannelJob = channelUseCases.deleteChannel(eventChannel).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    showUpdateChannelDialog = false
-                    progressMsg = "Deleting"
-                    showProgressDialog = true
-                }
-
-                is Resource.Success -> {
-                    channelMap[eventChannel.clubId]?.removeIf { m -> m.channelId == eventChannel.channelId }
-                    showProgressDialog = false
-
-                    Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Error -> {

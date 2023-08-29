@@ -54,10 +54,14 @@ class ChannelDetailScreenViewModel @Inject constructor(
     var channelModel by mutableStateOf(Channel())
     var clubModel by mutableStateOf(Club())
 
-    var showPrivateConfirmationDialog = mutableStateOf(false)
     var isFetching by mutableStateOf(false)
     var isUpdating by mutableStateOf(false)
     var isAdmin by mutableStateOf(false)
+
+    var progressMsg by mutableStateOf("")
+
+    var showPrivateConfirmationDialog = mutableStateOf(false)
+    var showUpdateChannelDialog = mutableStateOf(false)
 
     var updateChannelName by mutableStateOf("")
     var updateChannelPrivate by mutableIntStateOf(0)
@@ -76,12 +80,19 @@ class ChannelDetailScreenViewModel @Inject constructor(
     }
 
     fun updateChannel() {
+        progressMsg = "Updating"
         channelUseCases.updateChannel(
             channelModel.copy(name = updateChannelName, private = updateChannelPrivate)
         ).onEach { resource ->
             when (resource) {
-                is Resource.Loading -> isUpdating = true
+                is Resource.Loading -> {
+                    showUpdateChannelDialog.value = false
+                    isUpdating = true
+                }
+
                 is Resource.Success -> {
+                    showUpdateChannelDialog.value = false
+                    isUpdating = false
                     channelModel = resource.data
                     resetUpdate()
                     refreshAll()
@@ -90,6 +101,29 @@ class ChannelDetailScreenViewModel @Inject constructor(
                 is Resource.Error -> {
                     resetUpdate()
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun deleteChannel(onSuccess: () -> Unit) {
+        channelUseCases.deleteChannel(channelModel).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    showUpdateChannelDialog.value = false
+                    progressMsg = "Deleting"
+                    isUpdating = true
+                }
+
+                is Resource.Success -> {
+                    isUpdating = false
+                    onSuccess()
+                    Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Error -> {
+                    isUpdating = false
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
                 }
             }
         }.launchIn(viewModelScope)

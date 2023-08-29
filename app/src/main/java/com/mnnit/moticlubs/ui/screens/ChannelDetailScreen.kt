@@ -61,6 +61,7 @@ import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.homescreen.UpdateChannelDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -69,6 +70,7 @@ import com.mnnit.moticlubs.ui.viewmodel.ChannelDetailScreenViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelDetailScreen(
+    onDeleteChannel: () -> Unit,
     onBackPressed: () -> Unit,
     viewModel: ChannelDetailScreenViewModel = hiltViewModel(),
 ) {
@@ -116,14 +118,11 @@ fun ChannelDetailScreen(
                         },
                         actions = { Actions(viewModel) },
                         scrollBehavior = scrollBehavior,
-//                        colors = TopAppBarDefaults.largeTopAppBarColors(
-//                            scrolledContainerColor = colorScheme.surfaceColorAtElevation(2.dp)
-//                        )
                     )
                 },
                 content = {
                     if (viewModel.isUpdating) {
-                        ProgressDialog(progressMsg = "Updating channel")
+                        ProgressDialog(viewModel.progressMsg)
                     }
 
                     if (viewModel.showPrivateConfirmationDialog.value) {
@@ -140,6 +139,12 @@ fun ChannelDetailScreen(
                             onPositive = { viewModel.updateChannel() },
                             onNegative = { viewModel.resetUpdate() }
                         )
+                    }
+
+                    if (viewModel.showUpdateChannelDialog.value) {
+                        UpdateChannelDialog(viewModel, onUpdate = { viewModel.updateChannel() }) {
+                            viewModel.deleteChannel(onDeleteChannel)
+                        }
                     }
 
                     Column(
@@ -231,7 +236,7 @@ private fun RowScope.Actions(viewModel: ChannelDetailScreenViewModel) {
     val context = LocalContext.current
 
     AnimatedVisibility(
-        visible = viewModel.isAdmin,
+        visible = viewModel.channelModel.name != "General" && viewModel.isAdmin,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
@@ -256,7 +261,8 @@ private fun RowScope.Actions(viewModel: ChannelDetailScreenViewModel) {
             modifier = Modifier.size(42.dp),
             onClick = {
                 if (viewModel.isAdmin) {
-                    Toast.makeText(context, "Will implement", Toast.LENGTH_SHORT).show()
+                    viewModel.updateChannelName = viewModel.channelModel.name
+                    viewModel.showUpdateChannelDialog.value = true
                 }
             }
         ) {

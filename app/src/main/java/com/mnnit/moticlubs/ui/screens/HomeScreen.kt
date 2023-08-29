@@ -24,7 +24,6 @@ import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.homescreen.ClubList
 import com.mnnit.moticlubs.ui.components.homescreen.InputChannelDialog
-import com.mnnit.moticlubs.ui.components.homescreen.UpdateChannelDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -80,14 +79,6 @@ fun HomeScreen(
 
                 if (viewModel.showAddChannelDialog) {
                     InputChannelDialog(viewModel = viewModel) { viewModel.addChannel() }
-                }
-
-                if (viewModel.showUpdateChannelDialog) {
-                    UpdateChannelDialog(
-                        viewModel = viewModel,
-                        onUpdate = { viewModel.updateChannel() },
-                        onDelete = { viewModel.deleteChannel() }
-                    )
                 }
 
                 Column(

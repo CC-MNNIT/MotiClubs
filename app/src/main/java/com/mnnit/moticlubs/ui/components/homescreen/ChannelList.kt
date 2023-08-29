@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -70,7 +69,8 @@ fun ChannelList(
                             .align(Alignment.CenterVertically)
                             .height(42.dp)
                             .wrapContentSize(),
-                        onClick = {}
+                        onClick = {},
+                        enabled = false
                     ) {
                         Icon(
                             modifier = Modifier
@@ -96,7 +96,7 @@ fun ChannelList(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    Spacer(modifier = Modifier.padding(4.dp))
+                    Spacer(modifier = Modifier.padding(12.dp))
 
                     AnimatedVisibility(
                         visible = context.getUnreadPost(model.channelId).isNotEmpty(),
@@ -110,34 +110,7 @@ fun ChannelList(
                         ) { Text(text = "${context.getUnreadPost(model.channelId).size}") }
                     }
 
-                    Spacer(modifier = Modifier.padding(4.dp))
-
-                    if (viewModel.adminList.any {
-                            it.userId == viewModel.userModel.userId && it.clubId == clubModel.clubId
-                        } && model.name != "General"
-                    ) {
-                        IconButton(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .height(42.dp)
-                                .wrapContentSize(),
-                            onClick = {
-                                viewModel.eventChannel = model
-                                viewModel.updateChannelName = model.name
-                                viewModel.updateChannelPrivate = model.private
-                                viewModel.showUpdateChannelDialog = true
-                            }
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(18.dp)
-                                    .align(Alignment.CenterVertically),
-                                imageVector = Icons.Rounded.Edit,
-                                contentDescription = ""
-                            )
-                        }
-                        Spacer(modifier = Modifier.padding(4.dp))
-                    }
+                    Spacer(modifier = Modifier.padding(12.dp))
                 }
             }
         }
