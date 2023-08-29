@@ -31,5 +31,35 @@ data class User(
     @ColumnInfo(name = "avatar")
     val avatar: String,
 ) : Parcelable {
-    constructor() : this(-1, "", "", "", "", "", "")
+    constructor() : this(-1, "...", "...", "...", "...", "...", "")
+}
+
+@Parcelize
+@Entity
+data class AdminUser(
+    @ColumnInfo(name = "uid")
+    val userId: Long,
+
+    @ColumnInfo(name = "cid")
+    val clubId: Long,
+
+    @ColumnInfo(name = "regNo")
+    val regNo: String,
+
+    @ColumnInfo(name = "name")
+    val name: String,
+
+    @ColumnInfo(name = "email")
+    val email: String,
+
+    @ColumnInfo(name = "course")
+    val course: String,
+
+    @ColumnInfo(name = "phone")
+    val phoneNumber: String,
+
+    @ColumnInfo(name = "avatar")
+    val avatar: String,
+) : Parcelable {
+    constructor() : this(-1, -1, "...", "...", "...", "...", "...", "")
 }

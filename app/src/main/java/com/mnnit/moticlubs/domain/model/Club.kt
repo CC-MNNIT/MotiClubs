@@ -25,5 +25,5 @@ data class Club(
     @ColumnInfo(name = "summary")
     val summary: String,
 ) : Parcelable {
-    constructor() : this(-1, "", "", "", "")
+    constructor() : this(-1, "...", "...", "", "...")
 }

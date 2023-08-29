@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -21,7 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.mnnit.moticlubs.data.network.dto.ImageUrl
+import com.mnnit.moticlubs.domain.util.getStringArg
 import com.mnnit.moticlubs.ui.components.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
@@ -34,9 +35,8 @@ class ImageScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var imageUrl by mutableStateOf(
-        savedStateHandle.get<ImageUrl>("image") ?: ImageUrl("")
-    )
+    var imageUrl by mutableStateOf(savedStateHandle.getStringArg("image"))
+
 }
 
 @Composable
@@ -46,10 +46,10 @@ fun ImageScreen(viewModel: ImageScreenViewModel = hiltViewModel()) {
     MotiClubsTheme(colorScheme) {
         SetNavBarsTheme()
 
-        val scale = remember { mutableStateOf(1f) }
-        val rotationState = remember { mutableStateOf(0f) }
-        val offsetX = remember { mutableStateOf(0f) }
-        val offsetY = remember { mutableStateOf(0f) }
+        val scale = remember { mutableFloatStateOf(1f) }
+        val rotationState = remember { mutableFloatStateOf(0f) }
+        val offsetX = remember { mutableFloatStateOf(0f) }
+        val offsetY = remember { mutableFloatStateOf(0f) }
         Box(
             modifier = Modifier
                 .clip(RectangleShape)
@@ -57,16 +57,16 @@ fun ImageScreen(viewModel: ImageScreenViewModel = hiltViewModel()) {
                 .background(colorScheme.background)
                 .pointerInput(Unit) {
                     detectTransformGestures(panZoomLock = true) { _, pan, zoom, rotation ->
-                        scale.value *= zoom
-                        rotationState.value += rotation
+                        scale.floatValue *= zoom
+                        rotationState.floatValue += rotation
 
-                        if (scale.value > 1f) {
-                            offsetX.value += pan.x
-                            offsetY.value += pan.y
+                        if (scale.floatValue > 1f) {
+                            offsetX.floatValue += pan.x
+                            offsetY.floatValue += pan.y
                         } else {
-                            offsetX.value = 0f
-                            offsetY.value = 0f
-                            rotationState.value = 0f
+                            offsetX.floatValue = 0f
+                            offsetY.floatValue = 0f
+                            rotationState.floatValue = 0f
                         }
                     }
                 }
@@ -76,14 +76,14 @@ fun ImageScreen(viewModel: ImageScreenViewModel = hiltViewModel()) {
                     .align(Alignment.Center)
                     .fillMaxSize()
                     .graphicsLayer(
-                        scaleX = maxOf(1f, minOf(3f, scale.value)),
-                        scaleY = maxOf(1f, minOf(3f, scale.value)),
-                        rotationZ = rotationState.value,
-                        translationX = offsetX.value,
-                        translationY = offsetY.value
+                        scaleX = maxOf(1f, minOf(3f, scale.floatValue)),
+                        scaleY = maxOf(1f, minOf(3f, scale.floatValue)),
+                        rotationZ = rotationState.floatValue,
+                        translationX = offsetX.floatValue,
+                        translationY = offsetY.floatValue
                     ),
                 contentDescription = null,
-                painter = LocalContext.current.getImageUrlPainter(url = viewModel.imageUrl.imageUrl)
+                painter = LocalContext.current.getImageUrlPainter(url = viewModel.imageUrl)
             )
         }
     }

@@ -19,12 +19,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.di.AppModule
 import com.mnnit.moticlubs.domain.model.Post
-import com.mnnit.moticlubs.domain.model.PostNotificationModel
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.getAuthToken
@@ -177,12 +175,6 @@ class AppFCMService : FirebaseMessagingService() {
             return
         }
 
-        val post = PostNotificationModel(
-            clubName, channelName,
-            channelID, postId, userId, adminName, url,
-            message
-        )
-
         postRead(channelID, postId)
 
         notificationCompat(
@@ -190,10 +182,10 @@ class AppFCMService : FirebaseMessagingService() {
             notificationStamp = postId,
             clubID.toString(),
             clubName,
-            "$adminName ${if (updated) "updated" else "posted"} in $clubName",
+            "$adminName ${if (updated) "updated" else "posted"} in $channelName - $clubName",
             message,
             url,
-            getPendingIntent(post)
+            getPendingIntent(postId)
         )
     }
 
@@ -202,10 +194,6 @@ class AppFCMService : FirebaseMessagingService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val postId = data["pid"]?.toLong() ?: -1
-        val postUserId = data["postUid"]?.toLong() ?: -1
-        val postMessage = data["postMessage"] ?: ""
-        val postUserName = data["postUserName"] ?: ""
-        val postUserAvatar = data["postUserAvatar"] ?: ""
 
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
@@ -233,12 +221,6 @@ class AppFCMService : FirebaseMessagingService() {
             return
         }
 
-        val post = PostNotificationModel(
-            clubName, channelName,
-            channelID, postId, postUserId, postUserName, postUserAvatar,
-            postMessage,
-        )
-
         postRead(channelID, postId)
 
         notificationCompat(
@@ -246,10 +228,10 @@ class AppFCMService : FirebaseMessagingService() {
             notificationStamp = System.currentTimeMillis(),
             clubID.toString(),
             clubName,
-            "$replyUserName replied in $channelName",
+            "$replyUserName replied to a post in $channelName",
             replyMessage,
             url,
-            getPendingIntent(post)
+            getPendingIntent(postId)
         )
     }
 
@@ -298,11 +280,11 @@ class AppFCMService : FirebaseMessagingService() {
         notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
     }
 
-    private fun getPendingIntent(post: PostNotificationModel) = TaskStackBuilder.create(this).run {
+    private fun getPendingIntent(postId: Long) = TaskStackBuilder.create(this).run {
         addNextIntentWithParentStack(
             Intent(
                 Intent.ACTION_VIEW,
-                "${Constants.APP_SCHEME_URL}/post=${Uri.encode(Gson().toJson(post))}".toUri()
+                "${Constants.APP_SCHEME_URL}/post=${Uri.encode(postId.toString())}".toUri()
             )
         )
         getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

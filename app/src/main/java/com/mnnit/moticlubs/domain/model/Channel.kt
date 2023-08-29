@@ -22,5 +22,5 @@ data class Channel(
     @ColumnInfo(name = "private")
     val private: Int,
 ) : Parcelable {
-    constructor() : this(-1L, -1, "", 0)
+    constructor() : this(-1L, -1, "...", 0)
 }

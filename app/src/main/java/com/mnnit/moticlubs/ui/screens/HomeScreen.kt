@@ -18,9 +18,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mnnit.moticlubs.domain.model.Channel
-import com.mnnit.moticlubs.domain.model.Club
-import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
@@ -35,8 +32,8 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
-    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit,
-    onNavigateToClubDetails: (club: Club, user: User) -> Unit,
+    onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
+    onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateContactUs: () -> Unit,
     onNavigateProfile: (viewModel: HomeScreenViewModel) -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()

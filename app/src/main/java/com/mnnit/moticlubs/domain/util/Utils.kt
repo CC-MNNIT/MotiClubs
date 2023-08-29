@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
@@ -41,6 +42,9 @@ object Constants {
     const val POST_ID_CLAIM = "postId"
     const val REPLY_ID_CLAIM = "replyId"
 }
+
+fun SavedStateHandle.getLongArg(arg: String): Long = get<Long>(arg) ?: -1
+fun SavedStateHandle.getStringArg(arg: String): String = get<String>(arg) ?: ""
 
 fun Context.getMkdFormatter() = Markwon.builder(this)
     .usePlugin(StrikethroughPlugin.create())

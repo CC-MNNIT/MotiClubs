@@ -3,6 +3,7 @@ package com.mnnit.moticlubs.domain.repository
 import android.app.Application
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Post
@@ -41,9 +42,9 @@ interface Repository {
 
     suspend fun insertOrUpdateAdmin(admin: Admin)
 
-    suspend fun getAdmins(): List<Admin>
+    suspend fun getAdmins(): List<AdminUser>
 
-    suspend fun deleteAdmin(admin: Admin)
+    suspend fun deleteAdmin(userId: Long)
 
     // ----------- CHANNEL
 
@@ -60,6 +61,8 @@ interface Repository {
     suspend fun insertOrUpdatePost(post: Post)
 
     suspend fun getPostsFromChannel(channelID: Long, page: Int): List<Post>
+
+    suspend fun getPost(postId: Long): Post
 
     suspend fun deletePost(post: Post)
 

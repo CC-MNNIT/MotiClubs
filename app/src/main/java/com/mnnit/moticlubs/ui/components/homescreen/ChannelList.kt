@@ -42,7 +42,7 @@ fun ChannelList(
     list: List<Channel>,
     viewModel: HomeScreenViewModel,
     clubModel: Club,
-    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit
+    onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -54,7 +54,7 @@ fun ChannelList(
     ) {
         list.forEach { model ->
             Card(
-                onClick = { onNavigateChannelClick(model, clubModel) },
+                onClick = { onNavigateChannelClick(model.channelId, clubModel.clubId) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))

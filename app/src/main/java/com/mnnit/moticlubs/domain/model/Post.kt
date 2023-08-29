@@ -24,19 +24,5 @@ data class Post(
     @ColumnInfo(name = "uid", index = true)
     val userId: Long,
 ) {
-    constructor() : this(-1L, -1L, 0, "", 0L)
-}
-
-@Parcelize
-data class PostNotificationModel(
-    val clubName: String,
-    val channelName: String,
-    val channelId: Long,
-    val postId: Long,
-    val userId: Long,
-    val adminName: String,
-    val adminAvatar: String,
-    val message: String,
-) : Parcelable {
-    constructor() : this("", "", -1, -1, -1, "", "", "")
+    constructor() : this(-1L, -1L, 1, "...", -1L)
 }

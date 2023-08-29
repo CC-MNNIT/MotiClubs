@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,22 +13,25 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,6 +41,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
     private val channelUseCases: ChannelUseCases,
     private val memberUseCases: MemberUseCases,
     private val userUseCases: UserUseCases,
+    private val repository: Repository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -44,29 +49,28 @@ class ChannelDetailScreenViewModel @Inject constructor(
         private const val TAG = "ChannelDetailScreenView"
     }
 
-    var clubModel by mutableStateOf(savedStateHandle.get<Club>(NavigationArgs.CLUB_ARG) ?: Club())
-    var channelModel by mutableStateOf(savedStateHandle.get<Channel>(NavigationArgs.CHANNEL_ARG) ?: Channel())
-//    val userModel by mutableStateOf(savedStateHandle.get<User>(NavigationArgs.USER_ARG) ?: User())
+    val channelId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.CHANNEL_ARG))
+
+    var channelModel by mutableStateOf(Channel())
+    var clubModel by mutableStateOf(Club())
 
     var showPrivateConfirmationDialog = mutableStateOf(false)
     var isFetching by mutableStateOf(false)
     var isUpdating by mutableStateOf(false)
     var isAdmin by mutableStateOf(false)
 
-    var updateChannelName by mutableStateOf(channelModel.name)
-    var updateChannelPrivate by mutableIntStateOf(channelModel.private)
+    var updateChannelName by mutableStateOf("")
+    var updateChannelPrivate by mutableIntStateOf(0)
 
     val memberList = mutableStateListOf<Member>()
-    val adminList = mutableStateListOf<Admin>()
+    val adminList = mutableStateListOf<AdminUser>()
     val memberInfo = mutableStateMapOf<Long, User>()
 
-    private var getChannelJob: Job? = null
     private var getMemberJob: Job? = null
     private var getAdminJob: Job? = null
 
     fun refreshAll() {
-        getChannel()
-        getMembers()
+        getModels()
         memberInfo.clear()
         getAdmins()
     }
@@ -97,30 +101,16 @@ class ChannelDetailScreenViewModel @Inject constructor(
         isUpdating = false
     }
 
-    private fun getChannel() {
-        getChannelJob?.cancel()
-        getChannelJob = channelUseCases.getChannel(channelModel.channelId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    isFetching = true
-                    resource.data?.let { channel ->
-                        channelModel = channel
-                        resetUpdate()
-                    }
-                }
+    private fun getModels() {
+        viewModelScope.launch {
+            channelModel = repository.getChannel(channelId)
+            clubModel = repository.getClub(channelModel.clubId)
 
-                is Resource.Success -> {
-                    channelModel = resource.data
-                    resetUpdate()
-                    isFetching = false
-                }
+            updateChannelName = channelModel.name
+            updateChannelPrivate = channelModel.private
 
-                is Resource.Error -> {
-                    isFetching = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+            getMembers()
+        }
     }
 
     private fun getMembers() {
@@ -130,7 +120,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
         }
 
         getMemberJob?.cancel()
-        getMemberJob = memberUseCases.getMembers(channelModel.channelId).onEach { resource ->
+        getMemberJob = memberUseCases.getMembers(channelId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->

@@ -18,9 +18,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -31,9 +37,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.gson.Gson
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.data.network.dto.ImageUrl
 import com.mnnit.moticlubs.domain.util.*
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -165,66 +169,89 @@ class MainActivity : ComponentActivity() {
                     // HOME
                     composable(AppNavigation.HOME) {
                         HomeScreen(
-                            onNavigateChannelClick = { channel, club ->
+                            onNavigateChannelClick = { channelId, clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CLUB_PAGE}?" +
-                                            "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(Gson().toJson(channel))}&" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}&" +
-                                            "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(viewModel.user))}"
+                                            "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channelId.toString())}&" +
+                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
                                 )
                             },
                             onNavigateContactUs = { navController.navigate(AppNavigation.ABOUT_US) },
                             onNavigateProfile = { navController.navigate(AppNavigation.PROFILE) },
-                            onNavigateToClubDetails = { club, user ->
+                            onNavigateToClubDetails = { clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CLUB_DETAIL}?" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}&" +
-                                            "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(user))}"
+                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
                                 )
                             }
                         )
                     }
 
+                    // PROFILE
+                    composable(AppNavigation.PROFILE) {
+                        ProfileScreen(
+                            viewModel,
+                            it.sharedViewModel(navController),
+                            onNavigationLogout = {
+                                navController.navigate(AppNavigation.LOGIN) {
+                                    popUpTo(AppNavigation.HOME) { inclusive = true }
+                                }
+                            }, onBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            })
+                    }
+
+                    // ABOUT US
+                    composable(AppNavigation.ABOUT_US) { AboutUsScreen() }
+
                     // CLUB PAGE
                     composable(
                         "${AppNavigation.CLUB_PAGE}?" +
                                 "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
-                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}&" +
-                                "${NavigationArgs.USER_ARG}={${NavigationArgs.USER_ARG}}",
+                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
-                            navArgument(NavigationArgs.CHANNEL_ARG) { type = ChannelParamType() },
-                            navArgument(NavigationArgs.CLUB_ARG) { type = ClubParamType() },
-                            navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
+                            navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType },
+                            navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
                         )
                     ) {
-                        ClubScreen(onNavigateToPost = { post ->
-                            navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(Gson().toJson(post))}")
-                        }, onNavigateToClubDetails = { club, user ->
+                        ClubScreen(onNavigateToPost = { postId ->
+                            navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(postId.toString())}")
+                        }, onNavigateToClubDetails = { clubId ->
                             navController.navigate(
                                 "${AppNavigation.CLUB_DETAIL}?" +
-                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}&" +
-                                        "${NavigationArgs.USER_ARG}=${Uri.encode(Gson().toJson(user))}"
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
                             )
-                        }, onNavigateToImageScreen = {
-                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
-                        }, onNavigateToChannelDetails = { club, channel ->
+                        }, onNavigateToImageScreen = { url ->
+                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(url)}")
+                        }, onNavigateToChannelDetails = { channel ->
                             navController.navigate(
                                 "${AppNavigation.CHANNEL_DETAIL}?" +
-                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(Gson().toJson(channel))}&" +
-                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(Gson().toJson(club))}"
+                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channel.toString())}"
                             )
                         }, onBackPressed = {
                             localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                         })
                     }
 
+                    // CLUB DETAILS
                     composable(
-                        "${AppNavigation.CHANNEL_DETAIL}?" +
-                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
+                        "${AppNavigation.CLUB_DETAIL}?" +
                                 "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
-                            navArgument(NavigationArgs.CHANNEL_ARG) { type = ChannelParamType() },
-                            navArgument(NavigationArgs.CLUB_ARG) { type = ClubParamType() }
+                            navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
+                        )
+                    ) {
+                        ClubDetailsScreen(onNavigateBackPressed = {
+                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                        })
+                    }
+
+                    // CHANNEL DETAILS
+                    composable(
+                        "${AppNavigation.CHANNEL_DETAIL}?" +
+                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}",
+                        arguments = listOf(
+                            navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType },
                         )
                     ) {
                         ChannelDetailScreen(
@@ -234,55 +261,26 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // PROFILE
-                    composable(AppNavigation.PROFILE) {
-                        ProfileScreen(viewModel, onNavigationLogout = {
-                            navController.navigate(AppNavigation.LOGIN) {
-                                popUpTo(AppNavigation.HOME) { inclusive = true }
-                            }
-                        }, onBackPressed = {
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
-                    }
-
-                    // ABOUT US
-                    composable(AppNavigation.ABOUT_US) { AboutUsScreen() }
-
-                    // CLUB POST
+                    // POST PAGE
                     composable(
                         "${AppNavigation.POST_PAGE}/{${NavigationArgs.POST_ARG}}",
-                        arguments = listOf(navArgument(NavigationArgs.POST_ARG) { type = PostParamType() }),
+                        arguments = listOf(navArgument(NavigationArgs.POST_ARG) { type = NavType.LongType }),
                         deepLinks = listOf(navDeepLink {
                             uriPattern =
                                 "${Constants.APP_SCHEME_URL}/${NavigationArgs.POST_ARG}={${NavigationArgs.POST_ARG}}"
                         })
                     ) {
-                        PostScreen(onNavigateImageClick = {
-                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(Gson().toJson(ImageUrl(it)))}")
+                        PostScreen(onNavigateImageClick = { url ->
+                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(url)}")
                         }, onNavigateBackPressed = {
                             localBackPressed?.onBackPressedDispatcher?.onBackPressed()
                         })
                     }
 
-                    // CLUB Details
-                    composable(
-                        "${AppNavigation.CLUB_DETAIL}?" +
-                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}&" +
-                                "${NavigationArgs.USER_ARG}={${NavigationArgs.USER_ARG}}",
-                        arguments = listOf(
-                            navArgument(NavigationArgs.CLUB_ARG) { type = ClubParamType() },
-                            navArgument(NavigationArgs.USER_ARG) { type = UserParamType() }
-                        )
-                    ) {
-                        ClubDetailsScreen(onNavigateBackPressed = {
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
-                    }
-
-                    // CLUB POST
+                    // POST IMAGE
                     composable(
                         "${AppNavigation.IMAGE_PAGE}/{image}",
-                        arguments = listOf(navArgument("image") { type = ImageUrlParamType() })
+                        arguments = listOf(navArgument("image") { type = NavType.StringType })
                     ) {
                         ImageScreen()
                     }
@@ -291,12 +289,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-//    @Composable
-//    inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
-//        val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
-//        val parentEntry = remember(this) {
-//            navController.getBackStackEntry(navGraphRoute)
-//        }
-//        return hiltViewModel(parentEntry)
-//    }
+    @Composable
+    inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
+        val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+        val parentEntry = remember(this) {
+            navController.getBackStackEntry(navGraphRoute)
+        }
+        return hiltViewModel(parentEntry)
+    }
 }

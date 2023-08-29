@@ -18,17 +18,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
-fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
+fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
     val colorScheme = getColorScheme()
 
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        value = appViewModel.user.name,
+        value = viewModel.user.name,
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Name") },
@@ -46,7 +46,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = appViewModel.user.email.replace("@mnnit.ac.in", ""),
+        value = viewModel.user.email.replace("@mnnit.ac.in", ""),
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "G-Suite ID") },
@@ -76,7 +76,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .padding(end = 8.dp),
-            value = appViewModel.user.regNo,
+            value = viewModel.user.regNo,
             onValueChange = {},
             shape = RoundedCornerShape(24.dp),
             label = { Text(text = "Reg No") },
@@ -90,7 +90,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
         )
 
         OutlinedTextField(
-            value = appViewModel.user.course,
+            value = viewModel.user.course,
             onValueChange = { },
             readOnly = true,
             label = { Text(text = "Course") },
@@ -110,7 +110,7 @@ fun UserInfo(appViewModel: AppViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = appViewModel.user.phoneNumber,
+        value = viewModel.user.phoneNumber,
         onValueChange = {},
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Phone No") },

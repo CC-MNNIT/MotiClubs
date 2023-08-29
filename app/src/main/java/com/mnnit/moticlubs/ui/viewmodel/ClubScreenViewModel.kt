@@ -16,13 +16,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.PostUseCases
-import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.Constants
-import com.mnnit.moticlubs.domain.util.NavigationArgs
+import com.mnnit.moticlubs.domain.util.NavigationArgs.CHANNEL_ARG
+import com.mnnit.moticlubs.domain.util.NavigationArgs.CLUB_ARG
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.getLongArg
+import com.mnnit.moticlubs.domain.util.getUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -33,23 +36,36 @@ import javax.inject.Inject
 @HiltViewModel
 class ClubScreenViewModel @Inject constructor(
     private val application: Application,
-    private val userUseCases: UserUseCases,
     private val clubUseCases: ClubUseCases,
-    private val postUseCases: PostUseCases,
     private val memberUseCases: MemberUseCases,
+    private val postUseCases: PostUseCases,
+    private val repository: Repository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val clubModel by mutableStateOf(savedStateHandle.get<Club>(NavigationArgs.CLUB_ARG) ?: Club())
-    val channelModel by mutableStateOf(savedStateHandle.get<Channel>(NavigationArgs.CHANNEL_ARG) ?: Channel())
-    val userModel by mutableStateOf(savedStateHandle.get<User>(NavigationArgs.USER_ARG) ?: User())
+    companion object {
+        private const val TAG = "ClubScreenViewModel"
+    }
+
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            getPostsList()
+        }
+    }
+
+    val clubId by mutableLongStateOf(savedStateHandle.getLongArg(CLUB_ARG))
+    val channelId by mutableLongStateOf(savedStateHandle.getLongArg(CHANNEL_ARG))
+    var userId by mutableLongStateOf(-1)
+
+    var clubModel by mutableStateOf(Club())
+    var channelModel by mutableStateOf(Channel())
 
     val eventPostMsg = mutableStateOf(TextFieldValue(""))
     val eventImageReplacerMap = mutableMapOf<String, String>()
     val eventUpdatePost = mutableStateOf(Post())
     val eventDeletePost = mutableStateOf(Post())
 
-    val adminMap = mutableStateMapOf<Long, User>()
+    val adminMap = mutableStateMapOf<Long, AdminUser>()
     val postsList = mutableStateListOf<Post>()
     val loadingPosts = mutableStateOf(false)
     val memberCount = mutableIntStateOf(-1)
@@ -93,6 +109,7 @@ class ClubScreenViewModel @Inject constructor(
     private var crudPostJob: Job? = null
     private var getPostsJob: Job? = null
 
+    private var getAdminJob: Job? = null
     private var getMembersJob: Job? = null
 
     fun clearEditor() {
@@ -100,6 +117,63 @@ class ClubScreenViewModel @Inject constructor(
         eventImageReplacerMap.clear()
         editMode.value = false
         showProgress.value = false
+    }
+
+    private fun getModels() {
+        viewModelScope.launch {
+            channelModel = repository.getChannel(channelId)
+            clubModel = repository.getClub(channelModel.clubId)
+
+            userId = application.getUserID()
+            getMembers()
+            getAdmins()
+        }
+    }
+
+    private fun getMembers() {
+        if (channelModel.private == 0) {
+            memberCount.intValue = -1
+            return
+        }
+
+        getMembersJob?.cancel()
+        getMembersJob = memberUseCases.getMembers(channelId).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> resource.data?.let { list -> memberCount.intValue = list.size }
+
+                is Resource.Success -> {
+                    memberCount.intValue = resource.data.size
+                    Log.d("TAG", "getMembers: ${memberCount.intValue}")
+                }
+
+                is Resource.Error -> Log.d("TAG", "getMembers: error: ${resource.errCode} : ${resource.errMsg}")
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getAdmins() {
+        getAdminJob?.cancel()
+        getAdminJob = clubUseCases.getAdmins().onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    resource.data?.let { list ->
+                        isAdmin = list.any { admin -> admin.userId == userId }
+                        list.forEach { admin -> adminMap[admin.userId] = admin }
+                    }
+                }
+
+                is Resource.Success -> {
+                    val list = resource.data
+                    list.forEach { admin -> adminMap[admin.userId] = admin }
+
+                    isAdmin = list.any { admin -> admin.userId == userId }
+                }
+
+                is Resource.Error -> {
+                    Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun getPostsList(refresh: Boolean = true) {
@@ -113,7 +187,7 @@ class ClubScreenViewModel @Inject constructor(
         }
 
         getPostsJob?.cancel()
-        getPostsJob = postUseCases.getPosts(channelModel.channelId, postPage).onEach { resource ->
+        getPostsJob = postUseCases.getPosts(channelId, postPage).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
@@ -149,52 +223,11 @@ class ClubScreenViewModel @Inject constructor(
                 is Resource.Error -> {
                     loadingPosts.value = false
                     paging = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }.launchIn(viewModelScope)
-    }
-
-    private fun getMembers() {
-        if (channelModel.private == 0) {
-            memberCount.intValue = -1
-            return
-        }
-
-        getMembersJob?.cancel()
-        getMembersJob = memberUseCases.getMembers(channelModel.channelId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> resource.data?.let { list -> memberCount.intValue = list.size }
-
-                is Resource.Success -> {
-                    memberCount.intValue = resource.data.size
-                    Log.d("TAG", "getMembers: ${memberCount.intValue}")
-                }
-
-                is Resource.Error -> Log.d("TAG", "getMembers: error: ${resource.errCode} : ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    private fun getAdmins() {
-        viewModelScope.launch {
-            val resource = clubUseCases.getAdmins(shouldFetch = false).first()
-            if (resource is Resource.Error) {
-                return@launch
-            }
-
-            resource.d?.let { list ->
-                val admins = list.filter { admin -> admin.clubId == channelModel.clubId }
-                isAdmin = admins.any { admin -> admin.userId == userModel.userId }
-
-                admins.forEach { admin ->
-                    val adminUserRes = userUseCases.getUser(admin.userId).first()
-                    if (adminUserRes !is Resource.Error) {
-                        adminUserRes.d?.let { adminUser -> adminMap[admin.userId] = adminUser }
-                    }
-                }
-            }
-        }
     }
 
     fun sendPost() {
@@ -205,12 +238,12 @@ class ClubScreenViewModel @Inject constructor(
             text = text.replace(key.replace("\n", ""), value)
         }
 
-        val channelID = channelModel.channelId
+        val channelID = channelId
         val time = System.currentTimeMillis()
         crudPostJob?.cancel()
         crudPostJob = postUseCases.sendPost(
-            Post(time, channelID, pageNo = 1, text, userModel.userId),
-            channelModel.clubId, 1
+            Post(time, channelID, pageNo = 1, text, userId),
+            clubId, 1
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
@@ -240,7 +273,7 @@ class ClubScreenViewModel @Inject constructor(
 
         crudPostJob?.cancel()
         val post = eventUpdatePost.value.copy(message = text)
-        crudPostJob = postUseCases.updatePost(post, channelModel.clubId).onEach { resource ->
+        crudPostJob = postUseCases.updatePost(post, clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
@@ -252,7 +285,8 @@ class ClubScreenViewModel @Inject constructor(
 
                 is Resource.Error -> {
                     showProgress.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }.launchIn(viewModelScope)
@@ -264,7 +298,7 @@ class ClubScreenViewModel @Inject constructor(
         showProgress.value = true
 
         crudPostJob?.cancel()
-        crudPostJob = postUseCases.deletePost(eventDeletePost.value, channelModel.clubId).onEach { resource ->
+        crudPostJob = postUseCases.deletePost(eventDeletePost.value, clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
                 is Resource.Success -> {
@@ -276,28 +310,23 @@ class ClubScreenViewModel @Inject constructor(
 
                 is Resource.Error -> {
                     showProgress.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }.launchIn(viewModelScope)
     }
 
     private fun registerPostReceiver() {
-        LocalBroadcastManager.getInstance(application)
-            .registerReceiver(
-                object : BroadcastReceiver() {
-                    override fun onReceive(context: Context?, intent: Intent?) {
-                        getPostsList()
-                    }
-                },
-                IntentFilter(Constants.POST_BROADCAST_ACTION)
-            )
+        with(LocalBroadcastManager.getInstance(application)) {
+            unregisterReceiver(receiver)
+            registerReceiver(receiver, IntentFilter(Constants.POST_BROADCAST_ACTION))
+        }
     }
 
     init {
         registerPostReceiver()
-        getMembers()
-        getAdmins()
+        getModels()
         getPostsList()
     }
 }

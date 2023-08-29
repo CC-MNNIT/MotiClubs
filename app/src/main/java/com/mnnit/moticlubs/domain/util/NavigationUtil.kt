@@ -16,6 +16,5 @@ object AppNavigation {
 object NavigationArgs {
     const val CLUB_ARG = "club"
     const val CHANNEL_ARG = "channel"
-    const val USER_ARG = "user"
     const val POST_ARG = "post"
 }

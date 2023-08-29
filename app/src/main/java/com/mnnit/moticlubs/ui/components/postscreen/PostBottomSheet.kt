@@ -42,7 +42,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Reply
-import com.mnnit.moticlubs.domain.util.getUserID
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
@@ -218,14 +216,12 @@ private fun Reply(
     reply: Reply,
     colorScheme: ColorScheme
 ) {
-    val context = LocalContext.current
-
     Card(
         modifier = Modifier
             .safeContentPadding()
             .clip(RoundedCornerShape(24.dp))
             .combinedClickable(onLongClick = {
-                if (reply.userId == context.getUserID()) {
+                if (reply.userId == viewModel.userId) {
                     viewModel.replyDeleteItem.value = reply
                     viewModel.showConfirmationDeleteDialog.value = true
                 }
@@ -257,7 +253,7 @@ private fun Reply(
                         overflow = TextOverflow.Ellipsis
                     )
 
-                    if (reply.userId == viewModel.postNotificationModel.userId) {
+                    if (reply.userId == viewModel.postModel.userId) {
                         Card(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp)

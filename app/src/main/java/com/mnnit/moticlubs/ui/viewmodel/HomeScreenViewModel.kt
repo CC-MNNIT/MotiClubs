@@ -13,7 +13,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
@@ -23,7 +23,6 @@ import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getUserID
 import com.mnnit.moticlubs.domain.util.setAuthToken
-import com.mnnit.moticlubs.domain.util.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -43,7 +42,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     var user by mutableStateOf(User())
-    val adminList = mutableStateListOf<Admin>()
+    val adminList = mutableStateListOf<AdminUser>()
     val clubsList = mutableStateListOf<Club>()
     val channelMap = mutableStateMapOf<Long, SnapshotStateList<Channel>>()
 
@@ -69,6 +68,25 @@ class HomeScreenViewModel @Inject constructor(
     private var addChannelJob: Job? = null
     private var updateChannelJob: Job? = null
     private var deleteChannelJob: Job? = null
+    private var updateUserJob: Job? = null
+
+    fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: () -> Unit) {
+        updateUserJob?.cancel()
+        updateUserJob = userUseCases.updateUser(user.copy(avatar = url)).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    user = resource.data
+                    onResponse()
+                }
+
+                is Resource.Error -> {
+                    Log.d(TAG, "updateProfilePic: ${resource.errCode}: ${resource.errMsg}")
+                    onFailure()
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun addChannel() {
         addChannelJob?.cancel()
@@ -157,7 +175,6 @@ class HomeScreenViewModel @Inject constructor(
 
         isFetchingAdmins = true
         FirebaseAuth.getInstance().currentUser?.getIdToken(tokenRefresh)?.addOnSuccessListener {
-            application.setUserID(it.claims["userId"]?.toString()?.toLong() ?: -1)
             application.setAuthToken(it.token ?: "")
 
             getUser()

@@ -34,9 +34,15 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
-fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit, onBackPressed: () -> Unit) {
+fun ProfileScreen(
+    appViewModel: AppViewModel,
+    viewModel: HomeScreenViewModel,
+    onNavigationLogout: () -> Unit,
+    onBackPressed: () -> Unit
+) {
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
     val loading = remember { mutableStateOf(false) }
@@ -67,7 +73,7 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit, on
                     scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
                     actions = {
                         UpdateProfileIcon(
-                            appViewModel = appViewModel,
+                            appViewModel = viewModel,
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
                                 .padding(end = 16.dp),
@@ -78,10 +84,10 @@ fun ProfileScreen(appViewModel: AppViewModel, onNavigationLogout: () -> Unit, on
 
                 ProfilePicture(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    url = appViewModel.user.avatar,
+                    url = viewModel.user.avatar,
                     size = 156.dp
                 )
-                UserInfo(appViewModel = appViewModel, modifier = Modifier.padding(top = 56.dp))
+                UserInfo(viewModel = viewModel, modifier = Modifier.padding(top = 56.dp))
 
                 Button(
                     onClick = {

@@ -7,17 +7,13 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -29,13 +25,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.compressBitmap
-import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
+import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 import java.io.ByteArrayOutputStream
 
 @Composable
-fun RowScope.UpdateProfileIcon(
-    appViewModel: AppViewModel,
+fun UpdateProfileIcon(
+    appViewModel: HomeScreenViewModel,
     modifier: Modifier = Modifier,
     loading: MutableState<Boolean>
 ) {
@@ -67,7 +62,7 @@ fun RowScope.UpdateProfileIcon(
 private fun updateClubProfilePicture(
     context: Context,
     imageUri: Uri,
-    appViewModel: AppViewModel,
+    appViewModel: HomeScreenViewModel,
     loading: MutableState<Boolean>
 ) {
     val storageRef = Firebase.storage.reference

@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LastBaseline
@@ -35,19 +34,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun PostItem(
     bottomSheetScaffoldState: MutableState<BottomSheetScaffoldState>,
-    clubModel: Club,
     channelModel: Channel,
-    postsList: SnapshotStateList<Post>,
-    userID: Long,
-    idx: Int,
-    admin: User,
+    post: Post,
+    userId: Long,
+    admin: AdminUser,
     editMode: MutableState<Boolean>,
     eventUpdatePost: MutableState<Post>,
     postMsg: MutableState<TextFieldValue>,
     imageReplacerMap: MutableMap<String, String>,
     eventDeletePost: MutableState<Post>,
     showDelPostDialog: MutableState<Boolean>,
-    onNavigateToPost: (post: PostNotificationModel) -> Unit
+    onNavigateToPost: (postId: Long) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()
@@ -56,20 +53,7 @@ fun PostItem(
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 24.dp), elevation = CardDefaults.cardElevation(0.dp),
-        onClick = {
-            onNavigateToPost(
-                PostNotificationModel(
-                    clubModel.name,
-                    channelModel.name,
-                    channelModel.channelId,
-                    postsList[idx].postId,
-                    postsList[idx].userId,
-                    admin.name,
-                    admin.avatar,
-                    postsList[idx].message,
-                )
-            )
-        },
+        onClick = { onNavigateToPost(post.postId) },
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
     ) {
         Card(
@@ -88,12 +72,12 @@ fun PostItem(
                     size = 42.dp
                 )
 
-                AuthorNameTimestamp(postsList[idx].postId, admin.name)
+                AuthorNameTimestamp(post.postId, admin.name)
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(
                     visible = LocalContext.current.getUnreadPost(channelModel.channelId)
-                        .contains(postsList[idx].postId.toString()),
+                        .contains(post.postId.toString()),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .padding(16.dp)
@@ -103,14 +87,14 @@ fun PostItem(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                AnimatedVisibility(visible = postsList[idx].userId == userID) {
+                AnimatedVisibility(visible = post.userId == userId) {
                     IconButton(onClick = {
-                        eventUpdatePost.value = postsList[idx]
+                        eventUpdatePost.value = post
                         editMode.value = true
 
-                        var preprocessText = postsList[idx].message
+                        var preprocessText = post.message
                         imageReplacerMap.clear()
-                        postsList[idx].message.lines().forEach {
+                        post.message.lines().forEach {
                             if (it.startsWith("<img src")) {
                                 val key = "[image_${imageReplacerMap.size}]"
                                 imageReplacerMap[key] = it
@@ -131,9 +115,9 @@ fun PostItem(
                         )
                     }
                 }
-                AnimatedVisibility(visible = postsList[idx].userId == userID) {
+                AnimatedVisibility(visible = post.userId == userId) {
                     IconButton(onClick = {
-                        eventDeletePost.value = postsList[idx]
+                        eventDeletePost.value = post
                         showDelPostDialog.value = true
                     }) {
                         Icon(
@@ -146,7 +130,7 @@ fun PostItem(
             }
         }
         MarkdownText(
-            markdown = postsList[idx].message,
+            markdown = post.message,
             color = contentColorFor(backgroundColor = getColorScheme().background),
             maxLines = 4,
             modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp),

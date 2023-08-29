@@ -28,10 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.*
+import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
-import com.mnnit.moticlubs.domain.model.PostNotificationModel
-import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.components.clubscreen.ChannelNameBar
@@ -45,9 +44,9 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubScreenViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ClubScreen(
-    onNavigateToPost: (post: PostNotificationModel) -> Unit,
-    onNavigateToClubDetails: (club: Club, user: User) -> Unit,
-    onNavigateToChannelDetails: (club: Club, channel: Channel) -> Unit,
+    onNavigateToPost: (postId: Long) -> Unit,
+    onNavigateToClubDetails: (clubId: Long) -> Unit,
+    onNavigateToChannelDetails: (channelId: Long) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
     onBackPressed: () -> Unit,
     viewModel: ClubScreenViewModel = hiltViewModel()
@@ -167,8 +166,8 @@ fun DeleteConfirmationDialog(viewModel: ClubScreenViewModel) {
 fun TopBar(
     viewModel: ClubScreenViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToClubDetails: (clubModel: Club, user: User) -> Unit,
-    onNavigateToChannelDetails: (club: Club, channel: Channel) -> Unit,
+    onNavigateToClubDetails: (clubId: Long) -> Unit,
+    onNavigateToChannelDetails: (channelId: Long) -> Unit,
     onBackPressed: () -> Unit
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
@@ -193,9 +192,9 @@ fun TopBar(
 @Composable
 fun Posts(
     viewModel: ClubScreenViewModel,
-    adminMap: MutableMap<Long, User>,
+    adminMap: MutableMap<Long, AdminUser>,
     scrollState: LazyListState,
-    onNavigateToPost: (post: PostNotificationModel) -> Unit,
+    onNavigateToPost: (postId: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
@@ -215,12 +214,10 @@ fun Posts(
                 }
                 PostItem(
                     bottomSheetScaffoldState = viewModel.bottomSheetScaffoldState,
-                    clubModel = viewModel.clubModel,
                     channelModel = viewModel.channelModel,
-                    postsList = viewModel.postsList,
-                    userID = viewModel.userModel.userId,
-                    idx = index,
-                    admin = adminMap[viewModel.postsList[index].userId] ?: User(),
+                    post = viewModel.postsList[index],
+                    userId = viewModel.userId,
+                    admin = adminMap[viewModel.postsList[index].userId] ?: AdminUser(),
                     editMode = viewModel.editMode,
                     eventUpdatePost = viewModel.eventUpdatePost,
                     postMsg = viewModel.eventPostMsg,

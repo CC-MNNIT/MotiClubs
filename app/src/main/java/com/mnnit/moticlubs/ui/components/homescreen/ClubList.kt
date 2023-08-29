@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
-import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
 import com.mnnit.moticlubs.domain.util.getExpandedChannel
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
@@ -43,8 +42,8 @@ fun ClubList(
     viewModel: HomeScreenViewModel,
     clubsList: SnapshotStateList<Club>,
     channelMap: MutableMap<Long, SnapshotStateList<Channel>>,
-    onNavigateChannelClick: (channel: Channel, club: Club) -> Unit,
-    onNavigateToClubDetails: (club: Club, user: User) -> Unit
+    onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
+    onNavigateToClubDetails: (clubId: Long) -> Unit
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -70,7 +69,7 @@ fun ClubList(
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
                         url = clubsList[idx].avatar,
-                        onClick = { onNavigateToClubDetails(viewModel.clubsList[idx], viewModel.user) }
+                        onClick = { onNavigateToClubDetails(viewModel.clubsList[idx].clubId) }
                     )
 
                     Column(

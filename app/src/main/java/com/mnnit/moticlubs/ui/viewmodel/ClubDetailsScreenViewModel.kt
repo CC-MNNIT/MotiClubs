@@ -4,6 +4,7 @@ import android.app.Application
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,13 +16,15 @@ import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Url
-import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.UrlUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
+import com.mnnit.moticlubs.domain.util.getLongArg
+import com.mnnit.moticlubs.domain.util.getUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
@@ -35,11 +38,14 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private val application: Application,
     private val urlUseCases: UrlUseCases,
     private val clubUseCases: ClubUseCases,
+    private val repository: Repository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    var clubModel by mutableStateOf(savedStateHandle.get<Club>(NavigationArgs.CLUB_ARG) ?: Club())
-    private var userModel by mutableStateOf(savedStateHandle.get<User>(NavigationArgs.USER_ARG) ?: User())
+    val clubId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.CLUB_ARG))
+    var userId by mutableLongStateOf(-1)
+
+    var clubModel by mutableStateOf(Club())
 
     var isAdmin by mutableStateOf(false)
 
@@ -47,7 +53,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
     var progressMsg by mutableStateOf("")
 
     var editDescriptionMode by mutableStateOf(false)
-    var displayedDescription by mutableStateOf(clubModel.description)
+    var displayedDescription by mutableStateOf("...")
 
     val showSocialLinkDialog = mutableStateOf(false)
     val showOtherLinkDialog = mutableStateOf(false)
@@ -67,6 +73,16 @@ class ClubDetailsScreenViewModel @Inject constructor(
     private var addUrlsJob: Job? = null
     private var updateClubJob: Job? = null
 
+    private fun getModels() {
+        viewModelScope.launch {
+            clubModel = repository.getClub(clubId)
+            displayedDescription = clubModel.description
+
+            userId = repository.getApplication().getUserID()
+            getAdmins()
+        }
+    }
+
     private fun getAdmins() {
         viewModelScope.launch {
             val resource = clubUseCases.getAdmins(shouldFetch = false).first()
@@ -75,8 +91,8 @@ class ClubDetailsScreenViewModel @Inject constructor(
             }
 
             resource.d?.let { list ->
-                val admins = list.filter { admin -> admin.clubId == clubModel.clubId }
-                isAdmin = admins.any { admin -> admin.userId == userModel.userId }
+                val admins = list.filter { admin -> admin.clubId == clubId }
+                isAdmin = admins.any { admin -> admin.userId == userId }
             }
         }
     }
@@ -88,7 +104,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
         showOtherLinkDialog.value = false
 
         addUrlsJob?.cancel()
-        addUrlsJob = urlUseCases.addUrls(clubId = clubModel.clubId, list)
+        addUrlsJob = urlUseCases.addUrls(clubId, list)
             .onEach { resource ->
                 when (resource) {
                     is Resource.Loading -> {
@@ -149,7 +165,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
         isFetching = true
 
         getUrlsJob?.cancel()
-        getUrlsJob = urlUseCases.getUrls(clubId = clubModel.clubId).onEach { resource ->
+        getUrlsJob = urlUseCases.getUrls(clubId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     isFetching = true
@@ -186,7 +202,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
         for (i in socialLinks.indices) {
             socialLinksLiveList[i] = socialLinks[i].mapToSocialLinkModel().apply {
                 this.urlName = SocialLinkComposeModel.socialLinkNames[i]
-                this.clubID = clubModel.clubId
+                this.clubID = clubId
             }
         }
 
@@ -199,7 +215,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
     }
 
     init {
-        getAdmins()
+        getModels()
         getUrls()
     }
 }

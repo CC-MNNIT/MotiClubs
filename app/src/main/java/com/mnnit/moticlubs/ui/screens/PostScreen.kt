@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LastBaseline
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.domain.model.Reply
-import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
@@ -40,11 +38,6 @@ fun PostScreen(
     onNavigateBackPressed: () -> Unit,
     viewModel: PostScreenViewModel = hiltViewModel()
 ) {
-    LocalContext.current.postRead(
-        viewModel.postNotificationModel.channelId,
-        viewModel.postNotificationModel.postId,
-        true
-    )
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
@@ -98,7 +91,7 @@ fun PostScreen(
                                     }
 
                                     Text(
-                                        "${viewModel.postNotificationModel.clubName} - ${viewModel.postNotificationModel.channelName}",
+                                        "${viewModel.clubModel.name} - ${viewModel.channelModel.name}",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         modifier = Modifier
@@ -113,11 +106,11 @@ fun PostScreen(
                                         .fillMaxWidth()
                                         .padding(16.dp)
                                 ) {
-                                    ProfilePicture(url = viewModel.postNotificationModel.adminAvatar, size = 56.dp)
+                                    ProfilePicture(url = viewModel.userModel.avatar, size = 56.dp)
                                     Spacer(modifier = Modifier.width(10.dp))
                                     AdminNameTimestamp(
-                                        time = viewModel.postNotificationModel.postId.toTimeString(),
-                                        name = viewModel.postNotificationModel.adminName
+                                        time = viewModel.postId.toTimeString(),
+                                        name = viewModel.userModel.name
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Row(
@@ -137,7 +130,7 @@ fun PostScreen(
 
                             MarkdownRender(
                                 modifier = Modifier.fillMaxWidth(),
-                                mkd = viewModel.postNotificationModel.message,
+                                mkd = viewModel.postModel.message,
                                 selectable = true,
                                 disableLinkMovementMethod = true,
                                 onImageClick = onNavigateImageClick

@@ -7,26 +7,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
-import com.mnnit.moticlubs.domain.model.User
-import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.Constants
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setUserID
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val application: Application,
-    private val userUseCases: UserUseCases
 ) : ViewModel() {
 
     companion object {
@@ -36,10 +28,6 @@ class AppViewModel @Inject constructor(
     var showErrorScreen by mutableStateOf(false)
     var fetchingState by mutableStateOf(false)
     var showSplashScreen by mutableStateOf(true)
-    var user by mutableStateOf(User())
-
-    private var getUserJob: Job? = null
-    private var updateUserJob: Job? = null
 
     fun getUser(
         firebaseUser: FirebaseUser?,
@@ -59,31 +47,9 @@ class AppViewModel @Inject constructor(
             application.setUserID(currentUserID)
             application.setAuthToken(it.token ?: "")
 
-            getUserJob?.cancel()
-            getUserJob = userUseCases.getUser(currentUserID).onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        resource.data?.let { user -> this.user = user }
-                        fetchingState = true
-                        showErrorScreen = false
-                    }
-
-                    is Resource.Success -> {
-                        fetchingState = false
-                        showErrorScreen = false
-                        showSplashScreen = false
-
-                        user = resource.data
-                        onResponse()
-                    }
-
-                    is Resource.Error -> {
-                        fetchingState = false
-                        showSplashScreen = false
-                        onFailure()
-                    }
-                }
-            }.launchIn(viewModelScope)
+            fetchingState = false
+            showErrorScreen = false
+            onResponse()
         }.addOnCompleteListener {
             fetchingState = false
             showSplashScreen = false
@@ -92,24 +58,6 @@ class AppViewModel @Inject constructor(
 //                showErrorScreen = true
             }
         }
-    }
-
-    fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: () -> Unit) {
-        updateUserJob?.cancel()
-        updateUserJob = userUseCases.updateUser(user.copy(avatar = url)).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    user = resource.data
-                    onResponse()
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "updateProfilePic: ${resource.errCode}: ${resource.errMsg}")
-                    onFailure()
-                }
-            }
-        }.launchIn(viewModelScope)
     }
 
     fun logoutUser() {

@@ -15,6 +15,7 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,29 +25,36 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.mnnit.moticlubs.domain.model.PostNotificationModel
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.ReplyUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.use_case.ViewUseCases
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.postRead
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PostScreenViewModel @Inject constructor(
     private val application: Application,
+    private val replyUseCases: ReplyUseCases,
+    private val repository: Repository,
     private val userUseCases: UserUseCases,
     private val viewUseCases: ViewUseCases,
-    private val replyUseCases: ReplyUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -54,10 +62,19 @@ class PostScreenViewModel @Inject constructor(
         private const val TAG = "PostScreenViewModel"
     }
 
-    var postNotificationModel by mutableStateOf(
-        savedStateHandle.get<PostNotificationModel>(NavigationArgs.POST_ARG)
-            ?: PostNotificationModel()
-    )
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            getReplies()
+        }
+    }
+
+    val postId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.POST_ARG))
+    var userId by mutableLongStateOf(-1)
+
+    var postModel by mutableStateOf(Post())
+    var channelModel by mutableStateOf(Channel())
+    var clubModel by mutableStateOf(Club())
+    var userModel by mutableStateOf(User())
 
     val userMap = mutableStateMapOf<Long, User>()
     var viewCount by mutableStateOf("-")
@@ -65,7 +82,7 @@ class PostScreenViewModel @Inject constructor(
     val replyMsg = mutableStateOf("")
 
     var pageEnded by mutableStateOf(false)
-    var paging by mutableStateOf(false)
+    private var paging by mutableStateOf(false)
     private var postPage = 1
 
     val showProgress = mutableStateOf(false)
@@ -119,7 +136,7 @@ class PostScreenViewModel @Inject constructor(
         }
 
         getReplyJob?.cancel()
-        getReplyJob = replyUseCases.getReplies(postNotificationModel.postId, postPage).onEach { resource ->
+        getReplyJob = replyUseCases.getReplies(postId, postPage).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     loadingReplies.value = true
@@ -173,7 +190,7 @@ class PostScreenViewModel @Inject constructor(
         sendReplyJob?.cancel()
         sendReplyJob = replyUseCases.sendReply(
             Reply(
-                postNotificationModel.postId,
+                postId,
                 application.getUserID(),
                 replyMsg.value,
                 pageNo = 1,
@@ -219,28 +236,42 @@ class PostScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private fun getModels() {
+        viewModelScope.launch {
+            postModel = repository.getPost(postId)
+            userModel = repository.getUser(postModel.userId) ?: User()
+            channelModel = repository.getChannel(postModel.channelId)
+            clubModel = repository.getClub(channelModel.clubId)
+            userId = application.getUserID()
+
+            application.postRead(postModel.channelId, postId, true)
+            getReplies()
+            viewPost()
+            getViews()
+        }
+    }
+
     private fun viewPost() {
         viewPostJob?.cancel()
-        viewPostJob =
-            viewUseCases.addViews(View(postNotificationModel.userId, postNotificationModel.postId))
-                .onEach { resource ->
-                    when (resource) {
-                        is Resource.Loading -> resource.data?.let { list ->
-                            viewCount = list.size.toString()
-                        }
-
-                        is Resource.Success -> viewCount = resource.data.size.toString()
-                        is Resource.Error -> Log.d(
-                            TAG,
-                            "viewPost: ${resource.errCode} : ${resource.errMsg}"
-                        )
+        viewPostJob = viewUseCases.addViews(View(postModel.userId, postModel.postId))
+            .onEach { resource ->
+                when (resource) {
+                    is Resource.Loading -> resource.data?.let { list ->
+                        viewCount = list.size.toString()
                     }
-                }.launchIn(viewModelScope)
+
+                    is Resource.Success -> viewCount = resource.data.size.toString()
+                    is Resource.Error -> Log.d(
+                        TAG,
+                        "viewPost: ${resource.errCode} : ${resource.errMsg}"
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     private fun getViews() {
         getViewJob?.cancel()
-        getViewJob = viewUseCases.getViews(postNotificationModel.postId).onEach { resource ->
+        getViewJob = viewUseCases.getViews(postModel.postId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> resource.data?.let { list -> viewCount = list.size.toString() }
                 is Resource.Success -> viewCount = resource.data.size.toString()
@@ -250,21 +281,14 @@ class PostScreenViewModel @Inject constructor(
     }
 
     private fun registerReplyReceiver() {
-        LocalBroadcastManager.getInstance(application)
-            .registerReceiver(
-                object : BroadcastReceiver() {
-                    override fun onReceive(context: Context?, intent: Intent?) {
-                        getReplies()
-                    }
-                },
-                IntentFilter(Constants.REPLY_BROADCAST_ACTION)
-            )
+        with(LocalBroadcastManager.getInstance(application)) {
+            unregisterReceiver(receiver)
+            registerReceiver(receiver, IntentFilter(Constants.REPLY_BROADCAST_ACTION))
+        }
     }
 
     init {
         registerReplyReceiver()
-        viewPost()
-        getViews()
-        getReplies()
+        getModels()
     }
 }

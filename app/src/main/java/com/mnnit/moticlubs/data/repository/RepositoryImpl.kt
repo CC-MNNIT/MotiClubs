@@ -5,11 +5,12 @@ import androidx.room.withTransaction
 import com.mnnit.moticlubs.data.data_source.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.Admin
+import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
-import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
@@ -68,12 +69,12 @@ class RepositoryImpl(
         db.withTransaction { dao.insertOrUpdateAdmin(admin) }
     }
 
-    override suspend fun getAdmins(): List<Admin> {
+    override suspend fun getAdmins(): List<AdminUser> {
         return dao.getAdmins()
     }
 
-    override suspend fun deleteAdmin(admin: Admin) {
-        db.withTransaction { dao.deleteAdmin(admin) }
+    override suspend fun deleteAdmin(userId: Long) {
+        db.withTransaction { dao.deleteAdmin(userId) }
     }
 
     // ----------- CHANNEL
@@ -102,6 +103,10 @@ class RepositoryImpl(
 
     override suspend fun getPostsFromChannel(channelID: Long, page: Int): List<Post> {
         return dao.getPostsFromChannel(channelID, page)
+    }
+
+    override suspend fun getPost(postId: Long): Post {
+        return dao.getPost(postId)
     }
 
     override suspend fun deletePost(post: Post) {
