@@ -16,17 +16,9 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
@@ -102,7 +94,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AnimatedVisibility(visible = viewModel.showErrorScreen) {
-                ErrorScreen()
+                ErrorScreen(viewModel)
             }
             AnimatedVisibility(visible = !viewModel.showErrorScreen) {
                 MainScreen(user = user)
@@ -299,75 +291,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun ErrorScreen() {
-        val colorScheme = getColorScheme()
-        MotiClubsTheme(colorScheme) {
-            SetNavBarsTheme()
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .imePadding()
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.CenterHorizontally)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            AnimatedVisibility(
-                                visible = viewModel.fetchingState,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                CircularProgressIndicator(modifier = Modifier.size(36.dp))
-                            }
-                            AnimatedVisibility(
-                                visible = !viewModel.fetchingState,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    Icon(
-                                        modifier = Modifier
-                                            .size(72.dp)
-                                            .align(Alignment.CenterHorizontally),
-                                        imageVector = Icons.Outlined.ErrorOutline, contentDescription = ""
-                                    )
-                                    Text(
-                                        "Unable to connect to server", fontSize = 24.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .padding(top = 24.dp)
-                                    )
-
-                                    Button(
-                                        onClick = { viewModel.getUser(FirebaseAuth.getInstance().currentUser) },
-                                        modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .padding(top = 16.dp, bottom = 16.dp)
-                                    ) {
-                                        Icon(
-                                            painter = rememberVectorPainter(image = Icons.Rounded.Refresh),
-                                            contentDescription = ""
-                                        )
-                                        Text(
-                                            text = "Refresh",
-                                            fontSize = 14.sp,
-                                            modifier = Modifier.padding(start = 8.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    @Composable
+//    inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
+//        val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
+//        val parentEntry = remember(this) {
+//            navController.getBackStackEntry(navGraphRoute)
+//        }
+//        return hiltViewModel(parentEntry)
+//    }
 }
