@@ -26,7 +26,7 @@ import com.mnnit.moticlubs.domain.util.NavigationArgs.CHANNEL_ARG
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CLUB_ARG
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
-import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.getUserId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -129,7 +129,7 @@ class ChannelScreenViewModel @Inject constructor(
             channelModel = repository.getChannel(channelId)
             clubModel = repository.getClub(clubId)
 
-            userId = application.getUserID()
+            userId = application.getUserId()
 
             val list = repository.getAdmins()
             isAdmin = list.any { admin -> admin.userId == userId && admin.clubId == clubId }

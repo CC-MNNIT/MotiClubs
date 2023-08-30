@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.setAuthToken
-import com.mnnit.moticlubs.domain.util.setUserID
+import com.mnnit.moticlubs.domain.util.setUserId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ class AppViewModel @Inject constructor(
         fetchingState = true
         firebaseUser.getIdToken(true).addOnSuccessListener {
             val currentUserID = it.claims["userId"]?.toString()?.toLong() ?: -1
-            application.setUserID(currentUserID)
+            application.setUserId(currentUserID)
             application.setAuthToken(it.token ?: "")
 
             fetchingState = false

@@ -39,7 +39,7 @@ import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
-import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.postRead
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -191,7 +191,7 @@ class PostScreenViewModel @Inject constructor(
         sendReplyJob = replyUseCases.sendReply(
             Reply(
                 postId,
-                application.getUserID(),
+                application.getUserId(),
                 replyMsg.value,
                 pageNo = 1,
                 System.currentTimeMillis(),
@@ -242,7 +242,7 @@ class PostScreenViewModel @Inject constructor(
             userModel = repository.getUser(postModel.userId) ?: User()
             channelModel = repository.getChannel(postModel.channelId)
             clubModel = repository.getClub(channelModel.clubId)
-            userId = application.getUserID()
+            userId = application.getUserId()
 
             application.postRead(postModel.channelId, postId, true)
             getReplies()

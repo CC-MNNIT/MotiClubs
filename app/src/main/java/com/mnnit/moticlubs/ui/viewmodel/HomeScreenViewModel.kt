@@ -24,7 +24,7 @@ import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
 import com.mnnit.moticlubs.domain.use_case.ClubUseCases
 import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.Resource
-import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -147,13 +147,13 @@ class HomeScreenViewModel @Inject constructor(
         if (loadLocal) {
             Log.d(TAG, "getUser: loadLocal")
             viewModelScope.launch {
-                userModel = repository.getUser(application.getUserID()) ?: User()
+                userModel = repository.getUser(application.getUserId()) ?: User()
             }
             return
         }
 
         getUserJob?.cancel()
-        getUserJob = userUseCases.getUser(application.getUserID(), false).onEach { resource ->
+        getUserJob = userUseCases.getUser(application.getUserId(), false).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> resource.data?.let { userModel = it }
                 is Resource.Success -> userModel = resource.data

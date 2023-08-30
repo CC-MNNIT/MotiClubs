@@ -26,7 +26,7 @@ import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
-import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.getUserId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -209,7 +209,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     adminList.clear()
                     adminList.addAll(resource.data)
-                    isAdmin = adminList.any { admin -> admin.userId == application.getUserID() }
+                    isAdmin = adminList.any { admin -> admin.userId == application.getUserId() }
                 }
 
                 is Resource.Error -> {

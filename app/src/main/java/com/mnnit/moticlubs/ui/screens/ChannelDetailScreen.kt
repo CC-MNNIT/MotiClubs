@@ -253,7 +253,7 @@ private fun RowScope.Actions(viewModel: ChannelDetailScreenViewModel) {
     }
     Spacer(modifier = Modifier.padding(4.dp))
     AnimatedVisibility(
-        visible = viewModel.isAdmin,
+        visible = viewModel.channelModel.name != "General" && viewModel.isAdmin,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {

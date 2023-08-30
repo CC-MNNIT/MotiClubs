@@ -3,12 +3,12 @@ package com.mnnit.moticlubs.domain.util
 import android.content.Context
 import com.mnnit.moticlubs.domain.model.Channel
 
-fun Context.setUserID(userID: Long) {
+fun Context.setUserId(userId: Long) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
-        .putLong(Constants.USER_ID, userID).apply()
+        .putLong(Constants.USER_ID, userId).apply()
 }
 
-fun Context.getUserID(): Long =
+fun Context.getUserId(): Long =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getLong(Constants.USER_ID, -1)
 
 fun Context.setAuthToken(token: String) =
@@ -29,22 +29,22 @@ fun Context.clubHasUnreadPost(channels: List<Channel>): Boolean {
     return has
 }
 
-fun Context.postRead(channelID: Long, postID: Long, read: Boolean = false) {
+fun Context.postRead(channelId: Long, postId: Long, read: Boolean = false) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
-        .putStringSet("ch$channelID", getUnreadPost(channelID).apply {
-            if (read) remove(postID.toString()) else add(postID.toString())
+        .putStringSet("ch$channelId", getUnreadPost(channelId).apply {
+            if (read) remove(postId.toString()) else add(postId.toString())
         }).apply()
 }
 
-fun Context.getUnreadPost(channelID: Long) =
+fun Context.getUnreadPost(channelId: Long) =
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
-        .getStringSet("ch$channelID", setOf())
+        .getStringSet("ch$channelId", setOf())
         ?.toMutableSet() ?: setOf<String>().toMutableSet()
 
-fun Context.getExpandedChannel(clubID: Long): Boolean =
-    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getBoolean("cl$clubID", false)
+fun Context.getExpandedChannel(clubId: Long): Boolean =
+    this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).getBoolean("cl$clubId", false)
 
-fun Context.setExpandedChannel(clubID: Long, expanded: Boolean) {
+fun Context.setExpandedChannel(clubId: Long, expanded: Boolean) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE)
-        .edit().putBoolean("cl$clubID", expanded).apply()
+        .edit().putBoolean("cl$clubId", expanded).apply()
 }

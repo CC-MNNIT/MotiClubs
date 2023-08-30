@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.app
 
 import android.app.NotificationChannel
+import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -20,14 +21,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.di.AppModule
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.getAuthToken
 import com.mnnit.moticlubs.domain.util.getMkdFormatter
-import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.postRead
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -41,10 +44,13 @@ class AppFCMService : FirebaseMessagingService() {
         private const val TAG = "AppFCMService"
     }
 
-    private val apiService
+    private val notificationManager: NotificationManager
+        get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    private val apiService: ApiService
         get() = AppModule.provideApiService()
 
-    private val repository
+    private val repository: Repository
         get() = AppModule.provideRepository(
             application,
             apiService,
@@ -101,7 +107,7 @@ class AppFCMService : FirebaseMessagingService() {
         Log.d(TAG, "deletePostNotification: deleteMode")
         postRead(channelID, postID, true)
 
-        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(postID.toNotificationID())
+        notificationManager.cancel(postID.toNotificationID())
 
         CoroutineScope(Dispatchers.IO).launch {
             AppModule.provideRepository(
@@ -129,7 +135,7 @@ class AppFCMService : FirebaseMessagingService() {
         Log.d(TAG, "deleteReplyNotification: deleteMode")
         postRead(channelID, postID, true)
 
-        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(replyID.toNotificationID())
+        notificationManager.cancel(replyID.toNotificationID())
 
         CoroutineScope(Dispatchers.IO).launch {
             AppModule.provideRepository(
@@ -145,8 +151,6 @@ class AppFCMService : FirebaseMessagingService() {
     private fun postNotification(data: Map<String, String>) {
         Log.d(TAG, "handleData: post notification")
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         val postId = data["pid"]?.toLong() ?: -1
         val userId = data["postUid"]?.toLong() ?: -1
         val message = data["postMessage"] ?: ""
@@ -155,50 +159,50 @@ class AppFCMService : FirebaseMessagingService() {
 
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
-        val channelID = data["chid"]?.toLong() ?: -1
-        val clubID = data["cid"]?.toInt() ?: -1
+        val channelId = data["chid"]?.toLong() ?: -1
+        val clubId = data["cid"]?.toInt() ?: -1
 
         val updated = data["updated"]?.toBoolean() ?: false
 
         prePost(
             Post(
                 postId = postId,
-                channelId = channelID,
+                channelId = channelId,
                 pageNo = 1,
                 message = message,
                 userId = userId
             )
         )
 
-        if (userId == getUserID()) {
+        if (userId == getUserId()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
             return
         }
 
-        postRead(channelID, postId)
+        postRead(channelId, postId)
 
         notificationCompat(
-            notificationManager,
             notificationStamp = postId,
-            clubID.toString(),
-            clubName,
-            "$adminName ${if (updated) "updated" else "posted"} in $channelName - $clubName",
-            message,
-            url,
-            getPendingIntent(postId)
+            channelId = channelId.toString(),
+            channelName = channelName,
+            clubId = clubId.toString(),
+            clubName = clubName,
+            title = "$adminName ${if (updated) "updated" else "posted"} in $channelName - $clubName",
+            message = message,
+            url = url,
+            pendingIntent = getPendingIntent(postId)
         )
     }
 
     private fun replyNotification(data: Map<String, String>) {
         Log.d(TAG, "handleData: reply notification")
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val postId = data["pid"]?.toLong() ?: -1
 
         val clubName = data["clubName"] ?: ""
         val channelName = data["channelName"] ?: ""
-        val channelID = data["chid"]?.toLong() ?: -1
-        val clubID = data["cid"]?.toInt() ?: -1
+        val channelId = data["chid"]?.toLong() ?: -1
+        val clubId = data["cid"]?.toInt() ?: -1
 
         val replyUserId = data["replyUid"]?.toLong() ?: -1
         val replyId = data["replyTime"]?.toLong() ?: -1
@@ -216,47 +220,52 @@ class AppFCMService : FirebaseMessagingService() {
             )
         )
 
-        if (replyUserId == getUserID()) {
+        if (replyUserId == getUserId()) {
             Log.d(TAG, "replyNotification: reply sender and receiver same")
             return
         }
 
-        postRead(channelID, postId)
+        postRead(channelId, postId)
 
         notificationCompat(
-            notificationManager,
-            notificationStamp = System.currentTimeMillis(),
-            clubID.toString(),
-            clubName,
-            "$replyUserName replied to a post in $channelName",
-            replyMessage,
-            url,
-            getPendingIntent(postId)
+            notificationStamp = replyId,
+            channelId = channelId.toString(),
+            channelName = channelName,
+            clubId = clubId.toString(),
+            clubName = clubName,
+            title = "$replyUserName replied to a post in $channelName",
+            message = replyMessage,
+            url = url,
+            pendingIntent = getPendingIntent(postId)
         )
     }
 
     private fun notificationCompat(
-        notificationManager: NotificationManager,
         notificationStamp: Long,
-        clubID: String,
+        channelId: String,
+        channelName: String,
+        clubId: String,
         clubName: String,
         title: String,
         message: String,
         url: String,
         pendingIntent: PendingIntent?
     ) {
+        notificationManager.createNotificationChannelGroup(NotificationChannelGroup(clubId, clubName))
+
         notificationManager.createNotificationChannel(
             NotificationChannel(
-                clubID,
-                clubName,
+                channelId,
+                channelName,
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 lightColor = Color.BLUE
                 enableVibration(true)
                 enableLights(true)
+                group = clubId
             })
 
-        val notificationHandler = NotificationCompat.Builder(applicationContext, clubID)
+        val notificationHandler = NotificationCompat.Builder(applicationContext, channelId)
             .setContentTitle(title)
             .setContentText(getMkdFormatter().toMarkdown(message))
             .setColorized(true)

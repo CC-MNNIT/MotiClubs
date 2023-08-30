@@ -25,7 +25,7 @@ import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.getLongArg
-import com.mnnit.moticlubs.domain.util.getUserID
+import com.mnnit.moticlubs.domain.util.getUserId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -87,7 +87,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
                 clubModel = repository.getClub(clubId)
                 displayedDescription = clubModel.description
 
-                userId = application.getUserID()
+                userId = application.getUserId()
                 isAdmin = repository.getAdmins().any { admin -> admin.userId == userId && admin.clubId == clubId }
             }
             return
