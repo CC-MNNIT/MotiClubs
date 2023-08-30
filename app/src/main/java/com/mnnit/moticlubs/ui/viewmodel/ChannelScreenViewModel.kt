@@ -53,8 +53,14 @@ class ChannelScreenViewModel @Inject constructor(
         }
     }
 
+    private var onResumeLocked by mutableStateOf(true)
+
     override fun onResume(owner: LifecycleOwner) {
-        Log.d(TAG, "onResume: $TAG")
+        Log.d(TAG, "onResume: $TAG: locked: $onResumeLocked")
+        if (onResumeLocked) {
+            onResumeLocked = false
+            return
+        }
         getModels()
         getPostsList()
     }
@@ -170,6 +176,7 @@ class ChannelScreenViewModel @Inject constructor(
             paging = true
         }
 
+        Log.d(TAG, "getPostsList: page: $postPage")
         getPostsJob?.cancel()
         getPostsJob = postUseCases.getPosts(channelId, postPage).onEach { resource ->
             when (resource) {

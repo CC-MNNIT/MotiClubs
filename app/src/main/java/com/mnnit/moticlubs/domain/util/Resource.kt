@@ -19,7 +19,7 @@ sealed class Resource<T>(val d: T? = null, val errorCode: Int = -1, val errorMsg
     data class Loading<T>(val data: T? = null) : Resource<T>(data)
 }
 
-inline fun <ReqT, ResT> Repository.networkResource(
+inline fun <reified ReqT, ResT> Repository.networkResource(
     errorMsg: String,
     crossinline query: suspend () -> ResT,
     crossinline apiCall: suspend (apiService: ApiService, auth: String?) -> Response<ReqT?>,
@@ -54,7 +54,7 @@ inline fun <ReqT, ResT> Repository.networkResource(
     emit(flow)
 }
 
-suspend inline fun <T> apiInvoker(crossinline invoke: (suspend () -> Response<T?>)): Resource<T> {
+suspend inline fun <reified T> apiInvoker(crossinline invoke: (suspend () -> Response<T?>)): Resource<T> {
     try {
         val response = withContext(Dispatchers.IO) { invoke() }
         val body = response.body()
@@ -68,7 +68,7 @@ suspend inline fun <T> apiInvoker(crossinline invoke: (suspend () -> Response<T?
         return Resource.Success(body)
     } catch (e: Exception) {
         e.printStackTrace()
-        Log.d(TAG, "apiInvoker: ${e.message}")
+        Log.d(TAG, "apiInvoker: ${T::class.simpleName} - ${e.message}")
         return Resource.Error(-1, e.localizedMessage ?: "Error")
     }
 }

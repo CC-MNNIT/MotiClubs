@@ -46,8 +46,15 @@ class HomeScreenViewModel @Inject constructor(
         private const val TAG = "HomeScreenViewModel"
     }
 
+    private var onResumeLocked by mutableStateOf(true)
+
     override fun onResume(owner: LifecycleOwner) {
-        Log.d(TAG, "onResume: $TAG")
+        Log.d(TAG, "onResume: $TAG: locked = $onResumeLocked")
+        if (onResumeLocked) {
+            onResumeLocked = false
+            return
+        }
+
         getUser(loadLocal = true)
         getClubs(loadLocal = true)
         getChannels(loadLocal = true)

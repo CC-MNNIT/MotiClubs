@@ -15,10 +15,10 @@ class GetAdmins(private val repository: Repository) {
         query = { repository.getAdmins() },
         apiCall = { apiService, auth -> apiService.getAllAdmins(auth) },
         saveResponse = { old, new ->
-            old.forEach { admin -> repository.deleteAdmin(admin.userId) }
-
             new.map { admin -> admin.mapToDomain() }
                 .forEach { user -> repository.insertOrUpdateUser(user) }
+
+            old.forEach { admin -> repository.deleteAdmin(admin.userId) }
 
             new.map { admin -> Admin(admin.uid, admin.clubId) }
                 .forEach { admin -> repository.insertOrUpdateAdmin(admin) }

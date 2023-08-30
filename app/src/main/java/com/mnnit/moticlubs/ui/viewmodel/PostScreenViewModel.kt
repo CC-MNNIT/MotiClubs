@@ -83,7 +83,7 @@ class PostScreenViewModel @Inject constructor(
 
     var pageEnded by mutableStateOf(false)
     private var paging by mutableStateOf(false)
-    private var postPage = 1
+    private var replyPage = 1
 
     val showProgress = mutableStateOf(false)
     val loadingReplies = mutableStateOf(false)
@@ -127,7 +127,7 @@ class PostScreenViewModel @Inject constructor(
 
     fun getReplies(refresh: Boolean = true) {
         if (refresh) {
-            postPage = 1
+            replyPage = 1
             pageEnded = false
             loadingReplies.value = true
         } else {
@@ -135,8 +135,9 @@ class PostScreenViewModel @Inject constructor(
             paging = true
         }
 
+        Log.d(TAG, "getReplies: page: $replyPage")
         getReplyJob?.cancel()
-        getReplyJob = replyUseCases.getReplies(postId, postPage).onEach { resource ->
+        getReplyJob = replyUseCases.getReplies(postId, replyPage).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     loadingReplies.value = true
@@ -149,7 +150,7 @@ class PostScreenViewModel @Inject constructor(
 
                             else -> {
                                 paging = true
-                                replyList.removeIf { reply -> reply.pageNo == postPage }
+                                replyList.removeIf { reply -> reply.pageNo == replyPage }
                             }
                         }
                         replyList.addAll(list)
@@ -159,11 +160,11 @@ class PostScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     when (refresh) {
                         true -> replyList.clear()
-                        else -> replyList.removeIf { reply -> reply.pageNo == postPage }
+                        else -> replyList.removeIf { reply -> reply.pageNo == replyPage }
                     }
                     when (resource.data.isEmpty()) {
                         true -> pageEnded = true
-                        else -> postPage++
+                        else -> replyPage++
                     }
                     replyList.addAll(resource.data)
                     loadingReplies.value = false
