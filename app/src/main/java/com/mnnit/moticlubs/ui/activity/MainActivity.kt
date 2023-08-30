@@ -159,13 +159,6 @@ class MainActivity : ComponentActivity() {
                             })
                     }
 
-                    // SIGN UP
-                    composable(AppNavigation.SIGN_UP) {
-                        SignupScreen({
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
-                    }
-
                     // HOME
                     composable(AppNavigation.HOME) {
                         HomeScreen(
