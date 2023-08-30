@@ -1,15 +1,22 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -17,12 +24,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
@@ -35,6 +46,8 @@ import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
+import java.nio.charset.StandardCharsets
+import java.util.Base64
 
 @Composable
 fun ProfileScreen(
@@ -43,9 +56,13 @@ fun ProfileScreen(
     onNavigationLogout: () -> Unit,
     onBackPressed: () -> Unit
 ) {
+    val colorScheme = getColorScheme()
     val scrollState = rememberScrollState()
     val showDialog = remember { mutableStateOf(false) }
     val loading = remember { mutableStateOf(false) }
+
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
 
     MotiClubsTheme(getColorScheme()) {
         SetNavBarsTheme()
@@ -88,6 +105,34 @@ fun ProfileScreen(
                     size = 156.dp
                 )
                 UserInfo(viewModel = viewModel, modifier = Modifier.padding(top = 56.dp))
+
+                Card(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 16.dp),
+                    onClick = {
+                        clipboardManager.setText(
+                            AnnotatedString(
+                                Base64.getEncoder()
+                                    .encode(viewModel.userModel.userId.toString().toByteArray())
+                                    .toString(StandardCharsets.UTF_8)
+                            )
+                        )
+                        Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
+                    },
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp, horizontal = 16.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "Copy unique ID", modifier = Modifier.align(Alignment.CenterVertically))
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Icon(Icons.Rounded.ContentCopy, contentDescription = "")
+                    }
+                }
 
                 Button(
                     onClick = {

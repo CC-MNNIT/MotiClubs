@@ -23,7 +23,7 @@ fun UserDto.mapToDomain(): User =
         name = this.name,
         email = this.email,
         course = this.course,
-        phoneNumber = this.phone,
+        branch = this.branch,
         avatar = this.avatar
     )
 
@@ -34,7 +34,7 @@ fun AdminDetailDto.mapToDomain(): User =
         name = this.name,
         email = this.email,
         course = this.course,
-        phoneNumber = this.phoneNumber,
+        branch = this.branch,
         avatar = this.avatar
     )
 

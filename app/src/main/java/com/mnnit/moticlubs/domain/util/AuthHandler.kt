@@ -51,15 +51,24 @@ object AuthHandler {
                     throw Exception("Please use college G-Suite ID")
                 }
 
+                val email = signInCredential.id
+                val regNo = Constants.REG_NO_REGEX.find(email)?.value
+                val displayName = signInCredential.displayName
+
+                regNo ?: throw Exception("Unable to parse regNo for $email")
+                displayName ?: throw Exception("Unable to find display name for $email")
+
+                val course = CourseExtractor.extract(regNo)
+
                 onSuccess(
                     GoogleAuthProvider.getCredential(signInCredential.googleIdToken, null),
                     SaveUserDto(
-                        Constants.REG_NO_REGEX.find(signInCredential.id)?.value ?: "REQ",
-                        signInCredential.displayName ?: "REQ",
-                        signInCredential.id,
-                        "REQ",
-                        signInCredential.phoneNumber ?: "REQ",
-                        signInCredential.profilePictureUri?.toString() ?: ""
+                        regNo = regNo,
+                        name = displayName,
+                        email = email,
+                        course = course.stream,
+                        branch = course.branch,
+                        avatar = signInCredential.profilePictureUri?.toString() ?: ""
                     )
                 )
             } catch (e: Exception) {

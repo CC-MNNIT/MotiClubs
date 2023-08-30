@@ -1,22 +1,23 @@
 package com.mnnit.moticlubs.ui.components.profilescreen
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
@@ -67,66 +68,34 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
         )
     )
 
-    Row(
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .padding(horizontal = 16.dp)
-    ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(end = 8.dp),
-            value = viewModel.userModel.regNo,
-            onValueChange = {},
-            shape = RoundedCornerShape(24.dp),
-            label = { Text(text = "Reg No") },
-            enabled = false,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
-                disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
-            )
-        )
-
-        OutlinedTextField(
-            value = viewModel.userModel.course,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(text = "Course") },
-            trailingIcon = {
-            },
-            shape = RoundedCornerShape(24.dp),
-            enabled = false,
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
-                disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
-            )
-        )
-    }
-
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = viewModel.userModel.phoneNumber,
+        value = viewModel.userModel.branch,
         onValueChange = {},
         shape = RoundedCornerShape(24.dp),
-        label = { Text(text = "Phone No") },
+        label = { Text(text = "Course") },
         enabled = false,
-        singleLine = true,
+        singleLine = false,
         leadingIcon = {
-            Text(
-                text = "+ 91",
-                fontSize = 15.sp,
+            Card(
                 modifier = Modifier
-                    .padding(start = 8.dp)
-                    .fillMaxHeight(),
-                textAlign = TextAlign.Center
-            )
+                    .fillMaxHeight()
+                    .padding(start = 8.dp, end = 4.dp),
+                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                Text(
+                    text = viewModel.userModel.course,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxHeight(),
+                    textAlign = TextAlign.Center
+                )
+            }
         },
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         colors = OutlinedTextFieldDefaults.colors(
             disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),

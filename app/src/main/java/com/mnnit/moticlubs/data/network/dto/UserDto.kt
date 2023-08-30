@@ -24,9 +24,9 @@ data class UserDto(
     @Expose
     val course: String,
 
-    @SerializedName("phone")
+    @SerializedName("branch")
     @Expose
-    val phone: String,
+    val branch: String,
 
     @SerializedName("avatar")
     @Expose
@@ -50,9 +50,9 @@ data class SaveUserDto(
     @Expose
     var course: String,
 
-    @SerializedName("phone")
+    @SerializedName("branch")
     @Expose
-    var phone: String,
+    var branch: String,
 
     @SerializedName("avatar")
     @Expose
@@ -102,9 +102,9 @@ data class AdminDetailDto(
     @Expose
     var course: String,
 
-    @SerializedName("phone")
+    @SerializedName("branch")
     @Expose
-    var phoneNumber: String,
+    var branch: String,
 
     @SerializedName("avatar")
     @Expose

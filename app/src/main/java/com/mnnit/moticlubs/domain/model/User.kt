@@ -25,8 +25,8 @@ data class User(
     @ColumnInfo(name = "course")
     val course: String,
 
-    @ColumnInfo(name = "phone")
-    val phoneNumber: String,
+    @ColumnInfo(name = "branch")
+    val branch: String,
 
     @ColumnInfo(name = "avatar")
     val avatar: String,
@@ -55,8 +55,8 @@ data class AdminUser(
     @ColumnInfo(name = "course")
     val course: String,
 
-    @ColumnInfo(name = "phone")
-    val phoneNumber: String,
+    @ColumnInfo(name = "branch")
+    val branch: String,
 
     @ColumnInfo(name = "avatar")
     val avatar: String,
