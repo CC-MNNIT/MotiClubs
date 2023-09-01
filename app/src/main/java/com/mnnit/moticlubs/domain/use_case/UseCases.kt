@@ -5,7 +5,7 @@ import com.mnnit.moticlubs.domain.use_case.channel.DeleteChannel
 import com.mnnit.moticlubs.domain.use_case.channel.GetAllChannels
 import com.mnnit.moticlubs.domain.use_case.channel.GetChannel
 import com.mnnit.moticlubs.domain.use_case.channel.UpdateChannel
-import com.mnnit.moticlubs.domain.use_case.club.GetAdmins
+import com.mnnit.moticlubs.domain.use_case.user.GetAllAdmins
 import com.mnnit.moticlubs.domain.use_case.club.GetClubs
 import com.mnnit.moticlubs.domain.use_case.club.UpdateClub
 import com.mnnit.moticlubs.domain.use_case.member.AddMembers
@@ -40,7 +40,8 @@ data class MemberUseCases(
 
 data class UserUseCases(
     val getUser: GetUser,
-    val updateUser: UpdateUser
+    val updateUser: UpdateUser,
+    val getAllAdmins: GetAllAdmins,
 )
 
 data class ChannelUseCases(
@@ -53,7 +54,6 @@ data class ChannelUseCases(
 
 data class ClubUseCases(
     val getClubs: GetClubs,
-    val getAdmins: GetAdmins,
     val updateClub: UpdateClub
 )
 

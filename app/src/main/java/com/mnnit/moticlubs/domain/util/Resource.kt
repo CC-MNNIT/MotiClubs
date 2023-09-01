@@ -4,7 +4,9 @@ import android.util.Log
 import com.google.gson.Gson
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.network.dto.ErrorDto
+import com.mnnit.moticlubs.domain.model.Stamp
 import com.mnnit.moticlubs.domain.repository.Repository
+import com.mnnit.moticlubs.domain.util.Constants.STAMP_HEADER
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -21,8 +23,13 @@ sealed class Resource<T>(val d: T? = null, val errorCode: Int = -1, val errorMsg
 
 inline fun <reified ReqT, ResT> Repository.networkResource(
     errorMsg: String,
+    stampKey: ResponseStamp.StampKey,
     crossinline query: suspend () -> ResT,
-    crossinline apiCall: suspend (apiService: ApiService, auth: String?) -> Response<ReqT?>,
+    crossinline apiCall: suspend (
+        apiService: ApiService,
+        auth: String?,
+        stamp: Long,
+    ) -> Response<ReqT?>,
     crossinline saveResponse: suspend (ResT, ReqT) -> Unit,
     shouldFetch: Boolean = true
 ): Flow<Resource<ResT>> = flow {
@@ -40,9 +47,23 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
     }
 
     val flow = try {
-        val apiResponse = apiInvoker { apiCall(getAPIService(), getApplication().getAuthToken()) }
+        val stampObj = getStampByKey(stampKey.getKey())
+        val stamp = stampObj?.stamp ?: 0
+
+        val apiResponse = apiInvoker {
+            apiCall(
+                getAPIService(),
+                getApplication().getAuthToken(),
+                stamp
+            )
+        }
         if (apiResponse is Resource.Success) {
-            saveResponse(data, apiResponse.data)
+            insertOrUpdateStamp(Stamp(stampKey.getKey(), apiResponse.data.second))
+
+            val result = apiResponse.data.first
+            if (result != null) {
+                saveResponse(data, result)
+            }
             Resource.Success(query())
         } else {
             Resource.Error(apiResponse.errorCode, apiResponse.errorMsg)
@@ -54,10 +75,18 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
     emit(flow)
 }
 
-suspend inline fun <reified T> apiInvoker(crossinline invoke: (suspend () -> Response<T?>)): Resource<T> {
+suspend inline fun <reified T> apiInvoker(
+    crossinline invoke: (suspend () -> Response<T?>)
+): Resource<Pair<T?, Long>> {
     try {
         val response = withContext(Dispatchers.IO) { invoke() }
         val body = response.body()
+        val stampHeaderValue = response.headers()[STAMP_HEADER]?.toLong() ?: 0
+
+        if (response.code() == 304) {
+            return Resource.Success(Pair(body, stampHeaderValue))
+        }
+
         if (!response.isSuccessful || body == null) {
             val message = response.errorBody()?.string()
                 ?.let { error -> Gson().fromJson(error, ErrorDto::class.java) }
@@ -65,7 +94,7 @@ suspend inline fun <reified T> apiInvoker(crossinline invoke: (suspend () -> Res
                 ?: response.message()
             return Resource.Error(response.code(), message)
         }
-        return Resource.Success(body)
+        return Resource.Success(Pair(body, stampHeaderValue))
     } catch (e: Exception) {
         e.printStackTrace()
         Log.d(TAG, "apiInvoker: ${T::class.simpleName} - ${e.message}")

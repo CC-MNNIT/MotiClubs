@@ -8,6 +8,7 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.model.Member
+import com.mnnit.moticlubs.domain.model.Stamp
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
@@ -22,9 +23,10 @@ import com.mnnit.moticlubs.domain.model.View
         Url::class,
         User::class,
         View::class,
-        Reply::class
+        Reply::class,
+        Stamp::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class LocalDatabase : RoomDatabase() {

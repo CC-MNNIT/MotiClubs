@@ -13,7 +13,10 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.data.network.dto.SaveUserDto
+import com.mnnit.moticlubs.domain.model.Stamp
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.ResponseStamp
 import com.mnnit.moticlubs.domain.util.apiInvoker
 import com.mnnit.moticlubs.domain.util.getAuthToken
 import com.mnnit.moticlubs.domain.util.setAuthToken
@@ -24,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val application: Application,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val repository: Repository,
 ) : ViewModel() {
 
     companion object {
@@ -49,7 +53,11 @@ class LoginScreenViewModel @Inject constructor(
         onResponse: () -> Unit, onFailure: (code: Int) -> Unit
     ) {
         viewModelScope.launch {
-            val bodyResource = apiInvoker { apiService.saveUser(application.getAuthToken(), saveUserDto) }
+            val stamp = (repository.getStampByKey(ResponseStamp.USER.getKey())
+                ?: Stamp(ResponseStamp.USER.getKey(), 0)).stamp
+            val bodyResource = apiInvoker {
+                apiService.saveUser(application.getAuthToken(), stamp, saveUserDto)
+            }
             if (bodyResource is Resource.Success) {
                 onResponse()
             } else {

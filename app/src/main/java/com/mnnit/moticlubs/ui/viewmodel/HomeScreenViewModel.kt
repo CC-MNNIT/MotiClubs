@@ -129,11 +129,11 @@ class HomeScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun refreshAll(tokenRefresh: Boolean = true) {
-        Log.d(TAG, "refreshAll: tokenRefresh = $tokenRefresh")
+    fun refreshAll() {
+        Log.d(TAG, "refreshAll")
 
         isFetchingAdmins = true
-        FirebaseAuth.getInstance().currentUser?.getIdToken(tokenRefresh)?.addOnSuccessListener {
+        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.addOnSuccessListener {
             application.setAuthToken(it.token ?: "")
 
             getUser()
@@ -172,7 +172,7 @@ class HomeScreenViewModel @Inject constructor(
     private fun getAdmins() {
         isFetchingAdmins = true
         getAdminJob?.cancel()
-        getAdminJob = clubUseCases.getAdmins().onEach { resource ->
+        getAdminJob = userUseCases.getAllAdmins().onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
@@ -275,6 +275,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
-        refreshAll(tokenRefresh = false)
+        refreshAll()
     }
 }

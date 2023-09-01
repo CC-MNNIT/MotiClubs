@@ -1,19 +1,21 @@
-package com.mnnit.moticlubs.domain.use_case.club
+package com.mnnit.moticlubs.domain.use_case.user
 
 import com.mnnit.moticlubs.domain.model.Admin
 import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.ResponseStamp
 import com.mnnit.moticlubs.domain.util.mapToDomain
 import com.mnnit.moticlubs.domain.util.networkResource
 import kotlinx.coroutines.flow.Flow
 
-class GetAdmins(private val repository: Repository) {
+class GetAllAdmins(private val repository: Repository) {
 
     operator fun invoke(shouldFetch: Boolean = true): Flow<Resource<List<AdminUser>>> = repository.networkResource(
         "Error getting admins",
+        stampKey = ResponseStamp.ADMIN,
         query = { repository.getAdmins() },
-        apiCall = { apiService, auth -> apiService.getAllAdmins(auth) },
+        apiCall = { apiService, auth, stamp -> apiService.getAllAdmins(auth, stamp) },
         saveResponse = { old, new ->
             new.map { admin -> admin.mapToDomain() }
                 .forEach { user -> repository.insertOrUpdateUser(user) }

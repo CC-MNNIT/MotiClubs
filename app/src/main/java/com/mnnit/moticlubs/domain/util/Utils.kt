@@ -22,11 +22,13 @@ object Constants {
     const val TOKEN = "token"
 
     const val AUTHORIZATION_HEADER = "Authorization"
+    const val STAMP_HEADER = "X-Stamp-Value"
 
     const val POST_BROADCAST_ACTION = "$SHARED_PREFERENCE.post"
     const val REPLY_BROADCAST_ACTION = "$SHARED_PREFERENCE.reply"
 
     const val BASE_URL = "https://sac.mnnit.ac.in/moticlubs/"
+//    const val BASE_URL = "http://172.31.64.238:8002/"
     private const val URL_PREFIX = "api/v1"
     const val CHANNEL_ROUTE = "$BASE_URL$URL_PREFIX/channel"
     const val CLUB_ROUTE = "$BASE_URL$URL_PREFIX/clubs"

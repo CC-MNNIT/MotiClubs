@@ -9,6 +9,7 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.model.Member
+import com.mnnit.moticlubs.domain.model.Stamp
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
@@ -99,4 +100,10 @@ interface Repository {
     suspend fun deleteReply(reply: Reply)
 
     suspend fun deleteReplyID(replyID: Long)
+
+    // ----------- STAMP
+
+    suspend fun insertOrUpdateStamp(stamp: Stamp)
+
+    suspend fun getStampByKey(key: String): Stamp?
 }

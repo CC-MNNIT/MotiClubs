@@ -11,6 +11,7 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.Stamp
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
@@ -171,5 +172,15 @@ class RepositoryImpl(
 
     override suspend fun deleteReplyID(replyID: Long) {
         db.withTransaction { dao.deleteReplyID(replyID) }
+    }
+
+    // ----------- STAMP
+
+    override suspend fun insertOrUpdateStamp(stamp: Stamp) {
+        db.withTransaction { dao.insertOrUpdateStamp(stamp) }
+    }
+
+    override suspend fun getStampByKey(key: String): Stamp? {
+        return dao.getStampByKey(key)
     }
 }

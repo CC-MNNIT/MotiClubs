@@ -13,7 +13,7 @@ import com.mnnit.moticlubs.domain.use_case.channel.DeleteChannel
 import com.mnnit.moticlubs.domain.use_case.channel.GetAllChannels
 import com.mnnit.moticlubs.domain.use_case.channel.GetChannel
 import com.mnnit.moticlubs.domain.use_case.channel.UpdateChannel
-import com.mnnit.moticlubs.domain.use_case.club.GetAdmins
+import com.mnnit.moticlubs.domain.use_case.user.GetAllAdmins
 import com.mnnit.moticlubs.domain.use_case.club.GetClubs
 import com.mnnit.moticlubs.domain.use_case.club.UpdateClub
 import com.mnnit.moticlubs.domain.use_case.member.AddMembers
@@ -100,7 +100,8 @@ object AppModule {
     fun provideUserUseCases(repository: Repository): UserUseCases =
         UserUseCases(
             getUser = GetUser(repository),
-            updateUser = UpdateUser(repository)
+            updateUser = UpdateUser(repository),
+            getAllAdmins = GetAllAdmins(repository),
         )
 
     @Provides
@@ -119,7 +120,6 @@ object AppModule {
     fun provideClubUseCases(repository: Repository): ClubUseCases =
         ClubUseCases(
             getClubs = GetClubs(repository),
-            getAdmins = GetAdmins(repository),
             updateClub = UpdateClub(repository)
         )
 

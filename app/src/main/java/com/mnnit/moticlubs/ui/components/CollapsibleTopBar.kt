@@ -67,6 +67,7 @@ fun CollapsibleTopAppBar(
     bigTitle: @Composable () -> Unit,
     smallTitle: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    maxHeight: Dp = 152.dp,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
@@ -82,7 +83,7 @@ fun CollapsibleTopAppBar(
         navigationIcon = navigationIcon,
         actions = actions,
         windowInsets = windowInsets,
-        maxHeight = 196.dp,
+        maxHeight = maxHeight,
         pinnedHeight = 64.dp,
         scrollBehavior = scrollBehavior
     )
