@@ -10,6 +10,7 @@ object AppNavigation {
     const val CLUB_DETAIL = "club_detail"
     const val CHANNEL_DETAIL = "channel_detail"
     const val IMAGE_PAGE = "img_page"
+    const val ADD_MEMBER_PAGE = "add_member_page"
 }
 
 object NavigationArgs {

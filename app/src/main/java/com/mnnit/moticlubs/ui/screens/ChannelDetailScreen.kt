@@ -1,10 +1,10 @@
 package com.mnnit.moticlubs.ui.screens
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,8 +47,9 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,6 +71,7 @@ import com.mnnit.moticlubs.ui.viewmodel.ChannelDetailScreenViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelDetailScreen(
+    onNavigateToAddMember: (channelId: Long) -> Unit,
     onDeleteChannel: () -> Unit,
     onBackPressed: () -> Unit,
     viewModel: ChannelDetailScreenViewModel = hiltViewModel(),
@@ -87,10 +89,14 @@ fun ChannelDetailScreen(
         } else {
             SetNavBarsTheme()
         }
+
+        LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .imePadding()
+                .imePadding(),
+            color = colorScheme.background
         ) {
             Scaffold(
                 modifier = Modifier
@@ -100,6 +106,7 @@ fun ChannelDetailScreen(
                 topBar = {
                     CollapsibleTopAppBar(
                         modifier = Modifier.wrapContentHeight(),
+                        maxHeight = 196.dp,
                         bigTitle = { BigTitle(viewModel) },
                         smallTitle = {
                             Text(
@@ -116,13 +123,32 @@ fun ChannelDetailScreen(
                                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                             }
                         },
-                        actions = { Actions(viewModel) },
+                        actions = { Actions(onNavigateToAddMember, viewModel) },
                         scrollBehavior = scrollBehavior,
                     )
                 },
                 content = {
                     if (viewModel.isUpdating) {
                         ProgressDialog(viewModel.progressMsg)
+                    }
+
+                    if (viewModel.showMemberProgressDialog.value) {
+                        ProgressDialog(progressMsg = "Removing")
+                    }
+
+                    if (viewModel.showRemoveConfirmationDialog.value) {
+                        ConfirmationDialog(
+                            showDialog = viewModel.showRemoveConfirmationDialog,
+                            message = "Are you sure you want to remove ${
+                                if (viewModel.removeMemberUserId == -1L) {
+                                    "this member"
+                                } else {
+                                    viewModel.memberInfo.getValue(viewModel.removeMemberUserId).name
+                                }
+                            } ?",
+                            positiveBtnText = "Remove",
+                            onPositive = { viewModel.removeMember() }
+                        )
                     }
 
                     if (viewModel.showPrivateConfirmationDialog.value) {
@@ -147,40 +173,45 @@ fun ChannelDetailScreen(
                         }
                     }
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .imePadding()
-                            .padding(it)
-                            .pullRefresh(
-                                state = refreshState,
-                                enabled = !viewModel.isFetching
-                            ),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    androidx.compose.material.Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = colorScheme.background
                     ) {
-                        PullDownProgressIndicator(
-                            modifier = Modifier.background(colorScheme.surfaceColorAtElevation(2.dp)),
-                            visible = viewModel.isFetching,
-                            refreshState = refreshState
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .imePadding()
+                                .padding(it)
+                                .pullRefresh(
+                                    state = refreshState,
+                                    enabled = !viewModel.isFetching
+                                ),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            PullDownProgressIndicator(
+                                modifier = Modifier.background(colorScheme.surfaceColorAtElevation(2.dp)),
+                                visible = viewModel.isFetching,
+                                refreshState = refreshState
+                            )
 
-                        Spacer(modifier = Modifier.padding(4.dp))
+                            Spacer(modifier = Modifier.padding(4.dp))
 
-                        Text(
-                            modifier = Modifier,
-                            text = "${
-                                if (viewModel.channelModel.private == 1) {
-                                    viewModel.memberList.size
-                                } else "All"
-                            } member${if (viewModel.memberList.size > 1) "s" else ""}",
-                            fontSize = 14.sp,
-                        )
+                            Text(
+                                modifier = Modifier,
+                                text = "${
+                                    if (viewModel.channelModel.private == 1) {
+                                        viewModel.memberList.size
+                                    } else "All"
+                                } member${if (viewModel.memberList.size > 1) "s" else ""}",
+                                fontSize = 14.sp,
+                            )
 
-                        Spacer(modifier = Modifier.padding(4.dp))
+                            Spacer(modifier = Modifier.padding(4.dp))
 
-                        MemberList(viewModel)
+                            MemberList(viewModel)
+                        }
                     }
-                }
+                },
             )
         }
     }
@@ -232,9 +263,10 @@ private fun BigTitle(viewModel: ChannelDetailScreenViewModel) {
 }
 
 @Composable
-private fun RowScope.Actions(viewModel: ChannelDetailScreenViewModel) {
-    val context = LocalContext.current
-
+private fun RowScope.Actions(
+    onNavigateToAddMember: (channelId: Long) -> Unit,
+    viewModel: ChannelDetailScreenViewModel
+) {
     AnimatedVisibility(
         visible = viewModel.channelModel.name != "General" && viewModel.isAdmin,
         enter = fadeIn(),
@@ -244,7 +276,7 @@ private fun RowScope.Actions(viewModel: ChannelDetailScreenViewModel) {
             modifier = Modifier.size(42.dp),
             onClick = {
                 if (viewModel.isAdmin) {
-                    Toast.makeText(context, "Will implement", Toast.LENGTH_SHORT).show()
+                    onNavigateToAddMember(viewModel.channelId)
                 }
             }
         ) {
@@ -308,7 +340,21 @@ private fun MemberItem(
     Card(
         modifier = Modifier
             .safeContentPadding()
-            .padding(top = 8.dp),
+            .padding(top = 8.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .combinedClickable(
+                onLongClick = {
+                    if (viewModel.isAdmin
+                        && !viewModel.adminList.any { admin ->
+                            admin.userId == member.userId && admin.clubId == viewModel.channelModel.clubId
+                        }
+                    ) {
+                        viewModel.removeMemberUserId = member.userId
+                        viewModel.showRemoveConfirmationDialog.value = true
+                    }
+                },
+                onClick = {}
+            ),
         elevation = CardDefaults.cardElevation(0.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
@@ -326,18 +372,33 @@ private fun MemberItem(
 
             Spacer(modifier = Modifier.padding(8.dp))
 
-            Text(
-                modifier = Modifier.align(Alignment.CenterVertically),
-                text = viewModel.memberInfo[member.userId]?.name ?: "...",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Column(modifier = Modifier.align(Alignment.CenterVertically)) {
+                Text(
+                    modifier = Modifier,
+                    text = viewModel.memberInfo[member.userId]?.name ?: "...",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    modifier = Modifier,
+                    text = viewModel.memberInfo[member.userId]?.regNo ?: "...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (viewModel.adminList.any { admin -> member.userId == admin.userId }) {
+            if (
+                viewModel.adminList.any { admin ->
+                    member.userId == admin.userId && admin.clubId == viewModel.channelModel.clubId
+                }
+            ) {
                 Card(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)

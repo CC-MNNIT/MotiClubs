@@ -248,6 +248,9 @@ class MainActivity : ComponentActivity() {
                         )
                     ) {
                         ChannelDetailScreen(
+                            onNavigateToAddMember = { channelId ->
+                                navController.navigate("${AppNavigation.ADD_MEMBER_PAGE}/${Uri.encode(channelId.toString())}")
+                            },
                             onDeleteChannel = {
                                 navController.navigate(AppNavigation.HOME) {
                                     popUpTo(AppNavigation.HOME) { inclusive = true }
@@ -282,6 +285,17 @@ class MainActivity : ComponentActivity() {
                         arguments = listOf(navArgument("image") { type = NavType.StringType })
                     ) {
                         ImageScreen()
+                    }
+
+                    composable(
+                        "${AppNavigation.ADD_MEMBER_PAGE}/{${NavigationArgs.CHANNEL_ARG}}",
+                        arguments = listOf(navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType })
+                    ) {
+                        AddMemberScreen(
+                            onBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            }
+                        )
                     }
                 }
             }

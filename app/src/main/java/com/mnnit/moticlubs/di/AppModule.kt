@@ -18,7 +18,7 @@ import com.mnnit.moticlubs.domain.use_case.club.GetClubs
 import com.mnnit.moticlubs.domain.use_case.club.UpdateClub
 import com.mnnit.moticlubs.domain.use_case.member.AddMembers
 import com.mnnit.moticlubs.domain.use_case.member.GetMembers
-import com.mnnit.moticlubs.domain.use_case.member.RemoveMembers
+import com.mnnit.moticlubs.domain.use_case.member.RemoveMember
 import com.mnnit.moticlubs.domain.use_case.post.DeletePost
 import com.mnnit.moticlubs.domain.use_case.post.GetPosts
 import com.mnnit.moticlubs.domain.use_case.post.SendPost
@@ -28,6 +28,7 @@ import com.mnnit.moticlubs.domain.use_case.reply.GetReplies
 import com.mnnit.moticlubs.domain.use_case.reply.SendReply
 import com.mnnit.moticlubs.domain.use_case.urls.AddUrls
 import com.mnnit.moticlubs.domain.use_case.urls.GetUrls
+import com.mnnit.moticlubs.domain.use_case.user.GetAllUsers
 import com.mnnit.moticlubs.domain.use_case.user.GetUser
 import com.mnnit.moticlubs.domain.use_case.user.UpdateUser
 import com.mnnit.moticlubs.domain.use_case.views.AddViews
@@ -92,7 +93,7 @@ object AppModule {
         MemberUseCases(
             getMembers = GetMembers(repository),
             addMembers = AddMembers(repository),
-            removeMembers = RemoveMembers(repository)
+            removeMember = RemoveMember(repository)
         )
 
     @Provides
@@ -102,6 +103,7 @@ object AppModule {
             getUser = GetUser(repository),
             updateUser = UpdateUser(repository),
             getAllAdmins = GetAllAdmins(repository),
+            getAllUsers = GetAllUsers(repository),
         )
 
     @Provides
