@@ -211,8 +211,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     memberList.clear()
-                    memberList.addAll(resource.data)
-                    memberList.sortWith(
+                    memberList.addAll(resource.data.sortedWith(
                         compareBy(
                             { member ->
                                 !adminList.any { admin ->
@@ -221,7 +220,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
                             },
                             { member -> memberInfo[member.userId]?.name ?: "" }
                         )
-                    )
+                    ))
                 }
 
                 is Resource.Error -> {
