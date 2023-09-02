@@ -132,7 +132,7 @@ fun PostScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 mkd = viewModel.postModel.message,
                                 selectable = true,
-                                disableLinkMovementMethod = true,
+                                disableLinkMovementMethod = false,
                                 onImageClick = onNavigateImageClick
                             )
                         }
