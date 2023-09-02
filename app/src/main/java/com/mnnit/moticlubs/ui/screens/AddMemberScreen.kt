@@ -49,6 +49,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -127,6 +128,10 @@ fun AddMemberScreen(
                                             searchText = viewModel.searchName,
                                             enabled = !viewModel.isFetching,
                                             label = "Name",
+                                            keyboardOptions = KeyboardOptions.Default.copy(
+                                                keyboardType = KeyboardType.Text,
+                                                capitalization = KeyboardCapitalization.Words
+                                            ),
                                             onValueChange = { viewModel.filterSearch() }
                                         )
                                         SearchField(
@@ -135,7 +140,8 @@ fun AddMemberScreen(
                                             enabled = !viewModel.isFetching,
                                             label = "RegNo",
                                             keyboardOptions = KeyboardOptions.Default.copy(
-                                                keyboardType = KeyboardType.Phone
+                                                keyboardType = KeyboardType.Text,
+                                                capitalization = KeyboardCapitalization.Characters
                                             ),
                                             onValueChange = { viewModel.filterSearch() }
                                         )
