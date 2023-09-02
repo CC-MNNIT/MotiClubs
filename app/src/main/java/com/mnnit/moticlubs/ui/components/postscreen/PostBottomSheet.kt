@@ -289,7 +289,8 @@ private fun Reply(
                     color = contentColorFor(backgroundColor = getColorScheme().background),
                     maxLines = 4,
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    disableLinkMovementMethod = true
+                    disableLinkMovementMethod = false,
+                    selectable = true
                 )
             }
         }
