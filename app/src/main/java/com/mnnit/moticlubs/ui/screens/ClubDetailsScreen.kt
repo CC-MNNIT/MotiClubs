@@ -2,10 +2,6 @@
 
 package com.mnnit.moticlubs.ui.screens
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.net.Uri
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,10 +32,9 @@ import com.canhub.cropper.CropImageOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.util.ImageUploadManager
 import com.mnnit.moticlubs.domain.util.Links
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
-import com.mnnit.moticlubs.domain.util.compressBitmap
-import com.mnnit.moticlubs.domain.util.connectionAvailable
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
@@ -49,7 +44,6 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
-import java.io.ByteArrayOutputStream
 
 @Composable
 fun ClubDetailsScreen(
@@ -210,7 +204,24 @@ private fun ClubProfilePic(
         if (result.isSuccessful) {
             viewModel.progressMsg = "Uploading ..."
             viewModel.showProgressDialog.value = true
-            updateClubProfilePicture(context, result.uriContent!!, viewModel, viewModel.showProgressDialog)
+
+            ImageUploadManager.uploadImageToFirebase(
+                context = context,
+                imageUri = result.uriContent!!,
+                viewModel.showProgressDialog,
+                storageRef = Firebase.storage.reference
+                    .child("profile_images")
+                    .child(viewModel.clubModel.clubId.toString()),
+                onSuccess = { downloadUrl ->
+                    viewModel.updateClub(url = downloadUrl, onResponse = {
+                        viewModel.showProgressDialog.value = false
+                        viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
+                    }, onFailure = {
+                        viewModel.showProgressDialog.value = false
+                        Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
+                    })
+                }
+            )
         } else {
             val exception = result.error
             Toast.makeText(context, "Error ${exception?.message}", Toast.LENGTH_SHORT).show()
@@ -253,53 +264,5 @@ private fun ClubProfilePic(
             size = 156.dp,
             onClick = {}
         )
-    }
-}
-
-private fun updateClubProfilePicture(
-    context: Context,
-    imageUri: Uri,
-    viewModel: ClubDetailsScreenViewModel,
-    loading: MutableState<Boolean>
-) {
-    if (!context.connectionAvailable()) {
-        Toast.makeText(context, "You're offline", Toast.LENGTH_SHORT).show()
-        loading.value = false
-        return
-    }
-
-    val storageRef = Firebase.storage.reference
-    val profilePicRef =
-        storageRef.child("profile_images").child(viewModel.clubModel.clubId.toString())
-
-    val bitmap = compressBitmap(imageUri, context)
-    bitmap ?: return
-
-    val boas = ByteArrayOutputStream()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 100, boas)
-    } else {
-        bitmap.compress(Bitmap.CompressFormat.WEBP, 100, boas)
-    }
-    profilePicRef.putBytes(boas.toByteArray()).continueWithTask { task ->
-        if (!task.isSuccessful) {
-            Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-            loading.value = false
-        }
-        profilePicRef.downloadUrl
-    }.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            val downloadUrl = task.result.toString()
-            viewModel.updateClub(url = downloadUrl, onResponse = {
-                loading.value = false
-                viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
-            }, onFailure = {
-                loading.value = false
-                Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
-            })
-        } else {
-            Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-            loading.value = false
-        }
     }
 }

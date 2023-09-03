@@ -90,24 +90,3 @@ fun Long.toTimeString(): String {
         }
     }
 }
-
-fun compressBitmap(uri: Uri, context: Context): Bitmap? {
-    val options = BitmapFactory.Options()
-    options.inJustDecodeBounds = true
-    val ins = context.contentResolver.openInputStream(uri)
-    BitmapFactory.decodeStream(ins, null, options)
-    ins?.close()
-
-    var scale = 1
-    while (options.outWidth / scale / 2 >= 200 && options.outHeight / scale / 2 >= 200) {
-        scale *= 2
-    }
-
-    val finalOptions = BitmapFactory.Options()
-    finalOptions.inSampleSize = scale
-
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val out = BitmapFactory.decodeStream(inputStream, null, finalOptions)
-    inputStream?.close()
-    return out
-}
