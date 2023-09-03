@@ -377,7 +377,7 @@ private fun UserList(
                 ) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        url = viewModel.searchUserList[index].avatar,
+                        userModel = viewModel.searchUserList[index],
                         size = 48.dp
                     )
 

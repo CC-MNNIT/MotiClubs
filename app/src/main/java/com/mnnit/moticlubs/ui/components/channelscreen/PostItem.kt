@@ -68,7 +68,7 @@ fun PostItem(
             ) {
                 ProfilePicture(
                     modifier = Modifier.align(Alignment.Top),
-                    url = admin.avatar,
+                    userModel = admin.getUser(),
                     size = 42.dp
                 )
 

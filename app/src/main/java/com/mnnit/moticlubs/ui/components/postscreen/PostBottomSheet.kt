@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
@@ -237,7 +238,7 @@ private fun Reply(
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.Top),
-                url = viewModel.userMap[reply.userId]?.avatar ?: "",
+                userModel = viewModel.userMap[reply.userId] ?: User(),
                 size = 42.dp
             )
 

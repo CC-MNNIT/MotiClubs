@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
@@ -74,7 +75,7 @@ fun ChannelTopBar(
                 ProfilePicture(
                     modifier = Modifier
                         .align(Alignment.CenterVertically),
-                    url = viewModel.clubModel.avatar,
+                    userModel = User().copy(avatar = viewModel.clubModel.avatar),
                     size = 42.dp,
                     onClick = { onNavigateToClubDetails(viewModel.clubId) }
                 )

@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -33,7 +34,7 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 @Composable
 fun ColumnScope.DeveloperProfile(
     modifier: Modifier = Modifier,
-    github: String = "",
+    userModel: User,
     linkedin: String = "",
     name: String,
     stream: String = "",
@@ -57,7 +58,12 @@ fun ColumnScope.DeveloperProfile(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            ProfilePicture(modifier = Modifier.align(Alignment.CenterVertically), url = github, size = 56.dp)
+            ProfilePicture(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                userModel = userModel,
+                size = 56.dp,
+                onClick = {}
+            )
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -100,14 +106,14 @@ fun ColumnScope.DeveloperProfile(
                     .fillMaxHeight()
             ) {
                 if (showIcons) {
-                    if (github.isTrimmedNotEmpty()) {
+                    if (userModel.avatar.isTrimmedNotEmpty()) {
                         IconButton(
                             modifier = Modifier
                                 .size(28.dp)
                                 .align(Alignment.CenterHorizontally),
                             onClick = {
                                 focusManager.clearFocus(true)
-                                uriHandler.openUri(github.replace(".png", ""))
+                                uriHandler.openUri(userModel.avatar.replace(".png", ""))
                             }
                         ) {
                             Icon(

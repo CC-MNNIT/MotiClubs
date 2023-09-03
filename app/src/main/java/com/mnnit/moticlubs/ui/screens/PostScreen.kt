@@ -106,7 +106,7 @@ fun PostScreen(
                                         .fillMaxWidth()
                                         .padding(16.dp)
                                 ) {
-                                    ProfilePicture(url = viewModel.userModel.avatar, size = 56.dp)
+                                    ProfilePicture(userModel = viewModel.userModel, size = 56.dp)
                                     Spacer(modifier = Modifier.width(10.dp))
                                     AdminNameTimestamp(
                                         time = viewModel.postId.toTimeString(),

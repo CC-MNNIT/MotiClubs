@@ -63,7 +63,7 @@ fun HomeScreen(
                     actions = {
                         ProfilePicture(
                             modifier = Modifier.padding(end = 16.dp),
-                            url = viewModel.userModel.avatar,
+                            userModel = viewModel.userModel,
                             onClick = { onNavigateProfile(viewModel) })
                     },
                     scrollBehavior = scrollBehavior,

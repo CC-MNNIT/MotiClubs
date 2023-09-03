@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.domain.model.User
 import com.squareup.picasso3.NetworkPolicy
 import com.squareup.picasso3.Picasso
 import com.squareup.picasso3.compose.rememberPainter
@@ -24,16 +25,28 @@ import com.squareup.picasso3.compose.rememberPainter
 @Composable
 fun ProfilePicture(
     modifier: Modifier = Modifier,
-    url: String,
+    userModel: User,
     size: Dp = 48.dp,
     onClick: (() -> Unit)? = null
 ) {
+    val showDialog = remember { mutableStateOf(false) }
+    if (showDialog.value) {
+        ProfileDialog(userModel = userModel, showDialog = showDialog)
+    }
+
     Image(
-        painter = LocalContext.current.getProfileUrlPainter(url = url), contentDescription = "",
+        painter = LocalContext.current.getProfileUrlPainter(url = userModel.avatar), contentDescription = "",
         modifier = modifier
             .clip(CircleShape)
             .size(size)
-            .clickable(enabled = onClick != null, onClick = { onClick?.let { onClick() } })
+            .clickable(enabled = true, onClick = {
+                if (onClick != null) {
+                    onClick()
+                    return@clickable
+                }
+
+                showDialog.value = true
+            })
     )
 }
 

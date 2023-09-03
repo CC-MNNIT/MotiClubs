@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
 import com.mnnit.moticlubs.domain.util.getExpandedChannel
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
@@ -68,7 +69,7 @@ fun ClubList(
                 Row(modifier = Modifier.padding(16.dp)) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        url = clubsList[idx].avatar,
+                        userModel = User().copy(avatar = clubsList[idx].avatar),
                         onClick = { onNavigateToClubDetails(viewModel.clubsList[idx].clubId) }
                     )
 

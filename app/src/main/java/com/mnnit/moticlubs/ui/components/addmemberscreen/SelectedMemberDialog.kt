@@ -149,7 +149,7 @@ private fun UserItem(user: User, viewModel: AddMemberViewModel) {
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                url = user.avatar,
+                userModel = user,
                 size = 48.dp
             )
 

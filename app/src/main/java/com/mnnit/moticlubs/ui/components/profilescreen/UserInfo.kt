@@ -1,8 +1,8 @@
 package com.mnnit.moticlubs.ui.components.profilescreen
 
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
@@ -18,18 +18,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
-fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
+fun UserInfo(userModel: User, modifier: Modifier = Modifier) {
     val colorScheme = getColorScheme()
 
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        value = viewModel.userModel.name,
+        value = userModel.name,
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Name") },
@@ -47,7 +47,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = viewModel.userModel.email.replace("@mnnit.ac.in", ""),
+        value = userModel.email.replace("@mnnit.ac.in", ""),
         onValueChange = { },
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "G-Suite ID") },
@@ -73,7 +73,7 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 16.dp),
-        value = viewModel.userModel.branch,
+        value = userModel.branch,
         onValueChange = {},
         shape = RoundedCornerShape(24.dp),
         label = { Text(text = "Course") },
@@ -82,16 +82,16 @@ fun UserInfo(viewModel: HomeScreenViewModel, modifier: Modifier = Modifier) {
         leadingIcon = {
             Card(
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .wrapContentSize()
                     .padding(start = 8.dp, end = 4.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
                 shape = RoundedCornerShape(24.dp)
             ) {
                 Text(
-                    text = viewModel.userModel.course,
+                    text = userModel.course,
                     modifier = Modifier
                         .padding(8.dp)
-                        .fillMaxHeight(),
+                        .wrapContentSize(),
                     textAlign = TextAlign.Center
                 )
             }

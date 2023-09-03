@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.aboutus.AboutUsContactForm
 import com.mnnit.moticlubs.ui.components.aboutus.DeveloperProfile
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -33,7 +34,6 @@ fun AboutUsScreen() {
 
     val cc = "https://github.com/CC-MNNIT.png"
     val shank = "https://github.com/shank03.png"
-    val hitesh = "https://github.com/mitrukahitesh.png"
     val amit = "https://github.com/hackeramitkumar.png"
 
     val scrollState = rememberScrollState()
@@ -104,7 +104,7 @@ fun AboutUsScreen() {
                                     .align(Alignment.CenterHorizontally)
                                     .padding(bottom = 16.dp),
                                 name = "Made with 💻\nBy CC Club - MNNIT",
-                                github = cc,
+                                userModel = User().copy(avatar = cc),
                                 showIcons = false
                             )
                         }
@@ -123,27 +123,19 @@ fun AboutUsScreen() {
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 102.dp)
                         ) {
                             DeveloperProfile(
-                                github = shank,
+                                userModel = User().copy(avatar = shank),
                                 linkedin = "https://linkedin.com/in/shank03",
                                 name = "Shashank Verma",
                                 stream = "CSE",
-                                year = "Pre-final year"
+                                year = "Final year"
                             )
                             Spacer(modifier = Modifier.padding(4.dp))
                             DeveloperProfile(
-                                github = hitesh,
-                                linkedin = "https://linkedin.com/in/mitrukahitesh",
-                                name = "Hitesh Mitruka",
-                                stream = "CSE",
-                                year = "Pre-final year"
-                            )
-                            Spacer(modifier = Modifier.padding(4.dp))
-                            DeveloperProfile(
-                                github = amit,
+                                userModel = User().copy(avatar = amit),
                                 linkedin = "https://www.linkedin.com/in/amit3210",
                                 name = "Amit Kumar",
                                 stream = "CSE",
-                                year = "Pre-final year"
+                                year = "Final year"
                             )
                         }
                     }

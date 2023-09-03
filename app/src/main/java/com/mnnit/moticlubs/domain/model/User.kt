@@ -62,4 +62,6 @@ data class AdminUser(
     val avatar: String,
 ) : Parcelable {
     constructor() : this(-1, -1, "...", "...", "...", "...", "...", "")
+
+    fun getUser(): User = User(userId, regNo, name, email, course, branch, avatar)
 }

@@ -35,6 +35,7 @@ import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.Links
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.compressBitmap
@@ -247,8 +248,9 @@ private fun ClubProfilePic(
 
         ProfilePicture(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            url = viewModel.clubModel.avatar,
-            size = 156.dp
+            userModel = User().copy(avatar = viewModel.clubModel.avatar),
+            size = 156.dp,
+            onClick = {}
         )
     }
 }

@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.domain.model.Member
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.CollapsibleTopAppBar
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -366,7 +367,7 @@ private fun MemberItem(
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                url = viewModel.memberInfo[member.userId]?.avatar ?: "",
+                userModel = viewModel.memberInfo[member.userId] ?: User(),
                 size = 48.dp
             )
 

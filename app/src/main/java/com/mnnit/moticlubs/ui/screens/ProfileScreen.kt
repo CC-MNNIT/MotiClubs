@@ -101,10 +101,10 @@ fun ProfileScreen(
 
                 ProfilePicture(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    url = viewModel.userModel.avatar,
+                    userModel = viewModel.userModel,
                     size = 156.dp
                 )
-                UserInfo(viewModel = viewModel, modifier = Modifier.padding(top = 56.dp))
+                UserInfo(userModel = viewModel.userModel, modifier = Modifier.padding(top = 56.dp))
 
                 Card(
                     modifier = Modifier
