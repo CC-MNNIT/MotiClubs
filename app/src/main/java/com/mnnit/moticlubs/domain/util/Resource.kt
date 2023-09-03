@@ -31,18 +31,18 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
         stamp: Long,
     ) -> Response<ReqT?>,
     crossinline saveResponse: suspend (ResT, ReqT) -> Unit,
-    shouldFetch: Boolean = true
+    remoteRequired: Boolean = false
 ): Flow<Resource<ResT>> = flow {
     val data = query()
     emit(Resource.Loading(data))
 
-    if (!shouldFetch) {
-        emit(if (data == null) Resource.Error(-1, errorMsg) else Resource.Success(data))
-        return@flow
-    }
-
     if (!getApplication().connectionAvailable()) {
-        emit(Resource.Success(data))
+        emit(
+            if (remoteRequired) {
+                Log.w(TAG, "networkResource: remoteRequired but connection unavailable")
+                Resource.Error(errMsg = "You're Offline")
+            } else Resource.Success(data)
+        )
         return@flow
     }
 

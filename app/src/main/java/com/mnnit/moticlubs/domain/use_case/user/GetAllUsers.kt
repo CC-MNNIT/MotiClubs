@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 class GetAllUsers(private val repository: Repository) {
 
     operator fun invoke(): Flow<Resource<List<User>>> = repository.networkResource(
-        "Error getting admins",
+        "Error getting all users",
         stampKey = ResponseStamp.USER.withKey("all"),
         query = { repository.getAllUsers() },
         apiCall = { apiService, auth, stamp -> apiService.getAllUsers(auth, stamp) },

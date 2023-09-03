@@ -39,6 +39,7 @@ import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.Links
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.compressBitmap
+import com.mnnit.moticlubs.domain.util.connectionAvailable
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
@@ -261,6 +262,12 @@ private fun updateClubProfilePicture(
     viewModel: ClubDetailsScreenViewModel,
     loading: MutableState<Boolean>
 ) {
+    if (!context.connectionAvailable()) {
+        Toast.makeText(context, "You're offline", Toast.LENGTH_SHORT).show()
+        loading.value = false
+        return
+    }
+
     val storageRef = Firebase.storage.reference
     val profilePicRef =
         storageRef.child("profile_images").child(viewModel.clubModel.clubId.toString())

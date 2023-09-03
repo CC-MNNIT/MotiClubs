@@ -21,6 +21,7 @@ class DeleteChannel(private val repository: Repository) {
                 channel.clubId
             )
         },
-        saveResponse = { _, _ -> repository.deleteChannel(channel) }
+        saveResponse = { _, _ -> repository.deleteChannel(channel) },
+        remoteRequired = true,
     )
 }

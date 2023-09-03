@@ -13,13 +13,14 @@ import kotlinx.coroutines.flow.Flow
 class AddUrls(private val repository: Repository) {
 
     operator fun invoke(clubId: Long, list: List<UrlModel>): Flow<Resource<List<Url>>> = repository.networkResource(
-        "Error getting urls",
+        "Error updating urls",
         stampKey = ResponseStamp.URL.withKey("$clubId"),
         query = { repository.getUrlsFromClub(clubId) },
         apiCall = { apiService, auth, stamp -> apiService.pushUrls(auth, stamp, clubId, UrlDto(list)) },
         saveResponse = { old, new ->
             old.forEach { m -> repository.deleteUrl(m) }
             new.map { m -> m.mapToDomain() }.forEach { m -> repository.insertOrUpdateUrl(m) }
-        }
+        },
+        remoteRequired = true,
     )
 }

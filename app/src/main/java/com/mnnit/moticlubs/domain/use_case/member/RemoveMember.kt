@@ -14,7 +14,7 @@ class RemoveMember(private val repository: Repository) {
         channelId: Long,
         userId: Long,
     ): Flow<Resource<Unit>> = repository.networkResource(
-        "",
+        "Unable to remove members",
         stampKey = ResponseStamp.MEMBER.withKey("$channelId"),
         query = { },
         apiCall = { apiService, auth, stamp ->
@@ -22,6 +22,7 @@ class RemoveMember(private val repository: Repository) {
         },
         saveResponse = { _, _ ->
             repository.deleteMember(Member(userId, channelId))
-        }
+        },
+        remoteRequired = true,
     )
 }

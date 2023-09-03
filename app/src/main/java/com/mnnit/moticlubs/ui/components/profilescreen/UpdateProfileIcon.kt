@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.compressBitmap
+import com.mnnit.moticlubs.domain.util.connectionAvailable
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 import java.io.ByteArrayOutputStream
 
@@ -65,6 +66,12 @@ private fun updateClubProfilePicture(
     appViewModel: HomeScreenViewModel,
     loading: MutableState<Boolean>
 ) {
+    if (!context.connectionAvailable()) {
+        Toast.makeText(context, "You're Offline", Toast.LENGTH_SHORT).show()
+        loading.value = false
+        return
+    }
+
     val storageRef = Firebase.storage.reference
     val profilePicRef =
         storageRef.child("profile_images").child(FirebaseAuth.getInstance().currentUser!!.uid)

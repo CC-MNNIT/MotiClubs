@@ -14,6 +14,7 @@ class SendReply(private val repository: Repository) {
         stampKey = ResponseStamp.REPLY.withKey("${reply.postId}").withKey("${reply.pageNo}"),
         query = { repository.getRepliesByPost(reply.postId, reply.pageNo) },
         apiCall = { apiService, auth, stamp -> apiService.postReply(auth, stamp, reply.mapFromDomain()) },
-        saveResponse = { _, new -> repository.insertOrUpdateReply(new.mapToDomain(reply.pageNo)) }
+        saveResponse = { _, new -> repository.insertOrUpdateReply(new.mapToDomain(reply.pageNo)) },
+        remoteRequired = true,
     )
 }

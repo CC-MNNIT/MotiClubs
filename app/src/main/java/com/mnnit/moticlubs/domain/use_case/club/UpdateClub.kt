@@ -27,6 +27,7 @@ class UpdateClub(private val repository: Repository) {
                 )
             )
         },
-        saveResponse = { _, new -> repository.insertOrUpdateClub(new.mapToDomain()) }
+        saveResponse = { _, new -> repository.insertOrUpdateClub(new.mapToDomain()) },
+        remoteRequired = true
     )
 }

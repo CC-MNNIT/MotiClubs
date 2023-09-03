@@ -160,7 +160,7 @@ class HomeScreenViewModel @Inject constructor(
         }
 
         getUserJob?.cancel()
-        getUserJob = userUseCases.getUser(application.getUserId(), false).onEach { resource ->
+        getUserJob = userUseCases.getUser(application.getUserId()).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> resource.data?.let { userModel = it }
                 is Resource.Success -> userModel = resource.data

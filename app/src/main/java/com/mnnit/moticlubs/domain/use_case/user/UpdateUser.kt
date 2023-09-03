@@ -22,6 +22,7 @@ class UpdateUser(private val repository: Repository) {
                 UpdateUserAvatarDto(user.avatar)
             )
         },
-        saveResponse = { _, new -> repository.insertOrUpdateUser(new.mapToDomain()) }
+        saveResponse = { _, new -> repository.insertOrUpdateUser(new.mapToDomain()) },
+        remoteRequired = true,
     )
 }

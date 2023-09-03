@@ -15,7 +15,7 @@ class AddMembers(private val repository: Repository) {
         channelId: Long,
         userIdList: List<Long>
     ): Flow<Resource<List<Member>>> = repository.networkResource(
-        "",
+        "Unable to add members",
         stampKey = ResponseStamp.MEMBER.withKey("$channelId"),
         query = { repository.getMembers(-1L) },
         apiCall = { apiService, auth, stamp ->
@@ -27,6 +27,7 @@ class AddMembers(private val repository: Repository) {
         },
         saveResponse = { _, new ->
             new.forEach { member -> repository.insertOrUpdateMember(Member(member.userId, member.channelId)) }
-        }
+        },
+        remoteRequired = true,
     )
 }

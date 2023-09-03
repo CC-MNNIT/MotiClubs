@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 class GetAllAdmins(private val repository: Repository) {
 
-    operator fun invoke(shouldFetch: Boolean = true): Flow<Resource<List<AdminUser>>> = repository.networkResource(
+    operator fun invoke(): Flow<Resource<List<AdminUser>>> = repository.networkResource(
         "Error getting admins",
         stampKey = ResponseStamp.ADMIN,
         query = { repository.getAdmins() },
@@ -25,6 +25,5 @@ class GetAllAdmins(private val repository: Repository) {
             new.map { admin -> Admin(admin.uid, admin.clubId) }
                 .forEach { admin -> repository.insertOrUpdateAdmin(admin) }
         },
-        shouldFetch = shouldFetch
     )
 }

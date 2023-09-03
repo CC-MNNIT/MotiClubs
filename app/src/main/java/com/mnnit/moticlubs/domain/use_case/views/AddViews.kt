@@ -12,10 +12,11 @@ import kotlinx.coroutines.flow.Flow
 class AddViews(private val repository: Repository) {
 
     operator fun invoke(view: View): Flow<Resource<List<View>>> = repository.networkResource(
-        "Unable to get views",
+        "Unable to update views",
         stampKey = ResponseStamp.NONE,
         query = { repository.getViewsFromPost(view.postId) },
         apiCall = { apiService, auth, _ -> apiService.addView(auth, ViewDto(view.postId, view.userId)) },
-        saveResponse = { _, new -> repository.insertOrUpdateView(new.mapToDomain()) }
+        saveResponse = { _, new -> repository.insertOrUpdateView(new.mapToDomain()) },
+        remoteRequired = true,
     )
 }

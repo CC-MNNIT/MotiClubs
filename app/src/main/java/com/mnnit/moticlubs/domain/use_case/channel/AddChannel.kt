@@ -16,6 +16,7 @@ class AddChannel(private val repository: Repository) {
         stampKey = ResponseStamp.CHANNEL,
         query = { channel },
         apiCall = { apiService, auth, stamp -> apiService.createChannel(auth, stamp, channel.mapFromDomain()) },
-        saveResponse = { _, new -> repository.insertOrUpdateChannel(new.mapToDomain()) }
+        saveResponse = { _, new -> repository.insertOrUpdateChannel(new.mapToDomain()) },
+        remoteRequired = true,
     )
 }

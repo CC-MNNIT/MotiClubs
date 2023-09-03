@@ -23,6 +23,7 @@ class UpdateChannel(private val repository: Repository) {
                 UpdateChannelDto(channel.clubId, channel.name, channel.private == 1)
             )
         },
-        saveResponse = { _, new -> repository.insertOrUpdateChannel(new.mapToDomain()) }
+        saveResponse = { _, new -> repository.insertOrUpdateChannel(new.mapToDomain()) },
+        remoteRequired = true
     )
 }

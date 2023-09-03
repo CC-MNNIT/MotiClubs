@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 class UpdatePost(private val repository: Repository) {
 
     operator fun invoke(post: Post, clubId: Long): Flow<Resource<List<Post>>> = repository.networkResource(
-        "Error sending post",
+        "Error updating post",
         stampKey = ResponseStamp.POST.withKey("${post.channelId}").withKey("${post.pageNo}"),
         query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
         apiCall = { apiService, auth, stamp ->
@@ -24,6 +24,7 @@ class UpdatePost(private val repository: Repository) {
                 UpdatePostModel(post.message)
             )
         },
-        saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) }
+        saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) },
+        remoteRequired = true,
     )
 }

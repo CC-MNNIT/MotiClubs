@@ -20,6 +20,7 @@ class SendPost(private val repository: Repository) {
         stampKey = ResponseStamp.POST.withKey("${post.channelId}").withKey("${post.pageNo}"),
         query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
         apiCall = { apiService, auth, stamp -> apiService.sendPost(auth, stamp, clubId, post.mapFromDomain(general)) },
-        saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) }
+        saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) },
+        remoteRequired = true,
     )
 }
