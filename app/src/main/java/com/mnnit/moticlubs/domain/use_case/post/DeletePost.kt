@@ -13,7 +13,7 @@ class DeletePost(private val repository: Repository) {
         "Error deleting post",
         stampKey = ResponseStamp.POST.withKey("${post.channelId}").withKey("${post.pageNo}"),
         query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
-        apiCall = { apiService, auth, stamp -> apiService.deletePost(auth, post.postId, clubId, stamp) },
+        apiCall = { apiService, auth, stamp -> apiService.deletePost(auth, stamp, post.postId, clubId) },
         saveResponse = { _, _ -> repository.deletePost(post) },
         remoteRequired = true,
     )
