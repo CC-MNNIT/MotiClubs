@@ -23,4 +23,11 @@ data class Channel(
     val private: Int,
 ) : Parcelable {
     constructor() : this(-1L, -1, "...", 0)
+
+    constructor(payload: Map<String, String>) : this(
+        channelId = payload["ch_chid"]?.toLong() ?: throw Error("Invalid ch_chid"),
+        clubId = payload["ch_cid"]?.toLong() ?: throw Error("Invalid ch_cid"),
+        name = payload["ch_name"] ?: throw Error("Invalid ch_name"),
+        private = payload["ch_private"]?.toInt() ?: throw Error("Invalid ch_private"),
+    )
 }

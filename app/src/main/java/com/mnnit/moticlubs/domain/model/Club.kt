@@ -26,4 +26,12 @@ data class Club(
     val summary: String,
 ) : Parcelable {
     constructor() : this(-1, "...", "...", "", "...")
+
+    constructor(payload: Map<String, String>) : this(
+        clubId = payload["c_cid"]?.toLong() ?: throw Error("Invalid c_cid"),
+        name = payload["c_name"] ?: throw Error("Invalid c_name"),
+        description = payload["c_description"] ?: throw Error("Invalid c_description"),
+        summary = payload["c_summary"] ?: throw Error("Invalid c_summary"),
+        avatar = payload["c_avatar"] ?: throw Error("Invalid c_avatar"),
+    )
 }

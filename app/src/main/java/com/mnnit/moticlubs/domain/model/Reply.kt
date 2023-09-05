@@ -25,5 +25,12 @@ data class Reply(
     @ColumnInfo(name = "time")
     val time: Long,
 ) : Parcelable {
-    constructor(): this(-1L, -1L, "", 0, -1L)
+    constructor() : this(-1L, -1L, "", 0, -1L)
+    constructor(payload: Map<String, String>) : this(
+        time = payload["r_time"]?.toLong() ?: throw Error("Invalid r_time"),
+        postId = payload["r_pid"]?.toLong() ?: throw Error("Invalid r_pid"),
+        userId = payload["r_uid"]?.toLong() ?: throw Error("Invalid r_uid"),
+        message = payload["r_message"] ?: throw Error("Invalid r_message"),
+        pageNo = 1,
+    )
 }

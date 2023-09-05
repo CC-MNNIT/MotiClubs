@@ -24,8 +24,11 @@ import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.di.AppModule
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.model.Reply
+import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.getAuthToken
@@ -151,92 +154,82 @@ class AppFCMService : FirebaseMessagingService() {
     private fun postNotification(data: Map<String, String>) {
         Log.d(TAG, "handleData: post notification")
 
-        val postId = data["pid"]?.toLong() ?: -1
-        val userId = data["postUid"]?.toLong() ?: -1
-        val message = data["postMessage"] ?: ""
-        val adminName = data["postUserName"] ?: ""
-        val url = data["postUserAvatar"] ?: ""
-
-        val clubName = data["clubName"] ?: ""
-        val channelName = data["channelName"] ?: ""
-        val channelId = data["chid"]?.toLong() ?: -1
-        val clubId = data["cid"]?.toInt() ?: -1
+        val post: Post
+        val channel: Channel
+        val club: Club
+        val user: User
+        try {
+            post = Post(data)
+            channel = Channel(data)
+            club = Club(data)
+            user = User(data)
+        } catch (e: Error) {
+            Log.d(TAG, "postNotification: ERR: ${e.localizedMessage}")
+            return
+        }
 
         val updated = data["updated"]?.toBoolean() ?: false
 
-        prePost(
-            Post(
-                postId = postId,
-                channelId = channelId,
-                pageNo = 1,
-                message = message,
-                userId = userId
-            )
-        )
+        prePost(post, channel, club, user)
 
-        if (userId == getUserId()) {
+        if (user.userId == getUserId()) {
             Log.d(TAG, "postNotification: post sender and receiver same")
             return
         }
 
-        postRead(channelId, postId)
+        postRead(channel.channelId, post.postId)
 
         notificationCompat(
-            notificationStamp = postId,
-            channelId = channelId.toString(),
-            channelName = channelName,
-            clubId = clubId.toString(),
-            clubName = clubName,
-            title = "$adminName ${if (updated) "updated" else "posted"} in $channelName - $clubName",
-            message = message,
-            url = url,
-            pendingIntent = getPendingIntent(postId)
+            notificationStamp = post.postId,
+            channelId = channel.channelId.toString(),
+            channelName = channel.name,
+            clubId = club.clubId.toString(),
+            clubName = club.name,
+            title = "${user.name} ${if (updated) "updated" else "posted"} in ${channel.name} - ${club.name}",
+            message = post.message,
+            url = user.avatar,
+            pendingIntent = getPendingIntent(post.postId)
         )
     }
 
     private fun replyNotification(data: Map<String, String>) {
         Log.d(TAG, "handleData: reply notification")
 
-        val postId = data["pid"]?.toLong() ?: -1
+        val post: Post
+        val channel: Channel
+        val club: Club
+        val user: User
+        val reply: Reply
+        try {
+            post = Post(data)
+            channel = Channel(data)
+            club = Club(data)
+            user = User(data)
+            reply = Reply(data)
+        } catch (e: Error) {
+            Log.d(TAG, "replyNotification: ERR: ${e.localizedMessage}")
+            return
+        }
 
-        val clubName = data["clubName"] ?: ""
-        val channelName = data["channelName"] ?: ""
-        val channelId = data["chid"]?.toLong() ?: -1
-        val clubId = data["cid"]?.toInt() ?: -1
+        preReply(post, channel, club, user, reply)
 
-        val replyUserId = data["replyUid"]?.toLong() ?: -1
-        val replyId = data["replyTime"]?.toLong() ?: -1
-        val replyMessage = data["replyMessage"] ?: ""
-        val replyUserName = data["replyUserName"] ?: ""
-        val url = data["replyUserAvatar"] ?: ""
-
-        preReply(
-            Reply(
-                postId = postId,
-                userId = replyUserId,
-                message = replyMessage,
-                pageNo = 1,
-                time = replyId
-            )
-        )
-
-        if (replyUserId == getUserId()) {
+        if (reply.userId == getUserId()) {
             Log.d(TAG, "replyNotification: reply sender and receiver same")
             return
         }
 
-        postRead(channelId, postId)
+        postRead(channel.channelId, post.postId)
 
         notificationCompat(
-            notificationStamp = replyId,
-            channelId = channelId.toString(),
-            channelName = channelName,
-            clubId = clubId.toString(),
-            clubName = clubName,
-            title = "$replyUserName replied to a post in $channelName",
-            message = replyMessage,
-            url = url,
-            pendingIntent = getPendingIntent(postId)
+            notificationStamp = reply.time,
+            channelId = channel.channelId.toString(),
+            channelName = channel.name,
+            clubId = club.clubId.toString(),
+            clubName = club.name,
+            title = "${user.name} replied to a post in ${channel.name}",
+            message = reply.message,
+            url = user.avatar,
+            pendingIntent = getPendingIntent(post.postId)
         )
     }
 
@@ -301,17 +294,39 @@ class AppFCMService : FirebaseMessagingService() {
 
     private fun Long.toNotificationID(): Int = (this % 1000000L).toInt()
 
-    private fun prePost(post: Post) {
+    private fun prePost(
+        post: Post,
+        channel: Channel,
+        club: Club,
+        user: User,
+    ) {
         LocalBroadcastManager.getInstance(this)
             .sendBroadcast(Intent(Constants.POST_BROADCAST_ACTION))
 
-        CoroutineScope(Dispatchers.IO).launch { repository.insertOrUpdatePost(post) }
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.insertOrUpdatePost(post)
+            repository.insertOrUpdateChannel(channel)
+            repository.insertOrUpdateClub(club)
+            repository.insertOrUpdateUser(user)
+        }
     }
 
-    private fun preReply(reply: Reply) {
+    private fun preReply(
+        post: Post,
+        channel: Channel,
+        club: Club,
+        user: User,
+        reply: Reply,
+    ) {
         LocalBroadcastManager.getInstance(this)
             .sendBroadcast(Intent(Constants.REPLY_BROADCAST_ACTION))
 
-        CoroutineScope(Dispatchers.IO).launch { repository.insertOrUpdateReply(reply) }
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.insertOrUpdatePost(post)
+            repository.insertOrUpdateChannel(channel)
+            repository.insertOrUpdateClub(club)
+            repository.insertOrUpdateUser(user)
+            repository.insertOrUpdateReply(reply)
+        }
     }
 }

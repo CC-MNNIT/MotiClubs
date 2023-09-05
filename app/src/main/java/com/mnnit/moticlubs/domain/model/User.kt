@@ -32,6 +32,15 @@ data class User(
     val avatar: String,
 ) : Parcelable {
     constructor() : this(-1, "...", "...", "...", "...", "...", "")
+    constructor(payload: Map<String, String>) : this(
+        userId = payload["u_uid"]?.toLong() ?: throw Error("Invalid u_uid"),
+        regNo = payload["u_regno"] ?: throw Error("Invalid u_regno"),
+        name = payload["u_name"] ?: throw Error("Invalid u_name"),
+        email = payload["u_email"] ?: throw Error("Invalid u_email"),
+        course = payload["u_course"] ?: throw Error("Invalid u_course"),
+        branch = payload["u_branch"] ?: throw Error("Invalid u_branch"),
+        avatar = payload["u_avatar"] ?: throw Error("Invalid u_avatar"),
+    )
 }
 
 @Parcelize

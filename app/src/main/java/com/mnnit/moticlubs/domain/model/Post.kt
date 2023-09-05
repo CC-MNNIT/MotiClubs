@@ -1,10 +1,8 @@
 package com.mnnit.moticlubs.domain.model
 
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "post")
 data class Post(
@@ -25,4 +23,12 @@ data class Post(
     val userId: Long,
 ) {
     constructor() : this(-1L, -1L, 1, "...", -1L)
+
+    constructor(payload: Map<String, String>) : this(
+        postId = payload["p_pid"]?.toLong() ?: throw Error("Invalid p_pid"),
+        userId = payload["p_uid"]?.toLong() ?: throw Error("Invalid p_uid"),
+        channelId = payload["p_chid"]?.toLong() ?: throw Error("Invalid p_chid"),
+        message = payload["p_message"] ?: throw Error("Invalid p_message"),
+        pageNo = 1,
+    )
 }
