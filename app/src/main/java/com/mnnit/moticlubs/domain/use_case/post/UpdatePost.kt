@@ -21,7 +21,7 @@ class UpdatePost(private val repository: Repository) {
                 stamp,
                 post.postId,
                 clubId,
-                UpdatePostModel(post.message)
+                UpdatePostModel(post.message, System.currentTimeMillis())
             )
         },
         saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) },

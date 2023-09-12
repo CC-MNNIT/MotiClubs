@@ -233,8 +233,8 @@ class ChannelScreenViewModel @Inject constructor(
         val time = System.currentTimeMillis()
         crudPostJob?.cancel()
         crudPostJob = postUseCases.sendPost(
-            Post(time, channelID, pageNo = 1, text, userId),
-            clubId, 1
+            Post(time, channelID, time, pageNo = 1, text, userId),
+            clubId,
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true

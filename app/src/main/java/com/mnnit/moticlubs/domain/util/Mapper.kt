@@ -67,18 +67,19 @@ fun PostDto.mapToDomain(page: Int): Post =
     Post(
         postId = this.postId,
         channelId = this.channelId,
+        updated = this.updated,
         pageNo = page,
         message = this.message,
         userId = this.userId
     )
 
-fun Post.mapFromDomain(general: Int): PostDto =
+fun Post.mapFromDomain(): PostDto =
     PostDto(
         postId = this.postId,
         channelId = this.channelId,
+        updated = this.updated,
         message = this.message,
         userId = this.userId,
-        general = general
     )
 
 fun ViewDto.mapToDomain(): View =

@@ -26,7 +26,7 @@ import com.mnnit.moticlubs.domain.model.View
         Reply::class,
         Stamp::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class LocalDatabase : RoomDatabase() {

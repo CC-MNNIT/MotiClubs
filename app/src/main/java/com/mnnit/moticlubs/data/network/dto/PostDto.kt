@@ -12,6 +12,10 @@ data class PostDto(
     @Expose
     var channelId: Long,
 
+    @SerializedName("updated")
+    @Expose
+    var updated: Long,
+
     @SerializedName("message")
     @Expose
     var message: String,
@@ -19,14 +23,14 @@ data class PostDto(
     @SerializedName("uid")
     @Expose
     var userId: Long,
-
-    @SerializedName("general")
-    @Expose
-    var general: Int,
 )
 
 data class UpdatePostModel(
     @SerializedName("message")
     @Expose
     var message: String,
+
+    @SerializedName("updated")
+    @Expose
+    var updated: Long,
 )
