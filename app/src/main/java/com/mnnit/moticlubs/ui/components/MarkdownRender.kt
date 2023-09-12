@@ -57,6 +57,8 @@ fun MarkdownRender(
             val matcher = Patterns.WEB_URL.matcher(it)
             if (matcher.find()) {
                 list.add(PreviewMarkdown.Image(it.substring(matcher.start(), matcher.end())))
+            } else {
+                sb.append(it).append("\n")
             }
         } else {
             sb.append(it).append("\n")
