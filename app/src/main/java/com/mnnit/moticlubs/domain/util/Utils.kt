@@ -1,16 +1,22 @@
 package com.mnnit.moticlubs.domain.util
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.toOffset
 import androidx.lifecycle.SavedStateHandle
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
+import me.saket.telephoto.zoomable.ZoomableContentLocation
 import java.util.Calendar
+import kotlin.math.min
 
 object Constants {
     val EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@mnnit.ac.in$".toRegex()
@@ -28,7 +34,6 @@ object Constants {
     const val REPLY_BROADCAST_ACTION = "$SHARED_PREFERENCE.reply"
 
     const val BASE_URL = "https://sac.mnnit.ac.in/moticlubs/"
-//    const val BASE_URL = "http://172.31.64.238:8002/"
     private const val URL_PREFIX = "api/v1"
     const val CHANNEL_ROUTE = "$BASE_URL$URL_PREFIX/channel"
     const val CLUB_ROUTE = "$BASE_URL$URL_PREFIX/clubs"
@@ -55,8 +60,33 @@ fun Context.getMkdFormatter() = Markwon.builder(this)
     .usePlugin(TablePlugin.create(this))
     .build()
 
-fun String.getDomainMail(): String = "$this@mnnit.ac.in"
 fun String.isTrimmedNotEmpty(): Boolean = this.trim().isNotEmpty()
+
+fun Painter.zoomableContentLocation(): ZoomableContentLocation = object : ZoomableContentLocation {
+    private fun Size.discardFractionalParts(): IntSize {
+        return IntSize(width = width.toInt(), height = height.toInt())
+    }
+
+    override fun location(layoutSize: Size, direction: LayoutDirection): Rect {
+        val heightScale = layoutSize.height / this@zoomableContentLocation.intrinsicSize.height
+        val widthScale = layoutSize.width / this@zoomableContentLocation.intrinsicSize.width
+
+        val scale = min(heightScale, widthScale)
+
+        val scaledSize = this@zoomableContentLocation.intrinsicSize * scale
+        val alignedOffset = Alignment.Center.align(
+            size = scaledSize.discardFractionalParts(),
+            space = layoutSize.discardFractionalParts(),
+            layoutDirection = direction,
+        )
+        return Rect(
+            offset = alignedOffset.toOffset(),
+            size = scaledSize
+        )
+    }
+
+    override fun size(layoutSize: Size): Size = layoutSize
+}
 
 private val mMonthsList: List<String> = listOf(
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

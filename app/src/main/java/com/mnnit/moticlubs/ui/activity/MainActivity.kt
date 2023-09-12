@@ -105,14 +105,14 @@ class MainActivity : ComponentActivity() {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-            AnimatedVisibility(visible = viewModel.showErrorScreen) {
-                ErrorScreen(viewModel)
-            }
-            AnimatedVisibility(visible = !viewModel.showErrorScreen) {
-                MainScreen(user = user)
+                AnimatedVisibility(visible = viewModel.showErrorScreen) {
+                    ErrorScreen(viewModel)
+                }
+                AnimatedVisibility(visible = !viewModel.showErrorScreen) {
+                    MainScreen(user = user)
+                }
             }
         }
-    }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -291,7 +291,9 @@ class MainActivity : ComponentActivity() {
                         "${AppNavigation.IMAGE_PAGE}/{image}",
                         arguments = listOf(navArgument("image") { type = NavType.StringType })
                     ) {
-                        ImageScreen()
+                        ImageScreen(onBackPressed = {
+                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                        })
                     }
 
                     composable(

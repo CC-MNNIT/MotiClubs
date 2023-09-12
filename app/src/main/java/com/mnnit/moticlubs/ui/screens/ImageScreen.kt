@@ -1,33 +1,37 @@
 package com.mnnit.moticlubs.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.mnnit.moticlubs.domain.util.getStringArg
+import com.mnnit.moticlubs.domain.util.zoomableContentLocation
 import com.mnnit.moticlubs.ui.components.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import me.saket.telephoto.zoomable.rememberZoomableState
+import me.saket.telephoto.zoomable.zoomable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,51 +44,43 @@ class ImageScreenViewModel @Inject constructor(
 }
 
 @Composable
-fun ImageScreen(viewModel: ImageScreenViewModel = hiltViewModel()) {
+fun ImageScreen(
+    onBackPressed: () -> Unit,
+    viewModel: ImageScreenViewModel = hiltViewModel()
+) {
     val colorScheme = getColorScheme()
 
+    val painter = LocalContext.current.getImageUrlPainter(url = viewModel.imageUrl)
+    val zoomState = rememberZoomableState()
+
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme()
+        SetTransparentSystemBars()
 
-        val scale = remember { mutableFloatStateOf(1f) }
-        val rotationState = remember { mutableFloatStateOf(0f) }
-        val offsetX = remember { mutableFloatStateOf(0f) }
-        val offsetY = remember { mutableFloatStateOf(0f) }
-        Box(
-            modifier = Modifier
-                .clip(RectangleShape)
-                .wrapContentSize()
-                .background(colorScheme.background)
-                .pointerInput(Unit) {
-                    detectTransformGestures(panZoomLock = true) { _, pan, zoom, rotation ->
-                        scale.floatValue *= zoom
-                        rotationState.floatValue += rotation
-
-                        if (scale.floatValue > 1f) {
-                            offsetX.floatValue += pan.x
-                            offsetY.floatValue += pan.y
-                        } else {
-                            offsetX.floatValue = 0f
-                            offsetY.floatValue = 0f
-                            rotationState.floatValue = 0f
-                        }
-                    }
-                }
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 modifier = Modifier
-                    .align(Alignment.Center)
                     .fillMaxSize()
-                    .graphicsLayer(
-                        scaleX = maxOf(1f, minOf(3f, scale.floatValue)),
-                        scaleY = maxOf(1f, minOf(3f, scale.floatValue)),
-                        rotationZ = rotationState.floatValue,
-                        translationX = offsetX.floatValue,
-                        translationY = offsetY.floatValue
-                    ),
+                    .zoomable(zoomState),
                 contentDescription = null,
-                painter = LocalContext.current.getImageUrlPainter(url = viewModel.imageUrl)
+                alignment = Alignment.Center,
+                painter = painter
             )
+
+            LaunchedEffect(painter.intrinsicSize) {
+                zoomState.setContentLocation(painter.zoomableContentLocation())
+            }
+
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .systemBarsPadding()
+                    .padding(16.dp)
+                    .size(42.dp),
+                onClick = onBackPressed,
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = colorScheme.background)
+            ) {
+                Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+            }
         }
     }
 }
