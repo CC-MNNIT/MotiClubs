@@ -36,7 +36,7 @@ import com.mnnit.moticlubs.ui.components.channelscreen.ChannelTopBar
 import com.mnnit.moticlubs.ui.components.channelscreen.PostCreateUpdateBottomSheet
 import com.mnnit.moticlubs.ui.components.channelscreen.PostItem
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 
@@ -60,11 +60,11 @@ fun ChannelScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp, true)
+        SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 
-        Surface(modifier = Modifier.imePadding(), color = colorScheme.background) {
+        Surface(modifier = Modifier.systemBarsPadding(), color = colorScheme.background) {
             BottomSheetScaffold(
                 modifier = Modifier.imePadding(),
                 sheetContent = {

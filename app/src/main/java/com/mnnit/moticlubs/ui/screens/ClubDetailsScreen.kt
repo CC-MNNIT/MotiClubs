@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.mnnit.moticlubs.ui.screens
 
 import android.util.Log
@@ -41,10 +39,11 @@ import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputOtherLinkDialog
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputSocialLinkDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ClubDetailsScreen(
     onNavigateBackPressed: () -> Unit,
@@ -58,7 +57,7 @@ fun ClubDetailsScreen(
         onRefresh = viewModel::refresh
     )
     MotiClubsTheme(colorScheme = getColorScheme()) {
-        SetNavBarsTheme(2.dp, false)
+        SetTransparentSystemBars(setStatusBar = false)
 
         Surface(
             modifier = Modifier

@@ -43,9 +43,7 @@ fun ChannelTopBar(
     val colorScheme = getColorScheme()
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .safeContentPadding(),
+        modifier = modifier.fillMaxWidth(),
         onClick = { onNavigateToChannelDetails(viewModel.channelId) },
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
         shape = RoundedCornerShape(8.dp),

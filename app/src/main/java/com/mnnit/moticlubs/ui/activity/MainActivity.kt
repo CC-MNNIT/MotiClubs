@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -41,7 +42,7 @@ import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.domain.util.*
 import com.mnnit.moticlubs.ui.screens.*
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -70,6 +71,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition { viewModel.showSplashScreen }
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         oneTapClient = Identity.getSignInClient(this)
         signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
@@ -97,6 +100,11 @@ class MainActivity : ComponentActivity() {
         viewModel.getUser(user)
 
         setContent {
+            SetTransparentSystemBars()
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
             AnimatedVisibility(visible = viewModel.showErrorScreen) {
                 ErrorScreen(viewModel)
             }
@@ -104,6 +112,7 @@ class MainActivity : ComponentActivity() {
                 MainScreen(user = user)
             }
         }
+    }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -127,7 +136,7 @@ class MainActivity : ComponentActivity() {
     fun MainScreen(user: FirebaseUser?) {
         val colorScheme = getColorScheme()
         MotiClubsTheme(colorScheme) {
-            SetNavBarsTheme()
+            SetTransparentSystemBars()
 
             Surface(
                 modifier = Modifier
@@ -138,9 +147,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 NavHost(
-                    modifier = Modifier
-                        .imePadding()
-                        .systemBarsPadding(),
+                    modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     startDestination = if (user != null) AppNavigation.HOME else AppNavigation.LOGIN,
                 ) {

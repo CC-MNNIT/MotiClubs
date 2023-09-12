@@ -27,7 +27,7 @@ import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.postscreen.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
@@ -41,9 +41,11 @@ fun PostScreen(
 
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
-        SetNavBarsTheme(elevation = 2.dp, true)
+        SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .systemBarsPadding(),
             color = colorScheme.background
         ) {
             androidx.compose.material.BottomSheetScaffold(

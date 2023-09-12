@@ -65,7 +65,7 @@ import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.homescreen.UpdateChannelDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelDetailScreenViewModel
 
@@ -86,9 +86,9 @@ fun ChannelDetailScreen(
     )
     MotiClubsTheme(colorScheme = getColorScheme()) {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
-            SetNavBarsTheme(2.dp, false)
+            SetTransparentSystemBars(setStatusBar = false)
         } else {
-            SetNavBarsTheme()
+            SetTransparentSystemBars()
         }
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
@@ -182,7 +182,7 @@ fun ChannelDetailScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .imePadding()
-                                .padding(it)
+                                .padding(PaddingValues(top = it.calculateTopPadding()))
                                 .pullRefresh(
                                     state = refreshState,
                                     enabled = !viewModel.isFetching
@@ -340,7 +340,6 @@ private fun MemberItem(
 
     Card(
         modifier = Modifier
-            .safeContentPadding()
             .padding(top = 8.dp)
             .clip(RoundedCornerShape(24.dp))
             .combinedClickable(

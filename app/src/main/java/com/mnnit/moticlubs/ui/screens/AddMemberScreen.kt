@@ -63,7 +63,7 @@ import com.mnnit.moticlubs.ui.components.addmemberscreen.CourseSelectField
 import com.mnnit.moticlubs.ui.components.addmemberscreen.SearchField
 import com.mnnit.moticlubs.ui.components.addmemberscreen.SelectedMemberDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 
@@ -79,9 +79,9 @@ fun AddMemberScreen(
 
     MotiClubsTheme(colorScheme) {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
-            SetNavBarsTheme(2.dp, false)
+            SetTransparentSystemBars(setStatusBar = false)
         } else {
-            SetNavBarsTheme()
+            SetTransparentSystemBars()
         }
 
         Surface(
@@ -272,7 +272,7 @@ fun AddMemberScreen(
 
                 Column(
                     modifier = Modifier
-                        .padding(pd)
+                        .padding(PaddingValues(top = pd.calculateTopPadding()))
                         .imePadding()
                         .fillMaxSize()
                         .animateContentSize()
@@ -341,9 +341,7 @@ private fun UserList(
 
         items(viewModel.searchUserList.size) { index ->
             Card(
-                modifier = Modifier
-                    .safeContentPadding()
-                    .padding(top = 8.dp),
+                modifier = Modifier.padding(top = 8.dp),
                 elevation = CardDefaults.cardElevation(0.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(

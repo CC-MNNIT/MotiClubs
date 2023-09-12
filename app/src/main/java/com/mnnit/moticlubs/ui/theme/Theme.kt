@@ -2,12 +2,18 @@ package com.mnnit.moticlubs.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -86,20 +92,20 @@ fun getColorScheme() =
     }
 
 @Composable
-fun SetNavBarsTheme(elevation: Dp = 0.dp, setNavBar: Boolean = true) {
+fun SetTransparentSystemBars(setStatusBar: Boolean = true, setNavBar: Boolean = true) {
     val colorScheme = getColorScheme()
     val darkTheme = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
     LaunchedEffect(systemUiController, darkTheme) {
         systemUiController.setStatusBarColor(
-            color = if (elevation == 0.dp) colorScheme.background else colorScheme.surfaceColorAtElevation(2.dp),
-            darkIcons = !darkTheme
+            color = if (setStatusBar) Color.Transparent else colorScheme.surfaceColorAtElevation(2.dp),
+            darkIcons = !darkTheme,
         )
+
         systemUiController.setNavigationBarColor(
-            color = if (elevation == 0.dp || !setNavBar) colorScheme.background else {
-                colorScheme.surfaceColorAtElevation(2.dp)
-            },
-            darkIcons = !darkTheme
+            color = if (setNavBar) Color.Transparent else colorScheme.surfaceColorAtElevation(2.dp),
+            darkIcons = !darkTheme,
+            navigationBarContrastEnforced = false
         )
     }
 }

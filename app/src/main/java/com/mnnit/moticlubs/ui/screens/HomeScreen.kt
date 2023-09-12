@@ -25,7 +25,7 @@ import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.homescreen.ClubList
 import com.mnnit.moticlubs.ui.components.homescreen.InputChannelDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
@@ -47,18 +47,20 @@ fun HomeScreen(
 
     MotiClubsTheme(colorScheme) {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
-            SetNavBarsTheme(2.dp, false)
+            SetTransparentSystemBars(setStatusBar = false)
         } else {
-            SetNavBarsTheme()
+            SetTransparentSystemBars()
         }
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            modifier = Modifier
+                .statusBarsPadding()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 LargeTopAppBar(
-                    modifier = Modifier,
+                    modifier = Modifier.statusBarsPadding(),
                     title = { Text(text = "MNNIT Clubs", fontSize = 28.sp) },
                     actions = {
                         ProfilePicture(
@@ -84,7 +86,7 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(it)
+                        .padding(PaddingValues(top = it.calculateTopPadding()))
                         .pullRefresh(
                             state = refreshState,
                             enabled = !viewModel.isFetchingAdmins

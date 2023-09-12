@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +43,7 @@ import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.profilescreen.UpdateProfileIcon
 import com.mnnit.moticlubs.ui.components.profilescreen.UserInfo
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.SetNavBarsTheme
+import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
@@ -65,17 +66,17 @@ fun ProfileScreen(
     val context = LocalContext.current
 
     MotiClubsTheme(getColorScheme()) {
-        SetNavBarsTheme()
+        SetTransparentSystemBars()
         Surface(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding()
+                    .systemBarsPadding()
                     .verticalScroll(scrollState)
                     .wrapContentHeight(Alignment.Top),
             ) {
                 TopAppBar(
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier,
                     title = {
                         Text(
                             text = "Profile",
