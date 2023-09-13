@@ -12,7 +12,7 @@ class GetUser(private val repository: Repository) {
 
     operator fun invoke(userId: Long): Flow<Resource<User>> = repository.networkResource(
         "Error getting user",
-        stampKey = ResponseStamp.USER,
+        stampKey = ResponseStamp.USER.withKey("$userId"),
         query = { repository.getUser(userId) ?: User() },
         apiCall = { apiService, auth, stamp -> apiService.getUserDetails(auth, stamp, userId) },
         saveResponse = { _, new -> repository.insertOrUpdateUser(new.mapToDomain()) },
