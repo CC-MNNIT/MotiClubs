@@ -22,11 +22,13 @@ import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.use_case.MemberUseCases
 import com.mnnit.moticlubs.domain.use_case.PostUseCases
 import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.Constants.INPUT_POST_MESSAGE_SIZE
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CHANNEL_ARG
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CLUB_ARG
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
+import com.mnnit.moticlubs.domain.util.lengthInRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -219,6 +221,15 @@ class ChannelScreenViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun postLengthInRange(): Boolean {
+        var text = eventPostMsg.value.text
+        eventImageReplacerMap.forEach { (key, value) ->
+            text = text.replace(key.replace("\n", ""), value)
+        }
+
+        return INPUT_POST_MESSAGE_SIZE.lengthInRange(text)
     }
 
     fun sendPost() {

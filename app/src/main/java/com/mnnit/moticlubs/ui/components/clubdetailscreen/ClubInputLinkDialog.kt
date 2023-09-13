@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.mnnit.moticlubs.domain.util.Constants.INPUT_URL_SIZE
+import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
@@ -86,6 +88,7 @@ fun InputLinkDialog(
                         .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
                     enabled = inputLink.value.matches(Patterns.WEB_URL.toRegex())
+                            && INPUT_URL_SIZE.lengthInRange(inputLink.value)
                 ) {
                     Text(text = "Add Link", fontSize = 14.sp)
                 }

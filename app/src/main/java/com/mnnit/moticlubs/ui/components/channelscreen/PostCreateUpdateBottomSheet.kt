@@ -251,7 +251,10 @@ fun PostCreateUpdateBottomSheet(
                                 text = if (viewModel.editMode.value) "Update" else "Send",
                                 fontSize = 14.sp,
                                 color = contentColorFor(
-                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
+                                    backgroundColor = if (
+                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
+                                        && viewModel.postLengthInRange()
+                                    ) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
@@ -263,7 +266,10 @@ fun PostCreateUpdateBottomSheet(
                                 painter = rememberVectorPainter(image = Icons.Rounded.Send),
                                 contentDescription = "",
                                 tint = contentColorFor(
-                                    backgroundColor = if (viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
+                                    backgroundColor = if (
+                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
+                                        && viewModel.postLengthInRange()
+                                    ) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
@@ -276,6 +282,7 @@ fun PostCreateUpdateBottomSheet(
                         shape = RoundedCornerShape(24.dp),
                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
                         enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
+                                && viewModel.postLengthInRange()
                     )
                 }
             }

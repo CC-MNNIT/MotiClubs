@@ -48,6 +48,13 @@ object Constants {
     const val CHANNEL_ID_CLAIM = "channelId"
     const val POST_ID_CLAIM = "postId"
     const val REPLY_ID_CLAIM = "replyId"
+
+    const val INPUT_USER_CONTACT_SIZE = 256
+    const val INPUT_CHANNEL_NAME_SIZE = 256
+    const val INPUT_CLUB_DESCRIPTION_SIZE = 1024
+    const val INPUT_CLUB_SUMMARY_SIZE = 512
+    const val INPUT_POST_MESSAGE_SIZE = 2048
+    const val INPUT_URL_SIZE = 512
 }
 
 fun SavedStateHandle.getLongArg(arg: String): Long = get<Long>(arg) ?: -1
@@ -61,6 +68,7 @@ fun Context.getMkdFormatter() = Markwon.builder(this)
     .build()
 
 fun String.isTrimmedNotEmpty(): Boolean = this.trim().isNotEmpty()
+fun Int.lengthInRange(value: String): Boolean = value.length < this
 
 fun Painter.zoomableContentLocation(): ZoomableContentLocation = object : ZoomableContentLocation {
     private fun Size.discardFractionalParts(): IntSize {

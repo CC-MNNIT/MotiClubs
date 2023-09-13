@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.mnnit.moticlubs.domain.util.Constants.INPUT_CHANNEL_NAME_SIZE
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
+import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
@@ -90,6 +92,7 @@ fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
                         .padding(top = 16.dp)
                         .align(Alignment.CenterHorizontally),
                     enabled = viewModel.inputChannelName.isTrimmedNotEmpty()
+                            && INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.inputChannelName)
                 ) {
                     Text(text = "Add Channel", fontSize = 14.sp)
                 }

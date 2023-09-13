@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.model.Url
+import com.mnnit.moticlubs.domain.util.Constants.INPUT_URL_SIZE
 import com.mnnit.moticlubs.ui.components.MarkdownText
 
 abstract class LinkComposeModel {
@@ -31,7 +32,7 @@ abstract class LinkComposeModel {
     abstract fun getName(): String
     fun validUrl(): Boolean {
         val url = getUrl()
-        return url.isTrimmedNotEmpty() && url.matches(Patterns.WEB_URL.toRegex())
+        return url.isTrimmedNotEmpty() && url.matches(Patterns.WEB_URL.toRegex()) && INPUT_URL_SIZE.lengthInRange(url)
     }
 }
 
