@@ -52,7 +52,10 @@ fun AboutUsScreen() {
             darkIcons = !isSystemInDarkTheme()
         )
 
-        BottomSheetScaffold(modifier = Modifier.imePadding(),
+        BottomSheetScaffold(
+            modifier = Modifier
+                .imePadding()
+                .systemBarsPadding(),
             scaffoldState = scaffoldState,
             sheetPeekHeight = 72.dp,
             sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
