@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.clubdetailscreen
+package com.mnnit.moticlubs.ui.components.channelscreen
 
 import android.util.Patterns
 import androidx.compose.foundation.background
@@ -29,7 +29,7 @@ import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun InputLinkDialog(
+fun PostInputLinkDialog(
     showDialog: MutableState<Boolean>,
     inputLinkName: MutableState<String>,
     inputLink: MutableState<String>,

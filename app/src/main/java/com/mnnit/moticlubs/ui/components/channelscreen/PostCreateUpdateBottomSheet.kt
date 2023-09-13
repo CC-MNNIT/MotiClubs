@@ -30,7 +30,6 @@ import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.postscreen.PostTextFormatter
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 import kotlinx.coroutines.launch

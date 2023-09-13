@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components.postscreen
+package com.mnnit.moticlubs.ui.components.channelscreen
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -33,8 +33,6 @@ import com.canhub.cropper.CropImageView
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.ImageUploadManager
-import com.mnnit.moticlubs.ui.components.channelscreen.PostGuidanceDialog
-import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputLinkDialog
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 
 @Composable
@@ -83,7 +81,7 @@ fun PostTextFormatter(viewModel: ChannelScreenViewModel) {
     }
 
     if (viewModel.showLinkDialog.value) {
-        InputLinkDialog(
+        PostInputLinkDialog(
             showDialog = viewModel.showLinkDialog,
             inputLinkName = viewModel.inputLinkName,
             inputLink = viewModel.inputLink,
