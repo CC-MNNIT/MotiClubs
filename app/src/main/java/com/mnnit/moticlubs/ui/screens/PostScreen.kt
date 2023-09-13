@@ -143,7 +143,7 @@ fun PostScreen(
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = 72.dp,
                 sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
-                sheetGesturesEnabled = viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed
+                sheetGesturesEnabled = false
             )
         }
     }

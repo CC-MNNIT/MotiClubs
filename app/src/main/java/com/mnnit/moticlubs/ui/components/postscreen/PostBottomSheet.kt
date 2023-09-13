@@ -122,6 +122,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                             scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse() }
                         }
                         if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                            viewModel.getReplies()
                             scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
                         }
                     }

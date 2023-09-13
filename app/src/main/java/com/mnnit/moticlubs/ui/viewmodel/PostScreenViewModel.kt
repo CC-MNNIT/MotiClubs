@@ -246,7 +246,6 @@ class PostScreenViewModel @Inject constructor(
             userId = application.getUserId()
 
             application.postRead(postModel.channelId, postId, true)
-            getReplies()
             viewPost()
             getViews()
         }
