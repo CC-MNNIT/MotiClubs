@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -295,6 +295,14 @@ fun AddMemberScreen(
                                     text = "${viewModel.selectedUserMap.size} selected",
                                     fontSize = 14.sp,
                                     color = colorScheme.primary
+                                )
+                            },
+                            trailingIcon = {
+                                Icon(
+                                    modifier = Modifier.padding(2.dp),
+                                    imageVector = Icons.Rounded.Add,
+                                    contentDescription = "",
+                                    tint = colorScheme.primary
                                 )
                             },
                             modifier = Modifier
