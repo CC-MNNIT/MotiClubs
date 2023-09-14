@@ -7,18 +7,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
+import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setUserId
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val application: Application,
+    private val repository: Repository,
 ) : ViewModel() {
 
     companion object {
@@ -63,6 +67,9 @@ class AppViewModel @Inject constructor(
     fun logoutUser() {
         FirebaseAuth.getInstance().signOut()
         application.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit().clear().apply()
+        viewModelScope.launch {
+            repository.deleteAllStamp()
+        }
     }
 
     init {

@@ -183,4 +183,8 @@ class RepositoryImpl(
     override suspend fun getStampByKey(key: String): Stamp? {
         return dao.getStampByKey(key)
     }
+
+    override suspend fun deleteAllStamp() {
+        db.withTransaction { dao.deleteAllStamp() }
+    }
 }

@@ -106,4 +106,6 @@ interface Repository {
     suspend fun insertOrUpdateStamp(stamp: Stamp)
 
     suspend fun getStampByKey(key: String): Stamp?
+
+    suspend fun deleteAllStamp()
 }

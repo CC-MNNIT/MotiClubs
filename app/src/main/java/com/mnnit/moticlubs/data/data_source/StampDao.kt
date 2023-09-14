@@ -13,4 +13,7 @@ interface StampDao {
 
     @Query("SELECT * FROM stamp where stamp.header = :key")
     suspend fun getStampByKey(key: String): Stamp?
+
+    @Query("DELETE FROM stamp")
+    suspend fun deleteAllStamp()
 }
