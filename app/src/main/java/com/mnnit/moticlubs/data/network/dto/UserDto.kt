@@ -31,6 +31,10 @@ data class UserDto(
     @SerializedName("avatar")
     @Expose
     val avatar: String = "",
+
+    @SerializedName("contact")
+    @Expose
+    val contact: String = "",
 )
 
 data class SaveUserDto(
@@ -57,12 +61,22 @@ data class SaveUserDto(
     @SerializedName("avatar")
     @Expose
     var avatar: String = "",
+
+    @SerializedName("contact")
+    @Expose
+    val contact: String = "",
 )
 
 data class UpdateUserAvatarDto(
     @SerializedName("avatar")
     @Expose
     var avatar: String,
+)
+
+data class UpdateUserContactDto(
+    @SerializedName("contact")
+    @Expose
+    var contact: String,
 )
 
 data class FCMDto(
@@ -113,4 +127,8 @@ data class AdminDetailDto(
     @SerializedName("cid")
     @Expose
     var clubId: Long,
+
+    @SerializedName("contact")
+    @Expose
+    val contact: String = "",
 )

@@ -24,7 +24,8 @@ fun UserDto.mapToDomain(): User =
         email = this.email,
         course = this.course,
         branch = this.branch,
-        avatar = this.avatar
+        avatar = this.avatar,
+        contact = this.contact,
     )
 
 fun AdminDetailDto.mapToDomain(): User =
@@ -35,7 +36,8 @@ fun AdminDetailDto.mapToDomain(): User =
         email = this.email,
         course = this.course,
         branch = this.branch,
-        avatar = this.avatar
+        avatar = this.avatar,
+        contact = this.contact,
     )
 
 fun ClubModel.mapToDomain(): Club =

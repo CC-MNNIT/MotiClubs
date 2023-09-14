@@ -43,6 +43,13 @@ interface UserApi {
         @Body avatar: UpdateUserAvatarDto,
     ): Response<UserDto?>
 
+    @POST("$USER_ROUTE/contact")
+    suspend fun setContact(
+        @Header(AUTHORIZATION_HEADER) auth: String?,
+        @Header(STAMP_HEADER) stamp: Long,
+        @Body contact: UpdateUserContactDto,
+    ): Response<UserDto?>
+
     @POST("$USER_ROUTE/fcm")
     suspend fun setFCMToken(
         @Header(AUTHORIZATION_HEADER) auth: String?,

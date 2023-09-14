@@ -30,8 +30,11 @@ data class User(
 
     @ColumnInfo(name = "avatar")
     val avatar: String,
+
+    @ColumnInfo(name = "contact")
+    val contact: String,
 ) : Parcelable {
-    constructor() : this(-1, "...", "...", "...", "...", "...", "")
+    constructor() : this(-1, "...", "...", "...", "...", "...", "", "")
     constructor(payload: Map<String, String>) : this(
         userId = payload["u_uid"]?.toLong() ?: throw Error("Invalid u_uid"),
         regNo = payload["u_regno"] ?: throw Error("Invalid u_regno"),
@@ -40,6 +43,7 @@ data class User(
         course = payload["u_course"] ?: throw Error("Invalid u_course"),
         branch = payload["u_branch"] ?: throw Error("Invalid u_branch"),
         avatar = payload["u_avatar"] ?: throw Error("Invalid u_avatar"),
+        contact = payload["u_contact"] ?: throw Error("Invalid u_contact"),
     )
 }
 
@@ -69,8 +73,11 @@ data class AdminUser(
 
     @ColumnInfo(name = "avatar")
     val avatar: String,
-) : Parcelable {
-    constructor() : this(-1, -1, "...", "...", "...", "...", "...", "")
 
-    fun getUser(): User = User(userId, regNo, name, email, course, branch, avatar)
+    @ColumnInfo(name = "contact")
+    val contact: String,
+) : Parcelable {
+    constructor() : this(-1, -1, "...", "...", "...", "...", "...", "", "")
+
+    fun getUser(): User = User(userId, regNo, name, email, course, branch, avatar, contact)
 }

@@ -69,12 +69,14 @@ class HomeScreenViewModel @Inject constructor(
     var isFetchingAdmins by mutableStateOf(false)
     var isFetchingChannels by mutableStateOf(false)
     var isFetchingClubs by mutableStateOf(false)
+    var editingEnabled = mutableStateOf(false)
 
     var showAddChannelDialog by mutableStateOf(false)
     var showProgressDialog by mutableStateOf(false)
     var progressMsg by mutableStateOf("")
 
     var eventChannel by mutableStateOf(Channel())
+    var eventContact = mutableStateOf("")
     var inputChannelName by mutableStateOf("")
     var inputChannelPrivate by mutableIntStateOf(0)
 
@@ -98,6 +100,29 @@ class HomeScreenViewModel @Inject constructor(
                 is Resource.Error -> {
                     Log.d(TAG, "updateProfilePic: ${resource.errCode}: ${resource.errMsg}")
                     onFailure()
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun updateContactInfo() {
+        val contact = eventContact.value.ifEmpty { "None" }
+
+        showProgressDialog = true
+        progressMsg = "Updating"
+        updateUserJob?.cancel()
+        updateUserJob = userUseCases.updateUser(userModel, contact).onEach { resource ->
+            when (resource) {
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    showProgressDialog = false
+                    getUser()
+                }
+
+                is Resource.Error -> {
+                    showProgressDialog = false
+                    eventContact.value = userModel.contact.ifEmpty { "None" }
+                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
                 }
             }
         }.launchIn(viewModelScope)
@@ -162,8 +187,16 @@ class HomeScreenViewModel @Inject constructor(
         getUserJob?.cancel()
         getUserJob = userUseCases.getUser(application.getUserId()).onEach { resource ->
             when (resource) {
-                is Resource.Loading -> resource.data?.let { userModel = it }
-                is Resource.Success -> userModel = resource.data
+                is Resource.Loading -> resource.data?.let {
+                    userModel = it
+                    eventContact.value = userModel.contact.ifEmpty { "None" }
+                }
+
+                is Resource.Success -> {
+                    userModel = resource.data
+                    eventContact.value = userModel.contact.ifEmpty { "None" }
+                }
+
                 is Resource.Error -> Log.d(TAG, "getUser: error: ${resource.errCode} : ${resource.errMsg}")
             }
         }.launchIn(viewModelScope)

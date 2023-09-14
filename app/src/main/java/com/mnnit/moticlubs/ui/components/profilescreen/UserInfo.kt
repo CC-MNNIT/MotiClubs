@@ -2,28 +2,46 @@ package com.mnnit.moticlubs.ui.components.profilescreen
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun UserInfo(userModel: User, modifier: Modifier = Modifier) {
+fun UserInfo(
+    userModel: User,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    contactText: MutableState<String>? = null,
+    enabled: MutableState<Boolean> = mutableStateOf(false),
+) {
     val colorScheme = getColorScheme()
+    val clipboardManager = LocalClipboardManager.current
 
     OutlinedTextField(
         modifier = modifier
@@ -100,6 +118,40 @@ fun UserInfo(userModel: User, modifier: Modifier = Modifier) {
             disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
             disabledLeadingIconColor = contentColorFor(backgroundColor = colorScheme.background)
+        )
+    )
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .padding(horizontal = 16.dp),
+        value = contactText?.value ?: userModel.contact,
+        onValueChange = { contactText?.value = it },
+        shape = RoundedCornerShape(24.dp),
+        label = { Text(text = "Contact Me") },
+        enabled = enabled.value,
+        trailingIcon = {
+            IconButton(
+                modifier = Modifier
+                    .size(42.dp)
+                    .padding(end = 1.dp),
+                onClick = {
+                    clipboardManager.setText(AnnotatedString(text = userModel.contact))
+                },
+                colors = IconButtonDefaults.filledIconButtonColors(colorScheme.primary),
+                enabled = userModel.contact.isTrimmedNotEmpty() && userModel.contact != "None"
+            ) {
+                Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = "")
+            }
+        },
+        leadingIcon = leadingIcon,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
+            disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background)
         )
     )
 }

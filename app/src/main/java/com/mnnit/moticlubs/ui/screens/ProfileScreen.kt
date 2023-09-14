@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -14,12 +15,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Logout
+import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -105,7 +109,37 @@ fun ProfileScreen(
                     userModel = viewModel.userModel,
                     size = 156.dp
                 )
-                UserInfo(userModel = viewModel.userModel, modifier = Modifier.padding(top = 56.dp))
+                UserInfo(
+                    userModel = viewModel.userModel,
+                    modifier = Modifier.padding(top = 56.dp),
+                    leadingIcon = {
+                        IconButton(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .padding(start = 1.dp),
+                            onClick = {
+                                if (viewModel.editingEnabled.value) {
+                                    viewModel.updateContactInfo()
+                                    viewModel.editingEnabled.value = false
+                                } else {
+                                    viewModel.editingEnabled.value = true
+                                }
+                            },
+                            colors = IconButtonDefaults.filledIconButtonColors(colorScheme.primary),
+                        ) {
+                            Icon(
+                                imageVector = if (viewModel.editingEnabled.value) {
+                                    Icons.Rounded.Save
+                                } else {
+                                    Icons.Rounded.Edit
+                                },
+                                contentDescription = ""
+                            )
+                        }
+                    },
+                    contactText = viewModel.eventContact,
+                    enabled = viewModel.editingEnabled,
+                )
 
                 Card(
                     modifier = Modifier
