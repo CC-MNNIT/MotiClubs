@@ -191,7 +191,7 @@ private fun Replies(
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             value = viewModel.replyMsg.value,
             onValueChange = { viewModel.replyMsg.value = it },
             shape = RoundedCornerShape(24.dp),
@@ -234,7 +234,7 @@ private fun Reply(
     ) {
         Row(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(vertical = 8.dp)
                 .fillMaxWidth()
         ) {
             ProfilePicture(
@@ -282,7 +282,9 @@ private fun Reply(
                     Text(
                         text = reply.time.toTimeString(),
                         style = MaterialTheme.typography.bodySmall,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
