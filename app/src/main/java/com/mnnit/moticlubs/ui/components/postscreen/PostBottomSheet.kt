@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -25,6 +24,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.pullrefresh.PullRefreshState
+import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -84,10 +84,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
     ) {
         Column(
             modifier = Modifier
-                .padding(
-                    top = 16.dp,
-                    start = 16.dp, end = 16.dp
-                )
+                .padding(top = 16.dp)
                 .imePadding()
                 .fillMaxWidth()
         ) {
@@ -102,7 +99,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                 Text(text = "", modifier = Modifier.padding(12.dp))
             }
 
-            Row(modifier = Modifier.padding(bottom = 12.dp)) {
+            Row(modifier = Modifier.padding(bottom = 12.dp, start = 16.dp, end = 16.dp)) {
                 Text(
                     text = "Replies",
                     fontSize = 20.sp,
@@ -122,7 +119,6 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
                             scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse() }
                         }
                         if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
-                            viewModel.getReplies()
                             scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
                         }
                     }
@@ -159,7 +155,7 @@ private fun Replies(
 ) {
     val colorScheme = getColorScheme()
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.pullRefresh(refreshState)) {
 
         PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
 
@@ -170,17 +166,15 @@ private fun Replies(
                 .animateContentSize(),
             reverseLayout = true,
         ) {
-            items(viewModel.replyList.size) {
-                if (!viewModel.userMap.containsKey(viewModel.replyList[it].userId)) {
-                    viewModel.getUser(viewModel.replyList[it].userId)
+            items(viewModel.replyList.size) { index ->
+                if (!viewModel.userMap.containsKey(viewModel.replyList[index].userId)) {
+                    viewModel.getUser(viewModel.replyList[index].userId)
                 }
 
-                Reply(viewModel, viewModel.replyList[it], colorScheme)
-            }
+                Reply(viewModel, viewModel.replyList[index], colorScheme)
 
-            item {
-                LaunchedEffect(scrollState.canScrollForward) {
-                    if (!scrollState.canScrollForward && !viewModel.loadingReplies.value && !viewModel.pageEnded) {
+                LaunchedEffect(index) {
+                    if (index == viewModel.replyList.size - 1) {
                         viewModel.getReplies(refresh = false)
                     }
                 }
@@ -191,7 +185,7 @@ private fun Replies(
             modifier = Modifier
                 .imePadding()
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(vertical = 8.dp, horizontal = 12.dp),
             value = viewModel.replyMsg.value,
             onValueChange = { viewModel.replyMsg.value = it },
             shape = RoundedCornerShape(24.dp),
@@ -220,7 +214,6 @@ private fun Reply(
 ) {
     Card(
         modifier = Modifier
-            .safeContentPadding()
             .clip(RoundedCornerShape(24.dp))
             .combinedClickable(onLongClick = {
                 if (reply.userId == viewModel.userId) {
@@ -234,7 +227,7 @@ private fun Reply(
     ) {
         Row(
             modifier = Modifier
-                .padding(vertical = 8.dp)
+                .padding(vertical = 8.dp, horizontal = 12.dp)
                 .fillMaxWidth()
         ) {
             ProfilePicture(

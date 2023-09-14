@@ -64,6 +64,7 @@ class PostScreenViewModel @Inject constructor(
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d(TAG, "onReceive: reply broadcast")
             getReplies()
         }
     }
@@ -81,8 +82,7 @@ class PostScreenViewModel @Inject constructor(
     val replyList = mutableStateListOf<Reply>()
     val replyMsg = mutableStateOf("")
 
-    var pageEnded by mutableStateOf(false)
-    private var paging by mutableStateOf(false)
+    private var pageEnded by mutableStateOf(false)
     private var replyPage = 1
 
     val showProgress = mutableStateOf(false)
@@ -126,13 +126,17 @@ class PostScreenViewModel @Inject constructor(
     }
 
     fun getReplies(refresh: Boolean = true) {
+        loadingReplies.value = true
+
         if (refresh) {
             replyPage = 1
             pageEnded = false
-            loadingReplies.value = true
-        } else {
-            if (pageEnded || paging) return
-            paging = true
+        }
+
+        if (pageEnded) {
+            Log.d(TAG, "getReplies: page ended")
+            loadingReplies.value = false
+            return
         }
 
         Log.d(TAG, "getReplies: page: $replyPage")
@@ -148,10 +152,7 @@ class PostScreenViewModel @Inject constructor(
                                 replyList.clear()
                             }
 
-                            else -> {
-                                paging = true
-                                replyList.removeIf { reply -> reply.pageNo == replyPage }
-                            }
+                            else -> replyList.removeIf { reply -> reply.pageNo == replyPage }
                         }
                         replyList.addAll(list)
                     }
@@ -168,12 +169,10 @@ class PostScreenViewModel @Inject constructor(
                     }
                     replyList.addAll(resource.data)
                     loadingReplies.value = false
-                    paging = false
                 }
 
                 is Resource.Error -> {
                     loadingReplies.value = false
-                    paging = false
                     Toast.makeText(
                         application,
                         "Error ${resource.errCode}: ${resource.errMsg}",
@@ -246,6 +245,7 @@ class PostScreenViewModel @Inject constructor(
             userId = application.getUserId()
 
             application.postRead(postModel.channelId, postId, true)
+            getReplies()
             viewPost()
             getViews()
         }
