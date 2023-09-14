@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.intl.LocaleList
@@ -122,22 +121,6 @@ fun ChannelScreen(
                                 onNavigateToPost = onNavigateToPost
                             )
 
-                            AnimatedVisibility(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                                    .weight(0.03f),
-                                visible = viewModel.paging,
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
-                                androidx.compose.material3.LinearProgressIndicator(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    strokeCap = StrokeCap.Round
-                                )
-                            }
-
                             if (viewModel.showDelPostDialog.value) {
                                 DeleteConfirmationDialog(viewModel = viewModel)
                             }
@@ -227,10 +210,9 @@ fun Posts(
                     showDelPostDialog = viewModel.showDelPostDialog,
                     onNavigateToPost
                 )
-            }
-            item {
-                LaunchedEffect(scrollState.canScrollForward) {
-                    if (!scrollState.canScrollForward && !viewModel.loadingPosts.value && !viewModel.pageEnded) {
+
+                LaunchedEffect(index) {
+                    if (index == viewModel.postsList.size - 1) {
                         viewModel.getPostsList(refresh = false)
                     }
                 }

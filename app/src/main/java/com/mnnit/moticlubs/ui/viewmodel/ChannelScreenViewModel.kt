@@ -116,8 +116,7 @@ class ChannelScreenViewModel @Inject constructor(
     val scrollValue = mutableIntStateOf(0)
     var isAdmin by mutableStateOf(false)
 
-    var pageEnded by mutableStateOf(false)
-    var paging by mutableStateOf(false)
+    private var pageEnded by mutableStateOf(false)
     private var postPage = 1
 
     private var crudPostJob: Job? = null
@@ -169,13 +168,17 @@ class ChannelScreenViewModel @Inject constructor(
     }
 
     fun getPostsList(refresh: Boolean = true) {
+        loadingPosts.value = true
+
         if (refresh) {
             postPage = 1
             pageEnded = false
-            loadingPosts.value = true
-        } else {
-            if (pageEnded || paging) return
-            paging = true
+        }
+
+        if (pageEnded) {
+            Log.d(TAG, "getPostsList: page ended")
+            loadingPosts.value = false
+            return
         }
 
         Log.d(TAG, "getPostsList: page: $postPage")
@@ -190,10 +193,7 @@ class ChannelScreenViewModel @Inject constructor(
                                 postsList.clear()
                             }
 
-                            else -> {
-                                paging = true
-                                postsList.removeIf { post -> post.pageNo == postPage }
-                            }
+                            else -> postsList.removeIf { post -> post.pageNo == postPage }
                         }
                         postsList.addAll(list)
                     }
@@ -210,12 +210,10 @@ class ChannelScreenViewModel @Inject constructor(
                     }
                     postsList.addAll(resource.data)
                     loadingPosts.value = false
-                    paging = false
                 }
 
                 is Resource.Error -> {
                     loadingPosts.value = false
-                    paging = false
                     Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
                         .show()
                 }
