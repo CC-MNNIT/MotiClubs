@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -319,13 +318,27 @@ private fun MemberList(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
         ) {
-            items(viewModel.memberList.size) {
-                val member = viewModel.memberList[it]
-                if (!viewModel.memberInfo.containsKey(member.userId)) {
-                    viewModel.getUser(member.userId)
-                }
+            if (viewModel.channelModel.private == 1) {
+                items(viewModel.memberList.size) {
+                    val member = viewModel.memberList[it]
+                    if (!viewModel.memberInfo.containsKey(member.userId)) {
+                        viewModel.getUser(member.userId)
+                    }
 
-                MemberItem(member, viewModel)
+                    MemberItem(member, viewModel)
+                }
+            } else {
+                items(viewModel.adminList.size) {
+                    val admin = viewModel.adminList[it]
+
+                    if (admin.clubId == viewModel.channelModel.clubId) {
+                        if (!viewModel.memberInfo.containsKey(admin.userId)) {
+                            viewModel.getUser(admin.userId)
+                        }
+
+                        MemberItem(Member(userId = admin.userId, channelId = admin.clubId), viewModel)
+                    }
+                }
             }
         }
     }
