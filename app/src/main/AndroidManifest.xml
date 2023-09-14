@@ -51,14 +51,14 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/round_notifications_active_24" />
+            android:resource="@drawable/app_icon" />
         <!--
  Set color used with incoming notification messages. This is used when no color is set for the incoming
              notification message. See README(https://goo.gl/6BKBk7) for more.
         -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/backGroundColor" />
+            android:resource="@color/backgroundColor" />
 
         <service
             android:name=".app.AppFCMService"
