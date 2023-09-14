@@ -52,10 +52,9 @@ object AuthHandler {
                 }
 
                 val email = signInCredential.id
-                val regNo = Constants.REG_NO_REGEX.find(email)?.value
+                val regNo = Constants.REG_NO_REGEX.find(email)?.value ?: "none"
                 val displayName = signInCredential.displayName
 
-                regNo ?: throw Exception("Unable to parse regNo for $email")
                 displayName ?: throw Exception("Unable to find display name for $email")
 
                 val course = CourseExtractor.extract(regNo)
