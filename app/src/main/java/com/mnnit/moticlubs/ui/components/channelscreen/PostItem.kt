@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.ui.components.channelscreen
 
+import android.util.Patterns
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -130,7 +131,7 @@ fun PostItem(
             }
         }
         MarkdownText(
-            markdown = post.message,
+            markdown = post.message.replace("<img src=\"${Patterns.WEB_URL.pattern()}\">".toRegex(), "_image 📸_"),
             color = contentColorFor(backgroundColor = getColorScheme().background),
             maxLines = 4,
             modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp),
