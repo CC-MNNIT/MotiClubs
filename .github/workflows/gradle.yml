@@ -9,9 +9,9 @@ name: Android Gradle Build
 
 on:
   push:
-    branches: [ "dev-stage" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "dev-stage" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
