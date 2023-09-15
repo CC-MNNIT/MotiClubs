@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mnnit.moticlubs.BuildConfig
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
@@ -105,6 +106,13 @@ fun AboutUsScreen(viewModel: AboutUsViewModel = hiltViewModel()) {
                                     text = LocalContext.current.getString(R.string.app_name),
                                     textAlign = TextAlign.Center,
                                     fontSize = 24.sp
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally),
+                                    text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 15.sp
                                 )
 
                                 DeveloperProfile(
