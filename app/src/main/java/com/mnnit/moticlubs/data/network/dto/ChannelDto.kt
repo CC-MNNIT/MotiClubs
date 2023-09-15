@@ -38,14 +38,3 @@ data class UpdateChannelDto(
     @Expose
     var private: Boolean,
 ) : Parcelable
-
-@Parcelize
-data class ChannelNavModel(
-    @SerializedName("chid")
-    @Expose
-    var channelId: Long,
-
-    @SerializedName("name")
-    @Expose
-    var name: String,
-) : Parcelable

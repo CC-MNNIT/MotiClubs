@@ -9,4 +9,11 @@ import com.mnnit.moticlubs.data.network.api.UserApi
 import com.mnnit.moticlubs.data.network.api.ViewsApi
 import com.mnnit.moticlubs.data.network.api.GithubApi
 
-interface ApiService : UserApi, ClubApi, PostsApi, ChannelsApi, UrlApi, ViewsApi, ReplyApi, GithubApi
+interface ApiService : UserApi,
+    ClubApi,
+    PostsApi,
+    ChannelsApi,
+    UrlApi,
+    ViewsApi,
+    ReplyApi,
+    GithubApi

@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: AppViewModel by viewModels()
 
+    // Notification permission activity result contract
     private val requestPermission: ActivityResultLauncher<String> = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
+        // Initialize google sign in client
         oneTapClient = Identity.getSignInClient(this)
         signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
@@ -84,10 +86,12 @@ class MainActivity : ComponentActivity() {
             )
             .build()
 
+        // Register sign in activity result launcher
         googleSignInLauncher = registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult()
         ) { result -> AuthHandler.onResult(result) }
 
+        // Notification permission required for Android Tiramisu and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             validateNotificationPermission()
         } else {

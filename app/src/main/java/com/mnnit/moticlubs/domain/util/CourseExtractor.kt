@@ -4,6 +4,7 @@ object CourseExtractor {
 
     data class Course(val stream: String, val branch: String)
 
+    // Regex for extracting course identifier from regNo
     private val COURSE_CODE_REGEX = "(?<=[0-9]{4})([0-9](?=[0-9]{3})|[a-zA-Z]+(?=[0-9]{2}))".toRegex()
     private const val UNIDENTIFIED = "N/A"
 
@@ -85,11 +86,17 @@ object CourseExtractor {
         this["RPH"] = "Ph.D. (Physics Department)"
     }
 
+    /**
+     * Extracts the [Course] by matching [COURSE_CODE_REGEX] to param [regNo]
+     */
     fun extract(regNo: String): Course = COURSE_CODE_REGEX
         .find(regNo.uppercase())
         .let { match ->
-            match ?: return Course(UNIDENTIFIED, "")
-            Course(getStream(match.value), COURSE_MAP.getOrDefault(match.value, UNIDENTIFIED))
+            match ?: return Course(stream = UNIDENTIFIED, branch = "")
+            Course(
+                stream = getStream(courseCode = match.value),
+                branch = COURSE_MAP.getOrDefault(match.value, UNIDENTIFIED)
+            )
         }
 
     private fun getStream(courseCode: String): String = when (courseCode[0]) {

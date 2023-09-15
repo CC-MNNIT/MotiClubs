@@ -14,11 +14,20 @@ object AuthHandler {
 
     private var callback: (result: ActivityResult) -> Unit = {}
 
+    /**
+     * IMPORTANT: This function needs to be called in the result of [ActivityResultContracts.StartIntentSenderForResult]
+     */
     fun onResult(result: ActivityResult) {
         callback(result)
         callback = {}
     }
 
+    /**
+     * Initiates one tap google sign in.
+     *
+     * @param onSuccess is the function to be executed when the sign in is successful
+     * @param onFailure is the function that allows user to handle UI upon error
+     */
     fun oneTapGoogleSignIn(
         oneTapClient: SignInClient,
         signInRequest: BeginSignInRequest,

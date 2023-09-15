@@ -62,6 +62,9 @@ class AppFCMService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "onNewToken")
+
+        // Attempt to upload firebase messaging token
+        // Result doesn't matter
         CoroutineScope(Dispatchers.IO).launch {
             val response = apiService.setFCMToken(getAuthToken(), FCMTokenDto(token))
 
@@ -233,6 +236,8 @@ class AppFCMService : FirebaseMessagingService() {
         )
     }
 
+    // ========================= NOTIFICATION HELPER ===========================
+
     private fun notificationCompat(
         notificationStamp: Long,
         channelId: String,
@@ -244,8 +249,13 @@ class AppFCMService : FirebaseMessagingService() {
         url: String,
         pendingIntent: PendingIntent?
     ) {
+
+        // Create notification group for club
         notificationManager.createNotificationChannelGroup(NotificationChannelGroup(clubId, clubName))
 
+        // Create notification channel in the club group
+        // This can allow users to disable either notifications from club
+        // or only specific channels
         notificationManager.createNotificationChannel(
             NotificationChannel(
                 channelId,
@@ -282,6 +292,9 @@ class AppFCMService : FirebaseMessagingService() {
         notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
     }
 
+    /**
+     * @return [PendingIntent] with app url to navigate to the post screen with [postId]
+     */
     private fun getPendingIntent(postId: Long) = TaskStackBuilder.create(this).run {
         addNextIntentWithParentStack(
             Intent(
@@ -294,6 +307,12 @@ class AppFCMService : FirebaseMessagingService() {
 
     private fun Long.toNotificationID(): Int = (this % 1000000L).toInt()
 
+    /**
+     * Executed before posting notification
+     * - Inserts the entities from notification payload so that user can view the post
+     * without fetching in the app
+     * - Send broadcast for [Constants.POST_BROADCAST_ACTION] if app is foreground with registered receiver
+     */
     private fun prePost(
         post: Post,
         channel: Channel,
@@ -311,6 +330,12 @@ class AppFCMService : FirebaseMessagingService() {
         }
     }
 
+    /**
+     * Executed before posting notification
+     * - Inserts the entities from notification payload so that user can view the post or reply
+     * without fetching in the app
+     * - Send broadcast for [Constants.REPLY_BROADCAST_ACTION] if app is foreground with registered receiver
+     */
     private fun preReply(
         post: Post,
         channel: Channel,

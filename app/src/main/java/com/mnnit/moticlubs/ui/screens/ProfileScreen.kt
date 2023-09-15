@@ -41,6 +41,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
@@ -126,6 +128,7 @@ fun ProfileScreen(
                                 }
                             },
                             colors = IconButtonDefaults.filledIconButtonColors(colorScheme.primary),
+                            enabled = Constants.INPUT_USER_CONTACT_SIZE.lengthInRange(viewModel.eventContact.value)
                         ) {
                             Icon(
                                 imageVector = if (viewModel.editingEnabled.value) {

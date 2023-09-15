@@ -12,6 +12,11 @@ import java.io.ByteArrayOutputStream
 
 object ImageUploadManager {
 
+    /**
+     * Uploads the given [imageUri] to Firebase [storageRef]
+     *
+     * @param onSuccess allows caller to handle the downloadUrl upon upload
+     */
     fun uploadImageToFirebase(
         context: Context,
         imageUri: Uri,

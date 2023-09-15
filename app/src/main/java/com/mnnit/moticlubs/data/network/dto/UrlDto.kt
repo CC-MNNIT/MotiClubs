@@ -1,9 +1,7 @@
 package com.mnnit.moticlubs.data.network.dto
 
-import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
 data class UrlResponseModel(
     @SerializedName("urlId")
@@ -50,8 +48,3 @@ data class UrlModel(
     @Expose
     var url: String,
 )
-
-@Parcelize
-data class ImageUrl(
-    val imageUrl: String
-) : Parcelable
