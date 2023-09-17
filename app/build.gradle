@@ -7,6 +7,12 @@ plugins {
     id 'com.google.firebase.crashlytics'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
+    id 'org.jlleitschuh.gradle.ktlint'
+}
+
+ktlint {
+    android.set(true)
+    outputColorName.set("RED")
 }
 
 android {
@@ -38,12 +44,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = '17'
-        freeCompilerArgs += "-opt-in=com.google.accompanist.pager.ExperimentalPagerApi"
         freeCompilerArgs += "-opt-in=androidx.compose.animation.ExperimentalAnimationApi"
         freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
         freeCompilerArgs += "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi"
         freeCompilerArgs += "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi"
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
     buildFeatures {
         compose true
@@ -56,6 +60,9 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 dependencies {
@@ -65,6 +72,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core-splashscreen:1.0.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
 
     implementation 'androidx.compose.compiler:compiler:1.5.1'
     implementation 'androidx.compose.ui:ui:1.5.0'
@@ -118,6 +126,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:21.1.1'
     implementation 'com.google.firebase:firebase-auth:21.3.0'
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
+
+    lintChecks "com.slack.lint.compose:compose-lint-checks:1.2.0"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
