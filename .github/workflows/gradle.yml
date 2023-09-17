@@ -28,6 +28,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: gradle
     - name: Get secret
       env:
         JSON: ${{ secrets.JSON_PASS }}
