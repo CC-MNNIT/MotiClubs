@@ -144,22 +144,25 @@ fun PostCreateUpdateBottomSheet(
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(onClick = {
-                    keyboardController?.hide()
-                    focusManager.clearFocus()
+                IconButton(
+                    onClick = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
 
-                    if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
-                        viewModel.showClearDraftDialog.value = true
-                        return@IconButton
-                    }
-
-                    viewModel.clearEditor()
-                    scope.launch {
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                        if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
+                            viewModel.showClearDraftDialog.value = true
+                            return@IconButton
                         }
-                    }
-                }, modifier = Modifier.align(Alignment.CenterVertically),) {
+
+                        viewModel.clearEditor()
+                        scope.launch {
+                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                            }
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                ) {
                     Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
                 }
             }
@@ -309,7 +312,7 @@ fun PostCreateUpdateBottomSheet(
                         shape = RoundedCornerShape(24.dp),
                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
                         enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
-                            viewModel.postLengthInRange(),
+                                viewModel.postLengthInRange(),
                     )
                 }
             }

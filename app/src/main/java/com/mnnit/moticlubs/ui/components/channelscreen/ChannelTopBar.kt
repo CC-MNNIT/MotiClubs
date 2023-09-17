@@ -101,11 +101,11 @@ fun ChannelTopBar(
                 // Number of members
                 Text(
                     text = "${viewModel.clubModel.name} - ${
-                    if (viewModel.memberCount.intValue == -1) {
-                        "General"
-                    } else {
-                        "${viewModel.memberCount.intValue} members"
-                    }
+                        if (viewModel.memberCount.intValue == -1) {
+                            "General"
+                        } else {
+                            "${viewModel.memberCount.intValue} members"
+                        }
                     }",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

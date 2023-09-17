@@ -217,12 +217,15 @@ private fun Reply(
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
-            .combinedClickable(onLongClick = {
-                if (reply.userId == viewModel.userId) {
-                    viewModel.replyDeleteItem.value = reply
-                    viewModel.showConfirmationDeleteDialog.value = true
-                }
-            }, onClick = {},),
+            .combinedClickable(
+                onLongClick = {
+                    if (reply.userId == viewModel.userId) {
+                        viewModel.replyDeleteItem.value = reply
+                        viewModel.showConfirmationDeleteDialog.value = true
+                    }
+                },
+                onClick = {},
+            ),
         elevation = CardDefaults.cardElevation(0.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),

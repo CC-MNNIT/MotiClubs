@@ -103,28 +103,28 @@ fun HomeScreen(
                         .pullRefresh(
                             state = refreshState,
                             enabled = !viewModel.isFetchingAdmins &&
-                                !viewModel.isFetchingChannels &&
-                                !viewModel.isFetchingClubs,
+                                    !viewModel.isFetchingChannels &&
+                                    !viewModel.isFetchingClubs,
                         ),
                 ) {
                     PullDownProgressIndicator(
                         visible = viewModel.isFetchingAdmins ||
-                            viewModel.isFetchingChannels ||
-                            viewModel.isFetchingClubs,
+                                viewModel.isFetchingChannels ||
+                                viewModel.isFetchingClubs,
                         refreshState = refreshState,
                     )
 
                     AnimatedVisibility(
                         visible = viewModel.clubsList.value.isEmpty() && !viewModel.isFetchingAdmins &&
-                            !viewModel.isFetchingChannels &&
-                            !viewModel.isFetchingClubs,
+                                !viewModel.isFetchingChannels &&
+                                !viewModel.isFetchingClubs,
                         modifier = Modifier
                             .fillMaxSize()
                             .pullRefresh(
                                 state = refreshState,
                                 enabled = !viewModel.isFetchingAdmins &&
-                                    !viewModel.isFetchingChannels &&
-                                    !viewModel.isFetchingClubs,
+                                        !viewModel.isFetchingChannels &&
+                                        !viewModel.isFetchingClubs,
                             )
                             .verticalScroll(rememberScrollState()),
                     ) {

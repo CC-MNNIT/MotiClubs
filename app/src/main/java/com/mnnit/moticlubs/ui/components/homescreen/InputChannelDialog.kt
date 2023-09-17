@@ -96,7 +96,7 @@ fun InputChannelDialog(
                         .padding(top = 16.dp)
                         .align(Alignment.CenterHorizontally),
                     enabled = viewModel.inputChannelName.isTrimmedNotEmpty() &&
-                        INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.inputChannelName),
+                            INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.inputChannelName),
                 ) {
                     Text(text = "Add Channel", fontSize = 14.sp)
                 }

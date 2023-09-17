@@ -110,9 +110,12 @@ fun ClubList(
                         ),
                         modifier = Modifier.align(Alignment.CenterVertically),
                     ) {
-                        BadgedBox(badge = {
-                            Badge { Text(text = " ") }
-                        }, modifier = Modifier.align(Alignment.CenterVertically),) {}
+                        BadgedBox(
+                            badge = {
+                                Badge { Text(text = " ") }
+                            },
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                        ) {}
                     }
                     Spacer(modifier = Modifier.padding(8.dp))
                 }
