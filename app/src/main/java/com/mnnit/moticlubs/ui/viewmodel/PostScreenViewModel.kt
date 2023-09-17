@@ -16,9 +16,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
 import androidx.lifecycle.SavedStateHandle
@@ -40,7 +37,12 @@ import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
+import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.postRead
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateMapOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -72,29 +74,29 @@ class PostScreenViewModel @Inject constructor(
     val postId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.POST_ARG))
     var userId by mutableLongStateOf(-1)
 
-    var postModel by mutableStateOf(Post())
-    var channelModel by mutableStateOf(Channel())
-    var clubModel by mutableStateOf(Club())
-    var userModel by mutableStateOf(User())
+    var postModel by publishedStateOf(Post())
+    var channelModel by publishedStateOf(Channel())
+    var clubModel by publishedStateOf(Club())
+    var userModel by publishedStateOf(User())
 
-    val userMap = mutableStateMapOf<Long, User>()
-    var viewCount by mutableStateOf("-")
-    val replyList = mutableStateListOf<Reply>()
-    val replyMsg = mutableStateOf("")
+    val userMap = publishedStateMapOf<Long, User>()
+    var viewCount by publishedStateOf("-")
+    val replyList = publishedStateListOf<Reply>()
+    val replyMsg = publishedStateOf("")
 
-    private var pageEnded by mutableStateOf(false)
+    private var pageEnded by publishedStateOf(false)
     private var replyPage = 1
 
-    val showProgress = mutableStateOf(false)
-    val loadingReplies = mutableStateOf(false)
-    val showDialog = mutableStateOf(false)
+    val showProgress = publishedStateOf(false)
+    val loadingReplies = publishedStateOf(false)
+    val showDialog = publishedStateOf(false)
 
-    val showDeleteDialog = mutableStateOf(false)
-    val showConfirmationDeleteDialog = mutableStateOf(false)
-    val replyDeleteItem = mutableStateOf(Reply())
+    val showDeleteDialog = publishedStateOf(false)
+    val showConfirmationDeleteDialog = publishedStateOf(false)
+    val replyDeleteItem = publishedStateOf(Reply())
 
     @OptIn(ExperimentalMaterialApi::class)
-    val bottomSheetScaffoldState = mutableStateOf(
+    val bottomSheetScaffoldState = publishedStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
             bottomSheetState = BottomSheetState(
@@ -112,11 +114,11 @@ class PostScreenViewModel @Inject constructor(
     private var viewPostJob: Job? = null
 
     fun getUser(userId: Long) {
-        userMap[userId] = User()
+        userMap.value[userId] = User()
         userUseCases.getUser(userId).onEach { resource ->
             when (resource) {
-                is Resource.Loading -> resource.data?.let { user -> userMap[user.userId] = user }
-                is Resource.Success -> userMap[resource.data.userId] = resource.data
+                is Resource.Loading -> resource.data?.let { user -> userMap.value[user.userId] = user }
+                is Resource.Success -> userMap.value[resource.data.userId] = resource.data
 
                 is Resource.Error -> {
                     Log.d(TAG, "getUser: error fetching $userId; ${resource.errCode}: ${resource.errMsg}")
@@ -149,25 +151,25 @@ class PostScreenViewModel @Inject constructor(
                         when (refresh) {
                             true -> {
                                 loadingReplies.value = true
-                                replyList.clear()
+                                replyList.value.clear()
                             }
 
-                            else -> replyList.removeIf { reply -> reply.pageNo == replyPage }
+                            else -> replyList.value.removeIf { reply -> reply.pageNo == replyPage }
                         }
-                        replyList.addAll(list)
+                        replyList.value.addAll(list)
                     }
                 }
 
                 is Resource.Success -> {
                     when (refresh) {
-                        true -> replyList.clear()
-                        else -> replyList.removeIf { reply -> reply.pageNo == replyPage }
+                        true -> replyList.value.clear()
+                        else -> replyList.value.removeIf { reply -> reply.pageNo == replyPage }
                     }
                     when (resource.data.isEmpty()) {
                         true -> pageEnded = true
                         else -> replyPage++
                     }
-                    replyList.addAll(resource.data)
+                    replyList.value.addAll(resource.data)
                     loadingReplies.value = false
                 }
 
@@ -223,7 +225,7 @@ class PostScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     Toast.makeText(application, "Reply deleted", Toast.LENGTH_SHORT).show()
 
-                    replyList.removeIf { it.time == replyDeleteItem.value.time }
+                    replyList.value.removeIf { it.time == replyDeleteItem.value.time }
                     showDeleteDialog.value = false
                     replyDeleteItem.value = Reply()
                 }

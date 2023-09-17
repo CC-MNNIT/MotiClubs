@@ -31,7 +31,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.lengthInRange
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
@@ -61,19 +61,20 @@ fun ProfileScreen(
     appViewModel: AppViewModel,
     viewModel: HomeScreenViewModel,
     onNavigationLogout: () -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     val scrollState = rememberScrollState()
-    val showDialog = remember { mutableStateOf(false) }
-    val loading = remember { mutableStateOf(false) }
+    val showDialog = remember { publishedStateOf(false) }
+    val loading = remember { publishedStateOf(false) }
 
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
     MotiClubsTheme(getColorScheme()) {
         SetTransparentSystemBars()
-        Surface(modifier = Modifier.fillMaxWidth()) {
+        Surface(modifier = modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,10 +99,10 @@ fun ProfileScreen(
                     actions = {
                         UpdateProfileIcon(
                             appViewModel = viewModel,
+                            loading = loading,
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
-                                .padding(end = 16.dp),
-                            loading
+                                .padding(end = 16.dp)
                         )
                     }
                 )

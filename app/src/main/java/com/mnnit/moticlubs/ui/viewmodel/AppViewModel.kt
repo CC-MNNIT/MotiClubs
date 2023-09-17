@@ -3,9 +3,6 @@ package com.mnnit.moticlubs.ui.viewmodel
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -13,8 +10,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.internal.InternalTokenResult
 import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setUserId
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,9 +29,9 @@ class AppViewModel @Inject constructor(
         private const val TAG = "AppViewModel"
     }
 
-    var showErrorScreen by mutableStateOf(false)
-    var fetchingState by mutableStateOf(false)
-    var showSplashScreen by mutableStateOf(true)
+    var showErrorScreen by publishedStateOf(false)
+    var fetchingState by publishedStateOf(false)
+    var showSplashScreen by publishedStateOf(true)
 
     fun getUser(
         firebaseUser: FirebaseUser?,

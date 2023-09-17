@@ -14,8 +14,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
@@ -23,32 +21,34 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.PublishedList
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.ui.theme.textColorFor
 
 @Composable
 fun OtherLinkItem(
-    modifier: Modifier = Modifier,
     idx: Int,
-    linksList: SnapshotStateList<OtherLinkComposeModel>,
-    refIdx: MutableState<Int>,
-    showColorPalette: MutableState<Boolean>,
+    linksList: PublishedList<OtherLinkComposeModel>,
+    refIdx: PublishedState<Int>,
+    showColorPalette: PublishedState<Boolean>,
+    modifier: Modifier = Modifier,
     onDeleteItem: (idx: Int) -> Unit = {}
 ) {
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
-            value = linksList[idx].fieldValue.value,
+            value = linksList.value[idx].fieldValue.value,
             onValueChange = {
                 val str = it.text
                 if (!str.contains("\\")) {
                     val tr = it.selection
                     val subStr = str.substring(tr.start, tr.end)
 
-                    linksList[idx].fieldValue.value = TextFieldValue(
+                    linksList.value[idx].fieldValue.value = TextFieldValue(
                         str.replaceRange(tr.start, tr.end, "\\$subStr"),
                         selection = TextRange(tr.end + 1, tr.end + 1)
                     )
                 } else {
-                    linksList[idx].fieldValue.value = it
+                    linksList.value[idx].fieldValue.value = it
                 }
             },
             modifier = Modifier
@@ -66,12 +66,12 @@ fun OtherLinkItem(
                         refIdx.value = idx
                         showColorPalette.value = true
                     },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = linksList[idx].color.value)
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = linksList.value[idx].color.value)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.ColorLens,
                         contentDescription = null,
-                        tint = textColorFor(color = linksList[idx].color.value)
+                        tint = textColorFor(color = linksList.value[idx].color.value)
                     )
                 }
             },
@@ -79,7 +79,7 @@ fun OtherLinkItem(
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterVertically),
                     onClick = {
-                        linksList.removeAt(idx)
+                        linksList.value.removeAt(idx)
                         onDeleteItem(idx)
                     }
                 ) {
@@ -87,7 +87,7 @@ fun OtherLinkItem(
                 }
             },
             singleLine = true,
-            isError = !linksList[idx].validUrl(),
+            isError = !linksList.value[idx].validUrl(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
         )
     }

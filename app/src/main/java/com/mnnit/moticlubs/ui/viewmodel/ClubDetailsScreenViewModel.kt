@@ -4,10 +4,7 @@ import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
@@ -26,6 +23,10 @@ import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
+import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -49,29 +50,29 @@ class ClubDetailsScreenViewModel @Inject constructor(
     val clubId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.CLUB_ARG))
     var userId by mutableLongStateOf(-1)
 
-    var clubModel by mutableStateOf(Club())
+    var clubModel by publishedStateOf(Club())
 
-    var isAdmin by mutableStateOf(false)
+    var isAdmin by publishedStateOf(false)
 
-    var isFetching by mutableStateOf(false)
-    var progressMsg by mutableStateOf("")
+    var isFetching by publishedStateOf(false)
+    var progressMsg by publishedStateOf("")
 
-    var editDescriptionMode by mutableStateOf(false)
-    var displayedDescription by mutableStateOf("...")
+    var editDescriptionMode by publishedStateOf(false)
+    var displayedDescription by publishedStateOf("...")
 
-    val showSocialLinkDialog = mutableStateOf(false)
-    val showOtherLinkDialog = mutableStateOf(false)
-    val showProgressDialog = mutableStateOf(false)
-    val showColorPaletteDialog = mutableStateOf(false)
+    val showSocialLinkDialog = publishedStateOf(false)
+    val showOtherLinkDialog = publishedStateOf(false)
+    val showProgressDialog = publishedStateOf(false)
+    val showColorPaletteDialog = publishedStateOf(false)
 
-    val otherLinks = mutableStateListOf<Url>()
-    val otherLinksLiveList = mutableStateListOf<OtherLinkComposeModel>()
-    val otherLinkIdx = mutableIntStateOf(0)
+    val otherLinks = publishedStateListOf<Url>()
+    val otherLinksLiveList = publishedStateListOf<OtherLinkComposeModel>()
+    val otherLinkIdx = publishedStateOf(0)
 
-    val socialLinksLiveList = mutableStateListOf(
+    val socialLinksLiveList = publishedStateListOf(
         SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel()
     )
-    val socialLinks = mutableStateListOf(Url(), Url(), Url(), Url())
+    val socialLinks = publishedStateListOf(Url(), Url(), Url(), Url())
 
     private var getUrlsJob: Job? = null
     private var addUrlsJob: Job? = null
@@ -201,32 +202,32 @@ class ClubDetailsScreenViewModel @Inject constructor(
     }
 
     private fun mapUrlList(urls: List<Url>) {
-        socialLinks[0] = urls.findLast {
+        socialLinks.value[0] = urls.findLast {
             it.name.toLowerCase(LocaleList.current).contains("facebook")
         } ?: Url()
-        socialLinks[1] = urls.findLast {
+        socialLinks.value[1] = urls.findLast {
             it.name.toLowerCase(LocaleList.current).contains("instagram")
         } ?: Url()
-        socialLinks[2] = urls.findLast {
+        socialLinks.value[2] = urls.findLast {
             it.name.toLowerCase(LocaleList.current).contains("twitter")
         } ?: Url()
-        socialLinks[3] = urls.findLast {
+        socialLinks.value[3] = urls.findLast {
             it.name.toLowerCase(LocaleList.current).contains("github")
         } ?: Url()
 
-        for (i in socialLinks.indices) {
-            socialLinksLiveList[i] = socialLinks[i].mapToSocialLinkModel().apply {
+        for (i in socialLinks.value.indices) {
+            socialLinksLiveList.value[i] = socialLinks.value[i].mapToSocialLinkModel().apply {
                 this.urlName = SocialLinkComposeModel.socialLinkNames[i]
                 this.clubID = clubId
             }
         }
 
-        otherLinks.clear()
-        otherLinks.addAll(urls.filter { f ->
+        otherLinks.value.clear()
+        otherLinks.value.addAll(urls.filter { f ->
             !SocialLinkComposeModel.socialLinkNames.any { s -> f.name.contains(s) }
         })
-        otherLinksLiveList.clear()
-        otherLinksLiveList.addAll(otherLinks.map { m -> m.mapToOtherLinkModel() })
+        otherLinksLiveList.value.clear()
+        otherLinksLiveList.value.addAll(otherLinks.value.map { m -> m.mapToOtherLinkModel() })
     }
 
     init {

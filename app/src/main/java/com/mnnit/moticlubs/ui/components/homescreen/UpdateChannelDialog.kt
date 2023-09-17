@@ -19,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,14 +32,20 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_CHANNEL_NAME_SIZE
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.lengthInRange
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelDetailScreenViewModel
 
 @Composable
-fun UpdateChannelDialog(viewModel: ChannelDetailScreenViewModel, onUpdate: () -> Unit, onDelete: () -> Unit) {
+fun UpdateChannelDialog(
+    viewModel: ChannelDetailScreenViewModel,
+    onUpdate: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val colorScheme = getColorScheme()
-    val showConfirmation = remember { mutableStateOf(false) }
+    val showConfirmation = remember { publishedStateOf(false) }
 
     if (showConfirmation.value) {
         ConfirmationDialog(
@@ -56,7 +61,7 @@ fun UpdateChannelDialog(viewModel: ChannelDetailScreenViewModel, onUpdate: () ->
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.9f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))

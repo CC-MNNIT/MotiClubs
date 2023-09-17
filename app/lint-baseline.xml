@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<lint>
+    <!--    <issue id="ComposeMultipleContentEmitters">-->
+    <!--        <option name="allowed-composition-locals" value="CustomEmitter,AnotherEmitter" />-->
+    <!--    </issue>-->
+    <!--    <issue id="ComposeModifierMissing">-->
+    <!--        <option name="visibility-threshold" value="only_public" />-->
+    <!--    </issue>-->
+</lint>

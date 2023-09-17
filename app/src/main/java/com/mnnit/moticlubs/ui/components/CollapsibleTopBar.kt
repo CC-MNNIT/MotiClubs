@@ -92,7 +92,6 @@ fun CollapsibleTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TwoRowsTopAppBar(
-    modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     titleTextStyle: TextStyle,
     titleBottomPadding: Dp,
@@ -103,7 +102,8 @@ private fun TwoRowsTopAppBar(
     windowInsets: WindowInsets,
     maxHeight: Dp,
     pinnedHeight: Dp,
-    scrollBehavior: TopAppBarScrollBehavior?
+    scrollBehavior: TopAppBarScrollBehavior?,
+    modifier: Modifier = Modifier,
 ) {
     if (maxHeight <= pinnedHeight) {
         throw IllegalArgumentException(
@@ -226,7 +226,6 @@ private fun TwoRowsTopAppBar(
 
 @Composable
 private fun TopAppBarLayout(
-    modifier: Modifier,
     heightPx: Float,
     navigationIconContentColor: Color,
     titleContentColor: Color,
@@ -240,6 +239,7 @@ private fun TopAppBarLayout(
     hideTitleSemantics: Boolean,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Layout(
         {

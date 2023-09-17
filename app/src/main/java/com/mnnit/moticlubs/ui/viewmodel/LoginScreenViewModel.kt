@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthCredential
@@ -19,6 +18,7 @@ import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.ResponseStamp
 import com.mnnit.moticlubs.domain.util.apiInvoker
 import com.mnnit.moticlubs.domain.util.getAuthToken
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ class LoginScreenViewModel @Inject constructor(
         private const val TAG = "LoginScreenViewModel"
     }
 
-    val isLoading = mutableStateOf(false)
+    val isLoading = publishedStateOf(false)
 
     private fun setFCMToken(token: String, onSuccess: () -> Unit, onFailure: (code: Int) -> Unit) {
         viewModelScope.launch {

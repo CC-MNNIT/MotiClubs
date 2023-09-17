@@ -11,7 +11,6 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +23,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.util.PublishedMap
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.getUnreadPost
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
@@ -34,23 +35,24 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostItem(
-    bottomSheetScaffoldState: MutableState<BottomSheetScaffoldState>,
+    bottomSheetScaffoldState: PublishedState<BottomSheetScaffoldState>,
     channelModel: Channel,
     post: Post,
     userId: Long,
     admin: AdminUser,
-    editMode: MutableState<Boolean>,
-    eventUpdatePost: MutableState<Post>,
-    postMsg: MutableState<TextFieldValue>,
-    imageReplacerMap: MutableMap<String, String>,
-    eventDeletePost: MutableState<Post>,
-    showDelPostDialog: MutableState<Boolean>,
-    onNavigateToPost: (postId: Long) -> Unit
+    editMode: PublishedState<Boolean>,
+    eventUpdatePost: PublishedState<Post>,
+    postMsg: PublishedState<TextFieldValue>,
+    imageReplacerMap: PublishedMap<String, String>,
+    eventDeletePost: PublishedState<Post>,
+    showDelPostDialog: PublishedState<Boolean>,
+    onNavigateToPost: (postId: Long) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 24.dp), elevation = CardDefaults.cardElevation(0.dp),
@@ -94,11 +96,11 @@ fun PostItem(
                         editMode.value = true
 
                         var preprocessText = post.message
-                        imageReplacerMap.clear()
+                        imageReplacerMap.value.clear()
                         post.message.lines().forEach {
                             if (it.startsWith("<img src")) {
-                                val key = "[image_${imageReplacerMap.size}]"
-                                imageReplacerMap[key] = it
+                                val key = "[image_${imageReplacerMap.value.size}]"
+                                imageReplacerMap.value[key] = it
                                 preprocessText = preprocessText.replace(it, key)
                             }
                         }

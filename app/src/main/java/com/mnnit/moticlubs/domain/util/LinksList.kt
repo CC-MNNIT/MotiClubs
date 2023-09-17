@@ -2,6 +2,7 @@ package com.mnnit.moticlubs.domain.util
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,9 +39,9 @@ data class SocialLinkComposeModel(
     val urlID: Long = -1L,
     var clubID: Long,
     var urlName: String,
-    val urlFieldValue: MutableState<TextFieldValue>,
-    val colorCode: MutableState<String>,
-    val color: MutableState<Color>,
+    val urlFieldValue: PublishedState<TextFieldValue>,
+    val colorCode: PublishedState<String>,
+    val color: PublishedState<Color>,
 ) : LinkComposeModel() {
 
     companion object {
@@ -54,9 +53,9 @@ data class SocialLinkComposeModel(
         -1,
         -1,
         "",
-        mutableStateOf(TextFieldValue("")),
-        mutableStateOf(""),
-        mutableStateOf(Color.White)
+        publishedStateOf(TextFieldValue("")),
+        publishedStateOf(""),
+        publishedStateOf(Color.White)
     )
 
     fun mapToUrlModel(): UrlModel {
@@ -76,17 +75,17 @@ data class SocialLinkComposeModel(
 data class OtherLinkComposeModel(
     val urlID: Long = -1L,
     val clubID: Long,
-    val fieldValue: MutableState<TextFieldValue>,
-    val colorCode: MutableState<String>,
-    val color: MutableState<Color>,
+    val fieldValue: PublishedState<TextFieldValue>,
+    val colorCode: PublishedState<String>,
+    val color: PublishedState<Color>,
 ) : LinkComposeModel() {
 
     constructor() : this(
         -1,
         -1,
-        mutableStateOf(TextFieldValue("\\")),
-        mutableStateOf("FFFFFF"),
-        mutableStateOf(Color.White)
+        publishedStateOf(TextFieldValue("\\")),
+        publishedStateOf("FFFFFF"),
+        publishedStateOf(Color.White)
     )
 
     fun mapToUrlModel(): UrlModel {
@@ -110,22 +109,30 @@ fun List<Url>.toStringBadges(): String {
 }
 
 @Composable
-fun Links(isAdmin: Boolean, linksHeader: String, links: List<Url>, onClick: () -> Unit = {}) {
-    Text(modifier = Modifier.padding(top = 16.dp), text = linksHeader, fontSize = 13.sp)
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-        MarkdownText(
-            markdown = links.toStringBadges(),
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .fillMaxWidth(if (isAdmin) 0.8f else 1f)
-        )
-        if (isAdmin) {
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                onClick = { onClick() },
-                modifier = Modifier.align(Alignment.Top)
-            ) {
-                Icon(imageVector = Icons.Rounded.Edit, contentDescription = "")
+fun Links(
+    isAdmin: Boolean,
+    linksHeader: String,
+    links: PublishedList<Url>,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(modifier = Modifier.padding(top = 16.dp), text = linksHeader, fontSize = 13.sp)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            MarkdownText(
+                markdown = links.value.filter { f -> f.name.isTrimmedNotEmpty() }.toStringBadges(),
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .fillMaxWidth(if (isAdmin) 0.8f else 1f)
+            )
+            if (isAdmin) {
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = { onClick() },
+                    modifier = Modifier.align(Alignment.Top)
+                ) {
+                    Icon(imageVector = Icons.Rounded.Edit, contentDescription = "")
+                }
             }
         }
     }

@@ -36,6 +36,7 @@ fun HomeScreen(
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateContactUs: () -> Unit,
     onNavigateProfile: (viewModel: HomeScreenViewModel) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val colorScheme = getColorScheme()
@@ -55,7 +56,7 @@ fun HomeScreen(
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 
         Scaffold(
-            modifier = Modifier
+            modifier = modifier
                 .statusBarsPadding()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -80,7 +81,7 @@ fun HomeScreen(
                 }
 
                 if (viewModel.showAddChannelDialog) {
-                    InputChannelDialog(viewModel = viewModel) { viewModel.addChannel() }
+                    InputChannelDialog(viewModel = viewModel, onClick = { viewModel.addChannel() })
                 }
 
                 Column(
@@ -102,7 +103,7 @@ fun HomeScreen(
                     )
 
                     AnimatedVisibility(
-                        visible = viewModel.clubsList.isEmpty() && !viewModel.isFetchingAdmins
+                        visible = viewModel.clubsList.value.isEmpty() && !viewModel.isFetchingAdmins
                                 && !viewModel.isFetchingChannels
                                 && !viewModel.isFetchingClubs,
                         modifier = Modifier

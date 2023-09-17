@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,10 +34,10 @@ import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 @Composable
 fun ChannelTopBar(
     viewModel: ChannelScreenViewModel,
-    modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateToChannelDetails: (channelId: Long) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
 

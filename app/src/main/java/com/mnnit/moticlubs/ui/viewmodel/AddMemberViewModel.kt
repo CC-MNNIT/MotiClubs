@@ -4,10 +4,6 @@ import android.app.Application
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +17,12 @@ import com.mnnit.moticlubs.domain.use_case.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
+import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateMapOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -40,8 +41,8 @@ class AddMemberViewModel @Inject constructor(
 
     val channelId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.CHANNEL_ARG))
 
-    var channelModel by mutableStateOf(Channel())
-    var clubModel by mutableStateOf(Club())
+    var channelModel by publishedStateOf(Channel())
+    var clubModel by publishedStateOf(Club())
 
     val courseList = listOf("B.Tech.", "M.Tech.", "M.Sc.", "MBA", "MCA", "Ph.D.")
     val branchMap = mapOf(
@@ -123,22 +124,22 @@ class AddMemberViewModel @Inject constructor(
         ),
     )
 
-    val selectedUserMap = mutableStateMapOf<Long, User>()
-    val searchUserList = mutableStateListOf<User>()
-    private val allUserList = mutableStateListOf<User>()
+    val selectedUserMap = publishedStateMapOf<Long, User>()
+    val searchUserList = publishedStateListOf<User>()
+    private val allUserList = publishedStateListOf<User>()
 
-    private val memberList = mutableStateListOf<Member>()
+    private val memberList = publishedStateListOf<Member>()
 
-    val searchName = mutableStateOf("")
-    val searchRegNo = mutableStateOf("")
-    val searchCourse = mutableStateOf("")
-    val searchBranch = mutableStateOf("")
+    val searchName = publishedStateOf("")
+    val searchRegNo = publishedStateOf("")
+    val searchCourse = publishedStateOf("")
+    val searchBranch = publishedStateOf("")
 
-    var isFetching by mutableStateOf(false)
-    var showSelectedMemberDialog by mutableStateOf(false)
-    var showProgressDialog by mutableStateOf(false)
-    var courseDropDownExpanded by mutableStateOf(false)
-    var branchDropDownExpanded by mutableStateOf(false)
+    var isFetching by publishedStateOf(false)
+    var showSelectedMemberDialog by publishedStateOf(false)
+    var showProgressDialog by publishedStateOf(false)
+    var courseDropDownExpanded by publishedStateOf(false)
+    var branchDropDownExpanded by publishedStateOf(false)
 
     private var getMemberJob: Job? = null
     private var addMemberJob: Job? = null
@@ -146,17 +147,17 @@ class AddMemberViewModel @Inject constructor(
 
     private fun getAllUsers() {
         getAllUserJob?.cancel()
-        allUserList.clear()
+        allUserList.value.clear()
         isFetching = true
         getAllUserJob = userUseCases.getAllUsers().onEach { resource ->
             when (resource) {
                 is Resource.Loading -> isFetching = true
                 is Resource.Success -> {
-                    allUserList.clear()
-                    selectedUserMap.clear()
+                    allUserList.value.clear()
+                    selectedUserMap.value.clear()
 
-                    allUserList.addAll(resource.data.filter { user ->
-                        !memberList.any { member -> user.userId == member.userId }
+                    allUserList.value.addAll(resource.data.filter { user ->
+                        !memberList.value.any { member -> user.userId == member.userId }
                     })
                     isFetching = false
                 }
@@ -170,15 +171,15 @@ class AddMemberViewModel @Inject constructor(
     }
 
     fun filterSearch() {
-        searchUserList.clear()
+        searchUserList.value.clear()
 
         if (searchName.value.isTrimmedNotEmpty()
             || searchRegNo.value.isTrimmedNotEmpty()
             || searchCourse.value.isTrimmedNotEmpty()
             || searchBranch.value.isTrimmedNotEmpty()
         ) {
-            searchUserList.addAll(
-                allUserList
+            searchUserList.value.addAll(
+                allUserList.value
                     .filter { user ->
                         searchName.value.split(",").any {
                             user.name.lowercase().contains(it.trim().lowercase())
@@ -207,7 +208,7 @@ class AddMemberViewModel @Inject constructor(
         addMemberJob = memberUseCases.addMembers(
             channelModel.clubId,
             channelId,
-            selectedUserMap.map { it.key }
+            selectedUserMap.value.map { it.key }
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgressDialog = true
@@ -235,7 +236,7 @@ class AddMemberViewModel @Inject constructor(
 
     private fun getMembers() {
         if (channelModel.private == 0) {
-            memberList.clear()
+            memberList.value.clear()
             return
         }
 
@@ -244,14 +245,14 @@ class AddMemberViewModel @Inject constructor(
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
-                        memberList.clear()
-                        memberList.addAll(list)
+                        memberList.value.clear()
+                        memberList.value.addAll(list)
                     }
                 }
 
                 is Resource.Success -> {
-                    memberList.clear()
-                    memberList.addAll(resource.data)
+                    memberList.value.clear()
+                    memberList.value.addAll(resource.data)
                 }
 
                 is Resource.Error -> {

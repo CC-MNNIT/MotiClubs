@@ -13,9 +13,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +21,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.mnnit.moticlubs.domain.util.getStringArg
+import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import com.mnnit.moticlubs.domain.util.zoomableContentLocation
 import com.mnnit.moticlubs.ui.components.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
@@ -39,14 +39,15 @@ class ImageScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var imageUrl by mutableStateOf(savedStateHandle.getStringArg("image"))
+    var imageUrl by publishedStateOf(savedStateHandle.getStringArg("image"))
 
 }
 
 @Composable
 fun ImageScreen(
     onBackPressed: () -> Unit,
-    viewModel: ImageScreenViewModel = hiltViewModel()
+    modifier: Modifier = Modifier,
+    viewModel: ImageScreenViewModel = hiltViewModel(),
 ) {
     val colorScheme = getColorScheme()
 
@@ -56,7 +57,7 @@ fun ImageScreen(
     MotiClubsTheme(colorScheme) {
         SetTransparentSystemBars()
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = modifier.fillMaxSize()) {
             Image(
                 modifier = Modifier
                     .fillMaxSize()

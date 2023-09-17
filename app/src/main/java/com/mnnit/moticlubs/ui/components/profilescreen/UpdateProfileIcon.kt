@@ -9,7 +9,6 @@ import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -21,13 +20,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.ImageUploadManager
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
 fun UpdateProfileIcon(
     appViewModel: HomeScreenViewModel,
+    loading: PublishedState<Boolean>,
     modifier: Modifier = Modifier,
-    loading: MutableState<Boolean>
 ) {
     val context = LocalContext.current
 

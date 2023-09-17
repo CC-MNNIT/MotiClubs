@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.domain.model.AdminUser
+import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.*
 import com.mnnit.moticlubs.ui.components.channelscreen.ChannelTopBar
@@ -47,6 +48,7 @@ fun ChannelScreen(
     onNavigateToChannelDetails: (channelId: Long) -> Unit,
     onNavigateToImageScreen: (url: String) -> Unit,
     onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     val listScrollState = rememberLazyListState()
@@ -63,7 +65,7 @@ fun ChannelScreen(
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 
-        Surface(modifier = Modifier.systemBarsPadding(), color = colorScheme.background) {
+        Surface(modifier = modifier.systemBarsPadding(), color = colorScheme.background) {
             BottomSheetScaffold(
                 modifier = Modifier.imePadding(),
                 sheetContent = {
@@ -99,7 +101,7 @@ fun ChannelScreen(
                             )
 
                             AnimatedVisibility(
-                                visible = viewModel.postsList.isEmpty() && !viewModel.loadingPosts.value,
+                                visible = viewModel.postsList.value.isEmpty() && !viewModel.loadingPosts.value,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .align(Alignment.CenterHorizontally)
@@ -149,10 +151,10 @@ fun DeleteConfirmationDialog(viewModel: ChannelScreenViewModel) {
 @Composable
 fun TopBar(
     viewModel: ChannelScreenViewModel,
-    modifier: Modifier = Modifier,
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateToChannelDetails: (channelId: Long) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         com.mnnit.moticlubs.ui.components.channelscreen.SearchBar(
@@ -176,7 +178,7 @@ fun TopBar(
 @Composable
 fun Posts(
     viewModel: ChannelScreenViewModel,
-    adminMap: MutableMap<Long, AdminUser>,
+    adminMap: PublishedMap<Long, AdminUser>,
     scrollState: LazyListState,
     onNavigateToPost: (postId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -189,9 +191,9 @@ fun Posts(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            items(viewModel.postsList.size) { index ->
+            items(viewModel.postsList.value.size) { index ->
                 if (viewModel.searchMode.value && viewModel.searchValue.value.isTrimmedNotEmpty() &&
-                    !viewModel.postsList[index].message.toLowerCase(LocaleList.current)
+                    !viewModel.postsList.value[index].message.toLowerCase(LocaleList.current)
                         .contains(viewModel.searchValue.value.toLowerCase(LocaleList.current))
                 ) {
                     return@items
@@ -199,9 +201,9 @@ fun Posts(
                 PostItem(
                     bottomSheetScaffoldState = viewModel.bottomSheetScaffoldState,
                     channelModel = viewModel.channelModel,
-                    post = viewModel.postsList[index],
+                    post = viewModel.postsList.value[index],
                     userId = viewModel.userId,
-                    admin = adminMap[viewModel.postsList[index].userId] ?: AdminUser(),
+                    admin = adminMap.value[viewModel.postsList.value[index].userId] ?: AdminUser(),
                     editMode = viewModel.editMode,
                     eventUpdatePost = viewModel.eventUpdatePost,
                     postMsg = viewModel.eventPostMsg,
@@ -212,7 +214,7 @@ fun Posts(
                 )
 
                 LaunchedEffect(index) {
-                    if (index == viewModel.postsList.size - 1) {
+                    if (index == viewModel.postsList.value.size - 1) {
                         viewModel.getPostsList(refresh = false)
                     }
                 }

@@ -36,7 +36,7 @@ import com.mnnit.moticlubs.domain.util.ImageUploadManager
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 
 @Composable
-fun PostTextFormatter(viewModel: ChannelScreenViewModel) {
+fun PostTextFormatter(viewModel: ChannelScreenViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
@@ -59,8 +59,8 @@ fun PostTextFormatter(viewModel: ChannelScreenViewModel) {
                     val post = viewModel.eventPostMsg.value.text
                     val selection = viewModel.eventPostMsg.value.selection
                     val urlLink = "\n<img src=\"$downloadUrl\">\n"
-                    val msgLink = "\n[image_${viewModel.eventImageReplacerMap.size}]\n"
-                    viewModel.eventImageReplacerMap[msgLink.replace("\n", "")] = urlLink
+                    val msgLink = "\n[image_${viewModel.eventImageReplacerMap.value.size}]\n"
+                    viewModel.eventImageReplacerMap.value[msgLink.replace("\n", "")] = urlLink
 
                     viewModel.eventPostMsg.value = TextFieldValue(
                         post.replaceRange(selection.start, selection.end, msgLink),
@@ -95,7 +95,7 @@ fun PostTextFormatter(viewModel: ChannelScreenViewModel) {
 
     AnimatedVisibility(visible = !viewModel.isPreviewMode.value, enter = fadeIn(), exit = fadeOut()) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .imePadding()
                 .padding(top = 8.dp)
                 .fillMaxWidth()

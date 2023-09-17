@@ -32,26 +32,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.getUnreadPost
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
 fun ChannelList(
-    list: List<Channel>,
+    list: PublishedList<Channel>,
     viewModel: HomeScreenViewModel,
     clubModel: Club,
-    onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit
+    onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topEnd = 0.dp, topStart = 0.dp, bottomEnd = 24.dp, bottomStart = 24.dp),
         elevation = CardDefaults.cardElevation(0.dp),
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
     ) {
-        list.forEach { model ->
+        list.value.forEach { model ->
             Card(
                 onClick = { onNavigateChannelClick(model.channelId, clubModel.clubId) },
                 modifier = Modifier.fillMaxWidth(),
@@ -116,7 +118,7 @@ fun ChannelList(
         }
 
         AnimatedVisibility(
-            visible = viewModel.adminList.any {
+            visible = viewModel.adminList.value.any {
                 it.userId == viewModel.userModel.userId && it.clubId == clubModel.clubId
             },
             enter = fadeIn(),

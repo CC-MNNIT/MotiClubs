@@ -22,10 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,22 +33,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun AboutUsContactForm() {
+fun AboutUsContactForm(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val colorScheme = getColorScheme()
-    var name by remember { mutableStateOf("") }
-    var postMsg by remember { mutableStateOf("") }
+    var name by remember { publishedStateOf("") }
+    var postMsg by remember { publishedStateOf("") }
 
     Surface(
         color = colorScheme.background,
         tonalElevation = 2.dp,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .imePadding()
     ) {

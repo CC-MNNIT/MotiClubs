@@ -17,9 +17,9 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PullDownProgressIndicator(
-    modifier: Modifier = Modifier,
     visible: Boolean,
-    refreshState: PullRefreshState
+    refreshState: PullRefreshState,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
 

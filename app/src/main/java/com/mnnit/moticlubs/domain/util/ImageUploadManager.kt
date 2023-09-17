@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
 import com.google.firebase.storage.StorageReference
 import java.io.ByteArrayOutputStream
 
@@ -20,7 +19,7 @@ object ImageUploadManager {
     fun uploadImageToFirebase(
         context: Context,
         imageUri: Uri,
-        loading: MutableState<Boolean>,
+        loading: PublishedState<Boolean>,
         storageRef: StorageReference,
         onSuccess: (downloadUrl: String) -> Unit
     ) {

@@ -36,6 +36,7 @@ import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 fun PostScreen(
     onNavigateImageClick: (url: String) -> Unit,
     onNavigateBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: PostScreenViewModel = hiltViewModel()
 ) {
 
@@ -43,7 +44,7 @@ fun PostScreen(
     MotiClubsTheme(colorScheme) {
         SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .systemBarsPadding(),
             color = colorScheme.background

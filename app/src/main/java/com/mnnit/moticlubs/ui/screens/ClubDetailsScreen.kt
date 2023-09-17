@@ -47,6 +47,7 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 @Composable
 fun ClubDetailsScreen(
     onNavigateBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ClubDetailsScreenViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
@@ -60,7 +61,7 @@ fun ClubDetailsScreen(
         SetTransparentSystemBars(setStatusBar = false)
 
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .imePadding()
         ) {
@@ -77,8 +78,9 @@ fun ClubDetailsScreen(
                     InputSocialLinkDialog(
                         showDialog = viewModel.showSocialLinkDialog,
                         socialLinksLiveList = viewModel.socialLinksLiveList,
-                        otherLinksLiveList = viewModel.otherLinksLiveList
-                    ) { list -> viewModel.pushUrls(list) }
+                        otherLinksLiveList = viewModel.otherLinksLiveList,
+                        onClick = { list -> viewModel.pushUrls(list) }
+                    )
                 }
 
                 if (viewModel.showOtherLinkDialog.value) {
@@ -87,13 +89,14 @@ fun ClubDetailsScreen(
                         showColorPaletteDialog = viewModel.showColorPaletteDialog,
                         otherLinksLiveList = viewModel.otherLinksLiveList,
                         otherLinkIdx = viewModel.otherLinkIdx,
-                        socialLinksLiveList = viewModel.socialLinksLiveList
-                    ) { list -> viewModel.pushUrls(list) }
+                        socialLinksLiveList = viewModel.socialLinksLiveList,
+                        onClick = { list -> viewModel.pushUrls(list) }
+                    )
                 }
 
                 if (viewModel.showColorPaletteDialog.value) {
                     ColorPaletteDialog(
-                        otherLinkComposeModel = viewModel.otherLinksLiveList[viewModel.otherLinkIdx.intValue],
+                        otherLinkComposeModel = viewModel.otherLinksLiveList.value[viewModel.otherLinkIdx.value],
                         viewModel.showColorPaletteDialog
                     )
                 }
@@ -146,36 +149,36 @@ fun ClubDetailsScreen(
                                 fontWeight = FontWeight.SemiBold
                             )
 
-                            val socials = viewModel.socialLinks.filter { f -> f.name.isTrimmedNotEmpty() }
+                            val socials = viewModel.socialLinks.value.filter { f -> f.name.isTrimmedNotEmpty() }
                             if (socials.isNotEmpty() || viewModel.isAdmin) {
                                 Links(
                                     isAdmin = viewModel.isAdmin,
                                     "Socials",
-                                    socials,
+                                    viewModel.socialLinks,
                                     onClick = {
-                                        for (i in viewModel.socialLinks.indices) {
-                                            viewModel.socialLinksLiveList[i] =
-                                                viewModel.socialLinks[i].mapToSocialLinkModel()
+                                        for (i in viewModel.socialLinks.value.indices) {
+                                            viewModel.socialLinksLiveList.value[i] =
+                                                viewModel.socialLinks.value[i].mapToSocialLinkModel()
                                                     .apply {
                                                         this.urlName = SocialLinkComposeModel.socialLinkNames[i]
                                                         this.clubID = viewModel.clubModel.clubId
                                                     }
-                                            Log.d("TAG", "ClubDetailsScreen: ${viewModel.socialLinksLiveList[i]}")
+                                            Log.d("TAG", "ClubDetailsScreen: ${viewModel.socialLinksLiveList.value[i]}")
                                         }
 
                                         viewModel.showSocialLinkDialog.value = true
                                     }
                                 )
                             }
-                            if (viewModel.otherLinks.isNotEmpty() || viewModel.isAdmin) {
+                            if (viewModel.otherLinks.value.isNotEmpty() || viewModel.isAdmin) {
                                 Links(
                                     isAdmin = viewModel.isAdmin,
                                     "Others",
                                     viewModel.otherLinks,
                                     onClick = {
-                                        viewModel.otherLinksLiveList.clear()
-                                        viewModel.otherLinksLiveList.addAll(
-                                            viewModel.otherLinks.map { m -> m.mapToOtherLinkModel() }
+                                        viewModel.otherLinksLiveList.value.clear()
+                                        viewModel.otherLinksLiveList.value.addAll(
+                                            viewModel.otherLinks.value.map { m -> m.mapToOtherLinkModel() }
                                         )
                                         viewModel.showOtherLinkDialog.value = true
                                     }

@@ -28,18 +28,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 
 @Composable
 fun CourseSelectField(
     viewModel: AddMemberViewModel,
+    modifier: Modifier = Modifier
 ) {
     val colorScheme = getColorScheme()
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentSize(Alignment.CenterEnd)
     ) {
