@@ -11,8 +11,13 @@ plugins {
 }
 
 ktlint {
-    android.set(true)
-    outputColorName.set("RED")
+    android = true
+    outputColorName = "RED"
+    reporters {
+        reporter "plain"
+        reporter "checkstyle"
+        reporter "sarif"
+    }
 }
 
 android {
