@@ -37,7 +37,7 @@ import com.mnnit.moticlubs.ui.viewmodel.AboutUsViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AboutUsScreen(viewModel: AboutUsViewModel = hiltViewModel()) {
+fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = hiltViewModel()) {
 
     val cc = "https://github.com/CC-MNNIT.png"
     val shank = "https://github.com/shank03.png"
@@ -50,7 +50,7 @@ fun AboutUsScreen(viewModel: AboutUsViewModel = hiltViewModel()) {
         SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
 
         BottomSheetScaffold(
-            modifier = Modifier
+            modifier = modifier
                 .imePadding()
                 .systemBarsPadding(),
             scaffoldState = scaffoldState,

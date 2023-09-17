@@ -8,17 +8,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
 fun ConfirmationDialog(
-    showDialog: MutableState<Boolean>,
+    showDialog: PublishedState<Boolean>,
     message: String,
     positiveBtnText: String,
     negativeBtnText: String = "Cancel",

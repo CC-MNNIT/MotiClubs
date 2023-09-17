@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
+fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
     val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -78,7 +78,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
     Surface(
         color = colorScheme.background,
         tonalElevation = 2.dp,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .imePadding()
     ) {
@@ -134,12 +134,12 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
             }
 
             Replies(
-                modifier = Modifier
-                    .weight(1f)
-                    .imePadding(),
                 viewModel,
                 refreshState,
-                scrollState
+                scrollState,
+                modifier = Modifier
+                    .weight(1f)
+                    .imePadding()
             )
         }
     }
@@ -148,10 +148,10 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Replies(
-    modifier: Modifier = Modifier,
     viewModel: PostScreenViewModel,
     refreshState: PullRefreshState,
-    scrollState: LazyListState
+    scrollState: LazyListState,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
 
@@ -166,15 +166,15 @@ private fun Replies(
                 .animateContentSize(),
             reverseLayout = true,
         ) {
-            items(viewModel.replyList.size) { index ->
-                if (!viewModel.userMap.containsKey(viewModel.replyList[index].userId)) {
-                    viewModel.getUser(viewModel.replyList[index].userId)
+            items(viewModel.replyList.value.size) { index ->
+                if (!viewModel.userMap.value.containsKey(viewModel.replyList.value[index].userId)) {
+                    viewModel.getUser(viewModel.replyList.value[index].userId)
                 }
 
-                Reply(viewModel, viewModel.replyList[index], colorScheme)
+                Reply(viewModel, viewModel.replyList.value[index], colorScheme)
 
                 LaunchedEffect(index) {
-                    if (index == viewModel.replyList.size - 1) {
+                    if (index == viewModel.replyList.value.size - 1) {
                         viewModel.getReplies(refresh = false)
                     }
                 }
@@ -232,14 +232,14 @@ private fun Reply(
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.Top),
-                userModel = viewModel.userMap[reply.userId] ?: User(),
+                userModel = viewModel.userMap.value[reply.userId] ?: User(),
                 size = 42.dp
             )
 
             Column {
                 Row {
                     Text(
-                        text = viewModel.userMap[reply.userId]?.name ?: "Random User",
+                        text = viewModel.userMap.value[reply.userId]?.name ?: "Random User",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(start = 8.dp),

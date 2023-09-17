@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 fun PostCreateUpdateBottomSheet(
     viewModel: ChannelScreenViewModel,
     onNavigateImageClick: (url: String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
@@ -49,7 +50,7 @@ fun PostCreateUpdateBottomSheet(
     Surface(
         color = colorScheme.background,
         tonalElevation = 2.dp,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .imePadding()
     ) {

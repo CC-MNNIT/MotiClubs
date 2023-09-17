@@ -1,16 +1,16 @@
 package com.mnnit.moticlubs.ui.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.network.dto.GithubContributorDto
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.apiInvoker
+import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,12 +24,12 @@ class AboutUsViewModel @Inject constructor(
         private const val TAG = "AboutUsViewModel"
     }
 
-    var loadingContributors by mutableStateOf(false)
-    var showContributorDialog by mutableStateOf(false)
-    var contributorTagApp by mutableStateOf(true)
+    var loadingContributors by publishedStateOf(false)
+    var showContributorDialog by publishedStateOf(false)
+    var contributorTagApp by publishedStateOf(true)
 
-    val appContributors = mutableStateListOf<GithubContributorDto>()
-    val backendContributors = mutableStateListOf<GithubContributorDto>()
+    val appContributors = publishedStateListOf<GithubContributorDto>()
+    val backendContributors = publishedStateListOf<GithubContributorDto>()
 
     fun getContributors() {
         viewModelScope.launch {
@@ -37,14 +37,14 @@ class AboutUsViewModel @Inject constructor(
 
             if (contributorTagApp) {
                 getResource(apiInvoker { apiService.getAppContributors() }) {
-                    appContributors.clear()
-                    appContributors.addAll(it)
+                    appContributors.value.clear()
+                    appContributors.value.addAll(it)
                     loadingContributors = false
                 }
             } else {
                 getResource(apiInvoker { apiService.getBackendContributors() }) {
-                    backendContributors.clear()
-                    backendContributors.addAll(it)
+                    backendContributors.value.clear()
+                    backendContributors.value.addAll(it)
                     loadingContributors = false
                 }
             }

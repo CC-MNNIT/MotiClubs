@@ -20,14 +20,14 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
-fun ProgressDialog(progressMsg: String) {
+fun ProgressDialog(progressMsg: String, modifier: Modifier = Modifier) {
     val colorScheme = getColorScheme()
     Dialog(
         onDismissRequest = {},
         DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.7f)
                 .clip(RoundedCornerShape(24.dp))
                 .background(colorScheme.background)

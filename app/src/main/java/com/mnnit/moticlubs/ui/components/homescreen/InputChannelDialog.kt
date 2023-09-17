@@ -30,14 +30,18 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
-fun InputChannelDialog(viewModel: HomeScreenViewModel, onClick: () -> Unit) {
+fun InputChannelDialog(
+    viewModel: HomeScreenViewModel,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val colorScheme = getColorScheme()
     Dialog(
         onDismissRequest = { viewModel.showAddChannelDialog = false },
         DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))

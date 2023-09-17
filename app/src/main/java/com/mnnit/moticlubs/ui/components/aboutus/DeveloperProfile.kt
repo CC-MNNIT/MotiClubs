@@ -33,10 +33,10 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
 fun ColumnScope.DeveloperProfile(
-    modifier: Modifier = Modifier,
     userModel: User,
-    linkedin: String = "",
     name: String,
+    modifier: Modifier = Modifier,
+    linkedin: String = "",
     stream: String = "",
     year: String = "",
     showIcons: Boolean = true

@@ -52,6 +52,7 @@ fun LoginScreen(
     launcher: ActivityResultLauncher<IntentSenderRequest>,
     appViewModel: AppViewModel,
     onNavigateToMain: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: LoginScreenViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -73,7 +74,7 @@ fun LoginScreen(
         }
 
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             color = bgColor
         ) {
             Row(

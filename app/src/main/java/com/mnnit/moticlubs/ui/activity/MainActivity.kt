@@ -137,13 +137,13 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MainScreen(user: FirebaseUser?) {
+    fun MainScreen(user: FirebaseUser?, modifier: Modifier = Modifier) {
         val colorScheme = getColorScheme()
         MotiClubsTheme(colorScheme) {
             SetTransparentSystemBars()
 
             Surface(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .imePadding()
             ) {

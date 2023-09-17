@@ -12,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,20 +24,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_URL_SIZE
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
 fun PostInputLinkDialog(
-    showDialog: MutableState<Boolean>,
-    inputLinkName: MutableState<String>,
-    inputLink: MutableState<String>,
-    postMsg: MutableState<TextFieldValue>
+    showDialog: PublishedState<Boolean>,
+    inputLinkName: PublishedState<String>,
+    inputLink: PublishedState<String>,
+    postMsg: PublishedState<TextFieldValue>,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))

@@ -30,13 +30,13 @@ import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 
 @Composable
-fun ErrorScreen(viewModel: AppViewModel) {
+fun ErrorScreen(viewModel: AppViewModel, modifier: Modifier = Modifier) {
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
         SetTransparentSystemBars()
 
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .imePadding()
         ) {

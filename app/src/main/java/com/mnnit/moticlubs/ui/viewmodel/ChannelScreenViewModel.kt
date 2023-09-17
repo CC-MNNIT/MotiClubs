@@ -28,7 +28,12 @@ import com.mnnit.moticlubs.domain.util.NavigationArgs.CLUB_ARG
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
+import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.lengthInRange
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateMapOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -55,7 +60,7 @@ class ChannelScreenViewModel @Inject constructor(
         }
     }
 
-    private var onResumeLocked by mutableStateOf(true)
+    private var onResumeLocked by publishedStateOf(true)
 
     override fun onResume(owner: LifecycleOwner) {
         Log.d(TAG, "onResume: $TAG: locked: $onResumeLocked")
@@ -71,39 +76,39 @@ class ChannelScreenViewModel @Inject constructor(
     val channelId by mutableLongStateOf(savedStateHandle.getLongArg(CHANNEL_ARG))
     var userId by mutableLongStateOf(-1)
 
-    var clubModel by mutableStateOf(Club())
+    var clubModel by publishedStateOf(Club())
     var channelModel by mutableStateOf(Channel())
 
-    val eventPostMsg = mutableStateOf(TextFieldValue(""))
-    val eventImageReplacerMap = mutableMapOf<String, String>()
-    val eventUpdatePost = mutableStateOf(Post())
-    val eventDeletePost = mutableStateOf(Post())
+    val eventPostMsg = publishedStateOf(TextFieldValue(""))
+    val eventImageReplacerMap = publishedStateMapOf<String, String>()
+    val eventUpdatePost = publishedStateOf(Post())
+    val eventDeletePost = publishedStateOf(Post())
 
-    val adminMap = mutableStateMapOf<Long, AdminUser>()
-    val postsList = mutableStateListOf<Post>()
-    val loadingPosts = mutableStateOf(false)
+    val adminMap = publishedStateMapOf<Long, AdminUser>()
+    val postsList = publishedStateListOf<Post>()
+    val loadingPosts = publishedStateOf(false)
     val memberCount = mutableIntStateOf(-1)
 
-    val editMode = mutableStateOf(false)
-    val showEditDialog = mutableStateOf(false)
+    val editMode = publishedStateOf(false)
+    val showEditDialog = publishedStateOf(false)
 
-    val searchMode = mutableStateOf(false)
-    val searchValue = mutableStateOf("")
+    val searchMode = publishedStateOf(false)
+    val searchValue = publishedStateOf("")
 
-    val isPreviewMode = mutableStateOf(false)
-    val showGuidanceDialog = mutableStateOf(false)
+    val isPreviewMode = publishedStateOf(false)
+    val showGuidanceDialog = publishedStateOf(false)
 
-    val inputLinkName = mutableStateOf("")
-    val inputLink = mutableStateOf("")
-    val showLinkDialog = mutableStateOf(false)
+    val inputLinkName = publishedStateOf("")
+    val inputLink = publishedStateOf("")
+    val showLinkDialog = publishedStateOf(false)
 
-    val progressText = mutableStateOf("Loading ...")
-    val showProgress = mutableStateOf(false)
-    val showDialog = mutableStateOf(false)
-    val showDelPostDialog = mutableStateOf(false)
-    val showClearDraftDialog = mutableStateOf(false)
+    val progressText = publishedStateOf("Loading ...")
+    val showProgress = publishedStateOf(false)
+    val showDialog = publishedStateOf(false)
+    val showDelPostDialog = publishedStateOf(false)
+    val showClearDraftDialog = publishedStateOf(false)
 
-    val bottomSheetScaffoldState = mutableStateOf(
+    val bottomSheetScaffoldState = publishedStateOf(
         BottomSheetScaffoldState(
             drawerState = DrawerState(initialValue = DrawerValue.Closed),
             bottomSheetState = BottomSheetState(
@@ -114,9 +119,9 @@ class ChannelScreenViewModel @Inject constructor(
         )
     )
     val scrollValue = mutableIntStateOf(0)
-    var isAdmin by mutableStateOf(false)
+    var isAdmin by publishedStateOf(false)
 
-    private var pageEnded by mutableStateOf(false)
+    private var pageEnded by publishedStateOf(false)
     private var postPage = 1
 
     private var crudPostJob: Job? = null
@@ -126,7 +131,7 @@ class ChannelScreenViewModel @Inject constructor(
 
     fun clearEditor() {
         eventPostMsg.value = TextFieldValue("")
-        eventImageReplacerMap.clear()
+        eventImageReplacerMap.value.clear()
         editMode.value = false
         showProgress.value = false
     }
@@ -140,7 +145,7 @@ class ChannelScreenViewModel @Inject constructor(
 
             val list = repository.getAdmins()
             isAdmin = list.any { admin -> admin.userId == userId && admin.clubId == clubId }
-            list.forEach { admin -> adminMap[admin.userId] = admin }
+            list.forEach { admin -> adminMap.value[admin.userId] = admin }
 
             getMembers()
         }
@@ -190,25 +195,25 @@ class ChannelScreenViewModel @Inject constructor(
                         when (refresh) {
                             true -> {
                                 loadingPosts.value = true
-                                postsList.clear()
+                                postsList.value.clear()
                             }
 
-                            else -> postsList.removeIf { post -> post.pageNo == postPage }
+                            else -> postsList.value.removeIf { post -> post.pageNo == postPage }
                         }
-                        postsList.addAll(list)
+                        postsList.value.addAll(list)
                     }
                 }
 
                 is Resource.Success -> {
                     when (refresh) {
-                        true -> postsList.clear()
-                        else -> postsList.removeIf { post -> post.pageNo == postPage }
+                        true -> postsList.value.clear()
+                        else -> postsList.value.removeIf { post -> post.pageNo == postPage }
                     }
                     when (resource.data.isEmpty()) {
                         true -> pageEnded = true
                         else -> postPage++
                     }
-                    postsList.addAll(resource.data)
+                    postsList.value.addAll(resource.data)
                     loadingPosts.value = false
                 }
 
@@ -223,7 +228,7 @@ class ChannelScreenViewModel @Inject constructor(
 
     fun postLengthInRange(): Boolean {
         var text = eventPostMsg.value.text
-        eventImageReplacerMap.forEach { (key, value) ->
+        eventImageReplacerMap.value.forEach { (key, value) ->
             text = text.replace(key.replace("\n", ""), value)
         }
 
@@ -234,7 +239,7 @@ class ChannelScreenViewModel @Inject constructor(
         isPreviewMode.value = false
 
         var text = eventPostMsg.value.text
-        eventImageReplacerMap.forEach { (key, value) ->
+        eventImageReplacerMap.value.forEach { (key, value) ->
             text = text.replace(key.replace("\n", ""), value)
         }
 
@@ -250,8 +255,8 @@ class ChannelScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
 
-                    postsList.clear()
-                    postsList.addAll(resource.data)
+                    postsList.value.clear()
+                    postsList.value.addAll(resource.data)
                     clearEditor()
                 }
 
@@ -267,7 +272,7 @@ class ChannelScreenViewModel @Inject constructor(
         isPreviewMode.value = false
 
         var text = eventPostMsg.value.text
-        eventImageReplacerMap.forEach { (key, value) ->
+        eventImageReplacerMap.value.forEach { (key, value) ->
             text = text.replace(key.replace("\n", ""), value)
         }
 
@@ -279,7 +284,7 @@ class ChannelScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
 
-                    postsList.replaceAll { p -> if (p.postId == post.postId) post else p }
+                    postsList.value.replaceAll { p -> if (p.postId == post.postId) post else p }
                     clearEditor()
                 }
 
@@ -304,7 +309,7 @@ class ChannelScreenViewModel @Inject constructor(
                 is Resource.Success -> {
                     Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
 
-                    postsList.removeIf { post -> post.postId == eventDeletePost.value.postId }
+                    postsList.value.removeIf { post -> post.postId == eventDeletePost.value.postId }
                     showProgress.value = false
                 }
 

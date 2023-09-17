@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -48,9 +48,10 @@ import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 fun SelectedMemberDialog(
     viewModel: AddMemberViewModel,
     onAdd: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
-    val showConfirmation = remember { mutableStateOf(false) }
+    val showConfirmation = remember { publishedStateOf(false) }
     val scrollState = rememberLazyListState()
 
     if (showConfirmation.value) {
@@ -67,7 +68,7 @@ fun SelectedMemberDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.95f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
@@ -92,8 +93,8 @@ fun SelectedMemberDialog(
                         modifier = Modifier.animateContentSize(),
                         state = scrollState,
                     ) {
-                        items(viewModel.selectedUserMap.entries.size) {
-                            UserItem(viewModel.selectedUserMap.entries.elementAt(it).value, viewModel)
+                        items(viewModel.selectedUserMap.value.entries.size) {
+                            UserItem(viewModel.selectedUserMap.value.entries.elementAt(it).value, viewModel)
                         }
                     }
                 }
@@ -120,7 +121,7 @@ fun SelectedMemberDialog(
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
-                        enabled = viewModel.selectedUserMap.size > 0
+                        enabled = viewModel.selectedUserMap.value.size > 0
                     ) {
                         Text(text = "Add all", fontSize = 14.sp)
                     }
@@ -183,7 +184,7 @@ private fun UserItem(user: User, viewModel: AddMemberViewModel) {
                     .padding()
                     .align(Alignment.CenterVertically),
                 onClick = {
-                    viewModel.selectedUserMap.remove(user.userId)
+                    viewModel.selectedUserMap.value.remove(user.userId)
                 }
             ) {
                 Icon(imageVector = Icons.Rounded.Delete, contentDescription = "")

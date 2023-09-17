@@ -45,6 +45,7 @@ import com.mnnit.moticlubs.ui.viewmodel.AboutUsViewModel
 fun ContributorDialog(
     app: Boolean,
     viewModel: AboutUsViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     val scrollState = rememberLazyListState()
@@ -54,7 +55,7 @@ fun ContributorDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.95f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
@@ -87,12 +88,12 @@ fun ContributorDialog(
                         state = scrollState,
                     ) {
                         if (app) {
-                            items(viewModel.appContributors.size) {
-                                ContributorItem(viewModel.appContributors[it])
+                            items(viewModel.appContributors.value.size) {
+                                ContributorItem(viewModel.appContributors.value[it])
                             }
                         } else {
-                            items(viewModel.backendContributors.size) {
-                                ContributorItem(viewModel.backendContributors[it])
+                            items(viewModel.backendContributors.value.size) {
+                                ContributorItem(viewModel.backendContributors.value[it])
                             }
                         }
                     }

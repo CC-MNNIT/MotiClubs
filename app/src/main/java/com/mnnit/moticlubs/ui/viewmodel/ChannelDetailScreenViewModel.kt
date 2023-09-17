@@ -6,9 +6,6 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -28,6 +25,11 @@ import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
+import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateMapOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
+import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -49,7 +51,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
         private const val TAG = "ChannelDetailScreenView"
     }
 
-    private var onResumeLocked by mutableStateOf(true)
+    private var onResumeLocked by publishedStateOf(true)
 
     override fun onResume(owner: LifecycleOwner) {
         Log.d(TAG, "onResume: $TAG: locked: $onResumeLocked")
@@ -63,27 +65,27 @@ class ChannelDetailScreenViewModel @Inject constructor(
     val channelId by mutableLongStateOf(savedStateHandle.getLongArg(NavigationArgs.CHANNEL_ARG))
     var userId by mutableLongStateOf(-1)
 
-    var channelModel by mutableStateOf(Channel())
-    var clubModel by mutableStateOf(Club())
+    var channelModel by publishedStateOf(Channel())
+    var clubModel by publishedStateOf(Club())
 
-    var isFetching by mutableStateOf(false)
-    var isUpdating by mutableStateOf(false)
-    var isAdmin by mutableStateOf(false)
+    var isFetching by publishedStateOf(false)
+    var isUpdating by publishedStateOf(false)
+    var isAdmin by publishedStateOf(false)
 
-    var progressMsg by mutableStateOf("")
+    var progressMsg by publishedStateOf("")
     var removeMemberUserId by mutableLongStateOf(-1)
 
-    var showMemberProgressDialog = mutableStateOf(false)
-    var showRemoveConfirmationDialog = mutableStateOf(false)
-    var showPrivateConfirmationDialog = mutableStateOf(false)
-    var showUpdateChannelDialog = mutableStateOf(false)
+    var showMemberProgressDialog = publishedStateOf(false)
+    var showRemoveConfirmationDialog = publishedStateOf(false)
+    var showPrivateConfirmationDialog = publishedStateOf(false)
+    var showUpdateChannelDialog = publishedStateOf(false)
 
-    var updateChannelName by mutableStateOf("")
+    var updateChannelName by publishedStateOf("")
     var updateChannelPrivate by mutableIntStateOf(0)
 
-    val memberList = mutableStateListOf<Member>()
-    val adminList = mutableStateListOf<AdminUser>()
-    val memberInfo = mutableStateMapOf<Long, User>()
+    val memberList = publishedStateListOf<Member>()
+    val adminList = publishedStateListOf<AdminUser>()
+    val memberInfo = publishedStateMapOf<Long, User>()
 
     private var getMemberJob: Job? = null
     private var removeMemberJob: Job? = null
@@ -91,7 +93,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
 
     fun refreshAll() {
         getModels()
-        memberInfo.clear()
+        memberInfo.value.clear()
         getAdmins()
     }
 
@@ -195,7 +197,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
 
     private fun getMembers() {
         if (channelModel.private == 0) {
-            memberList.clear()
+            memberList.value.clear()
             return
         }
 
@@ -204,21 +206,21 @@ class ChannelDetailScreenViewModel @Inject constructor(
             when (resource) {
                 is Resource.Loading -> {
                     resource.data?.let { list ->
-                        memberList.clear()
-                        memberList.addAll(list)
+                        memberList.value.clear()
+                        memberList.value.addAll(list)
                     }
                 }
 
                 is Resource.Success -> {
-                    memberList.clear()
-                    memberList.addAll(resource.data.sortedWith(
+                    memberList.value.clear()
+                    memberList.value.addAll(resource.data.sortedWith(
                         compareBy(
                             { member ->
-                                !adminList.any { admin ->
+                                !adminList.value.any { admin ->
                                     admin.userId == member.userId && admin.clubId == channelModel.clubId
                                 }
                             },
-                            { member -> memberInfo[member.userId]?.name ?: "" }
+                            { member -> memberInfo.value[member.userId]?.name ?: "" }
                         )
                     ))
                 }
@@ -231,16 +233,16 @@ class ChannelDetailScreenViewModel @Inject constructor(
     }
 
     fun getUser(userId: Long) {
-        memberInfo[userId] = User()
+        memberInfo.value[userId] = User()
         userUseCases.getUser(userId).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    resource.data?.let { user -> memberInfo[user.userId] = user }
+                    resource.data?.let { user -> memberInfo.value[user.userId] = user }
                 }
 
                 is Resource.Success -> {
                     val user = resource.data
-                    memberInfo[user.userId] = user
+                    memberInfo.value[user.userId] = user
                 }
 
                 is Resource.Error -> Log.d(TAG, "getUser: err - ${resource.errCode}: ${resource.errMsg}")
@@ -255,16 +257,18 @@ class ChannelDetailScreenViewModel @Inject constructor(
                 is Resource.Loading -> {
                     resource.data?.let { list ->
                         if (list.isNotEmpty()) {
-                            adminList.clear()
-                            adminList.addAll(list)
+                            adminList.value.clear()
+                            adminList.value.addAll(list)
                         }
                     }
                 }
 
                 is Resource.Success -> {
-                    adminList.clear()
-                    adminList.addAll(resource.data)
-                    isAdmin = adminList.any { admin -> admin.userId == userId && admin.clubId == channelModel.clubId }
+                    adminList.value.clear()
+                    adminList.value.addAll(resource.data)
+                    isAdmin = adminList.value.any { admin ->
+                        admin.userId == userId && admin.clubId == channelModel.clubId
+                    }
                 }
 
                 is Resource.Error -> {

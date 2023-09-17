@@ -17,11 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,9 +27,15 @@ import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
+import com.mnnit.moticlubs.domain.util.PublishedList
+import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
 import com.mnnit.moticlubs.domain.util.getExpandedChannel
+import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.publishedStateListOf
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
+import com.mnnit.moticlubs.domain.util.setValue
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
@@ -41,26 +43,31 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 @Composable
 fun ClubList(
     viewModel: HomeScreenViewModel,
-    clubsList: SnapshotStateList<Club>,
-    channelMap: MutableMap<Long, SnapshotStateList<Channel>>,
+    clubsList: PublishedList<Club>,
+    channelMap: PublishedMap<Long, PublishedList<Channel>>,
     onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
-    onNavigateToClubDetails: (clubId: Long) -> Unit
+    onNavigateToClubDetails: (clubId: Long) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
+    val emptyList = remember { publishedStateListOf<Channel>() }
+
     LazyColumn(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = modifier.fillMaxHeight(),
         contentPadding = PaddingValues(bottom = 72.dp, top = 16.dp, start = 16.dp, end = 16.dp),
     ) {
-        items(clubsList.size) { idx ->
-            var channelVisibility by remember { mutableStateOf(context.getExpandedChannel(clubsList[idx].clubId)) }
+        items(clubsList.value.size) { idx ->
+            var channelVisibility by remember {
+                publishedStateOf(context.getExpandedChannel(clubsList.value[idx].clubId))
+            }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 onClick = {
                     channelVisibility = !channelVisibility
-                    context.setExpandedChannel(clubsList[idx].clubId, channelVisibility)
+                    context.setExpandedChannel(clubsList.value[idx].clubId, channelVisibility)
                 },
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(if (channelVisibility) 8.dp else 0.dp),
@@ -69,8 +76,8 @@ fun ClubList(
                 Row(modifier = Modifier.padding(16.dp)) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        userModel = User().copy(avatar = clubsList[idx].avatar),
-                        onClick = { onNavigateToClubDetails(viewModel.clubsList[idx].clubId) }
+                        userModel = User().copy(avatar = clubsList.value[idx].avatar),
+                        onClick = { onNavigateToClubDetails(viewModel.clubsList.value[idx].clubId) }
                     )
 
                     Column(
@@ -79,13 +86,13 @@ fun ClubList(
                             .weight(1f)
                     ) {
                         Text(
-                            text = clubsList[idx].name,
+                            text = clubsList.value[idx].name,
                             fontSize = 16.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = clubsList[idx].summary,
+                            text = clubsList.value[idx].summary,
                             fontSize = 14.sp,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
@@ -96,7 +103,10 @@ fun ClubList(
 
                     AnimatedVisibility(
                         visible = context.clubHasUnreadPost(
-                            channelMap.getOrDefault(clubsList[idx].clubId, mutableListOf())
+                            channelMap.value.getOrDefault(
+                                clubsList.value[idx].clubId,
+                                emptyList
+                            ).value
                         ),
                         modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
@@ -109,10 +119,10 @@ fun ClubList(
 
                 AnimatedVisibility(visible = channelVisibility) {
                     ChannelList(
-                        list = channelMap.getOrDefault(clubsList[idx].clubId, mutableListOf()),
-                        viewModel,
-                        clubsList[idx],
-                        onNavigateChannelClick
+                        list = channelMap.value.getOrDefault(clubsList.value[idx].clubId, emptyList),
+                        viewModel = viewModel,
+                        clubModel = clubsList.value[idx],
+                        onNavigateChannelClick = onNavigateChannelClick,
                     )
                 }
             }

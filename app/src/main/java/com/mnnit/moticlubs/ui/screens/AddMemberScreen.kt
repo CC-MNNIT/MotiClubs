@@ -70,6 +70,7 @@ import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 @Composable
 fun AddMemberScreen(
     onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: AddMemberViewModel = hiltViewModel()
 ) {
     val colorScheme = getColorScheme()
@@ -86,7 +87,7 @@ fun AddMemberScreen(
 
         Surface(
             color = colorScheme.background,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .imePadding(),
             shadowElevation = 2.dp,
@@ -202,15 +203,15 @@ fun AddMemberScreen(
                                     Spacer(modifier = Modifier.weight(1f))
                                     AssistChip(
                                         onClick = {
-                                            viewModel.searchUserList.forEach { user ->
-                                                viewModel.selectedUserMap[user.userId] = user
+                                            viewModel.searchUserList.value.forEach { user ->
+                                                viewModel.selectedUserMap.value[user.userId] = user
                                             }
                                         },
                                         label = {
                                             Text(
                                                 text = "Select all",
                                                 fontSize = 14.sp,
-                                                color = if (viewModel.searchUserList.size > 0) {
+                                                color = if (viewModel.searchUserList.value.size > 0) {
                                                     contentColorFor(backgroundColor = colorScheme.primary)
                                                 } else {
                                                     colorScheme.onSurfaceVariant
@@ -224,7 +225,7 @@ fun AddMemberScreen(
                                         shape = RoundedCornerShape(24.dp),
                                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
                                         border = AssistChipDefaults.assistChipBorder(borderColor = colorScheme.primary),
-                                        enabled = viewModel.searchUserList.size > 0
+                                        enabled = viewModel.searchUserList.value.size > 0
                                     )
                                 }
 
@@ -263,11 +264,14 @@ fun AddMemberScreen(
                 }
 
                 if (viewModel.showSelectedMemberDialog) {
-                    SelectedMemberDialog(viewModel) {
-                        viewModel.showSelectedMemberDialog = false
-                        viewModel.showProgressDialog = true
-                        viewModel.addMembers(onBackPressed)
-                    }
+                    SelectedMemberDialog(
+                        viewModel = viewModel,
+                        onAdd = {
+                            viewModel.showSelectedMemberDialog = false
+                            viewModel.showProgressDialog = true
+                            viewModel.addMembers(onBackPressed)
+                        }
+                    )
                 }
 
                 Column(
@@ -282,7 +286,7 @@ fun AddMemberScreen(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(top = 8.dp),
-                        visible = viewModel.selectedUserMap.size > 0,
+                        visible = viewModel.selectedUserMap.value.size > 0,
                         enter = fadeIn(),
                         exit = fadeOut(),
                     ) {
@@ -292,7 +296,7 @@ fun AddMemberScreen(
                             },
                             label = {
                                 Text(
-                                    text = "${viewModel.selectedUserMap.size} selected",
+                                    text = "${viewModel.selectedUserMap.value.size} selected",
                                     fontSize = 14.sp,
                                     color = colorScheme.primary
                                 )
@@ -336,7 +340,7 @@ private fun UserList(
     ) {
 
         item {
-            if (viewModel.searchUserList.isEmpty()) {
+            if (viewModel.searchUserList.value.isEmpty()) {
                 Text(
                     text = "No results",
                     modifier = Modifier
@@ -347,32 +351,32 @@ private fun UserList(
             }
         }
 
-        items(viewModel.searchUserList.size) { index ->
+        items(viewModel.searchUserList.value.size) { index ->
             Card(
                 modifier = Modifier.padding(top = 8.dp),
                 elevation = CardDefaults.cardElevation(0.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    colorScheme.surfaceColorAtElevation(if (viewModel.selectedUserMap.containsKey(viewModel.searchUserList[index].userId)) 16.dp else 2.dp)
+                    colorScheme.surfaceColorAtElevation(if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) 16.dp else 2.dp)
                 ),
                 border = BorderStroke(
-                    width = if (viewModel.selectedUserMap.containsKey(viewModel.searchUserList[index].userId)) {
+                    width = if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
                         1.dp
                     } else {
                         0.dp
                     },
-                    color = if (viewModel.selectedUserMap.containsKey(viewModel.searchUserList[index].userId)) {
+                    color = if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
                         colorScheme.primary
                     } else {
                         colorScheme.background
                     }
                 ),
                 onClick = {
-                    if (viewModel.selectedUserMap.containsKey(viewModel.searchUserList[index].userId)) {
-                        viewModel.selectedUserMap.remove(viewModel.searchUserList[index].userId)
+                    if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
+                        viewModel.selectedUserMap.value.remove(viewModel.searchUserList.value[index].userId)
                     } else {
-                        viewModel.selectedUserMap[viewModel.searchUserList[index].userId] =
-                            viewModel.searchUserList[index]
+                        viewModel.selectedUserMap.value[viewModel.searchUserList.value[index].userId] =
+                            viewModel.searchUserList.value[index]
                     }
                 }
             ) {
@@ -383,7 +387,7 @@ private fun UserList(
                 ) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        userModel = viewModel.searchUserList[index],
+                        userModel = viewModel.searchUserList.value[index],
                         size = 48.dp
                     )
 
@@ -392,7 +396,7 @@ private fun UserList(
                     Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                         Text(
                             modifier = Modifier,
-                            text = viewModel.searchUserList[index].name,
+                            text = viewModel.searchUserList.value[index].name,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
@@ -401,7 +405,7 @@ private fun UserList(
 
                         Text(
                             modifier = Modifier,
-                            text = viewModel.searchUserList[index].regNo,
+                            text = viewModel.searchUserList.value[index].regNo,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,

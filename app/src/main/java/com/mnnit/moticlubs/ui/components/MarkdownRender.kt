@@ -18,13 +18,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.mnnit.moticlubs.domain.util.PublishedMap
+import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
 fun MarkdownRender(
-    modifier: Modifier = Modifier,
     mkd: String,
-    imageReplacerMap: MutableMap<String, String> = mutableMapOf(),
+    modifier: Modifier = Modifier,
+    imageReplacerMap: PublishedMap<String, String> = publishedStateMapOf(),
     selectable: Boolean = false,
     disableLinkMovementMethod: Boolean = false,
     onImageClick: (url: String) -> Unit = {}
@@ -32,18 +34,18 @@ fun MarkdownRender(
     val colorScheme = getColorScheme()
 
     var preprocessText = mkd
-    if (imageReplacerMap.isEmpty()) {
+    if (imageReplacerMap.value.isEmpty()) {
         mkd.lines().forEach {
             if (it.startsWith("<img src")) {
-                val key = "[image_${imageReplacerMap.size}]"
-                imageReplacerMap[key] = it
+                val key = "[image_${imageReplacerMap.value.size}]"
+                imageReplacerMap.value[key] = it
                 preprocessText = preprocessText.replace(it, key)
             }
         }
     }
 
     var text = preprocessText
-    imageReplacerMap.forEach { (key, value) ->
+    imageReplacerMap.value.forEach { (key, value) ->
         text = text.replace(key.replace("\n", ""), value)
     }
 

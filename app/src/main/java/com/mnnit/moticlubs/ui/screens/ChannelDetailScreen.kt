@@ -74,6 +74,7 @@ fun ChannelDetailScreen(
     onNavigateToAddMember: (channelId: Long) -> Unit,
     onDeleteChannel: () -> Unit,
     onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ChannelDetailScreenViewModel = hiltViewModel(),
 ) {
     val colorScheme = getColorScheme()
@@ -93,7 +94,7 @@ fun ChannelDetailScreen(
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .imePadding(),
             color = colorScheme.background
@@ -143,7 +144,7 @@ fun ChannelDetailScreen(
                                 if (viewModel.removeMemberUserId == -1L) {
                                     "this member"
                                 } else {
-                                    viewModel.memberInfo.getValue(viewModel.removeMemberUserId).name
+                                    viewModel.memberInfo.value.getValue(viewModel.removeMemberUserId).name
                                 }
                             } ?",
                             positiveBtnText = "Remove",
@@ -168,9 +169,11 @@ fun ChannelDetailScreen(
                     }
 
                     if (viewModel.showUpdateChannelDialog.value) {
-                        UpdateChannelDialog(viewModel, onUpdate = { viewModel.updateChannel() }) {
-                            viewModel.deleteChannel(onDeleteChannel)
-                        }
+                        UpdateChannelDialog(
+                            viewModel = viewModel,
+                            onUpdate = { viewModel.updateChannel() },
+                            onDelete = { viewModel.deleteChannel(onDeleteChannel) }
+                        )
                     }
 
                     androidx.compose.material.Surface(
@@ -200,9 +203,9 @@ fun ChannelDetailScreen(
                                 modifier = Modifier,
                                 text = "${
                                     if (viewModel.channelModel.private == 1) {
-                                        viewModel.memberList.size
+                                        viewModel.memberList.value.size
                                     } else "All"
-                                } member${if (viewModel.memberList.size > 1) "s" else ""}",
+                                } member${if (viewModel.memberList.value.size > 1) "s" else ""}",
                                 fontSize = 14.sp,
                             )
 
@@ -319,20 +322,20 @@ private fun MemberList(
                 .padding(horizontal = 16.dp),
         ) {
             if (viewModel.channelModel.private == 1) {
-                items(viewModel.memberList.size) {
-                    val member = viewModel.memberList[it]
-                    if (!viewModel.memberInfo.containsKey(member.userId)) {
+                items(viewModel.memberList.value.size) {
+                    val member = viewModel.memberList.value[it]
+                    if (!viewModel.memberInfo.value.containsKey(member.userId)) {
                         viewModel.getUser(member.userId)
                     }
 
                     MemberItem(member, viewModel)
                 }
             } else {
-                items(viewModel.adminList.size) {
-                    val admin = viewModel.adminList[it]
+                items(viewModel.adminList.value.size) {
+                    val admin = viewModel.adminList.value[it]
 
                     if (admin.clubId == viewModel.channelModel.clubId) {
-                        if (!viewModel.memberInfo.containsKey(admin.userId)) {
+                        if (!viewModel.memberInfo.value.containsKey(admin.userId)) {
                             viewModel.getUser(admin.userId)
                         }
 
@@ -358,7 +361,7 @@ private fun MemberItem(
             .combinedClickable(
                 onLongClick = {
                     if (viewModel.isAdmin
-                        && !viewModel.adminList.any { admin ->
+                        && !viewModel.adminList.value.any { admin ->
                             admin.userId == member.userId && admin.clubId == viewModel.channelModel.clubId
                         }
                     ) {
@@ -379,7 +382,7 @@ private fun MemberItem(
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                userModel = viewModel.memberInfo[member.userId] ?: User(),
+                userModel = viewModel.memberInfo.value[member.userId] ?: User(),
                 size = 48.dp
             )
 
@@ -388,7 +391,7 @@ private fun MemberItem(
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                 Text(
                     modifier = Modifier,
-                    text = viewModel.memberInfo[member.userId]?.name ?: "...",
+                    text = viewModel.memberInfo.value[member.userId]?.name ?: "...",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -397,7 +400,7 @@ private fun MemberItem(
 
                 Text(
                     modifier = Modifier,
-                    text = viewModel.memberInfo[member.userId]?.regNo ?: "...",
+                    text = viewModel.memberInfo.value[member.userId]?.regNo ?: "...",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -408,7 +411,7 @@ private fun MemberItem(
             Spacer(modifier = Modifier.weight(1f))
 
             if (
-                viewModel.adminList.any { admin ->
+                viewModel.adminList.value.any { admin ->
                     member.userId == admin.userId && admin.clubId == viewModel.channelModel.clubId
                 }
             ) {

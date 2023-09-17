@@ -42,7 +42,7 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel) {
+fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val scope = rememberCoroutineScope()
@@ -53,7 +53,7 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel) {
     val colorScheme = getColorScheme()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .imePadding()
     ) {

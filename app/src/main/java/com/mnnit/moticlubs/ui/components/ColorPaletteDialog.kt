@@ -12,8 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,22 +26,28 @@ import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.PublishedState
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.theme.textColorFor
 
 @Composable
-fun ColorPaletteDialog(otherLinkComposeModel: OtherLinkComposeModel, show: MutableState<Boolean>) {
+fun ColorPaletteDialog(
+    otherLinkComposeModel: OtherLinkComposeModel,
+    show: PublishedState<Boolean>,
+    modifier: Modifier = Modifier,
+) {
     val colorScheme = getColorScheme()
     val controller = rememberColorPickerController().apply {
         this.setWheelColor(Color.Black)
     }
 
-    val colorCode = remember { mutableStateOf("") }
-    val color = remember { mutableStateOf(Color.White) }
+    val colorCode = remember { publishedStateOf("") }
+    val color = remember { publishedStateOf(Color.White) }
 
     Dialog(onDismissRequest = { show.value = false }, DialogProperties()) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(colorScheme.background)

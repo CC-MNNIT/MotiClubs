@@ -11,8 +11,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,21 +22,24 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
+import com.mnnit.moticlubs.domain.util.PublishedList
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 
 @Composable
 fun InputSocialLinkDialog(
-    showDialog: MutableState<Boolean>,
-    socialLinksLiveList: SnapshotStateList<SocialLinkComposeModel>,
-    otherLinksLiveList: SnapshotStateList<OtherLinkComposeModel>,
-    onClick: (list: List<UrlModel>) -> Unit
+    showDialog: PublishedState<Boolean>,
+    socialLinksLiveList: PublishedList<SocialLinkComposeModel>,
+    otherLinksLiveList: PublishedList<OtherLinkComposeModel>,
+    onClick: (list: List<UrlModel>) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
@@ -55,51 +56,51 @@ fun InputSocialLinkDialog(
 
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = socialLinksLiveList[0].urlFieldValue.value,
-                    onValueChange = { socialLinksLiveList[0].urlFieldValue.value = it },
+                    value = socialLinksLiveList.value[0].urlFieldValue.value,
+                    onValueChange = { socialLinksLiveList.value[0].urlFieldValue.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Facebook") },
                     singleLine = true,
-                    isError = !socialLinksLiveList[0].validUrl(),
+                    isError = !socialLinksLiveList.value[0].validUrl(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = socialLinksLiveList[1].urlFieldValue.value,
-                    onValueChange = { socialLinksLiveList[1].urlFieldValue.value = it },
+                    value = socialLinksLiveList.value[1].urlFieldValue.value,
+                    onValueChange = { socialLinksLiveList.value[1].urlFieldValue.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Instagram") },
                     singleLine = true,
-                    isError = !socialLinksLiveList[1].validUrl(),
+                    isError = !socialLinksLiveList.value[1].validUrl(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = socialLinksLiveList[2].urlFieldValue.value,
-                    onValueChange = { socialLinksLiveList[2].urlFieldValue.value = it },
+                    value = socialLinksLiveList.value[2].urlFieldValue.value,
+                    onValueChange = { socialLinksLiveList.value[2].urlFieldValue.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Twitter") },
                     singleLine = true,
-                    isError = !socialLinksLiveList[2].validUrl(),
+                    isError = !socialLinksLiveList.value[2].validUrl(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = socialLinksLiveList[3].urlFieldValue.value,
-                    onValueChange = { socialLinksLiveList[3].urlFieldValue.value = it },
+                    value = socialLinksLiveList.value[3].urlFieldValue.value,
+                    onValueChange = { socialLinksLiveList.value[3].urlFieldValue.value = it },
                     shape = RoundedCornerShape(24.dp),
                     label = { Text(text = "Github") },
                     singleLine = true,
-                    isError = !socialLinksLiveList[3].validUrl(),
+                    isError = !socialLinksLiveList.value[3].validUrl(),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                 )
 
                 Button(
                     onClick = {
-                        val list = socialLinksLiveList
+                        val list = socialLinksLiveList.value
                             .filter { it.validUrl() }.map { it.mapToUrlModel() }
                             .toMutableList()
-                        val others = otherLinksLiveList
+                        val others = otherLinksLiveList.value
                             .filter { it.validUrl() && it.getName().isTrimmedNotEmpty() }.map { it.mapToUrlModel() }
                         list.addAll(others)
                         onClick(list)
@@ -107,7 +108,7 @@ fun InputSocialLinkDialog(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
-                    enabled = socialLinksLiveList.any { it.validUrl() }
+                    enabled = socialLinksLiveList.value.any { it.validUrl() }
                 ) {
                     Text(text = "Save Link(s)", fontSize = 14.sp)
                 }
