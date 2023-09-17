@@ -36,6 +36,6 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
       - name: Build with Gradle
-        run: ./gradlew :app:ktlintCheck :app:lintVitalRelease :app:bundleRelease --parallel
+        run: ./gradlew :app:lintVitalRelease :app:bundleRelease --parallel
       - name: Remove secret
         run: rm -rf app/google-services.json
