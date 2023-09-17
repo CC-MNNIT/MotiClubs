@@ -16,8 +16,8 @@ import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setUserId
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
@@ -36,7 +36,7 @@ class AppViewModel @Inject constructor(
     fun getUser(
         firebaseUser: FirebaseUser?,
         onResponse: () -> Unit = {},
-        onFailure: () -> Unit = {}
+        onFailure: () -> Unit = {},
     ) {
         if (firebaseUser == null) {
             fetchingState = false

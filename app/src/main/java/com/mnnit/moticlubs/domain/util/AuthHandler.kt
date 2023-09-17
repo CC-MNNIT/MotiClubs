@@ -76,8 +76,8 @@ object AuthHandler {
                         email = email,
                         course = course.stream,
                         branch = course.branch,
-                        avatar = signInCredential.profilePictureUri?.toString() ?: ""
-                    )
+                        avatar = signInCredential.profilePictureUri?.toString() ?: "",
+                    ),
                 )
             } catch (e: Exception) {
                 onFailure(e)

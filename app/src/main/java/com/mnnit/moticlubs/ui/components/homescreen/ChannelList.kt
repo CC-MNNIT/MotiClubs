@@ -43,7 +43,7 @@ fun ChannelList(
     viewModel: HomeScreenViewModel,
     clubModel: Club,
     onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     val context = LocalContext.current
@@ -51,20 +51,20 @@ fun ChannelList(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topEnd = 0.dp, topStart = 0.dp, bottomEnd = 24.dp, bottomStart = 24.dp),
         elevation = CardDefaults.cardElevation(0.dp),
-        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
+        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp)),
     ) {
         list.value.forEach { model ->
             Card(
                 onClick = { onNavigateChannelClick(model.channelId, clubModel.clubId) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
-                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
+                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp)),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     IconButton(
                         modifier = Modifier
@@ -72,7 +72,7 @@ fun ChannelList(
                             .height(42.dp)
                             .wrapContentSize(),
                         onClick = {},
-                        enabled = false
+                        enabled = false,
                     ) {
                         Icon(
                             modifier = Modifier
@@ -82,7 +82,9 @@ fun ChannelList(
                             contentDescription = "",
                             tint = if (model.private == 1) {
                                 LocalContentColor.current
-                            } else colorScheme.surfaceColorAtElevation(8.dp)
+                            } else {
+                                colorScheme.surfaceColorAtElevation(8.dp)
+                            },
                         )
                     }
 
@@ -95,7 +97,7 @@ fun ChannelList(
                             .align(Alignment.CenterVertically)
                             .weight(1f),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
 
                     Spacer(modifier = Modifier.padding(12.dp))
@@ -103,12 +105,12 @@ fun ChannelList(
                     AnimatedVisibility(
                         visible = context.getUnreadPost(model.channelId).isNotEmpty(),
                         modifier = Modifier
-                            .align(Alignment.CenterVertically)
+                            .align(Alignment.CenterVertically),
                     ) {
                         Badge(
                             Modifier
                                 .align(Alignment.CenterVertically)
-                                .wrapContentSize()
+                                .wrapContentSize(),
                         ) { Text(text = "${context.getUnreadPost(model.channelId).size}") }
                     }
 
@@ -122,7 +124,7 @@ fun ChannelList(
                 it.userId == viewModel.userModel.userId && it.clubId == clubModel.clubId
             },
             enter = fadeIn(),
-            exit = fadeOut()
+            exit = fadeOut(),
         ) {
             Card(
                 onClick = {
@@ -133,7 +135,7 @@ fun ChannelList(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
-                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -141,7 +143,7 @@ fun ChannelList(
                         fontSize = 14.sp,
                         modifier = Modifier
                             .padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 12.dp)
-                            .align(Alignment.CenterVertically)
+                            .align(Alignment.CenterVertically),
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
@@ -150,7 +152,7 @@ fun ChannelList(
                         modifier = Modifier
                             .padding(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 12.dp)
                             .align(Alignment.CenterVertically)
-                            .size(18.dp)
+                            .size(18.dp),
                     )
                 }
             }

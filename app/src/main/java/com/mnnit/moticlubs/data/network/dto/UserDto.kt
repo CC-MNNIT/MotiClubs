@@ -92,7 +92,7 @@ data class FCMDto(
 data class FCMTokenDto(
     @SerializedName("token")
     @Expose
-    var token: String
+    var token: String,
 )
 
 data class AdminDetailDto(

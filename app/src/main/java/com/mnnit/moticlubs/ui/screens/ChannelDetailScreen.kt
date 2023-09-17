@@ -82,7 +82,7 @@ fun ChannelDetailScreen(
 
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetching,
-        onRefresh = viewModel::refreshAll
+        onRefresh = viewModel::refreshAll,
     )
     MotiClubsTheme(colorScheme = getColorScheme()) {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
@@ -97,7 +97,7 @@ fun ChannelDetailScreen(
             modifier = modifier
                 .fillMaxWidth()
                 .imePadding(),
-            color = colorScheme.background
+            color = colorScheme.background,
         ) {
             Scaffold(
                 modifier = Modifier
@@ -119,7 +119,7 @@ fun ChannelDetailScreen(
                         navigationIcon = {
                             IconButton(
                                 modifier = Modifier.size(42.dp),
-                                onClick = onBackPressed
+                                onClick = onBackPressed,
                             ) {
                                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                             }
@@ -141,14 +141,14 @@ fun ChannelDetailScreen(
                         ConfirmationDialog(
                             showDialog = viewModel.showRemoveConfirmationDialog,
                             message = "Are you sure you want to remove ${
-                                if (viewModel.removeMemberUserId == -1L) {
-                                    "this member"
-                                } else {
-                                    viewModel.memberInfo.value.getValue(viewModel.removeMemberUserId).name
-                                }
+                            if (viewModel.removeMemberUserId == -1L) {
+                                "this member"
+                            } else {
+                                viewModel.memberInfo.value.getValue(viewModel.removeMemberUserId).name
+                            }
                             } ?",
                             positiveBtnText = "Remove",
-                            onPositive = { viewModel.removeMember() }
+                            onPositive = { viewModel.removeMember() },
                         )
                     }
 
@@ -156,15 +156,16 @@ fun ChannelDetailScreen(
                         ConfirmationDialog(
                             showDialog = viewModel.showPrivateConfirmationDialog,
                             message = "${
-                                if (viewModel.updateChannelPrivate == 0) {
-                                    "Making channel public will allow all the users to access the channel."
-                                } else {
-                                    "Making channel private will restrict access to only admins of club and members of the channel."
-                                }
+                            if (viewModel.updateChannelPrivate == 0) {
+                                "Making channel public will allow all the users to access the channel."
+                            } else {
+                                "Making channel private will restrict access to only admins of " +
+                                    "club and members of the channel."
+                            }
                             }\n\nAre you sure you want to continue ?",
                             positiveBtnText = "Continue",
                             onPositive = { viewModel.updateChannel() },
-                            onNegative = { viewModel.resetUpdate() }
+                            onNegative = { viewModel.resetUpdate() },
                         )
                     }
 
@@ -172,13 +173,13 @@ fun ChannelDetailScreen(
                         UpdateChannelDialog(
                             viewModel = viewModel,
                             onUpdate = { viewModel.updateChannel() },
-                            onDelete = { viewModel.deleteChannel(onDeleteChannel) }
+                            onDelete = { viewModel.deleteChannel(onDeleteChannel) },
                         )
                     }
 
                     androidx.compose.material.Surface(
                         modifier = Modifier.fillMaxSize(),
-                        color = colorScheme.background
+                        color = colorScheme.background,
                     ) {
                         Column(
                             modifier = Modifier
@@ -187,14 +188,14 @@ fun ChannelDetailScreen(
                                 .padding(PaddingValues(top = it.calculateTopPadding()))
                                 .pullRefresh(
                                     state = refreshState,
-                                    enabled = !viewModel.isFetching
+                                    enabled = !viewModel.isFetching,
                                 ),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             PullDownProgressIndicator(
                                 modifier = Modifier.background(colorScheme.surfaceColorAtElevation(2.dp)),
                                 visible = viewModel.isFetching,
-                                refreshState = refreshState
+                                refreshState = refreshState,
                             )
 
                             Spacer(modifier = Modifier.padding(4.dp))
@@ -202,9 +203,11 @@ fun ChannelDetailScreen(
                             Text(
                                 modifier = Modifier,
                                 text = "${
-                                    if (viewModel.channelModel.private == 1) {
-                                        viewModel.memberList.value.size
-                                    } else "All"
+                                if (viewModel.channelModel.private == 1) {
+                                    viewModel.memberList.value.size
+                                } else {
+                                    "All"
+                                }
                                 } member${if (viewModel.memberList.value.size > 1) "s" else ""}",
                                 fontSize = 14.sp,
                             )
@@ -223,7 +226,7 @@ fun ChannelDetailScreen(
 @Composable
 private fun BigTitle(viewModel: ChannelDetailScreenViewModel) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
             modifier = Modifier
@@ -242,12 +245,12 @@ private fun BigTitle(viewModel: ChannelDetailScreenViewModel) {
             modifier = Modifier
                 .padding(end = 16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = "Private",
                 modifier = Modifier.align(Alignment.CenterVertically),
-                fontSize = 14.sp
+                fontSize = 14.sp,
             )
             Switch(
                 modifier = Modifier
@@ -268,7 +271,7 @@ private fun BigTitle(viewModel: ChannelDetailScreenViewModel) {
 @Composable
 private fun RowScope.Actions(
     onNavigateToAddMember: (channelId: Long) -> Unit,
-    viewModel: ChannelDetailScreenViewModel
+    viewModel: ChannelDetailScreenViewModel,
 ) {
     AnimatedVisibility(
         visible = viewModel.channelModel.name != "General" && viewModel.isAdmin,
@@ -281,7 +284,7 @@ private fun RowScope.Actions(
                 if (viewModel.isAdmin) {
                     onNavigateToAddMember(viewModel.channelId)
                 }
-            }
+            },
         ) {
             Icon(imageVector = Icons.Rounded.GroupAdd, contentDescription = "")
         }
@@ -299,7 +302,7 @@ private fun RowScope.Actions(
                     viewModel.updateChannelName = viewModel.channelModel.name
                     viewModel.showUpdateChannelDialog.value = true
                 }
-            }
+            },
         ) {
             Icon(imageVector = Icons.Rounded.Edit, contentDescription = "")
         }
@@ -309,7 +312,7 @@ private fun RowScope.Actions(
 @Composable
 private fun MemberList(
     viewModel: ChannelDetailScreenViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
 
@@ -360,8 +363,8 @@ private fun MemberItem(
             .clip(RoundedCornerShape(24.dp))
             .combinedClickable(
                 onLongClick = {
-                    if (viewModel.isAdmin
-                        && !viewModel.adminList.value.any { admin ->
+                    if (viewModel.isAdmin &&
+                        !viewModel.adminList.value.any { admin ->
                             admin.userId == member.userId && admin.clubId == viewModel.channelModel.clubId
                         }
                     ) {
@@ -369,7 +372,7 @@ private fun MemberItem(
                         viewModel.showRemoveConfirmationDialog.value = true
                     }
                 },
-                onClick = {}
+                onClick = {},
             ),
         elevation = CardDefaults.cardElevation(0.dp),
         shape = RoundedCornerShape(24.dp),
@@ -378,12 +381,12 @@ private fun MemberItem(
         Row(
             modifier = Modifier
                 .padding(12.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 userModel = viewModel.memberInfo.value[member.userId] ?: User(),
-                size = 48.dp
+                size = 48.dp,
             )
 
             Spacer(modifier = Modifier.padding(8.dp))
@@ -395,7 +398,7 @@ private fun MemberItem(
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Text(
@@ -404,7 +407,7 @@ private fun MemberItem(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -431,7 +434,7 @@ private fun MemberItem(
                             modifier = Modifier
                                 .padding(horizontal = 4.dp)
                                 .align(Alignment.CenterVertically),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }

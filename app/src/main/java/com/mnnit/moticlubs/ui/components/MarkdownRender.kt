@@ -29,7 +29,7 @@ fun MarkdownRender(
     imageReplacerMap: PublishedMap<String, String> = publishedStateMapOf(),
     selectable: Boolean = false,
     disableLinkMovementMethod: Boolean = false,
-    onImageClick: (url: String) -> Unit = {}
+    onImageClick: (url: String) -> Unit = {},
 ) {
     val colorScheme = getColorScheme()
 
@@ -70,7 +70,7 @@ fun MarkdownRender(
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(bottom = 88.dp, top = 16.dp, start = 16.dp, end = 16.dp)
+        contentPadding = PaddingValues(bottom = 88.dp, top = 16.dp, start = 16.dp, end = 16.dp),
     ) {
         items(count = list.size) { idx ->
             if (list[idx] is PreviewMarkdown.Text) {
@@ -80,24 +80,25 @@ fun MarkdownRender(
                         color = contentColorFor(backgroundColor = colorScheme.background),
                         selectable = selectable,
                         disableLinkMovementMethod = disableLinkMovementMethod,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             } else {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp)
+                        .padding(vertical = 12.dp),
                 ) {
                     Image(
-                        painter = LocalContext.current.getImageUrlPainter(url = list[idx].str), contentDescription = "",
+                        painter = LocalContext.current.getImageUrlPainter(url = list[idx].str),
+                        contentDescription = "",
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .clip(RoundedCornerShape(16.dp))
                             .fillMaxWidth()
                             .heightIn(0.dp, 248.dp)
                             .clickable(true, onClick = { onImageClick(list[idx].str) }),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
                 }
             }

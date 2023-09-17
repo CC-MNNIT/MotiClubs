@@ -15,8 +15,8 @@ import com.mnnit.moticlubs.data.network.dto.UrlModel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Url
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.ClubUseCases
-import com.mnnit.moticlubs.domain.use_case.UrlUseCases
+import com.mnnit.moticlubs.domain.usecase.ClubUseCases
+import com.mnnit.moticlubs.domain.usecase.UrlUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
 import com.mnnit.moticlubs.domain.util.Resource
@@ -28,11 +28,11 @@ import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ClubDetailsScreenViewModel @Inject constructor(
@@ -70,7 +70,10 @@ class ClubDetailsScreenViewModel @Inject constructor(
     val otherLinkIdx = publishedStateOf(0)
 
     val socialLinksLiveList = publishedStateListOf(
-        SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel(), SocialLinkComposeModel()
+        SocialLinkComposeModel(),
+        SocialLinkComposeModel(),
+        SocialLinkComposeModel(),
+        SocialLinkComposeModel(),
     )
     val socialLinks = publishedStateListOf(Url(), Url(), Url(), Url())
 
@@ -148,7 +151,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
         url: String = clubModel.avatar,
         description: String = clubModel.description,
         onResponse: () -> Unit,
-        onFailure: (code: Int) -> Unit
+        onFailure: (code: Int) -> Unit,
     ) {
         updateClubJob?.cancel()
         updateClubJob = clubUseCases.updateClub(clubModel.copy(avatar = url, description = description))
@@ -223,9 +226,11 @@ class ClubDetailsScreenViewModel @Inject constructor(
         }
 
         otherLinks.value.clear()
-        otherLinks.value.addAll(urls.filter { f ->
-            !SocialLinkComposeModel.socialLinkNames.any { s -> f.name.contains(s) }
-        })
+        otherLinks.value.addAll(
+            urls.filter { f ->
+                !SocialLinkComposeModel.socialLinkNames.any { s -> f.name.contains(s) }
+            },
+        )
         otherLinksLiveList.value.clear()
         otherLinksLiveList.value.addAll(otherLinks.value.map { m -> m.mapToOtherLinkModel() })
     }

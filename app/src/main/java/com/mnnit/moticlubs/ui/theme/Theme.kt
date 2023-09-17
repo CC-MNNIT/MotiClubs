@@ -84,9 +84,13 @@ private val DarkColorPalette = darkColorScheme(
 @Composable
 fun getColorScheme() =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (isSystemInDarkTheme()) dynamicDarkColorScheme(LocalContext.current) else dynamicLightColorScheme(
-            LocalContext.current
-        )
+        if (isSystemInDarkTheme()) {
+            dynamicDarkColorScheme(LocalContext.current)
+        } else {
+            dynamicLightColorScheme(
+                LocalContext.current,
+            )
+        }
     } else {
         if (isSystemInDarkTheme()) DarkColorPalette else LightColorPalette
     }
@@ -105,7 +109,7 @@ fun SetTransparentSystemBars(setStatusBar: Boolean = true, setNavBar: Boolean = 
         systemUiController.setNavigationBarColor(
             color = if (setNavBar) Color.Transparent else colorScheme.surfaceColorAtElevation(2.dp),
             darkIcons = !darkTheme,
-            navigationBarContrastEnforced = false
+            navigationBarContrastEnforced = false,
         )
     }
 }
@@ -127,26 +131,26 @@ private fun Color.toRGB(): IntArray {
 @Composable
 fun MotiClubsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) DarkColorPalette else LightColorPalette
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
         shapes = Shapes(),
-        content = content
+        content = content,
     )
 }
 
 @Composable
 fun MotiClubsTheme(
     colorScheme: ColorScheme,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
         shapes = Shapes(),
-        content = content
+        content = content,
     )
 }

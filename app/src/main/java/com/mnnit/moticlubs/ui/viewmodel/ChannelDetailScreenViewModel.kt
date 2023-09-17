@@ -18,9 +18,9 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
-import com.mnnit.moticlubs.domain.use_case.MemberUseCases
-import com.mnnit.moticlubs.domain.use_case.UserUseCases
+import com.mnnit.moticlubs.domain.usecase.ChannelUseCases
+import com.mnnit.moticlubs.domain.usecase.MemberUseCases
+import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
@@ -31,11 +31,11 @@ import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ChannelDetailScreenViewModel @Inject constructor(
@@ -100,7 +100,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
     fun updateChannel() {
         progressMsg = "Updating"
         channelUseCases.updateChannel(
-            channelModel.copy(name = updateChannelName, private = updateChannelPrivate)
+            channelModel.copy(name = updateChannelName, private = updateChannelPrivate),
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> {
@@ -163,7 +163,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
         removeMemberJob = memberUseCases.removeMember(
             channelModel.clubId,
             channelId,
-            removeMemberUserId
+            removeMemberUserId,
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showMemberProgressDialog.value = true
@@ -213,16 +213,18 @@ class ChannelDetailScreenViewModel @Inject constructor(
 
                 is Resource.Success -> {
                     memberList.value.clear()
-                    memberList.value.addAll(resource.data.sortedWith(
-                        compareBy(
-                            { member ->
-                                !adminList.value.any { admin ->
-                                    admin.userId == member.userId && admin.clubId == channelModel.clubId
-                                }
-                            },
-                            { member -> memberInfo.value[member.userId]?.name ?: "" }
-                        )
-                    ))
+                    memberList.value.addAll(
+                        resource.data.sortedWith(
+                            compareBy(
+                                { member ->
+                                    !adminList.value.any { admin ->
+                                        admin.userId == member.userId && admin.clubId == channelModel.clubId
+                                    }
+                                },
+                                { member -> memberInfo.value[member.userId]?.name ?: "" },
+                            ),
+                        ),
+                    )
                 }
 
                 is Resource.Error -> {

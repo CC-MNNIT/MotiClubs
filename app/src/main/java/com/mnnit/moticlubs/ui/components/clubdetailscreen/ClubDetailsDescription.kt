@@ -55,7 +55,7 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .imePadding()
+            .imePadding(),
     ) {
         Row(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
             Text(
@@ -63,7 +63,7 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
                 fontSize = 12.sp,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .padding(top = 8.dp)
+                    .padding(top = 8.dp),
             )
             if (viewModel.isAdmin) {
                 Spacer(modifier = Modifier.weight(1f))
@@ -85,7 +85,8 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
                                 onFailure = {
                                     viewModel.showProgressDialog.value = false
                                     Toast.makeText(context, "Unable to update description", Toast.LENGTH_SHORT).show()
-                                })
+                                },
+                            )
                         } else {
                             // ON EDIT
                             viewModel.displayedDescription = viewModel.clubModel.description
@@ -97,14 +98,15 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
                         INPUT_CLUB_DESCRIPTION_SIZE.lengthInRange(viewModel.displayedDescription)
                     } else {
                         true
-                    }
+                    },
                 ) {
                     Icon(
                         imageVector = if (viewModel.editDescriptionMode) {
                             Icons.Rounded.Save
                         } else {
                             Icons.Rounded.Edit
-                        }, contentDescription = ""
+                        },
+                        contentDescription = "",
                     )
                 }
                 if (viewModel.editDescriptionMode) {
@@ -114,7 +116,7 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
                             viewModel.displayedDescription = viewModel.clubModel.description
                             keyboardController?.hide()
                         },
-                        modifier = Modifier.align(Alignment.Top)
+                        modifier = Modifier.align(Alignment.Top),
                     ) {
                         Icon(imageVector = Icons.Rounded.Close, contentDescription = "")
                     }
@@ -147,8 +149,8 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
                 focusedLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                 focusedBorderColor = colorScheme.background,
                 unfocusedLabelColor = contentColorFor(backgroundColor = colorScheme.background),
-                unfocusedBorderColor = colorScheme.background
-            )
+                unfocusedBorderColor = colorScheme.background,
+            ),
         )
         LaunchedEffect(viewModel.editDescriptionMode) {
             if (viewModel.editDescriptionMode) focusRequester.requestFocus()

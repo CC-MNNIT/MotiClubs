@@ -51,18 +51,18 @@ fun ChannelTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround,
         ) {
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .wrapContentSize()
+                    .wrapContentSize(),
             ) {
                 IconButton(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .size(42.dp),
-                    onClick = onBackPressed
+                    onClick = onBackPressed,
                 ) {
                     Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                 }
@@ -74,7 +74,7 @@ fun ChannelTopBar(
                         .align(Alignment.CenterVertically),
                     userModel = User().copy(avatar = viewModel.clubModel.avatar),
                     size = 42.dp,
-                    onClick = { onNavigateToClubDetails(viewModel.clubId) }
+                    onClick = { onNavigateToClubDetails(viewModel.clubId) },
                 )
             }
 
@@ -95,19 +95,21 @@ fun ChannelTopBar(
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Start,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 // Number of members
                 Text(
                     text = "${viewModel.clubModel.name} - ${
-                        if (viewModel.memberCount.intValue == -1) "General" else {
-                            "${viewModel.memberCount.intValue} members"
-                        }
+                    if (viewModel.memberCount.intValue == -1) {
+                        "General"
+                    } else {
+                        "${viewModel.memberCount.intValue} members"
+                    }
                     }",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1
+                    maxLines = 1,
                 )
             }
 
@@ -116,14 +118,14 @@ fun ChannelTopBar(
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .wrapContentSize()
+                    .wrapContentSize(),
             ) {
                 // Search icon
                 IconButton(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .size(42.dp),
-                    onClick = { viewModel.searchMode.value = true }
+                    onClick = { viewModel.searchMode.value = true },
                 ) {
                     Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
                 }

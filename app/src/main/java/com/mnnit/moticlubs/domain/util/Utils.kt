@@ -14,9 +14,9 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
-import me.saket.telephoto.zoomable.ZoomableContentLocation
 import java.util.Calendar
 import kotlin.math.min
+import me.saket.telephoto.zoomable.ZoomableContentLocation
 
 object Constants {
     val EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@mnnit.ac.in$".toRegex()
@@ -89,7 +89,7 @@ fun Painter.zoomableContentLocation(): ZoomableContentLocation = object : Zoomab
         )
         return Rect(
             offset = alignedOffset.toOffset(),
-            size = scaledSize
+            size = scaledSize,
         )
     }
 
@@ -97,7 +97,7 @@ fun Painter.zoomableContentLocation(): ZoomableContentLocation = object : Zoomab
 }
 
 private val mMonthsList: List<String> = listOf(
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 )
 
 fun Long.toTimeString(): String {
@@ -124,7 +124,7 @@ fun Long.toTimeString(): String {
             val month = calendar.get(Calendar.MONTH)
 
             "${if (hour < 10) "0$hour" else "$hour"}:${if (min < 10) "0$min" else "$min"} " +
-                    "${if (hour24 < 12) "AM" else "PM"}, $day ${mMonthsList[month]}"
+                "${if (hour24 < 12) "AM" else "PM"}, $day ${mMonthsList[month]}"
         }
     }
 }

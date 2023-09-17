@@ -32,7 +32,7 @@ fun OtherLinkItem(
     refIdx: PublishedState<Int>,
     showColorPalette: PublishedState<Boolean>,
     modifier: Modifier = Modifier,
-    onDeleteItem: (idx: Int) -> Unit = {}
+    onDeleteItem: (idx: Int) -> Unit = {},
 ) {
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
@@ -45,7 +45,7 @@ fun OtherLinkItem(
 
                     linksList.value[idx].fieldValue.value = TextFieldValue(
                         str.replaceRange(tr.start, tr.end, "\\$subStr"),
-                        selection = TextRange(tr.end + 1, tr.end + 1)
+                        selection = TextRange(tr.end + 1, tr.end + 1),
                     )
                 } else {
                     linksList.value[idx].fieldValue.value = it
@@ -66,12 +66,12 @@ fun OtherLinkItem(
                         refIdx.value = idx
                         showColorPalette.value = true
                     },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = linksList.value[idx].color.value)
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = linksList.value[idx].color.value),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.ColorLens,
                         contentDescription = null,
-                        tint = textColorFor(color = linksList.value[idx].color.value)
+                        tint = textColorFor(color = linksList.value[idx].color.value),
                     )
                 }
             },
@@ -81,7 +81,7 @@ fun OtherLinkItem(
                     onClick = {
                         linksList.value.removeAt(idx)
                         onDeleteItem(idx)
-                    }
+                    },
                 ) {
                     Icon(imageVector = Icons.Rounded.DeleteOutline, contentDescription = null)
                 }

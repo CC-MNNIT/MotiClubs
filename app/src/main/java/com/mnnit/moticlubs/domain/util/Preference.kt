@@ -31,9 +31,12 @@ fun Context.clubHasUnreadPost(channels: List<Channel>): Boolean {
 
 fun Context.postRead(channelId: Long, postId: Long, read: Boolean = false) {
     this.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE).edit()
-        .putStringSet("ch$channelId", getUnreadPost(channelId).apply {
-            if (read) remove(postId.toString()) else add(postId.toString())
-        }).apply()
+        .putStringSet(
+            "ch$channelId",
+            getUnreadPost(channelId).apply {
+                if (read) remove(postId.toString()) else add(postId.toString())
+            },
+        ).apply()
 }
 
 fun Context.getUnreadPost(channelId: Long) =

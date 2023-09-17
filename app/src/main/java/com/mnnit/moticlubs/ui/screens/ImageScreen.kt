@@ -30,17 +30,16 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
-import javax.inject.Inject
 
 @HiltViewModel
 class ImageScreenViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     var imageUrl by publishedStateOf(savedStateHandle.getStringArg("image"))
-
 }
 
 @Composable
@@ -64,7 +63,7 @@ fun ImageScreen(
                     .zoomable(zoomState),
                 contentDescription = null,
                 alignment = Alignment.Center,
-                painter = painter
+                painter = painter,
             )
 
             LaunchedEffect(painter.intrinsicSize) {
@@ -78,7 +77,7 @@ fun ImageScreen(
                     .padding(16.dp)
                     .size(42.dp),
                 onClick = onBackPressed,
-                colors = IconButtonDefaults.filledIconButtonColors(containerColor = colorScheme.background)
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = colorScheme.background),
             ) {
                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
             }

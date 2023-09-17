@@ -34,14 +34,14 @@ import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 @Composable
 fun CourseSelectField(
     viewModel: AddMemberViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentSize(Alignment.CenterEnd)
+            .wrapContentSize(Alignment.CenterEnd),
     ) {
         OutlinedTextField(
             modifier = Modifier
@@ -62,12 +62,12 @@ fun CourseSelectField(
                     colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
                     shape = RoundedCornerShape(20.dp),
                     enabled = !viewModel.isFetching,
-                    onClick = { viewModel.courseDropDownExpanded = true }
+                    onClick = { viewModel.courseDropDownExpanded = true },
                 ) {
                     Row(
                         modifier = Modifier
                             .padding(8.dp)
-                            .wrapContentSize()
+                            .wrapContentSize(),
                     ) {
                         Text(
                             text = viewModel.searchCourse.value.ifEmpty { "Course" },
@@ -76,7 +76,7 @@ fun CourseSelectField(
                                 .padding(start = 4.dp)
                                 .wrapContentSize(),
                             fontSize = 14.sp,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                         Spacer(modifier = Modifier.padding(1.dp))
                         Icon(
@@ -84,7 +84,7 @@ fun CourseSelectField(
                             null,
                             Modifier
                                 .align(Alignment.CenterVertically)
-                                .rotate(if (viewModel.courseDropDownExpanded) 180f else 0f)
+                                .rotate(if (viewModel.courseDropDownExpanded) 180f else 0f),
                         )
                     }
                 }
@@ -98,7 +98,7 @@ fun CourseSelectField(
                     Icon(
                         Icons.Filled.ArrowDropDown,
                         null,
-                        Modifier.rotate(if (viewModel.branchDropDownExpanded) 180f else 0f)
+                        Modifier.rotate(if (viewModel.branchDropDownExpanded) 180f else 0f),
                     )
                 }
             },
@@ -108,8 +108,8 @@ fun CourseSelectField(
                 disabledLabelColor = colorScheme.onSurfaceVariant,
                 disabledLeadingIconColor = colorScheme.onSurfaceVariant,
                 disabledTrailingIconColor = colorScheme.onSurfaceVariant,
-                disabledBorderColor = colorScheme.outline
-            )
+                disabledBorderColor = colorScheme.outline,
+            ),
         )
 
         DropdownMenu(
@@ -136,14 +136,15 @@ fun CourseSelectField(
                         }
                         viewModel.courseDropDownExpanded = false
                         viewModel.filterSearch()
-                    })
+                    },
+                )
             }
         }
 
         DropdownMenu(
             modifier = Modifier.align(Alignment.CenterEnd),
             expanded = viewModel.branchDropDownExpanded,
-            onDismissRequest = { viewModel.branchDropDownExpanded = false }
+            onDismissRequest = { viewModel.branchDropDownExpanded = false },
         ) {
             viewModel.branchMap[viewModel.searchCourse.value]?.forEach { option ->
                 DropdownMenuItem(
@@ -152,7 +153,8 @@ fun CourseSelectField(
                         viewModel.searchBranch.value = option
                         viewModel.branchDropDownExpanded = false
                         viewModel.filterSearch()
-                    })
+                    },
+                )
             }
         }
     }

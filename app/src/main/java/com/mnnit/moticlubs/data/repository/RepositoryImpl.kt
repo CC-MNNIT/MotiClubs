@@ -2,7 +2,7 @@ package com.mnnit.moticlubs.data.repository
 
 import android.app.Application
 import androidx.room.withTransaction
-import com.mnnit.moticlubs.data.data_source.LocalDatabase
+import com.mnnit.moticlubs.data.datasource.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.Admin
 import com.mnnit.moticlubs.domain.model.AdminUser
@@ -20,7 +20,7 @@ import com.mnnit.moticlubs.domain.repository.Repository
 class RepositoryImpl(
     private val db: LocalDatabase,
     private val apiService: ApiService,
-    private val application: Application
+    private val application: Application,
 ) : Repository {
 
     private val dao = db.dao

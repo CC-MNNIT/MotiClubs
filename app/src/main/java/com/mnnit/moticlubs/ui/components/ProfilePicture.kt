@@ -27,7 +27,7 @@ fun ProfilePicture(
     userModel: User,
     modifier: Modifier = Modifier,
     size: Dp = 48.dp,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     val showDialog = remember { publishedStateOf(false) }
     if (showDialog.value) {
@@ -35,7 +35,8 @@ fun ProfilePicture(
     }
 
     Image(
-        painter = LocalContext.current.getProfileUrlPainter(url = userModel.avatar), contentDescription = "",
+        painter = LocalContext.current.getProfileUrlPainter(url = userModel.avatar),
+        contentDescription = "",
         modifier = modifier
             .clip(CircleShape)
             .size(size)
@@ -46,7 +47,7 @@ fun ProfilePicture(
                 }
 
                 showDialog.value = true
-            })
+            },),
     )
 }
 
@@ -62,15 +63,15 @@ private fun Context.getUrlPainter(url: String, profile: Boolean): Painter {
     return if (error.value) {
         picasso.value.rememberPainter(request = {
             it.load(url).placeholder(resID).error(resID)
-        }, key = url, onError = { Log.d("TAG", "getProfileUrlPainter: network error") })
+        }, key = url, onError = { Log.d("TAG", "getProfileUrlPainter: network error") },)
     } else {
         picasso.value.rememberPainter(request = {
             it.load(url).networkPolicy(NetworkPolicy.OFFLINE)
                 .placeholder(resID).error(resID)
         }, key = url, onError = {
-            Log.d("TAG", "getProfileUrlPainter: Error, fallback to network")
-            error.value = true
-        })
+                Log.d("TAG", "getProfileUrlPainter: Error, fallback to network")
+                error.value = true
+            },)
     }
 }
 

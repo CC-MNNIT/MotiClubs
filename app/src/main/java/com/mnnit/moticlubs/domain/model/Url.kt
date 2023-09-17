@@ -30,17 +30,20 @@ data class Url(
     constructor() : this(-1L, -1, "", "FFFFFF", "")
 
     fun mapToOtherLinkModel(): OtherLinkComposeModel = OtherLinkComposeModel(
-        urlId, clubId,
+        urlId,
+        clubId,
         publishedStateOf(TextFieldValue("$name\\$url")),
         publishedStateOf("#$colorCode"),
-        publishedStateOf(Color(android.graphics.Color.parseColor("#$colorCode")))
+        publishedStateOf(Color(android.graphics.Color.parseColor("#$colorCode"))),
     )
 
     fun mapToSocialLinkModel(): SocialLinkComposeModel = SocialLinkComposeModel(
-        urlId, clubId, name,
+        urlId,
+        clubId,
+        name,
         publishedStateOf(TextFieldValue(url)),
         publishedStateOf("#$colorCode"),
-        publishedStateOf(Color(android.graphics.Color.parseColor("#$colorCode")))
+        publishedStateOf(Color(android.graphics.Color.parseColor("#$colorCode"))),
     )
 
     fun getLinkBadge(): String {

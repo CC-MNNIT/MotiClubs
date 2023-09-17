@@ -7,8 +7,17 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.BottomSheetState
+import androidx.compose.material.BottomSheetValue
+import androidx.compose.material.DrawerState
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -17,10 +26,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.model.AdminUser
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Club
+import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.MemberUseCases
-import com.mnnit.moticlubs.domain.use_case.PostUseCases
+import com.mnnit.moticlubs.domain.usecase.MemberUseCases
+import com.mnnit.moticlubs.domain.usecase.PostUseCases
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_POST_MESSAGE_SIZE
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CHANNEL_ARG
@@ -35,10 +47,11 @@ import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
@@ -47,7 +60,7 @@ class ChannelScreenViewModel @Inject constructor(
     private val memberUseCases: MemberUseCases,
     private val postUseCases: PostUseCases,
     private val repository: Repository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     companion object {
@@ -77,7 +90,7 @@ class ChannelScreenViewModel @Inject constructor(
     var userId by mutableLongStateOf(-1)
 
     var clubModel by publishedStateOf(Club())
-    var channelModel by mutableStateOf(Channel())
+    var channelModel by publishedStateOf(Channel())
 
     val eventPostMsg = publishedStateOf(TextFieldValue(""))
     val eventImageReplacerMap = publishedStateMapOf<String, String>()
@@ -115,8 +128,8 @@ class ChannelScreenViewModel @Inject constructor(
                 initialValue = BottomSheetValue.Collapsed,
                 density = Density(application),
             ),
-            snackbarHostState = SnackbarHostState()
-        )
+            snackbarHostState = SnackbarHostState(),
+        ),
     )
     val scrollValue = mutableIntStateOf(0)
     var isAdmin by publishedStateOf(false)

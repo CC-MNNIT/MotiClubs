@@ -52,32 +52,32 @@ fun UpdateChannelDialog(
             showDialog = showConfirmation,
             message = "Are you sure you want to delete the channel ?\nThis will delete all the posts in the channel",
             positiveBtnText = "Delete",
-            onPositive = onDelete
+            onPositive = onDelete,
         )
     }
 
     Dialog(
         onDismissRequest = { viewModel.showUpdateChannelDialog.value = false },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
             modifier = modifier
                 .fillMaxWidth(0.9f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     "Update Channel",
                     fontSize = 16.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 ) {
                     OutlinedTextField(
                         modifier = Modifier
@@ -95,13 +95,13 @@ fun UpdateChannelDialog(
                         modifier = Modifier
                             .weight(0.2f)
                             .align(Alignment.CenterVertically),
-                        onClick = { showConfirmation.value = true }
+                        onClick = { showConfirmation.value = true },
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = Icons.Rounded.Delete,
                             contentDescription = "",
-                            tint = colorScheme.error
+                            tint = colorScheme.error,
                         )
                     }
                 }
@@ -110,14 +110,14 @@ fun UpdateChannelDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     Button(
                         onClick = { viewModel.showUpdateChannelDialog.value = false },
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
-                        colors = ButtonDefaults.buttonColors(colorScheme.error)
+                        colors = ButtonDefaults.buttonColors(colorScheme.error),
                     ) {
                         Text(text = "Cancel", fontSize = 14.sp)
                     }
@@ -127,8 +127,8 @@ fun UpdateChannelDialog(
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
-                        enabled = viewModel.updateChannelName.isTrimmedNotEmpty()
-                                && INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.updateChannelName)
+                        enabled = viewModel.updateChannelName.isTrimmedNotEmpty() &&
+                            INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.updateChannelName),
                     ) {
                         Text(text = "Save", fontSize = 14.sp)
                     }

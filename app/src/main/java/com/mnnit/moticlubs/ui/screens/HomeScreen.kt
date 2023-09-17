@@ -1,7 +1,11 @@
 package com.mnnit.moticlubs.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -10,8 +14,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -37,12 +48,12 @@ fun HomeScreen(
     onNavigateContactUs: () -> Unit,
     onNavigateProfile: (viewModel: HomeScreenViewModel) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeScreenViewModel = hiltViewModel()
+    viewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
     val colorScheme = getColorScheme()
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingChannels || viewModel.isFetchingClubs,
-        onRefresh = viewModel::refreshAll
+        onRefresh = viewModel::refreshAll,
     )
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
@@ -67,12 +78,13 @@ fun HomeScreen(
                         ProfilePicture(
                             modifier = Modifier.padding(end = 16.dp),
                             userModel = viewModel.userModel,
-                            onClick = { onNavigateProfile(viewModel) })
+                            onClick = { onNavigateProfile(viewModel) },
+                        )
                     },
                     scrollBehavior = scrollBehavior,
                     colors = TopAppBarDefaults.largeTopAppBarColors(
-                        scrolledContainerColor = colorScheme.surfaceColorAtElevation(2.dp)
-                    )
+                        scrolledContainerColor = colorScheme.surfaceColorAtElevation(2.dp),
+                    ),
                 )
             },
             content = {
@@ -90,37 +102,38 @@ fun HomeScreen(
                         .padding(PaddingValues(top = it.calculateTopPadding()))
                         .pullRefresh(
                             state = refreshState,
-                            enabled = !viewModel.isFetchingAdmins
-                                    && !viewModel.isFetchingChannels
-                                    && !viewModel.isFetchingClubs
-                        )
+                            enabled = !viewModel.isFetchingAdmins &&
+                                !viewModel.isFetchingChannels &&
+                                !viewModel.isFetchingClubs,
+                        ),
                 ) {
                     PullDownProgressIndicator(
-                        visible = viewModel.isFetchingAdmins
-                                || viewModel.isFetchingChannels
-                                || viewModel.isFetchingClubs,
-                        refreshState = refreshState
+                        visible = viewModel.isFetchingAdmins ||
+                            viewModel.isFetchingChannels ||
+                            viewModel.isFetchingClubs,
+                        refreshState = refreshState,
                     )
 
                     AnimatedVisibility(
-                        visible = viewModel.clubsList.value.isEmpty() && !viewModel.isFetchingAdmins
-                                && !viewModel.isFetchingChannels
-                                && !viewModel.isFetchingClubs,
+                        visible = viewModel.clubsList.value.isEmpty() && !viewModel.isFetchingAdmins &&
+                            !viewModel.isFetchingChannels &&
+                            !viewModel.isFetchingClubs,
                         modifier = Modifier
                             .fillMaxSize()
                             .pullRefresh(
-                                state = refreshState, enabled = !viewModel.isFetchingAdmins
-                                        && !viewModel.isFetchingChannels
-                                        && !viewModel.isFetchingClubs
+                                state = refreshState,
+                                enabled = !viewModel.isFetchingAdmins &&
+                                    !viewModel.isFetchingChannels &&
+                                    !viewModel.isFetchingClubs,
                             )
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(rememberScrollState()),
                     ) {
                         Text(
                             "Error loading clubs :/\nPull down to refresh",
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
-                                .padding(start = 16.dp)
+                                .padding(start = 16.dp),
                         )
                     }
                     ClubList(
@@ -128,7 +141,7 @@ fun HomeScreen(
                         clubsList = viewModel.clubsList,
                         channelMap = viewModel.channelMap,
                         onNavigateChannelClick = onNavigateChannelClick,
-                        onNavigateToClubDetails = onNavigateToClubDetails
+                        onNavigateToClubDetails = onNavigateToClubDetails,
                     )
                 }
             },
@@ -136,11 +149,11 @@ fun HomeScreen(
                 FloatingActionButton(
                     onClick = { onNavigateContactUs() },
                     shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.padding()
+                    modifier = Modifier.padding(),
                 ) {
                     Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "")
                 }
-            }
+            },
         )
     }
 }

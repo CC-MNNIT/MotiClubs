@@ -64,9 +64,9 @@ fun PostTextFormatter(viewModel: ChannelScreenViewModel, modifier: Modifier = Mo
 
                     viewModel.eventPostMsg.value = TextFieldValue(
                         post.replaceRange(selection.start, selection.end, msgLink),
-                        selection = TextRange(selection.end + msgLink.length, selection.end + msgLink.length)
+                        selection = TextRange(selection.end + msgLink.length, selection.end + msgLink.length),
                     )
-                }
+                },
             )
         } else {
             val exception = result.error
@@ -85,7 +85,7 @@ fun PostTextFormatter(viewModel: ChannelScreenViewModel, modifier: Modifier = Mo
             showDialog = viewModel.showLinkDialog,
             inputLinkName = viewModel.inputLinkName,
             inputLink = viewModel.inputLink,
-            postMsg = viewModel.eventPostMsg
+            postMsg = viewModel.eventPostMsg,
         )
     }
 
@@ -98,7 +98,7 @@ fun PostTextFormatter(viewModel: ChannelScreenViewModel, modifier: Modifier = Mo
             modifier = modifier
                 .imePadding()
                 .padding(top = 8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             IconButton(onClick = { formatMsg(viewModel, "**") }) {
                 Icon(Icons.Rounded.FormatBold, contentDescription = "")
@@ -138,6 +138,6 @@ private fun formatMsg(viewModel: ChannelScreenViewModel, token: String) {
     val offset = token.length * 2
     viewModel.eventPostMsg.value = TextFieldValue(
         str.replaceRange(tr.start, tr.end, "$token$subStr$token"),
-        selection = TextRange(tr.end + offset, tr.end + offset)
+        selection = TextRange(tr.end + offset, tr.end + offset),
     )
 }

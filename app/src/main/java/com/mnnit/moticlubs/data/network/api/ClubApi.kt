@@ -7,7 +7,11 @@ import com.mnnit.moticlubs.domain.util.Constants.CLUB_ID_CLAIM
 import com.mnnit.moticlubs.domain.util.Constants.CLUB_ROUTE
 import com.mnnit.moticlubs.domain.util.Constants.STAMP_HEADER
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface ClubApi {
 

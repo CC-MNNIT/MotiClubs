@@ -27,18 +27,18 @@ fun PullDownProgressIndicator(
         visible = visible || refreshState.progress > 0.69f,
         modifier = modifier
             .fillMaxWidth()
-            .background(colorScheme.surfaceColorAtElevation(2.dp))
+            .background(colorScheme.surfaceColorAtElevation(2.dp)),
     ) {
         if (refreshState.progress > 0.69f) {
             LinearProgressIndicator(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 strokeCap = StrokeCap.Round,
-                progress = 0f
+                progress = 0f,
             )
         } else {
             LinearProgressIndicator(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                strokeCap = StrokeCap.Round
+                strokeCap = StrokeCap.Round,
             )
         }
     }

@@ -5,7 +5,14 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -15,8 +22,15 @@ import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +48,10 @@ import com.mnnit.moticlubs.domain.util.ImageUploadManager
 import com.mnnit.moticlubs.domain.util.Links
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
-import com.mnnit.moticlubs.ui.components.*
+import com.mnnit.moticlubs.ui.components.ColorPaletteDialog
+import com.mnnit.moticlubs.ui.components.ProfilePicture
+import com.mnnit.moticlubs.ui.components.ProgressDialog
+import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputOtherLinkDialog
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputSocialLinkDialog
@@ -48,14 +65,14 @@ import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 fun ClubDetailsScreen(
     onNavigateBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ClubDetailsScreenViewModel = hiltViewModel()
+    viewModel: ClubDetailsScreenViewModel = hiltViewModel(),
 ) {
     val scrollState = rememberScrollState()
     val colorScheme = getColorScheme()
 
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetching,
-        onRefresh = viewModel::refresh
+        onRefresh = viewModel::refresh,
     )
     MotiClubsTheme(colorScheme = getColorScheme()) {
         SetTransparentSystemBars(setStatusBar = false)
@@ -63,12 +80,12 @@ fun ClubDetailsScreen(
         Surface(
             modifier = modifier
                 .fillMaxWidth()
-                .imePadding()
+                .imePadding(),
         ) {
             Scaffold(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .imePadding()
+                    .imePadding(),
             ) {
                 if (viewModel.showProgressDialog.value) {
                     ProgressDialog(progressMsg = viewModel.progressMsg)
@@ -79,7 +96,7 @@ fun ClubDetailsScreen(
                         showDialog = viewModel.showSocialLinkDialog,
                         socialLinksLiveList = viewModel.socialLinksLiveList,
                         otherLinksLiveList = viewModel.otherLinksLiveList,
-                        onClick = { list -> viewModel.pushUrls(list) }
+                        onClick = { list -> viewModel.pushUrls(list) },
                     )
                 }
 
@@ -90,14 +107,14 @@ fun ClubDetailsScreen(
                         otherLinksLiveList = viewModel.otherLinksLiveList,
                         otherLinkIdx = viewModel.otherLinkIdx,
                         socialLinksLiveList = viewModel.socialLinksLiveList,
-                        onClick = { list -> viewModel.pushUrls(list) }
+                        onClick = { list -> viewModel.pushUrls(list) },
                     )
                 }
 
                 if (viewModel.showColorPaletteDialog.value) {
                     ColorPaletteDialog(
                         otherLinkComposeModel = viewModel.otherLinksLiveList.value[viewModel.otherLinkIdx.value],
-                        viewModel.showColorPaletteDialog
+                        viewModel.showColorPaletteDialog,
                     )
                 }
 
@@ -108,13 +125,12 @@ fun ClubDetailsScreen(
                         .imePadding()
                         .verticalScroll(scrollState)
                         .padding(it),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-
                     PullDownProgressIndicator(
                         modifier = Modifier.background(colorScheme.surfaceColorAtElevation(2.dp)),
                         visible = viewModel.isFetching,
-                        refreshState = refreshState
+                        refreshState = refreshState,
                     )
 
                     Card(
@@ -128,25 +144,25 @@ fun ClubDetailsScreen(
                             modifier = Modifier
                                 .pullRefresh(state = refreshState)
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(16.dp),
                         ) {
                             ClubProfilePic(
                                 onNavigateBackPressed,
                                 viewModel = viewModel,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
                             )
 
                             Text(
                                 modifier = Modifier.padding(top = 16.dp),
                                 text = viewModel.clubModel.name,
                                 fontSize = 24.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
                             )
                             Text(
                                 modifier = Modifier.padding(top = 0.dp),
                                 text = viewModel.clubModel.summary,
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
                             )
 
                             val socials = viewModel.socialLinks.value.filter { f -> f.name.isTrimmedNotEmpty() }
@@ -167,7 +183,7 @@ fun ClubDetailsScreen(
                                         }
 
                                         viewModel.showSocialLinkDialog.value = true
-                                    }
+                                    },
                                 )
                             }
                             if (viewModel.otherLinks.value.isNotEmpty() || viewModel.isAdmin) {
@@ -178,10 +194,10 @@ fun ClubDetailsScreen(
                                     onClick = {
                                         viewModel.otherLinksLiveList.value.clear()
                                         viewModel.otherLinksLiveList.value.addAll(
-                                            viewModel.otherLinks.value.map { m -> m.mapToOtherLinkModel() }
+                                            viewModel.otherLinks.value.map { m -> m.mapToOtherLinkModel() },
                                         )
                                         viewModel.showOtherLinkDialog.value = true
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -198,7 +214,7 @@ fun ClubDetailsScreen(
 private fun ClubProfilePic(
     onNavigateBackPressed: () -> Unit,
     viewModel: ClubDetailsScreenViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -219,10 +235,10 @@ private fun ClubProfilePic(
                         viewModel.showProgressDialog.value = false
                         viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
                     }, onFailure = {
-                        viewModel.showProgressDialog.value = false
-                        Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
-                    })
-                }
+                            viewModel.showProgressDialog.value = false
+                            Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
+                        },)
+                },
             )
         } else {
             val exception = result.error
@@ -241,7 +257,7 @@ private fun ClubProfilePic(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .size(42.dp),
-                onClick = { onNavigateBackPressed() }
+                onClick = { onNavigateBackPressed() },
             ) {
                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
             }
@@ -264,7 +280,7 @@ private fun ClubProfilePic(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             userModel = User().copy(avatar = viewModel.clubModel.avatar),
             size = 156.dp,
-            onClick = {}
+            onClick = {},
         )
     }
 }

@@ -55,7 +55,7 @@ data class SocialLinkComposeModel(
         "",
         publishedStateOf(TextFieldValue("")),
         publishedStateOf(""),
-        publishedStateOf(Color.White)
+        publishedStateOf(Color.White),
     )
 
     fun mapToUrlModel(): UrlModel {
@@ -63,7 +63,7 @@ data class SocialLinkComposeModel(
             urlId = if (urlID == -1L) System.currentTimeMillis() else urlID,
             name = urlName.trim(),
             color = socialColors[socialLinkNames.indexOf(urlName.trim())],
-            url = urlFieldValue.value.text.toLowerCase(LocaleList.current).trim()
+            url = urlFieldValue.value.text.toLowerCase(LocaleList.current).trim(),
         )
     }
 
@@ -85,7 +85,7 @@ data class OtherLinkComposeModel(
         -1,
         publishedStateOf(TextFieldValue("\\")),
         publishedStateOf("FFFFFF"),
-        publishedStateOf(Color.White)
+        publishedStateOf(Color.White),
     )
 
     fun mapToUrlModel(): UrlModel {
@@ -94,7 +94,7 @@ data class OtherLinkComposeModel(
             urlId = if (urlID == -1L) System.currentTimeMillis() else urlID,
             name = tokens[0].trim(),
             color = colorCode.value.replace("#", ""),
-            url = tokens[1].toLowerCase(LocaleList.current).trim()
+            url = tokens[1].toLowerCase(LocaleList.current).trim(),
         )
     }
 
@@ -123,13 +123,13 @@ fun Links(
                 markdown = links.value.filter { f -> f.name.isTrimmedNotEmpty() }.toStringBadges(),
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .fillMaxWidth(if (isAdmin) 0.8f else 1f)
+                    .fillMaxWidth(if (isAdmin) 0.8f else 1f),
             )
             if (isAdmin) {
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = { onClick() },
-                    modifier = Modifier.align(Alignment.Top)
+                    modifier = Modifier.align(Alignment.Top),
                 ) {
                     Icon(imageVector = Icons.Rounded.Edit, contentDescription = "")
                 }

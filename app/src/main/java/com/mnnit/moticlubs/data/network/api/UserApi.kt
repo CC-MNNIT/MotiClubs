@@ -1,12 +1,22 @@
 package com.mnnit.moticlubs.data.network.api
 
-import com.mnnit.moticlubs.data.network.dto.*
+import com.mnnit.moticlubs.data.network.dto.AdminDetailDto
+import com.mnnit.moticlubs.data.network.dto.FCMDto
+import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
+import com.mnnit.moticlubs.data.network.dto.SaveUserDto
+import com.mnnit.moticlubs.data.network.dto.UpdateUserAvatarDto
+import com.mnnit.moticlubs.data.network.dto.UpdateUserContactDto
+import com.mnnit.moticlubs.data.network.dto.UserDto
 import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
 import com.mnnit.moticlubs.domain.util.Constants.STAMP_HEADER
 import com.mnnit.moticlubs.domain.util.Constants.USER_ID_CLAIM
 import com.mnnit.moticlubs.domain.util.Constants.USER_ROUTE
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface UserApi {
 
@@ -14,7 +24,7 @@ interface UserApi {
     suspend fun saveUser(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Header(STAMP_HEADER) stamp: Long,
-        @Body saveUserDto: SaveUserDto?
+        @Body saveUserDto: SaveUserDto?,
     ): Response<UserDto?>
 
     @GET("$USER_ROUTE/admins")
