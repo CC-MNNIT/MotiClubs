@@ -21,7 +21,7 @@ object ImageUploadManager {
         imageUri: Uri,
         loading: PublishedState<Boolean>,
         storageRef: StorageReference,
-        onSuccess: (downloadUrl: String) -> Unit
+        onSuccess: (downloadUrl: String) -> Unit,
     ) {
         if (!context.connectionAvailable()) {
             Toast.makeText(context, "You're Offline", Toast.LENGTH_SHORT).show()

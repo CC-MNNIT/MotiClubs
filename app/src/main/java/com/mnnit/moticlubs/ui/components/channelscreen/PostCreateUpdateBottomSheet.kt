@@ -4,15 +4,34 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Article
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -52,7 +71,7 @@ fun PostCreateUpdateBottomSheet(
         tonalElevation = 2.dp,
         modifier = modifier
             .fillMaxWidth()
-            .imePadding()
+            .imePadding(),
     ) {
         if (viewModel.showProgress.value) {
             ProgressDialog(progressMsg = viewModel.progressText.value)
@@ -92,17 +111,18 @@ fun PostCreateUpdateBottomSheet(
                             viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
                         }
                     }
-                }
+                },
             )
         }
         Column(
             modifier = Modifier
                 .padding(
                     top = 16.dp,
-                    start = 16.dp, end = 16.dp
+                    start = 16.dp,
+                    end = 16.dp,
                 )
                 .imePadding()
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Box(
                 modifier = Modifier
@@ -110,7 +130,7 @@ fun PostCreateUpdateBottomSheet(
                     .height(4.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(contentColorFor(backgroundColor = colorScheme.background))
+                    .background(contentColorFor(backgroundColor = colorScheme.background)),
             ) {
                 Text(text = "", modifier = Modifier.padding(12.dp))
             }
@@ -120,7 +140,7 @@ fun PostCreateUpdateBottomSheet(
                     text = if (viewModel.editMode.value) "Update Post" else "Write Post",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically),
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -139,7 +159,7 @@ fun PostCreateUpdateBottomSheet(
                             viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
                         }
                     }
-                }, modifier = Modifier.align(Alignment.CenterVertically)) {
+                }, modifier = Modifier.align(Alignment.CenterVertically),) {
                     Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
                 }
             }
@@ -147,7 +167,7 @@ fun PostCreateUpdateBottomSheet(
             Column(
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 AnimatedVisibility(
                     visible = viewModel.isPreviewMode.value,
@@ -155,17 +175,19 @@ fun PostCreateUpdateBottomSheet(
                         .imePadding()
                         .fillMaxWidth()
                         .weight(1f),
-                    enter = fadeIn(), exit = fadeOut()
+                    enter = fadeIn(),
+                    exit = fadeOut(),
                 ) {
                     Box(
                         modifier = Modifier
                             .imePadding()
                             .fillMaxWidth()
-                            .weight(1f)
+                            .weight(1f),
                     ) {
                         MarkdownRender(
-                            mkd = viewModel.eventPostMsg.value.text, imageReplacerMap = viewModel.eventImageReplacerMap,
-                            onImageClick = onNavigateImageClick
+                            mkd = viewModel.eventPostMsg.value.text,
+                            imageReplacerMap = viewModel.eventImageReplacerMap,
+                            onImageClick = onNavigateImageClick,
                         )
                     }
                 }
@@ -176,7 +198,8 @@ fun PostCreateUpdateBottomSheet(
                         .fillMaxWidth()
                         .weight(1f)
                         .imePadding(),
-                    enter = fadeIn(), exit = fadeOut()
+                    enter = fadeIn(),
+                    exit = fadeOut(),
                 ) {
                     OutlinedTextField(
                         modifier = Modifier
@@ -197,7 +220,7 @@ fun PostCreateUpdateBottomSheet(
                         onValueChange = { viewModel.eventPostMsg.value = it },
                         shape = RoundedCornerShape(24.dp),
                         placeholder = { Text(text = "Write your message here\nSupports Markdown formatting") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                     )
                 }
 
@@ -208,7 +231,7 @@ fun PostCreateUpdateBottomSheet(
                         .imePadding()
                         .padding(top = 8.dp, bottom = 8.dp)
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     FilterChip(
                         selected = viewModel.isPreviewMode.value,
@@ -223,15 +246,17 @@ fun PostCreateUpdateBottomSheet(
                         },
                         label = {
                             Text(text = "Preview", fontSize = 14.sp)
-                        }, leadingIcon = {
+                        },
+                        leadingIcon = {
                             Icon(
                                 painter = rememberVectorPainter(image = Icons.Rounded.Visibility),
-                                contentDescription = ""
+                                contentDescription = "",
                             )
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .imePadding()
                             .align(Alignment.CenterVertically),
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(24.dp),
                     )
 
                     Spacer(Modifier.weight(1f))
@@ -252,37 +277,39 @@ fun PostCreateUpdateBottomSheet(
                                 fontSize = 14.sp,
                                 color = contentColorFor(
                                     backgroundColor = if (
-                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
-                                        && viewModel.postLengthInRange()
+                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
+                                        viewModel.postLengthInRange()
                                     ) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
-                                    }
-                                )
+                                    },
+                                ),
                             )
-                        }, leadingIcon = {
+                        },
+                        leadingIcon = {
                             Icon(
                                 painter = rememberVectorPainter(image = Icons.Rounded.Send),
                                 contentDescription = "",
                                 tint = contentColorFor(
                                     backgroundColor = if (
-                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
-                                        && viewModel.postLengthInRange()
+                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
+                                        viewModel.postLengthInRange()
                                     ) {
                                         colorScheme.primary
                                     } else {
                                         colorScheme.onSurface.copy(alpha = 0.38f)
-                                    }
-                                )
+                                    },
+                                ),
                             )
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .imePadding()
                             .align(Alignment.CenterVertically),
                         shape = RoundedCornerShape(24.dp),
                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
-                        enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
-                                && viewModel.postLengthInRange()
+                        enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
+                            viewModel.postLengthInRange(),
                     )
                 }
             }
@@ -301,6 +328,6 @@ private fun PostConfirmationDialog(viewModel: ChannelScreenViewModel, update: Bo
             viewModel.progressText.value = if (update) "Updating ..." else "Posting ..."
             viewModel.showProgress.value = true
             onPost()
-        }
+        },
     )
 }

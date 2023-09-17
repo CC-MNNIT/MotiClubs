@@ -1,6 +1,16 @@
 package com.mnnit.moticlubs.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
@@ -8,7 +18,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.DeleteForever
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,9 +53,8 @@ fun PostScreen(
     onNavigateImageClick: (url: String) -> Unit,
     onNavigateBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PostScreenViewModel = hiltViewModel()
+    viewModel: PostScreenViewModel = hiltViewModel(),
 ) {
-
     val colorScheme = getColorScheme()
     MotiClubsTheme(colorScheme) {
         SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
@@ -47,7 +62,7 @@ fun PostScreen(
             modifier = modifier
                 .fillMaxWidth()
                 .systemBarsPadding(),
-            color = colorScheme.background
+            color = colorScheme.background,
         ) {
             androidx.compose.material.BottomSheetScaffold(
                 modifier = Modifier.imePadding(),
@@ -55,7 +70,6 @@ fun PostScreen(
                 content = {
                     Surface(modifier = Modifier.fillMaxSize(), color = colorScheme.background) {
                         Column(modifier = Modifier.fillMaxWidth()) {
-
                             if (viewModel.showDialog.value) {
                                 ProgressDialog(progressMsg = "Replying...")
                             }
@@ -71,7 +85,7 @@ fun PostScreen(
                                     positiveBtnText = "Delete",
                                     imageVector = Icons.Rounded.DeleteForever,
                                     onPositive = viewModel::deleteReply,
-                                    onNegative = { viewModel.replyDeleteItem.value = Reply() }
+                                    onNegative = { viewModel.replyDeleteItem.value = Reply() },
                                 )
                             }
 
@@ -88,7 +102,7 @@ fun PostScreen(
                                             .align(Alignment.CenterVertically)
                                             .padding(start = 16.dp)
                                             .size(24.dp),
-                                        onClick = { onNavigateBackPressed() }
+                                        onClick = { onNavigateBackPressed() },
                                     ) {
                                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                                     }
@@ -101,31 +115,31 @@ fun PostScreen(
                                             .padding(horizontal = 16.dp)
                                             .align(Alignment.CenterVertically),
                                         maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
+                                        overflow = TextOverflow.Ellipsis,
                                     )
                                 }
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp)
+                                        .padding(16.dp),
                                 ) {
                                     ProfilePicture(userModel = viewModel.userModel, size = 56.dp)
                                     Spacer(modifier = Modifier.width(10.dp))
                                     AdminNameTimestamp(
                                         time = viewModel.postId.toTimeString(),
-                                        name = viewModel.userModel.name
+                                        name = viewModel.userModel.name,
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Row(
                                         modifier = Modifier
                                             .align(Alignment.CenterVertically)
-                                            .padding(end = 16.dp, bottom = 16.dp)
+                                            .padding(end = 16.dp, bottom = 16.dp),
                                     ) {
                                         Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
                                         Text(
                                             modifier = Modifier.padding(start = 8.dp),
                                             text = viewModel.viewCount,
-                                            fontSize = 14.sp
+                                            fontSize = 14.sp,
                                         )
                                     }
                                 }
@@ -136,7 +150,7 @@ fun PostScreen(
                                 mkd = viewModel.postModel.message,
                                 selectable = true,
                                 disableLinkMovementMethod = false,
-                                onImageClick = onNavigateImageClick
+                                onImageClick = onNavigateImageClick,
                             )
                         }
                     }
@@ -144,7 +158,7 @@ fun PostScreen(
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = 72.dp,
                 sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
-                sheetGesturesEnabled = viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed
+                sheetGesturesEnabled = viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed,
             )
         }
     }
@@ -152,21 +166,22 @@ fun PostScreen(
 
 @Composable
 private fun AdminNameTimestamp(time: String, name: String) {
-    Column(modifier = Modifier
-        .padding(start = 8.dp)
-        .semantics(mergeDescendants = true) {}) {
+    Column(
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .semantics(mergeDescendants = true) {},
+    ) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier
-                .paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
+            modifier = Modifier.paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
             fontSize = 14.sp,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = time,
             style = MaterialTheme.typography.bodySmall,
-            fontSize = 12.sp
+            fontSize = 12.sp,
         )
     }
 }

@@ -3,46 +3,53 @@ package com.mnnit.moticlubs.di
 import android.app.Application
 import androidx.room.Room
 import com.google.gson.GsonBuilder
-import com.mnnit.moticlubs.data.data_source.LocalDatabase
+import com.mnnit.moticlubs.data.datasource.LocalDatabase
 import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.data.repository.RepositoryImpl
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.*
-import com.mnnit.moticlubs.domain.use_case.channel.AddChannel
-import com.mnnit.moticlubs.domain.use_case.channel.DeleteChannel
-import com.mnnit.moticlubs.domain.use_case.channel.GetAllChannels
-import com.mnnit.moticlubs.domain.use_case.channel.GetChannel
-import com.mnnit.moticlubs.domain.use_case.channel.UpdateChannel
-import com.mnnit.moticlubs.domain.use_case.user.GetAllAdmins
-import com.mnnit.moticlubs.domain.use_case.club.GetClubs
-import com.mnnit.moticlubs.domain.use_case.club.UpdateClub
-import com.mnnit.moticlubs.domain.use_case.member.AddMembers
-import com.mnnit.moticlubs.domain.use_case.member.GetMembers
-import com.mnnit.moticlubs.domain.use_case.member.RemoveMember
-import com.mnnit.moticlubs.domain.use_case.post.DeletePost
-import com.mnnit.moticlubs.domain.use_case.post.GetPosts
-import com.mnnit.moticlubs.domain.use_case.post.SendPost
-import com.mnnit.moticlubs.domain.use_case.post.UpdatePost
-import com.mnnit.moticlubs.domain.use_case.reply.DeleteReply
-import com.mnnit.moticlubs.domain.use_case.reply.GetReplies
-import com.mnnit.moticlubs.domain.use_case.reply.SendReply
-import com.mnnit.moticlubs.domain.use_case.urls.AddUrls
-import com.mnnit.moticlubs.domain.use_case.urls.GetUrls
-import com.mnnit.moticlubs.domain.use_case.user.GetAllUsers
-import com.mnnit.moticlubs.domain.use_case.user.GetUser
-import com.mnnit.moticlubs.domain.use_case.user.UpdateUser
-import com.mnnit.moticlubs.domain.use_case.views.AddViews
-import com.mnnit.moticlubs.domain.use_case.views.GetViews
+import com.mnnit.moticlubs.domain.usecase.ChannelUseCases
+import com.mnnit.moticlubs.domain.usecase.ClubUseCases
+import com.mnnit.moticlubs.domain.usecase.MemberUseCases
+import com.mnnit.moticlubs.domain.usecase.PostUseCases
+import com.mnnit.moticlubs.domain.usecase.ReplyUseCases
+import com.mnnit.moticlubs.domain.usecase.UrlUseCases
+import com.mnnit.moticlubs.domain.usecase.UserUseCases
+import com.mnnit.moticlubs.domain.usecase.ViewUseCases
+import com.mnnit.moticlubs.domain.usecase.channel.AddChannel
+import com.mnnit.moticlubs.domain.usecase.channel.DeleteChannel
+import com.mnnit.moticlubs.domain.usecase.channel.GetAllChannels
+import com.mnnit.moticlubs.domain.usecase.channel.GetChannel
+import com.mnnit.moticlubs.domain.usecase.channel.UpdateChannel
+import com.mnnit.moticlubs.domain.usecase.club.GetClubs
+import com.mnnit.moticlubs.domain.usecase.club.UpdateClub
+import com.mnnit.moticlubs.domain.usecase.member.AddMembers
+import com.mnnit.moticlubs.domain.usecase.member.GetMembers
+import com.mnnit.moticlubs.domain.usecase.member.RemoveMember
+import com.mnnit.moticlubs.domain.usecase.post.DeletePost
+import com.mnnit.moticlubs.domain.usecase.post.GetPosts
+import com.mnnit.moticlubs.domain.usecase.post.SendPost
+import com.mnnit.moticlubs.domain.usecase.post.UpdatePost
+import com.mnnit.moticlubs.domain.usecase.reply.DeleteReply
+import com.mnnit.moticlubs.domain.usecase.reply.GetReplies
+import com.mnnit.moticlubs.domain.usecase.reply.SendReply
+import com.mnnit.moticlubs.domain.usecase.urls.AddUrls
+import com.mnnit.moticlubs.domain.usecase.urls.GetUrls
+import com.mnnit.moticlubs.domain.usecase.user.GetAllAdmins
+import com.mnnit.moticlubs.domain.usecase.user.GetAllUsers
+import com.mnnit.moticlubs.domain.usecase.user.GetUser
+import com.mnnit.moticlubs.domain.usecase.user.UpdateUser
+import com.mnnit.moticlubs.domain.usecase.views.AddViews
+import com.mnnit.moticlubs.domain.usecase.views.GetViews
 import com.mnnit.moticlubs.domain.util.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -59,7 +66,7 @@ object AppModule {
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .writeTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(15, TimeUnit.SECONDS)
-                    .build()
+                    .build(),
             )
             .build()
             .create(ApiService::class.java)
@@ -84,7 +91,7 @@ object AppModule {
             getPosts = GetPosts(repository),
             sendPost = SendPost(repository),
             updatePost = UpdatePost(repository),
-            deletePost = DeletePost(repository)
+            deletePost = DeletePost(repository),
         )
 
     @Provides
@@ -93,7 +100,7 @@ object AppModule {
         MemberUseCases(
             getMembers = GetMembers(repository),
             addMembers = AddMembers(repository),
-            removeMember = RemoveMember(repository)
+            removeMember = RemoveMember(repository),
         )
 
     @Provides
@@ -114,7 +121,7 @@ object AppModule {
             getChannel = GetChannel(repository),
             addChannel = AddChannel(repository),
             updateChannel = UpdateChannel(repository),
-            deleteChannel = DeleteChannel(repository)
+            deleteChannel = DeleteChannel(repository),
         )
 
     @Provides
@@ -122,7 +129,7 @@ object AppModule {
     fun provideClubUseCases(repository: Repository): ClubUseCases =
         ClubUseCases(
             getClubs = GetClubs(repository),
-            updateClub = UpdateClub(repository)
+            updateClub = UpdateClub(repository),
         )
 
     @Provides
@@ -130,7 +137,7 @@ object AppModule {
     fun provideViewUseCases(repository: Repository): ViewUseCases =
         ViewUseCases(
             getViews = GetViews(repository),
-            addViews = AddViews(repository)
+            addViews = AddViews(repository),
         )
 
     @Provides
@@ -138,7 +145,7 @@ object AppModule {
     fun provideUrlUseCases(repository: Repository): UrlUseCases =
         UrlUseCases(
             getUrls = GetUrls(repository),
-            addUrls = AddUrls(repository)
+            addUrls = AddUrls(repository),
         )
 
     @Provides
@@ -147,6 +154,6 @@ object AppModule {
         ReplyUseCases(
             getReplies = GetReplies(repository),
             sendReply = SendReply(repository),
-            deleteReply = DeleteReply(repository)
+            deleteReply = DeleteReply(repository),
         )
 }

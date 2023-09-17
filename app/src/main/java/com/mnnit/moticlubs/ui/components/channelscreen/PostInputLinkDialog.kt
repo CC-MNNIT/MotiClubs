@@ -43,7 +43,7 @@ fun PostInputLinkDialog(
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -52,7 +52,7 @@ fun PostInputLinkDialog(
                     modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 OutlinedTextField(
@@ -81,15 +81,15 @@ fun PostInputLinkDialog(
                         val link = "\n[${inputLinkName.value}](${inputLink.value})\n"
                         postMsg.value = TextFieldValue(
                             post.replaceRange(selection.start, selection.end, link),
-                            selection = TextRange(selection.end + link.length, selection.end + link.length)
+                            selection = TextRange(selection.end + link.length, selection.end + link.length),
                         )
                         showDialog.value = false
                     },
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
-                    enabled = inputLink.value.matches(Patterns.WEB_URL.toRegex())
-                            && INPUT_URL_SIZE.lengthInRange(inputLink.value)
+                    enabled = inputLink.value.matches(Patterns.WEB_URL.toRegex()) &&
+                        INPUT_URL_SIZE.lengthInRange(inputLink.value),
                 ) {
                     Text(text = "Add Link", fontSize = 14.sp)
                 }

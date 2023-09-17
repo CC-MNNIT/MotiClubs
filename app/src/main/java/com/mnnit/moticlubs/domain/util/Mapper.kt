@@ -54,7 +54,7 @@ fun ChannelDto.mapToDomain(): Channel =
         channelId = this.channelId,
         clubId = this.clubId,
         name = this.name,
-        private = if (this.private) 1 else 0
+        private = if (this.private) 1 else 0,
     )
 
 fun Channel.mapFromDomain(): ChannelDto =
@@ -62,7 +62,7 @@ fun Channel.mapFromDomain(): ChannelDto =
         channelId = this.channelId,
         clubId = this.clubId,
         name = this.name,
-        private = this.private == 1
+        private = this.private == 1,
     )
 
 fun PostDto.mapToDomain(page: Int): Post =
@@ -72,7 +72,7 @@ fun PostDto.mapToDomain(page: Int): Post =
         updated = this.updated,
         pageNo = page,
         message = this.message,
-        userId = this.userId
+        userId = this.userId,
     )
 
 fun Post.mapFromDomain(): PostDto =
@@ -87,7 +87,7 @@ fun Post.mapFromDomain(): PostDto =
 fun ViewDto.mapToDomain(): View =
     View(
         userId = this.userId,
-        postId = this.postId
+        postId = this.postId,
     )
 
 fun UrlResponseModel.mapToDomain(): Url =
@@ -105,7 +105,7 @@ fun ReplyDto.mapToDomain(page: Int): Reply =
         userId = this.userId,
         message = this.message,
         time = this.time,
-        pageNo = page
+        pageNo = page,
     )
 
 fun Reply.mapFromDomain(): ReplyDto =
@@ -113,5 +113,5 @@ fun Reply.mapFromDomain(): ReplyDto =
         postId = this.postId,
         userId = this.userId,
         message = this.message,
-        time = this.time
+        time = this.time,
     )

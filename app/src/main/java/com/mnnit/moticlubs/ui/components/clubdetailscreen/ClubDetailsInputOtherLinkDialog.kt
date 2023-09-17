@@ -47,34 +47,34 @@ fun InputOtherLinkDialog(
     otherLinkIdx: PublishedState<Int>,
     socialLinksLiveList: PublishedList<SocialLinkComposeModel>,
     onClick: (list: List<UrlModel>) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val colorScheme = getColorScheme()
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     Dialog(
         onDismissRequest = { showDialog.value = false },
-        DialogProperties(usePlatformDefaultWidth = false)
+        DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
             modifier = modifier
                 .fillMaxWidth(0.85f)
                 .wrapContentHeight()
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
                     .heightIn(128.dp, 512.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Text(
                     "Other Link Input",
                     fontSize = 16.sp,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 if (otherLinksLiveList.value.isEmpty()) {
@@ -82,7 +82,8 @@ fun InputOtherLinkDialog(
                 }
 
                 LazyColumn(
-                    state = listState, modifier = Modifier.weight(1f, false)
+                    state = listState,
+                    modifier = Modifier.weight(1f, false),
                 ) {
                     items(otherLinksLiveList.value.size) { idx ->
                         OtherLinkItem(
@@ -99,12 +100,12 @@ fun InputOtherLinkDialog(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(0.3f)
+                        .weight(0.3f),
                 ) {
                     Spacer(
                         modifier = Modifier
                             .border(1.dp, color = colorScheme.primary)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
                     )
                     IconButton(
                         modifier = Modifier
@@ -116,8 +117,8 @@ fun InputOtherLinkDialog(
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = colorScheme.primary,
-                            contentColor = contentColorFor(backgroundColor = colorScheme.primary)
-                        )
+                            contentColor = contentColorFor(backgroundColor = colorScheme.primary),
+                        ),
                     ) {
                         Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
                     }
@@ -132,7 +133,7 @@ fun InputOtherLinkDialog(
                             list.addAll(others)
                             onClick(list)
                         },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
                         Text(text = "Save Link", fontSize = 14.sp)
                     }

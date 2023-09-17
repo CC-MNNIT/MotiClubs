@@ -50,7 +50,7 @@ fun ColorPaletteDialog(
             modifier = modifier
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -59,7 +59,7 @@ fun ColorPaletteDialog(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(bottom = 8.dp),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 HsvColorPicker(
@@ -70,22 +70,23 @@ fun ColorPaletteDialog(
                         colorCode.value = colorEnvelope.hexCode.substring(2)
                             .replace("#", "")
                         color.value = colorEnvelope.color
-                    }
+                    },
                 )
 
                 Text(
-                    text = "#${colorCode.value}", fontSize = 16.sp,
+                    text = "#${colorCode.value}",
+                    fontSize = 16.sp,
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .align(Alignment.CenterHorizontally),
-                    color = colorScheme.onBackground
+                    color = colorScheme.onBackground,
                 )
 
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Button(
                         onClick = { show.value = false },
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.background)
+                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.background),
                     ) {
                         Text(text = "Cancel", fontSize = 14.sp, color = colorScheme.primary)
                     }
@@ -99,11 +100,12 @@ fun ColorPaletteDialog(
                             otherLinkComposeModel.color.value = color.value
                         },
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        colors = ButtonDefaults.buttonColors(containerColor = color.value)
+                        colors = ButtonDefaults.buttonColors(containerColor = color.value),
                     ) {
                         Text(
-                            text = "Select", fontSize = 14.sp,
-                            color = textColorFor(color.value)
+                            text = "Select",
+                            fontSize = 14.sp,
+                            color = textColorFor(color.value),
                         )
                     }
                 }

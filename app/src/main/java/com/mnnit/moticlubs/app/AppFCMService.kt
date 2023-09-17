@@ -57,7 +57,7 @@ class AppFCMService : FirebaseMessagingService() {
         get() = AppModule.provideRepository(
             application,
             apiService,
-            AppModule.provideLocalDatabase(application)
+            AppModule.provideLocalDatabase(application),
         )
 
     override fun onNewToken(token: String) {
@@ -119,7 +119,7 @@ class AppFCMService : FirebaseMessagingService() {
             AppModule.provideRepository(
                 this@AppFCMService.application,
                 AppModule.provideApiService(),
-                AppModule.provideLocalDatabase(this@AppFCMService.application)
+                AppModule.provideLocalDatabase(this@AppFCMService.application),
             ).deletePostID(postID)
         }
         LocalBroadcastManager.getInstance(this)
@@ -147,7 +147,7 @@ class AppFCMService : FirebaseMessagingService() {
             AppModule.provideRepository(
                 this@AppFCMService.application,
                 AppModule.provideApiService(),
-                AppModule.provideLocalDatabase(this@AppFCMService.application)
+                AppModule.provideLocalDatabase(this@AppFCMService.application),
             ).deleteReplyID(replyID)
         }
         LocalBroadcastManager.getInstance(this)
@@ -191,7 +191,7 @@ class AppFCMService : FirebaseMessagingService() {
             title = "${user.name} ${if (updated) "updated" else "posted"} in ${channel.name} - ${club.name}",
             message = post.message,
             url = user.avatar,
-            pendingIntent = getPendingIntent(post.postId)
+            pendingIntent = getPendingIntent(post.postId),
         )
     }
 
@@ -232,7 +232,7 @@ class AppFCMService : FirebaseMessagingService() {
             title = "${user.name} replied to a post in ${channel.name}",
             message = reply.message,
             url = user.avatar,
-            pendingIntent = getPendingIntent(post.postId)
+            pendingIntent = getPendingIntent(post.postId),
         )
     }
 
@@ -247,9 +247,8 @@ class AppFCMService : FirebaseMessagingService() {
         title: String,
         message: String,
         url: String,
-        pendingIntent: PendingIntent?
+        pendingIntent: PendingIntent?,
     ) {
-
         // Create notification group for club
         notificationManager.createNotificationChannelGroup(NotificationChannelGroup(clubId, clubName))
 
@@ -260,13 +259,14 @@ class AppFCMService : FirebaseMessagingService() {
             NotificationChannel(
                 channelId,
                 channelName,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_HIGH,
             ).apply {
                 lightColor = Color.BLUE
                 enableVibration(true)
                 enableLights(true)
                 group = clubId
-            })
+            },
+        )
 
         val notificationHandler = NotificationCompat.Builder(applicationContext, channelId)
             .setContentTitle(title)
@@ -279,16 +279,18 @@ class AppFCMService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
 
-        Picasso.get().load(url).into(object : Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                notificationHandler.setLargeIcon(bitmap)
-                notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
-                Log.d(TAG, "postNotification: loaded profile icon")
-            }
+        Picasso.get().load(url).into(
+            object : Target {
+                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                    notificationHandler.setLargeIcon(bitmap)
+                    notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
+                    Log.d(TAG, "postNotification: loaded profile icon")
+                }
 
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-        })
+                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+            },
+        )
         notificationManager.notify(notificationStamp.toNotificationID(), notificationHandler.build())
     }
 
@@ -299,8 +301,8 @@ class AppFCMService : FirebaseMessagingService() {
         addNextIntentWithParentStack(
             Intent(
                 Intent.ACTION_VIEW,
-                "${Constants.APP_SCHEME_URL}/post=${Uri.encode(postId.toString())}".toUri()
-            )
+                "${Constants.APP_SCHEME_URL}/post=${Uri.encode(postId.toString())}".toUri(),
+            ),
         )
         getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }

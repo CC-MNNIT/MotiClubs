@@ -43,7 +43,7 @@ fun InputSocialLinkDialog(
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -51,7 +51,7 @@ fun InputSocialLinkDialog(
                     fontSize = 16.sp,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 OutlinedTextField(
@@ -108,7 +108,7 @@ fun InputSocialLinkDialog(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
-                    enabled = socialLinksLiveList.value.any { it.validUrl() }
+                    enabled = socialLinksLiveList.value.any { it.validUrl() },
                 ) {
                     Text(text = "Save Link(s)", fontSize = 14.sp)
                 }

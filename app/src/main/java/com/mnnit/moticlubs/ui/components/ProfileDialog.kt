@@ -31,21 +31,21 @@ fun ProfileDialog(
 
     Dialog(
         onDismissRequest = { showDialog.value = false },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
             modifier = modifier
                 .fillMaxWidth(0.95f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     "Profile",
                     fontSize = 16.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 ProfilePicture(
@@ -54,7 +54,7 @@ fun ProfileDialog(
                         .align(Alignment.CenterHorizontally),
                     userModel = userModel,
                     size = 156.dp,
-                    onClick = {}
+                    onClick = {},
                 )
                 UserInfo(userModel = userModel, modifier = Modifier.padding(top = 16.dp))
             }

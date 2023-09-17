@@ -95,7 +95,7 @@ object CourseExtractor {
             match ?: return Course(stream = UNIDENTIFIED, branch = "")
             Course(
                 stream = getStream(courseCode = match.value),
-                branch = COURSE_MAP.getOrDefault(match.value, UNIDENTIFIED)
+                branch = COURSE_MAP.getOrDefault(match.value, UNIDENTIFIED),
             )
         }
 

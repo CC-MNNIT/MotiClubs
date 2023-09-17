@@ -16,9 +16,9 @@ import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.ChannelUseCases
-import com.mnnit.moticlubs.domain.use_case.ClubUseCases
-import com.mnnit.moticlubs.domain.use_case.UserUseCases
+import com.mnnit.moticlubs.domain.usecase.ChannelUseCases
+import com.mnnit.moticlubs.domain.usecase.ClubUseCases
+import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getUserId
@@ -29,11 +29,11 @@ import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
@@ -141,7 +141,9 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Success -> {
-                    channelMap.value[eventChannel.clubId]?.value?.removeIf { m -> m.channelId == eventChannel.channelId }
+                    channelMap.value[eventChannel.clubId]?.value?.removeIf { m ->
+                        m.channelId == eventChannel.channelId
+                    }
                     channelMap.value[eventChannel.clubId]?.value?.add(eventChannel)
                     showProgressDialog = false
 

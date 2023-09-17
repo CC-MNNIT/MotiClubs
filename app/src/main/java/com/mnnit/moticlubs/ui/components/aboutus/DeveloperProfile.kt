@@ -39,7 +39,7 @@ fun ColumnScope.DeveloperProfile(
     linkedin: String = "",
     stream: String = "",
     year: String = "",
-    showIcons: Boolean = true
+    showIcons: Boolean = true,
 ) {
     val focusManager = LocalFocusManager.current
     val uriHandler = LocalUriHandler.current
@@ -50,31 +50,31 @@ fun ColumnScope.DeveloperProfile(
             .fillMaxWidth()
             .align(Alignment.CenterHorizontally),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround,
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 userModel = userModel,
                 size = 56.dp,
-                onClick = {}
+                onClick = {},
             )
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .padding(end = 32.dp)
+                    .padding(end = 32.dp),
             ) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
                     text = name,
                     fontSize = 16.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 if (stream.isTrimmedNotEmpty()) {
@@ -84,7 +84,7 @@ fun ColumnScope.DeveloperProfile(
                             .padding(top = 2.dp),
                         text = stream,
                         fontSize = 14.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
 
@@ -95,7 +95,7 @@ fun ColumnScope.DeveloperProfile(
                             .padding(top = 2.dp),
                         text = year,
                         fontSize = 12.sp,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
@@ -103,7 +103,7 @@ fun ColumnScope.DeveloperProfile(
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .fillMaxHeight()
+                    .fillMaxHeight(),
             ) {
                 if (showIcons) {
                     if (userModel.avatar.isTrimmedNotEmpty()) {
@@ -114,14 +114,14 @@ fun ColumnScope.DeveloperProfile(
                             onClick = {
                                 focusManager.clearFocus(true)
                                 uriHandler.openUri(userModel.avatar.replace(".png", ""))
-                            }
+                            },
                         ) {
                             Icon(
                                 modifier = Modifier
                                     .size(20.dp)
                                     .align(Alignment.CenterHorizontally),
                                 painter = painterResource(id = R.drawable.github),
-                                contentDescription = ""
+                                contentDescription = "",
                             )
                         }
                     }
@@ -135,14 +135,14 @@ fun ColumnScope.DeveloperProfile(
                             onClick = {
                                 focusManager.clearFocus(true)
                                 uriHandler.openUri(linkedin)
-                            }
+                            },
                         ) {
                             Icon(
                                 modifier = Modifier
                                     .size(20.dp)
                                     .align(Alignment.CenterHorizontally),
                                 painter = painterResource(id = R.drawable.linkedin),
-                                contentDescription = ""
+                                contentDescription = "",
                             )
                         }
                     }

@@ -58,8 +58,8 @@ fun UserInfo(
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
-                disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
-            )
+                disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
+            ),
         )
 
         OutlinedTextField(
@@ -76,7 +76,7 @@ fun UserInfo(
                 Text(
                     text = "@mnnit.ac.in",
                     modifier = Modifier.padding(end = 16.dp),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             },
             singleLine = true,
@@ -84,8 +84,8 @@ fun UserInfo(
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
-                disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background)
-            )
+                disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background),
+            ),
         )
 
         OutlinedTextField(
@@ -105,22 +105,22 @@ fun UserInfo(
                         .wrapContentSize()
                         .padding(start = 8.dp, end = 4.dp),
                     colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
                 ) {
                     Text(
                         text = userModel.course,
                         modifier = Modifier
                             .padding(8.dp)
                             .wrapContentSize(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
-                disabledLeadingIconColor = contentColorFor(backgroundColor = colorScheme.background)
-            )
+                disabledLeadingIconColor = contentColorFor(backgroundColor = colorScheme.background),
+            ),
         )
 
         OutlinedTextField(
@@ -142,7 +142,7 @@ fun UserInfo(
                         clipboardManager.setText(AnnotatedString(text = userModel.contact))
                     },
                     colors = IconButtonDefaults.filledIconButtonColors(colorScheme.primary),
-                    enabled = userModel.contact.isTrimmedNotEmpty() && userModel.contact != "None"
+                    enabled = userModel.contact.isTrimmedNotEmpty() && userModel.contact != "None",
                 ) {
                     Icon(imageVector = Icons.Rounded.ContentCopy, contentDescription = "")
                 }
@@ -153,8 +153,8 @@ fun UserInfo(
             colors = OutlinedTextFieldDefaults.colors(
                 disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
-                disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background)
-            )
+                disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background),
+            ),
         )
     }
 }

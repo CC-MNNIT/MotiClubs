@@ -12,8 +12,8 @@ import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AboutUsViewModel @Inject constructor(
@@ -53,7 +53,7 @@ class AboutUsViewModel @Inject constructor(
 
     private fun getResource(
         resource: Resource<Pair<List<GithubContributorDto>?, Long>>,
-        onSuccess: (list: List<GithubContributorDto>) -> Unit
+        onSuccess: (list: List<GithubContributorDto>) -> Unit,
     ) {
         when (resource) {
             is Resource.Error -> Log.d(TAG, "getResource: ${resource.errCode}: ${resource.errMsg}")

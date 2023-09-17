@@ -12,8 +12,8 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.MemberUseCases
-import com.mnnit.moticlubs.domain.use_case.UserUseCases
+import com.mnnit.moticlubs.domain.usecase.MemberUseCases
+import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
@@ -24,11 +24,11 @@ import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class AddMemberViewModel @Inject constructor(
@@ -47,7 +47,8 @@ class AddMemberViewModel @Inject constructor(
     val courseList = listOf("B.Tech.", "M.Tech.", "M.Sc.", "MBA", "MCA", "Ph.D.")
     val branchMap = mapOf(
         Pair(
-            "B.Tech.", listOf(
+            "B.Tech.",
+            listOf(
                 "Biotechnology",
                 "Civil Engineering",
                 "Electrical Engineering",
@@ -57,10 +58,11 @@ class AddMemberViewModel @Inject constructor(
                 "Production and Industrial Engineering",
                 "Information Technology",
                 "Chemical Engineering",
-            )
+            ),
         ),
         Pair(
-            "M.Tech.", listOf(
+            "M.Tech.",
+            listOf(
                 "Applied Mechanics",
                 "Biomedical Engineering",
                 "Biotechnology",
@@ -98,13 +100,14 @@ class AddMemberViewModel @Inject constructor(
                 "Thermal Engineering",
                 "Transportation Engineering",
                 "Microelectronics and VLSI Design",
-            )
+            ),
         ),
         Pair("MCA", listOf("Master of Computer Application")),
         Pair("MBA", listOf("Master of Business Administration")),
         Pair("M.Sc.", listOf("Mathematics And Scientific Computing")),
         Pair(
-            "Ph.D.", listOf(
+            "Ph.D.",
+            listOf(
                 "Doctor of Philosophy - Applied Mechanics Department",
                 "Doctor of Philosophy - Biotechnology Department",
                 "Doctor of Philosophy - Civil Engineering Department",
@@ -120,7 +123,7 @@ class AddMemberViewModel @Inject constructor(
                 "Doctor of Philosophy - Mechanical Engineering Department",
                 "Doctor of Philosophy - Management",
                 "Ph.D. (Physics Department)",
-            )
+            ),
         ),
     )
 
@@ -156,9 +159,11 @@ class AddMemberViewModel @Inject constructor(
                     allUserList.value.clear()
                     selectedUserMap.value.clear()
 
-                    allUserList.value.addAll(resource.data.filter { user ->
-                        !memberList.value.any { member -> user.userId == member.userId }
-                    })
+                    allUserList.value.addAll(
+                        resource.data.filter { user ->
+                            !memberList.value.any { member -> user.userId == member.userId }
+                        },
+                    )
                     isFetching = false
                 }
 
@@ -173,10 +178,10 @@ class AddMemberViewModel @Inject constructor(
     fun filterSearch() {
         searchUserList.value.clear()
 
-        if (searchName.value.isTrimmedNotEmpty()
-            || searchRegNo.value.isTrimmedNotEmpty()
-            || searchCourse.value.isTrimmedNotEmpty()
-            || searchBranch.value.isTrimmedNotEmpty()
+        if (searchName.value.isTrimmedNotEmpty() ||
+            searchRegNo.value.isTrimmedNotEmpty() ||
+            searchCourse.value.isTrimmedNotEmpty() ||
+            searchBranch.value.isTrimmedNotEmpty()
         ) {
             searchUserList.value.addAll(
                 allUserList.value
@@ -191,7 +196,7 @@ class AddMemberViewModel @Inject constructor(
                         }
                     }
                     .filter { user -> user.course.lowercase().contains(searchCourse.value.lowercase()) }
-                    .filter { user -> user.branch.lowercase().contains(searchBranch.value.lowercase()) }
+                    .filter { user -> user.branch.lowercase().contains(searchBranch.value.lowercase()) },
             )
         }
     }
@@ -208,7 +213,7 @@ class AddMemberViewModel @Inject constructor(
         addMemberJob = memberUseCases.addMembers(
             channelModel.clubId,
             channelId,
-            selectedUserMap.value.map { it.key }
+            selectedUserMap.value.map { it.key },
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgressDialog = true

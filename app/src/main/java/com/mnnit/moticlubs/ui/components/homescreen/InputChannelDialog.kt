@@ -38,21 +38,21 @@ fun InputChannelDialog(
     val colorScheme = getColorScheme()
     Dialog(
         onDismissRequest = { viewModel.showAddChannelDialog = false },
-        DialogProperties(usePlatformDefaultWidth = false)
+        DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
             modifier = modifier
                 .fillMaxWidth(0.85f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     "New Channel",
                     fontSize = 16.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 Row(
@@ -60,7 +60,7 @@ fun InputChannelDialog(
                         .padding(top = 16.dp)
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(text = "Private channel", modifier = Modifier.align(Alignment.CenterVertically))
                     Switch(
@@ -88,15 +88,15 @@ fun InputChannelDialog(
                         viewModel.eventChannel = viewModel.eventChannel.copy(
                             channelId = System.currentTimeMillis(),
                             name = viewModel.inputChannelName,
-                            private = viewModel.inputChannelPrivate
+                            private = viewModel.inputChannelPrivate,
                         )
                         onClick()
                     },
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .align(Alignment.CenterHorizontally),
-                    enabled = viewModel.inputChannelName.isTrimmedNotEmpty()
-                            && INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.inputChannelName)
+                    enabled = viewModel.inputChannelName.isTrimmedNotEmpty() &&
+                        INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.inputChannelName),
                 ) {
                     Text(text = "Add Channel", fontSize = 14.sp)
                 }

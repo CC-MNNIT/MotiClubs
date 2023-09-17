@@ -52,13 +52,13 @@ fun SearchField(
                 onClick = {
                     searchText.value = ""
                     onValueChange()
-                }
+                },
             ) {
                 Icon(imageVector = Icons.Outlined.Close, contentDescription = "")
             }
         }
     },
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val colorScheme = getColorScheme()
     val colors = OutlinedTextFieldDefaults.colors(
@@ -66,7 +66,7 @@ fun SearchField(
         unfocusedLabelColor = colorScheme.onSurfaceVariant,
         unfocusedLeadingIconColor = colorScheme.onSurfaceVariant,
         unfocusedTrailingIconColor = colorScheme.onSurfaceVariant,
-        unfocusedBorderColor = colorScheme.outline
+        unfocusedBorderColor = colorScheme.outline,
     )
 
     BasicTextField(
@@ -77,7 +77,7 @@ fun SearchField(
             .padding(top = 8.dp)
             .defaultMinSize(
                 minWidth = OutlinedTextFieldDefaults.MinWidth,
-                minHeight = OutlinedTextFieldDefaults.MinHeight
+                minHeight = OutlinedTextFieldDefaults.MinHeight,
             ),
         onValueChange = {
             searchText.value = it
@@ -116,8 +116,8 @@ fun SearchField(
                         colors = colors,
                         shape = RoundedCornerShape(24.dp),
                     )
-                }
+                },
             )
-        }
+        },
     )
 }

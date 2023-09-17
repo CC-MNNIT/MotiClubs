@@ -10,5 +10,5 @@ data class ViewDto(
 
     @SerializedName("uid")
     @Expose
-    var userId: Long
+    var userId: Long,
 )

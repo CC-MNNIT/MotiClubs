@@ -71,7 +71,7 @@ fun CollapsibleTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     TwoRowsTopAppBar(
         title = bigTitle,
@@ -85,7 +85,7 @@ fun CollapsibleTopAppBar(
         windowInsets = windowInsets,
         maxHeight = maxHeight,
         pinnedHeight = 64.dp,
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
     )
 }
 
@@ -107,7 +107,7 @@ private fun TwoRowsTopAppBar(
 ) {
     if (maxHeight <= pinnedHeight) {
         throw IllegalArgumentException(
-            "A TwoRowsTopAppBar max height should be greater than its pinned height"
+            "A TwoRowsTopAppBar max height should be greater than its pinned height",
         )
     }
 
@@ -140,8 +140,8 @@ private fun TwoRowsTopAppBar(
         containerColor(
             containerColor = colorScheme.surface,
             scrolledContainerColor = colorScheme.surfaceColorAtElevation(2.dp),
-            colorTransitionFraction = colorTransitionFraction
-        )
+            colorTransitionFraction = colorTransitionFraction,
+        ),
     )
 
     // Wrap the given actions in a Row.
@@ -149,7 +149,7 @@ private fun TwoRowsTopAppBar(
         Row(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
-            content = actions
+            content = actions,
         )
     }
     val topTitleAlpha = TopTitleAlphaEasing.transform(colorTransitionFraction)
@@ -171,9 +171,9 @@ private fun TwoRowsTopAppBar(
                     scrollBehavior.state,
                     velocity,
                     scrollBehavior.flingAnimationSpec,
-                    scrollBehavior.snapAnimationSpec
+                    scrollBehavior.snapAnimationSpec,
                 )
-            }
+            },
         )
     } else {
         Modifier
@@ -218,7 +218,7 @@ private fun TwoRowsTopAppBar(
                 titleBottomPadding = titleBottomPaddingPx,
                 hideTitleSemantics = hideBottomRowSemantics,
                 navigationIcon = {},
-                actions = {}
+                actions = {},
             )
         }
     }
@@ -246,11 +246,11 @@ private fun TopAppBarLayout(
             Box(
                 Modifier
                     .layoutId("navigationIcon")
-                    .padding(start = TopAppBarHorizontalPadding)
+                    .padding(start = TopAppBarHorizontalPadding),
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides navigationIconContentColor,
-                    content = navigationIcon
+                    content = navigationIcon,
                 )
             }
             Box(
@@ -258,27 +258,27 @@ private fun TopAppBarLayout(
                     .layoutId("title")
                     .padding(horizontal = TopAppBarHorizontalPadding)
                     .then(if (hideTitleSemantics) Modifier.clearAndSetSemantics { } else Modifier)
-                    .graphicsLayer(alpha = titleAlpha)
+                    .graphicsLayer(alpha = titleAlpha),
             ) {
                 ProvideTextStyle(value = titleTextStyle) {
                     CompositionLocalProvider(
                         LocalContentColor provides titleContentColor,
-                        content = title
+                        content = title,
                     )
                 }
             }
             Box(
                 Modifier
                     .layoutId("actionIcons")
-                    .padding(end = TopAppBarHorizontalPadding)
+                    .padding(end = TopAppBarHorizontalPadding),
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides actionIconContentColor,
-                    content = actions
+                    content = actions,
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     ) { measurables, constraints ->
         val navigationIconPlaceable =
             measurables.first { it.layoutId == "navigationIcon" }
@@ -311,7 +311,7 @@ private fun TopAppBarLayout(
             // Navigation icon
             navigationIconPlaceable.placeRelative(
                 x = 0,
-                y = (layoutHeight - navigationIconPlaceable.height) / 2
+                y = (layoutHeight - navigationIconPlaceable.height) / 2,
             )
 
             // Title
@@ -330,20 +330,23 @@ private fun TopAppBarLayout(
                     // Apply bottom padding from the title's baseline only when the Arrangement is
                     // "Bottom".
                     Arrangement.Bottom ->
-                        if (titleBottomPadding == 0) layoutHeight - titlePlaceable.height
-                        else layoutHeight - titlePlaceable.height - max(
-                            0,
-                            titleBottomPadding - titlePlaceable.height + titleBaseline
-                        )
+                        if (titleBottomPadding == 0) {
+                            layoutHeight - titlePlaceable.height
+                        } else {
+                            layoutHeight - titlePlaceable.height - max(
+                                0,
+                                titleBottomPadding - titlePlaceable.height + titleBaseline,
+                            )
+                        }
                     // Arrangement.Top
                     else -> 0
-                }
+                },
             )
 
             // Action icons
             actionIconsPlaceable.placeRelative(
                 x = constraints.maxWidth - actionIconsPlaceable.width,
-                y = (layoutHeight - actionIconsPlaceable.height) / 2
+                y = (layoutHeight - actionIconsPlaceable.height) / 2,
             )
         }
     }
@@ -353,12 +356,12 @@ private fun TopAppBarLayout(
 internal fun containerColor(
     containerColor: Color,
     scrolledContainerColor: Color,
-    colorTransitionFraction: Float
+    colorTransitionFraction: Float,
 ): Color {
     return lerp(
         containerColor,
         scrolledContainerColor,
-        FastOutLinearInEasing.transform(colorTransitionFraction)
+        FastOutLinearInEasing.transform(colorTransitionFraction),
     )
 }
 
@@ -367,7 +370,7 @@ private suspend fun settleAppBar(
     state: TopAppBarState,
     velocity: Float,
     flingAnimationSpec: DecayAnimationSpec<Float>?,
-    snapAnimationSpec: AnimationSpec<Float>?
+    snapAnimationSpec: AnimationSpec<Float>?,
 ): Velocity {
     // Check if the app bar is completely collapsed/expanded. If so, no need to settle the app bar,
     // and just return Zero Velocity.
@@ -407,7 +410,7 @@ private suspend fun settleAppBar(
                 } else {
                     state.heightOffsetLimit
                 },
-                animationSpec = snapAnimationSpec
+                animationSpec = snapAnimationSpec,
             ) { state.heightOffset = value }
         }
     }

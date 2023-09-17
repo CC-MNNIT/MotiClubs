@@ -29,9 +29,9 @@ import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.model.View
 import com.mnnit.moticlubs.domain.repository.Repository
-import com.mnnit.moticlubs.domain.use_case.ReplyUseCases
-import com.mnnit.moticlubs.domain.use_case.UserUseCases
-import com.mnnit.moticlubs.domain.use_case.ViewUseCases
+import com.mnnit.moticlubs.domain.usecase.ReplyUseCases
+import com.mnnit.moticlubs.domain.usecase.UserUseCases
+import com.mnnit.moticlubs.domain.usecase.ViewUseCases
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.Resource
@@ -44,11 +44,11 @@ import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class PostScreenViewModel @Inject constructor(
@@ -57,7 +57,7 @@ class PostScreenViewModel @Inject constructor(
     private val repository: Repository,
     private val userUseCases: UserUseCases,
     private val viewUseCases: ViewUseCases,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
@@ -103,8 +103,8 @@ class PostScreenViewModel @Inject constructor(
                 initialValue = BottomSheetValue.Collapsed,
                 density = Density(application),
             ),
-            snackbarHostState = SnackbarHostState()
-        )
+            snackbarHostState = SnackbarHostState(),
+        ),
     )
 
     private var getReplyJob: Job? = null
@@ -178,7 +178,7 @@ class PostScreenViewModel @Inject constructor(
                     Toast.makeText(
                         application,
                         "Error ${resource.errCode}: ${resource.errMsg}",
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
             }
@@ -197,7 +197,7 @@ class PostScreenViewModel @Inject constructor(
                 replyMsg.value,
                 pageNo = 1,
                 System.currentTimeMillis(),
-            )
+            ),
         ).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showProgress.value = true
@@ -265,7 +265,7 @@ class PostScreenViewModel @Inject constructor(
                     is Resource.Success -> viewCount = resource.data.size.toString()
                     is Resource.Error -> Log.d(
                         TAG,
-                        "viewPost: ${resource.errCode} : ${resource.errMsg}"
+                        "viewPost: ${resource.errCode} : ${resource.errMsg}",
                     )
                 }
             }.launchIn(viewModelScope)

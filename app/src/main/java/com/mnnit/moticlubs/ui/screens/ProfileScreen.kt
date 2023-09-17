@@ -87,7 +87,7 @@ fun ProfileScreen(
                     title = {
                         Text(
                             text = "Profile",
-                            style = MaterialTheme.typography.titleLarge
+                            style = MaterialTheme.typography.titleLarge,
                         )
                     },
                     navigationIcon = {
@@ -102,15 +102,15 @@ fun ProfileScreen(
                             loading = loading,
                             modifier = Modifier
                                 .align(Alignment.CenterVertically)
-                                .padding(end = 16.dp)
+                                .padding(end = 16.dp),
                         )
-                    }
+                    },
                 )
 
                 ProfilePicture(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     userModel = viewModel.userModel,
-                    size = 156.dp
+                    size = 156.dp,
                 )
                 UserInfo(
                     userModel = viewModel.userModel,
@@ -129,7 +129,7 @@ fun ProfileScreen(
                                 }
                             },
                             colors = IconButtonDefaults.filledIconButtonColors(colorScheme.primary),
-                            enabled = Constants.INPUT_USER_CONTACT_SIZE.lengthInRange(viewModel.eventContact.value)
+                            enabled = Constants.INPUT_USER_CONTACT_SIZE.lengthInRange(viewModel.eventContact.value),
                         ) {
                             Icon(
                                 imageVector = if (viewModel.editingEnabled.value) {
@@ -137,7 +137,7 @@ fun ProfileScreen(
                                 } else {
                                     Icons.Rounded.Edit
                                 },
-                                contentDescription = ""
+                                contentDescription = "",
                             )
                         }
                     },
@@ -154,18 +154,18 @@ fun ProfileScreen(
                             AnnotatedString(
                                 Base64.getEncoder()
                                     .encode(viewModel.userModel.userId.toString().toByteArray())
-                                    .toString(StandardCharsets.UTF_8)
-                            )
+                                    .toString(StandardCharsets.UTF_8),
+                            ),
                         )
                         Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
                     },
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+                    colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
                 ) {
                     Row(
                         modifier = Modifier
                             .padding(vertical = 8.dp, horizontal = 16.dp)
-                            .align(Alignment.CenterHorizontally)
+                            .align(Alignment.CenterHorizontally),
                     ) {
                         Text(text = "Copy unique ID", modifier = Modifier.align(Alignment.CenterVertically))
                         Spacer(modifier = Modifier.padding(8.dp))
@@ -179,7 +179,7 @@ fun ProfileScreen(
                     },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(top = 16.dp, bottom = 16.dp)
+                        .padding(top = 16.dp, bottom = 16.dp),
                 ) {
                     Icon(painter = rememberVectorPainter(image = Icons.Rounded.Logout), contentDescription = "")
                     Text(text = "Logout", fontSize = 14.sp, modifier = Modifier.padding(start = 8.dp))
@@ -197,7 +197,7 @@ fun ProfileScreen(
                     onPositive = {
                         appViewModel.logoutUser()
                         onNavigationLogout()
-                    }
+                    },
                 )
             }
         }

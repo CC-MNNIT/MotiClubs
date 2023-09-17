@@ -71,31 +71,31 @@ fun ClubList(
                 },
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(if (channelVisibility) 8.dp else 0.dp),
-                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
             ) {
                 Row(modifier = Modifier.padding(16.dp)) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
                         userModel = User().copy(avatar = clubsList.value[idx].avatar),
-                        onClick = { onNavigateToClubDetails(viewModel.clubsList.value[idx].clubId) }
+                        onClick = { onNavigateToClubDetails(viewModel.clubsList.value[idx].clubId) },
                     )
 
                     Column(
                         modifier = Modifier
                             .padding(start = 16.dp)
-                            .weight(1f)
+                            .weight(1f),
                     ) {
                         Text(
                             text = clubsList.value[idx].name,
                             fontSize = 16.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             text = clubsList.value[idx].summary,
                             fontSize = 14.sp,
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
 
@@ -105,14 +105,14 @@ fun ClubList(
                         visible = context.clubHasUnreadPost(
                             channelMap.value.getOrDefault(
                                 clubsList.value[idx].clubId,
-                                emptyList
-                            ).value
+                                emptyList,
+                            ).value,
                         ),
-                        modifier = Modifier.align(Alignment.CenterVertically)
+                        modifier = Modifier.align(Alignment.CenterVertically),
                     ) {
                         BadgedBox(badge = {
                             Badge { Text(text = " ") }
-                        }, modifier = Modifier.align(Alignment.CenterVertically)) {}
+                        }, modifier = Modifier.align(Alignment.CenterVertically),) {}
                     }
                     Spacer(modifier = Modifier.padding(8.dp))
                 }

@@ -38,58 +38,60 @@ fun ErrorScreen(viewModel: AppViewModel, modifier: Modifier = Modifier) {
         Surface(
             modifier = modifier
                 .fillMaxSize()
-                .imePadding()
+                .imePadding(),
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .align(Alignment.CenterHorizontally)
+                        .align(Alignment.CenterHorizontally),
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .align(Alignment.CenterVertically)
+                            .align(Alignment.CenterVertically),
                     ) {
                         AnimatedVisibility(
                             visible = viewModel.fetchingState,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
                         ) {
                             CircularProgressIndicator(modifier = Modifier.size(36.dp))
                         }
                         AnimatedVisibility(
                             visible = !viewModel.fetchingState,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
                         ) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Icon(
                                     modifier = Modifier
                                         .size(72.dp)
                                         .align(Alignment.CenterHorizontally),
-                                    imageVector = Icons.Outlined.ErrorOutline, contentDescription = ""
+                                    imageVector = Icons.Outlined.ErrorOutline,
+                                    contentDescription = "",
                                 )
                                 Text(
-                                    "Unable to connect to server", fontSize = 24.sp,
+                                    "Unable to connect to server",
+                                    fontSize = 24.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier
                                         .align(Alignment.CenterHorizontally)
-                                        .padding(top = 24.dp)
+                                        .padding(top = 24.dp),
                                 )
 
                                 Button(
                                     onClick = { viewModel.getUser(FirebaseAuth.getInstance().currentUser) },
                                     modifier = Modifier
                                         .align(Alignment.CenterHorizontally)
-                                        .padding(top = 16.dp, bottom = 16.dp)
+                                        .padding(top = 16.dp, bottom = 16.dp),
                                 ) {
                                     Icon(
                                         painter = rememberVectorPainter(image = Icons.Rounded.Refresh),
-                                        contentDescription = ""
+                                        contentDescription = "",
                                     )
                                     Text(
                                         text = "Refresh",
                                         fontSize = 14.sp,
-                                        modifier = Modifier.padding(start = 8.dp)
+                                        modifier = Modifier.padding(start = 8.dp),
                                     )
                                 }
                             }

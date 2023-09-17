@@ -33,54 +33,54 @@ val Poppins = FontFamily(
 val Typography = Typography(
     displayMedium = TextStyle(
         fontFamily = Poppins,
-        fontSize = 30.sp
+        fontSize = 30.sp,
     ),
     displaySmall = TextStyle(
         fontFamily = Poppins,
-        fontSize = 28.sp
+        fontSize = 28.sp,
     ),
     headlineLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 26.sp
+        fontSize = 26.sp,
     ),
     headlineMedium = TextStyle(
         fontFamily = Poppins,
-        fontSize = 24.sp
+        fontSize = 24.sp,
     ),
     headlineSmall = TextStyle(
         fontFamily = Poppins,
-        fontSize = 22.sp
+        fontSize = 22.sp,
     ),
     titleLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 20.sp
+        fontSize = 20.sp,
     ),
     titleMedium = TextStyle(
         fontFamily = Poppins,
-        fontSize = 18.sp
+        fontSize = 18.sp,
     ),
     titleSmall = TextStyle(
         fontFamily = Poppins,
-        fontSize = 16.sp
+        fontSize = 16.sp,
     ),
     bodyLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 14.sp
+        fontSize = 14.sp,
     ),
     bodyMedium = TextStyle(
         fontFamily = Poppins,
-        fontSize = 12.sp
+        fontSize = 12.sp,
     ),
     bodySmall = TextStyle(
         fontFamily = Poppins,
-        fontSize = 10.sp
+        fontSize = 10.sp,
     ),
     labelLarge = TextStyle(
         fontFamily = Poppins,
-        fontSize = 8.sp
+        fontSize = 8.sp,
     ),
     labelMedium = TextStyle(
         fontFamily = Poppins,
-        fontSize = 6.sp
-    )
+        fontSize = 6.sp,
+    ),
 )

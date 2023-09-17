@@ -71,7 +71,7 @@ import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 fun AddMemberScreen(
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AddMemberViewModel = hiltViewModel()
+    viewModel: AddMemberViewModel = hiltViewModel(),
 ) {
     val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -108,20 +108,20 @@ fun AddMemberScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.padding(end = 16.dp),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = "Add Members",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier
+                                    modifier = Modifier,
                                 )
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     Column(
                                         modifier = Modifier
                                             .align(Alignment.CenterVertically)
                                             .padding()
-                                            .weight(1f)
+                                            .weight(1f),
                                     ) {
                                         Text(text = "Enter comma separated values", fontSize = 12.sp)
                                         SearchField(
@@ -131,9 +131,9 @@ fun AddMemberScreen(
                                             label = "Name",
                                             keyboardOptions = KeyboardOptions.Default.copy(
                                                 keyboardType = KeyboardType.Text,
-                                                capitalization = KeyboardCapitalization.Words
+                                                capitalization = KeyboardCapitalization.Words,
                                             ),
-                                            onValueChange = { viewModel.filterSearch() }
+                                            onValueChange = { viewModel.filterSearch() },
                                         )
                                         SearchField(
                                             modifier = Modifier.fillMaxWidth(),
@@ -142,9 +142,9 @@ fun AddMemberScreen(
                                             label = "RegNo",
                                             keyboardOptions = KeyboardOptions.Default.copy(
                                                 keyboardType = KeyboardType.Text,
-                                                capitalization = KeyboardCapitalization.Characters
+                                                capitalization = KeyboardCapitalization.Characters,
                                             ),
-                                            onValueChange = { viewModel.filterSearch() }
+                                            onValueChange = { viewModel.filterSearch() },
                                         )
                                     }
 
@@ -162,18 +162,18 @@ fun AddMemberScreen(
                                         },
                                         colors = CardDefaults.cardColors(colorScheme.primary),
                                         shape = RoundedCornerShape(24.dp),
-                                        enabled = !viewModel.isFetching
+                                        enabled = !viewModel.isFetching,
                                     ) {
                                         Row(
                                             modifier = Modifier
                                                 .align(Alignment.CenterHorizontally)
-                                                .fillMaxHeight()
+                                                .fillMaxHeight(),
                                         ) {
                                             Icon(
                                                 modifier = Modifier.align(Alignment.CenterVertically),
                                                 imageVector = Icons.Outlined.Search,
                                                 contentDescription = "",
-                                                tint = colorScheme.onPrimary
+                                                tint = colorScheme.onPrimary,
                                             )
                                         }
                                     }
@@ -193,12 +193,14 @@ fun AddMemberScreen(
                                             Text(
                                                 text = "Clear all",
                                                 fontSize = 14.sp,
-                                                color = colorScheme.primary
+                                                color = colorScheme.primary,
                                             )
                                         },
                                         modifier = Modifier.imePadding(),
                                         shape = RoundedCornerShape(24.dp),
-                                        border = AssistChipDefaults.assistChipBorder(borderColor = colorScheme.background),
+                                        border = AssistChipDefaults.assistChipBorder(
+                                            borderColor = colorScheme.background,
+                                        ),
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     AssistChip(
@@ -215,7 +217,7 @@ fun AddMemberScreen(
                                                     contentColorFor(backgroundColor = colorScheme.primary)
                                                 } else {
                                                     colorScheme.onSurfaceVariant
-                                                }
+                                                },
                                             )
                                         },
                                         modifier = Modifier
@@ -223,20 +225,22 @@ fun AddMemberScreen(
                                             .align(Alignment.CenterVertically)
                                             .imePadding(),
                                         shape = RoundedCornerShape(24.dp),
-                                        colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
+                                        colors = AssistChipDefaults.assistChipColors(
+                                            containerColor = colorScheme.primary,
+                                        ),
                                         border = AssistChipDefaults.assistChipBorder(borderColor = colorScheme.primary),
-                                        enabled = viewModel.searchUserList.value.size > 0
+                                        enabled = viewModel.searchUserList.value.size > 0,
                                     )
                                 }
 
                                 AnimatedVisibility(
                                     visible = viewModel.isFetching,
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .fillMaxWidth(),
                                 ) {
                                     LinearProgressIndicator(
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                        strokeCap = StrokeCap.Round
+                                        strokeCap = StrokeCap.Round,
                                     )
                                 }
                             }
@@ -247,14 +251,14 @@ fun AddMemberScreen(
                         navigationIcon = {
                             IconButton(
                                 modifier = Modifier.size(42.dp),
-                                onClick = onBackPressed
+                                onClick = onBackPressed,
                             ) {
                                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
                             }
                         },
                         actions = {
                         },
-                        scrollBehavior = scrollBehavior
+                        scrollBehavior = scrollBehavior,
                     )
                 },
             ) { pd ->
@@ -270,7 +274,7 @@ fun AddMemberScreen(
                             viewModel.showSelectedMemberDialog = false
                             viewModel.showProgressDialog = true
                             viewModel.addMembers(onBackPressed)
-                        }
+                        },
                     )
                 }
 
@@ -279,9 +283,8 @@ fun AddMemberScreen(
                         .padding(PaddingValues(top = pd.calculateTopPadding()))
                         .imePadding()
                         .fillMaxSize()
-                        .animateContentSize()
+                        .animateContentSize(),
                 ) {
-
                     AnimatedVisibility(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
@@ -298,7 +301,7 @@ fun AddMemberScreen(
                                 Text(
                                     text = "${viewModel.selectedUserMap.value.size} selected",
                                     fontSize = 14.sp,
-                                    color = colorScheme.primary
+                                    color = colorScheme.primary,
                                 )
                             },
                             trailingIcon = {
@@ -306,7 +309,7 @@ fun AddMemberScreen(
                                     modifier = Modifier.padding(2.dp),
                                     imageVector = Icons.Rounded.Add,
                                     contentDescription = "",
-                                    tint = colorScheme.primary
+                                    tint = colorScheme.primary,
                                 )
                             },
                             modifier = Modifier
@@ -338,7 +341,6 @@ private fun UserList(
         state = scrollState,
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 72.dp),
     ) {
-
         item {
             if (viewModel.searchUserList.value.isEmpty()) {
                 Text(
@@ -346,7 +348,7 @@ private fun UserList(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         }
@@ -357,19 +359,31 @@ private fun UserList(
                 elevation = CardDefaults.cardElevation(0.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    colorScheme.surfaceColorAtElevation(if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) 16.dp else 2.dp)
+                    colorScheme.surfaceColorAtElevation(
+                        if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
+                            16.dp
+                        } else {
+                            2.dp
+                        },
+                    ),
                 ),
                 border = BorderStroke(
-                    width = if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
+                    width = if (viewModel.selectedUserMap.value.containsKey(
+                            viewModel.searchUserList.value[index].userId,
+                        )
+                    ) {
                         1.dp
                     } else {
                         0.dp
                     },
-                    color = if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
+                    color = if (viewModel.selectedUserMap.value.containsKey(
+                            viewModel.searchUserList.value[index].userId,
+                        )
+                    ) {
                         colorScheme.primary
                     } else {
                         colorScheme.background
-                    }
+                    },
                 ),
                 onClick = {
                     if (viewModel.selectedUserMap.value.containsKey(viewModel.searchUserList.value[index].userId)) {
@@ -378,17 +392,17 @@ private fun UserList(
                         viewModel.selectedUserMap.value[viewModel.searchUserList.value[index].userId] =
                             viewModel.searchUserList.value[index]
                     }
-                }
+                },
             ) {
                 Row(
                     modifier = Modifier
                         .padding(12.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 ) {
                     ProfilePicture(
                         modifier = Modifier.align(Alignment.CenterVertically),
                         userModel = viewModel.searchUserList.value[index],
-                        size = 48.dp
+                        size = 48.dp,
                     )
 
                     Spacer(modifier = Modifier.padding(8.dp))
@@ -400,7 +414,7 @@ private fun UserList(
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
 
                         Text(
@@ -409,7 +423,7 @@ private fun UserList(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
 

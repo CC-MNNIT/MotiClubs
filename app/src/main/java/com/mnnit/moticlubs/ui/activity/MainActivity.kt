@@ -15,8 +15,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,12 +41,25 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mnnit.moticlubs.R
-import com.mnnit.moticlubs.domain.util.*
-import com.mnnit.moticlubs.ui.screens.*
+import com.mnnit.moticlubs.domain.util.AppNavigation
+import com.mnnit.moticlubs.domain.util.AuthHandler
+import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.NavigationArgs
+import com.mnnit.moticlubs.ui.screens.AboutUsScreen
+import com.mnnit.moticlubs.ui.screens.AddMemberScreen
+import com.mnnit.moticlubs.ui.screens.ChannelDetailScreen
+import com.mnnit.moticlubs.ui.screens.ChannelScreen
+import com.mnnit.moticlubs.ui.screens.ClubDetailsScreen
+import com.mnnit.moticlubs.ui.screens.ErrorScreen
+import com.mnnit.moticlubs.ui.screens.HomeScreen
+import com.mnnit.moticlubs.ui.screens.ImageScreen
+import com.mnnit.moticlubs.ui.screens.LoginScreen
+import com.mnnit.moticlubs.ui.screens.PostScreen
+import com.mnnit.moticlubs.ui.screens.ProfileScreen
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
-import com.mnnit.moticlubs.ui.viewmodel.*
+import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,7 +69,7 @@ class MainActivity : ComponentActivity() {
 
     // Notification permission activity result contract
     private val requestPermission: ActivityResultLauncher<String> = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) {
         if (it) {
             openApp()
@@ -82,13 +97,13 @@ class MainActivity : ComponentActivity() {
                     .setSupported(true)
                     .setServerClientId(getString(R.string.default_web_client_id))
                     .setFilterByAuthorizedAccounts(false)
-                    .build()
+                    .build(),
             )
             .build()
 
         // Register sign in activity result launcher
         googleSignInLauncher = registerForActivityResult(
-            ActivityResultContracts.StartIntentSenderForResult()
+            ActivityResultContracts.StartIntentSenderForResult(),
         ) { result -> AuthHandler.onResult(result) }
 
         // Notification permission required for Android Tiramisu and above
@@ -107,7 +122,7 @@ class MainActivity : ComponentActivity() {
             SetTransparentSystemBars()
 
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 AnimatedVisibility(visible = viewModel.showErrorScreen) {
                     ErrorScreen(viewModel)
@@ -122,9 +137,10 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun validateNotificationPermission() {
         when {
-            (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.POST_NOTIFICATIONS
-            )) == PackageManager.PERMISSION_GRANTED -> openApp()
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED -> openApp()
 
             shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                 Toast.makeText(this, "Please enable notification permission for this app", Toast.LENGTH_SHORT).show()
@@ -145,7 +161,7 @@ class MainActivity : ComponentActivity() {
             Surface(
                 modifier = modifier
                     .fillMaxSize()
-                    .imePadding()
+                    .imePadding(),
             ) {
                 val localBackPressed = LocalOnBackPressedDispatcherOwner.current
                 val navController = rememberNavController()
@@ -167,7 +183,8 @@ class MainActivity : ComponentActivity() {
                                     popUpTo(AppNavigation.LOGIN) { inclusive = true }
                                 }
                                 navController.graph.setStartDestination(AppNavigation.HOME)
-                            })
+                            },
+                        )
                     }
 
                     // HOME
@@ -176,8 +193,8 @@ class MainActivity : ComponentActivity() {
                             onNavigateChannelClick = { channelId, clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CHANNEL_PAGE}?" +
-                                            "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channelId.toString())}&" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
+                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channelId.toString())}&" +
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
                                 )
                             },
                             onNavigateContactUs = { navController.navigate(AppNavigation.ABOUT_US) },
@@ -185,9 +202,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToClubDetails = { clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CLUB_DETAIL}?" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
                                 )
-                            }
+                            },
                         )
                     }
 
@@ -200,9 +217,11 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(AppNavigation.LOGIN) {
                                     popUpTo(AppNavigation.HOME) { inclusive = true }
                                 }
-                            }, onBackPressed = {
+                            },
+                            onBackPressed = {
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                            })
+                            },
+                        )
                     }
 
                     // ABOUT US
@@ -211,56 +230,66 @@ class MainActivity : ComponentActivity() {
                     // CHANNEL PAGE
                     composable(
                         "${AppNavigation.CHANNEL_PAGE}?" +
-                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
-                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
+                            "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
+                            "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType },
                             navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
-                        )
+                        ),
                     ) {
-                        ChannelScreen(onNavigateToPost = { postId ->
-                            navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(postId.toString())}")
-                        }, onNavigateToClubDetails = { clubId ->
-                            navController.navigate(
-                                "${AppNavigation.CLUB_DETAIL}?" +
-                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}"
-                            )
-                        }, onNavigateToImageScreen = { url ->
-                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(url)}")
-                        }, onNavigateToChannelDetails = { channel ->
-                            navController.navigate(
-                                "${AppNavigation.CHANNEL_DETAIL}?" +
-                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channel.toString())}"
-                            )
-                        }, onBackPressed = {
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
+                        ChannelScreen(
+                            onNavigateToPost = { postId ->
+                                navController.navigate("${AppNavigation.POST_PAGE}/${Uri.encode(postId.toString())}")
+                            },
+                            onNavigateToClubDetails = { clubId ->
+                                navController.navigate(
+                                    "${AppNavigation.CLUB_DETAIL}?" +
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
+                                )
+                            },
+                            onNavigateToImageScreen = { url ->
+                                navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(url)}")
+                            },
+                            onNavigateToChannelDetails = { channel ->
+                                navController.navigate(
+                                    "${AppNavigation.CHANNEL_DETAIL}?" +
+                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channel.toString())}",
+                                )
+                            },
+                            onBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            },
+                        )
                     }
 
                     // CLUB DETAILS
                     composable(
                         "${AppNavigation.CLUB_DETAIL}?" +
-                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
+                            "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
-                        )
+                        ),
                     ) {
-                        ClubDetailsScreen(onNavigateBackPressed = {
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
+                        ClubDetailsScreen(
+                            onNavigateBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            },
+                        )
                     }
 
                     // CHANNEL DETAILS
                     composable(
                         "${AppNavigation.CHANNEL_DETAIL}?" +
-                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}",
+                            "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType },
-                        )
+                        ),
                     ) {
                         ChannelDetailScreen(
                             onNavigateToAddMember = { channelId ->
-                                navController.navigate("${AppNavigation.ADD_MEMBER_PAGE}/${Uri.encode(channelId.toString())}")
+                                navController.navigate(
+                                    "${AppNavigation.ADD_MEMBER_PAGE}/${Uri.encode(channelId.toString())}",
+                                )
                             },
                             onDeleteChannel = {
                                 navController.navigate(AppNavigation.HOME) {
@@ -270,7 +299,7 @@ class MainActivity : ComponentActivity() {
                             },
                             onBackPressed = {
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                            }
+                            },
                         )
                     }
 
@@ -278,36 +307,43 @@ class MainActivity : ComponentActivity() {
                     composable(
                         "${AppNavigation.POST_PAGE}/{${NavigationArgs.POST_ARG}}",
                         arguments = listOf(navArgument(NavigationArgs.POST_ARG) { type = NavType.LongType }),
-                        deepLinks = listOf(navDeepLink {
-                            uriPattern =
-                                "${Constants.APP_SCHEME_URL}/${NavigationArgs.POST_ARG}={${NavigationArgs.POST_ARG}}"
-                        })
+                        deepLinks = listOf(
+                            navDeepLink {
+                                uriPattern = "${Constants.APP_SCHEME_URL}/" +
+                                    "${NavigationArgs.POST_ARG}={${NavigationArgs.POST_ARG}}"
+                            },
+                        ),
                     ) {
-                        PostScreen(onNavigateImageClick = { url ->
-                            navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(url)}")
-                        }, onNavigateBackPressed = {
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
+                        PostScreen(
+                            onNavigateImageClick = { url ->
+                                navController.navigate("${AppNavigation.IMAGE_PAGE}/${Uri.encode(url)}")
+                            },
+                            onNavigateBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            },
+                        )
                     }
 
                     // POST IMAGE
                     composable(
                         "${AppNavigation.IMAGE_PAGE}/{image}",
-                        arguments = listOf(navArgument("image") { type = NavType.StringType })
+                        arguments = listOf(navArgument("image") { type = NavType.StringType }),
                     ) {
-                        ImageScreen(onBackPressed = {
-                            localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                        })
+                        ImageScreen(
+                            onBackPressed = {
+                                localBackPressed?.onBackPressedDispatcher?.onBackPressed()
+                            },
+                        )
                     }
 
                     composable(
                         "${AppNavigation.ADD_MEMBER_PAGE}/{${NavigationArgs.CHANNEL_ARG}}",
-                        arguments = listOf(navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType })
+                        arguments = listOf(navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType }),
                     ) {
                         AddMemberScreen(
                             onBackPressed = {
                                 localBackPressed?.onBackPressedDispatcher?.onBackPressed()
-                            }
+                            },
                         )
                     }
                 }

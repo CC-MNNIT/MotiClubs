@@ -48,8 +48,8 @@ import io.noties.markwon.image.picasso.PicassoImagesPlugin.PicassoStore
 import io.noties.markwon.image.svg.SvgMediaDecoder
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
-import org.commonmark.node.SoftLineBreak
 import java.util.Collections
+import org.commonmark.node.SoftLineBreak
 
 /**
  * Modified from and Credits to : https://github.com/jeziellago/compose-markdown
@@ -99,7 +99,7 @@ fun MarkdownText(
             if (!disableLinkMovementMethod && selectable) {
                 textView.movementMethod = LinkMovementMethod.getInstance()
             }
-        }
+        },
     )
 }
 
@@ -114,16 +114,15 @@ private fun createTextView(
     @FontRes fontResource: Int? = null,
     style: TextStyle,
     @IdRes viewId: Int? = null,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ): TextView {
-
     val textColor = color.takeOrElse { style.color.takeOrElse { defaultColor } }
     val mergedStyle = style.merge(
         TextStyle(
             color = textColor,
             fontSize = if (fontSize != TextUnit.Unspecified) fontSize else style.fontSize,
             textAlign = textAlign,
-        )
+        ),
     )
     return TextView(context).apply {
         onClick?.let { setOnClickListener { onClick() } }
@@ -151,37 +150,45 @@ private fun createTextView(
 private fun createMarkdownRender(context: Context): Markwon {
     return Markwon.builder(context)
         .usePlugin(HtmlPlugin.create { plugin -> plugin.addHandler(TagAlignmentHandler()) })
-        .usePlugin(PicassoImagesPlugin.create(object : PicassoStore {
-            override fun load(drawable: AsyncDrawable): RequestCreator =
-                Picasso.get().load(drawable.destination).tag(drawable)
+        .usePlugin(
+            PicassoImagesPlugin.create(
+                object : PicassoStore {
+                    override fun load(drawable: AsyncDrawable): RequestCreator =
+                        Picasso.get().load(drawable.destination).tag(drawable)
 
-            override fun cancel(drawable: AsyncDrawable) {
-                Picasso.get().cancelTag(drawable)
-            }
-        }))
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun configureVisitor(builder: MarkwonVisitor.Builder) {
-                builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
-            }
+                    override fun cancel(drawable: AsyncDrawable) {
+                        Picasso.get().cancelTag(drawable)
+                    }
+                },
+            ),
+        )
+        .usePlugin(
+            object : AbstractMarkwonPlugin() {
+                override fun configureVisitor(builder: MarkwonVisitor.Builder) {
+                    builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
+                }
 
-            override fun beforeSetText(textView: TextView, markdown: Spanned) {
-                AsyncDrawableScheduler.unschedule(textView)
-            }
+                override fun beforeSetText(textView: TextView, markdown: Spanned) {
+                    AsyncDrawableScheduler.unschedule(textView)
+                }
 
-            override fun afterSetText(textView: TextView) {
-                AsyncDrawableScheduler.schedule(textView)
-            }
-        })
-        .usePlugin(ImagesPlugin.create { plugin ->
-            plugin.addSchemeHandler(OkHttpNetworkSchemeHandler.create())
-            plugin.addMediaDecoder(GifMediaDecoder.create(true))
+                override fun afterSetText(textView: TextView) {
+                    AsyncDrawableScheduler.schedule(textView)
+                }
+            },
+        )
+        .usePlugin(
+            ImagesPlugin.create { plugin ->
+                plugin.addSchemeHandler(OkHttpNetworkSchemeHandler.create())
+                plugin.addMediaDecoder(GifMediaDecoder.create(true))
 
-            plugin.addMediaDecoder(SvgMediaDecoder.create(context.resources))
-            plugin.addMediaDecoder(SvgMediaDecoder.create())
+                plugin.addMediaDecoder(SvgMediaDecoder.create(context.resources))
+                plugin.addMediaDecoder(SvgMediaDecoder.create())
 
-            plugin.defaultMediaDecoder(DefaultMediaDecoder.create(context.resources))
-            plugin.defaultMediaDecoder(DefaultMediaDecoder.create())
-        })
+                plugin.defaultMediaDecoder(DefaultMediaDecoder.create(context.resources))
+                plugin.defaultMediaDecoder(DefaultMediaDecoder.create())
+            },
+        )
         .usePlugin(StrikethroughPlugin.create())
         .usePlugin(TablePlugin.create(context))
         .usePlugin(LinkifyPlugin.create())

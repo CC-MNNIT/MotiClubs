@@ -31,7 +31,7 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
         stamp: Long,
     ) -> Response<ReqT?>,
     crossinline saveResponse: suspend (ResT, ReqT) -> Unit,
-    remoteRequired: Boolean = false
+    remoteRequired: Boolean = false,
 ): Flow<Resource<ResT>> = flow {
     val data = query()
     emit(Resource.Loading(data))
@@ -41,7 +41,9 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
             if (remoteRequired) {
                 Log.w(TAG, "networkResource: remoteRequired but connection unavailable")
                 Resource.Error(errMsg = "You're Offline")
-            } else Resource.Success(data)
+            } else {
+                Resource.Success(data)
+            },
         )
         return@flow
     }
@@ -54,7 +56,7 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
             apiCall(
                 getAPIService(),
                 getApplication().getAuthToken(),
-                stamp
+                stamp,
             )
         }
         if (apiResponse is Resource.Success) {
@@ -76,7 +78,7 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
 }
 
 suspend inline fun <reified T> apiInvoker(
-    crossinline invoke: (suspend () -> Response<T?>)
+    crossinline invoke: (suspend () -> Response<T?>),
 ): Resource<Pair<T?, Long>> {
     try {
         val response = withContext(Dispatchers.IO) { invoke() }

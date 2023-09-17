@@ -53,13 +53,13 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
         tonalElevation = 2.dp,
         modifier = modifier
             .fillMaxWidth()
-            .imePadding()
+            .imePadding(),
     ) {
         Column(
             modifier = Modifier
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 .imePadding()
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Box(
                 modifier = Modifier
@@ -67,7 +67,7 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                     .height(4.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(contentColorFor(backgroundColor = colorScheme.background))
+                    .background(contentColorFor(backgroundColor = colorScheme.background)),
             ) {
                 Text(text = "", modifier = Modifier.padding(12.dp))
             }
@@ -76,13 +76,13 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                 text = "Contact Us",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
+                modifier = Modifier.padding(top = 16.dp, bottom = 20.dp),
             )
 
             Column(
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 OutlinedTextField(
                     modifier = Modifier
@@ -97,7 +97,7 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                         disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
                         disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                     ),
-                    singleLine = true
+                    singleLine = true,
                 )
 
                 OutlinedTextField(
@@ -112,8 +112,8 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = contentColorFor(backgroundColor = colorScheme.background),
-                        disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background)
-                    )
+                        disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
+                    ),
                 )
 
                 AssistChip(
@@ -130,10 +130,11 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                                     colorScheme.primary
                                 } else {
                                     colorScheme.onSurface.copy(alpha = 0.38f)
-                                }
-                            )
+                                },
+                            ),
                         )
-                    }, leadingIcon = {
+                    },
+                    leadingIcon = {
                         Icon(
                             modifier = Modifier.padding(8.dp),
                             painter = rememberVectorPainter(image = Icons.Rounded.Send),
@@ -143,8 +144,8 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                                     colorScheme.primary
                                 } else {
                                     colorScheme.onSurface.copy(alpha = 0.38f)
-                                }
-                            )
+                                },
+                            ),
                         )
                     },
                     modifier = Modifier
@@ -153,7 +154,7 @@ fun AboutUsContactForm(modifier: Modifier = Modifier) {
                         .align(Alignment.End),
                     shape = RoundedCornerShape(24.dp),
                     colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
-                    enabled = postMsg.isTrimmedNotEmpty() && name.isTrimmedNotEmpty()
+                    enabled = postMsg.isTrimmedNotEmpty() && name.isTrimmedNotEmpty(),
                 )
             }
         }

@@ -2,14 +2,29 @@ package com.mnnit.moticlubs.ui.components.channelscreen
 
 import android.util.Patterns
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material3.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -22,7 +37,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnnit.moticlubs.domain.model.*
+import com.mnnit.moticlubs.domain.model.AdminUser
+import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.Post
 import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.getUnreadPost
@@ -55,24 +72,25 @@ fun PostItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
-        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 24.dp), elevation = CardDefaults.cardElevation(0.dp),
+        shape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 24.dp),
+        elevation = CardDefaults.cardElevation(0.dp),
         onClick = { onNavigateToPost(post.postId) },
-        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp))
+        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(8.dp)),
     ) {
         Card(
             elevation = CardDefaults.cardElevation(0.dp),
             shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp))
+            colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 ProfilePicture(
                     modifier = Modifier.align(Alignment.Top),
                     userModel = admin.getUser(),
-                    size = 42.dp
+                    size = 42.dp,
                 )
 
                 AuthorNameTimestamp(post.postId, admin.name)
@@ -83,7 +101,7 @@ fun PostItem(
                         .contains(post.postId.toString()),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(16.dp)
+                        .padding(16.dp),
                 ) {
                     Badge { }
                 }
@@ -91,42 +109,46 @@ fun PostItem(
                 Spacer(modifier = Modifier.weight(1f))
 
                 AnimatedVisibility(visible = post.userId == userId) {
-                    IconButton(onClick = {
-                        eventUpdatePost.value = post
-                        editMode.value = true
+                    IconButton(
+                        onClick = {
+                            eventUpdatePost.value = post
+                            editMode.value = true
 
-                        var preprocessText = post.message
-                        imageReplacerMap.value.clear()
-                        post.message.lines().forEach {
-                            if (it.startsWith("<img src")) {
-                                val key = "[image_${imageReplacerMap.value.size}]"
-                                imageReplacerMap.value[key] = it
-                                preprocessText = preprocessText.replace(it, key)
+                            var preprocessText = post.message
+                            imageReplacerMap.value.clear()
+                            post.message.lines().forEach {
+                                if (it.startsWith("<img src")) {
+                                    val key = "[image_${imageReplacerMap.value.size}]"
+                                    imageReplacerMap.value[key] = it
+                                    preprocessText = preprocessText.replace(it, key)
+                                }
                             }
-                        }
-                        postMsg.value = TextFieldValue(preprocessText)
-                        scope.launch {
-                            if (bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
-                                bottomSheetScaffoldState.value.bottomSheetState.expand()
+                            postMsg.value = TextFieldValue(preprocessText)
+                            scope.launch {
+                                if (bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                                    bottomSheetScaffoldState.value.bottomSheetState.expand()
+                                }
                             }
-                        }
-                    }) {
+                        },
+                    ) {
                         Icon(
                             modifier = Modifier.size(18.dp),
                             imageVector = Icons.Rounded.Edit,
-                            contentDescription = ""
+                            contentDescription = "",
                         )
                     }
                 }
                 AnimatedVisibility(visible = post.userId == userId) {
-                    IconButton(onClick = {
-                        eventDeletePost.value = post
-                        showDelPostDialog.value = true
-                    }) {
+                    IconButton(
+                        onClick = {
+                            eventDeletePost.value = post
+                            showDelPostDialog.value = true
+                        },
+                    ) {
                         Icon(
                             modifier = Modifier.size(18.dp),
                             imageVector = Icons.Rounded.Delete,
-                            contentDescription = ""
+                            contentDescription = "",
                         )
                     }
                 }
@@ -144,9 +166,10 @@ fun PostItem(
 
 @Composable
 private fun AuthorNameTimestamp(time: Long, name: String) {
-    Column(modifier = Modifier
-        .padding(start = 16.dp)
-        .semantics(mergeDescendants = true) {}
+    Column(
+        modifier = Modifier
+            .padding(start = 16.dp)
+            .semantics(mergeDescendants = true) {},
     ) {
         Text(
             text = name,
@@ -155,13 +178,13 @@ private fun AuthorNameTimestamp(time: Long, name: String) {
             modifier = Modifier.paddingFrom(LastBaseline, after = 8.dp), // Space to 1st bubble
             fontSize = 14.sp,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = time.toTimeString(),
             style = MaterialTheme.typography.bodySmall,
-            fontSize = 12.sp
+            fontSize = 12.sp,
         )
     }
 }

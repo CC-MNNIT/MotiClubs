@@ -52,14 +52,14 @@ fun ContributorDialog(
 
     Dialog(
         onDismissRequest = { viewModel.showContributorDialog = false },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
             modifier = modifier
                 .fillMaxWidth(0.95f)
                 .padding(16.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
@@ -67,21 +67,21 @@ fun ContributorDialog(
                     fontSize = 18.sp,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 AnimatedVisibility(
                     visible = viewModel.loadingContributors,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     LinearProgressIndicator(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        strokeCap = StrokeCap.Round
+                        strokeCap = StrokeCap.Round,
                     )
                 }
 
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     LazyColumn(
                         modifier = Modifier.animateContentSize(),
@@ -122,7 +122,7 @@ private fun ContributorItem(contributor: GithubContributorDto) {
         Row(
             modifier = Modifier
                 .padding(12.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.CenterVertically),
@@ -130,7 +130,7 @@ private fun ContributorItem(contributor: GithubContributorDto) {
                 size = 48.dp,
                 onClick = {
                     uriHandler.openUri(contributor.htmlUrl)
-                }
+                },
             )
 
             Spacer(modifier = Modifier.padding(8.dp))
@@ -142,7 +142,7 @@ private fun ContributorItem(contributor: GithubContributorDto) {
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Text(
@@ -151,7 +151,7 @@ private fun ContributorItem(contributor: GithubContributorDto) {
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -163,7 +163,7 @@ private fun ContributorItem(contributor: GithubContributorDto) {
                     .padding()
                     .align(Alignment.CenterVertically),
                 imageVector = Icons.Rounded.OpenInNew,
-                contentDescription = ""
+                contentDescription = "",
             )
         }
     }

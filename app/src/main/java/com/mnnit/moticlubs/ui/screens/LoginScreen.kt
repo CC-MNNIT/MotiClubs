@@ -53,7 +53,7 @@ fun LoginScreen(
     appViewModel: AppViewModel,
     onNavigateToMain: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LoginScreenViewModel = hiltViewModel()
+    viewModel: LoginScreenViewModel = hiltViewModel(),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val colorScheme = getColorScheme()
@@ -65,34 +65,34 @@ fun LoginScreen(
         LaunchedEffect(systemUiController) {
             systemUiController.setStatusBarColor(
                 color = bgColor,
-                darkIcons = false
+                darkIcons = false,
             )
             systemUiController.setNavigationBarColor(
                 color = bgColor,
-                darkIcons = false
+                darkIcons = false,
             )
         }
 
         Surface(
             modifier = modifier.fillMaxSize(),
-            color = bgColor
+            color = bgColor,
         ) {
             Row(
                 modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Column(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(top = 56.dp)
+                        .padding(top = 56.dp),
                 ) {
                     Image(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .size(176.dp),
                         painter = painterResource(id = R.drawable.app_icon),
-                        contentDescription = ""
+                        contentDescription = "",
                     )
 
                     Spacer(modifier = Modifier.padding(16.dp))
@@ -103,7 +103,7 @@ fun LoginScreen(
                         text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.headlineLarge,
                         color = Color.White,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
 
                     Spacer(modifier = Modifier.padding(24.dp))
@@ -112,7 +112,8 @@ fun LoginScreen(
                         visible = !viewModel.isLoading.value,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally),
-                        enter = fadeIn(), exit = fadeOut()
+                        enter = fadeIn(),
+                        exit = fadeOut(),
                     ) {
                         Card(
                             modifier = Modifier
@@ -134,36 +135,36 @@ fun LoginScreen(
                                             credential,
                                             preUser,
                                             appViewModel,
-                                            onNavigateToMain
+                                            onNavigateToMain,
                                         )
                                     },
                                     onFailure = {
                                         viewModel.isLoading.value = false
                                         Toast.makeText(context, "Error: ${it.localizedMessage}", Toast.LENGTH_SHORT)
                                             .show()
-                                    }
+                                    },
                                 )
                             },
-                            enabled = !viewModel.isLoading.value
+                            enabled = !viewModel.isLoading.value,
                         ) {
                             Row(
                                 modifier = Modifier
                                     .padding(horizontal = 12.dp, vertical = 8.dp)
-                                    .align(Alignment.CenterHorizontally)
+                                    .align(Alignment.CenterHorizontally),
                             ) {
                                 Image(
                                     modifier = Modifier
                                         .align(Alignment.CenterVertically)
                                         .size(24.dp),
                                     painter = painterResource(id = R.drawable.google_button),
-                                    contentDescription = ""
+                                    contentDescription = "",
                                 )
                                 Spacer(modifier = Modifier.padding(8.dp))
                                 Text(
                                     text = "Sign in with Google",
                                     modifier = Modifier
                                         .align(Alignment.CenterVertically),
-                                    color = Color(0xFF242424)
+                                    color = Color(0xFF242424),
                                 )
                             }
                         }
@@ -173,7 +174,8 @@ fun LoginScreen(
                         visible = viewModel.isLoading.value,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally),
-                        enter = fadeIn(), exit = fadeOut()
+                        enter = fadeIn(),
+                        exit = fadeOut(),
                     ) {
                         CircularProgressIndicator(color = Color.White)
                     }

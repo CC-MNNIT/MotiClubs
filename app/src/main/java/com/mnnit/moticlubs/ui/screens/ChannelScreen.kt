@@ -3,21 +3,31 @@ package com.mnnit.moticlubs.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -27,11 +37,11 @@ import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mnnit.moticlubs.*
 import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
-import com.mnnit.moticlubs.ui.components.*
+import com.mnnit.moticlubs.ui.components.ConfirmationDialog
+import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.channelscreen.ChannelTopBar
 import com.mnnit.moticlubs.ui.components.channelscreen.PostCreateUpdateBottomSheet
 import com.mnnit.moticlubs.ui.components.channelscreen.PostItem
@@ -49,14 +59,14 @@ fun ChannelScreen(
     onNavigateToImageScreen: (url: String) -> Unit,
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ChannelScreenViewModel = hiltViewModel()
+    viewModel: ChannelScreenViewModel = hiltViewModel(),
 ) {
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.loadingPosts.value,
-        onRefresh = viewModel::getPostsList
+        onRefresh = viewModel::getPostsList,
     )
 
     val colorScheme = getColorScheme()
@@ -78,7 +88,7 @@ fun ChannelScreen(
                             modifier = Modifier.padding(),
                             onNavigateToClubDetails = onNavigateToClubDetails,
                             onBackPressed = onBackPressed,
-                            onNavigateToChannelDetails = onNavigateToChannelDetails
+                            onNavigateToChannelDetails = onNavigateToChannelDetails,
                         )
                     }
                 },
@@ -88,30 +98,30 @@ fun ChannelScreen(
                             .pullRefresh(state = refreshState, enabled = !viewModel.loadingPosts.value)
                             .fillMaxSize()
                             .background(colorScheme.background)
-                            .padding(bottom = if (viewModel.isAdmin) 72.dp else 0.dp)
+                            .padding(bottom = if (viewModel.isAdmin) 72.dp else 0.dp),
                     ) {
                         Column(
                             Modifier
                                 .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                         ) {
                             PullDownProgressIndicator(
                                 visible = viewModel.loadingPosts.value,
-                                refreshState = refreshState
+                                refreshState = refreshState,
                             )
 
                             AnimatedVisibility(
                                 visible = viewModel.postsList.value.isEmpty() && !viewModel.loadingPosts.value,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .align(Alignment.CenterHorizontally)
+                                    .align(Alignment.CenterHorizontally),
                             ) {
                                 Text(
                                     "No posts yet :/\nPull down to refresh",
                                     fontSize = 14.sp,
                                     modifier = Modifier
                                         .align(Alignment.CenterHorizontally)
-                                        .padding(16.dp)
+                                        .padding(16.dp),
                                 )
                             }
 
@@ -120,7 +130,7 @@ fun ChannelScreen(
                                 modifier = Modifier.weight(1f),
                                 scrollState = listScrollState,
                                 adminMap = viewModel.adminMap,
-                                onNavigateToPost = onNavigateToPost
+                                onNavigateToPost = onNavigateToPost,
                             )
 
                             if (viewModel.showDelPostDialog.value) {
@@ -131,7 +141,7 @@ fun ChannelScreen(
                 },
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = if (viewModel.isAdmin) 72.dp else 0.dp,
-                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp)
+                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
             )
         }
     }
@@ -144,7 +154,7 @@ fun DeleteConfirmationDialog(viewModel: ChannelScreenViewModel) {
         message = "Are you sure you want to delete this post ?",
         positiveBtnText = "Delete",
         imageVector = Icons.Rounded.Delete,
-        onPositive = { viewModel.deletePost() }
+        onPositive = { viewModel.deletePost() },
     )
 }
 
@@ -154,13 +164,13 @@ fun TopBar(
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     onNavigateToChannelDetails: (channelId: Long) -> Unit,
     onBackPressed: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(visible = viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
         com.mnnit.moticlubs.ui.components.channelscreen.SearchBar(
             viewModel.searchMode,
             viewModel.searchValue,
-            modifier = modifier
+            modifier = modifier,
         )
     }
     AnimatedVisibility(visible = !viewModel.searchMode.value, enter = fadeIn(), exit = fadeOut()) {
@@ -169,7 +179,7 @@ fun TopBar(
             modifier = modifier,
             onNavigateToClubDetails = onNavigateToClubDetails,
             onBackPressed = onBackPressed,
-            onNavigateToChannelDetails = onNavigateToChannelDetails
+            onNavigateToChannelDetails = onNavigateToChannelDetails,
         )
     }
 }
@@ -189,7 +199,7 @@ fun Posts(
             contentPadding = PaddingValues(top = 16.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
         ) {
             items(viewModel.postsList.value.size) { index ->
                 if (viewModel.searchMode.value && viewModel.searchValue.value.isTrimmedNotEmpty() &&
@@ -210,7 +220,7 @@ fun Posts(
                     imageReplacerMap = viewModel.eventImageReplacerMap,
                     eventDeletePost = viewModel.eventDeletePost,
                     showDelPostDialog = viewModel.showDelPostDialog,
-                    onNavigateToPost
+                    onNavigateToPost,
                 )
 
                 LaunchedEffect(index) {

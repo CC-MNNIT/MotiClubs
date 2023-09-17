@@ -21,8 +21,8 @@ import com.mnnit.moticlubs.domain.util.getAuthToken
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
@@ -50,11 +50,14 @@ class LoginScreenViewModel @Inject constructor(
 
     private fun saveUser(
         saveUserDto: SaveUserDto,
-        onResponse: () -> Unit, onFailure: (code: Int) -> Unit
+        onResponse: () -> Unit,
+        onFailure: (code: Int) -> Unit,
     ) {
         viewModelScope.launch {
-            val stamp = (repository.getStampByKey(ResponseStamp.USER.getKey())
-                ?: Stamp(ResponseStamp.USER.getKey(), 0)).stamp
+            val stamp = (
+                repository.getStampByKey(ResponseStamp.USER.getKey())
+                    ?: Stamp(ResponseStamp.USER.getKey(), 0)
+                ).stamp
             val bodyResource = apiInvoker {
                 apiService.saveUser(application.getAuthToken(), stamp, saveUserDto)
             }
@@ -72,7 +75,7 @@ class LoginScreenViewModel @Inject constructor(
         credential: AuthCredential,
         preUser: SaveUserDto,
         appViewModel: AppViewModel,
-        onNavigateToMain: () -> Unit
+        onNavigateToMain: () -> Unit,
     ) {
         val auth = FirebaseAuth.getInstance()
         auth.signInWithCredential(credential)
@@ -110,7 +113,7 @@ class LoginScreenViewModel @Inject constructor(
                             saveUser(preUser, {
                                 auth.signOut()
                                 login(context, credential, preUser, appViewModel, onNavigateToMain)
-                            }) {
+                            },) {
                                 auth.signOut()
                                 isLoading.value = false
                                 Toast.makeText(context, "$it: Error signing up", Toast.LENGTH_SHORT).show()
@@ -131,19 +134,19 @@ class LoginScreenViewModel @Inject constructor(
         context: Context,
         auth: FirebaseAuth,
         appViewModel: AppViewModel,
-        onNavigateToMain: () -> Unit
+        onNavigateToMain: () -> Unit,
     ) {
         FirebaseMessaging.getInstance().token.addOnSuccessListener { fcm ->
             setFCMToken(fcm, {
                 appViewModel.getUser(auth.currentUser, {
                     isLoading.value = false
                     onNavigateToMain()
-                }) {
+                },) {
                     auth.signOut()
                     isLoading.value = false
                     Toast.makeText(context, "Error: Couldn't load user", Toast.LENGTH_SHORT).show()
                 }
-            }) {
+            },) {
                 auth.signOut()
                 isLoading.value = false
                 Toast.makeText(context, "Error: Couldn't set db-msg token", Toast.LENGTH_SHORT).show()

@@ -72,7 +72,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
 
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.loadingReplies.value,
-        onRefresh = viewModel::getReplies
+        onRefresh = viewModel::getReplies,
     )
 
     Surface(
@@ -80,13 +80,13 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
         tonalElevation = 2.dp,
         modifier = modifier
             .fillMaxWidth()
-            .imePadding()
+            .imePadding(),
     ) {
         Column(
             modifier = Modifier
                 .padding(top = 16.dp)
                 .imePadding()
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Box(
                 modifier = Modifier
@@ -94,7 +94,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
                     .height(4.dp)
                     .align(Alignment.CenterHorizontally)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(contentColorFor(backgroundColor = colorScheme.background))
+                    .background(contentColorFor(backgroundColor = colorScheme.background)),
             ) {
                 Text(text = "", modifier = Modifier.padding(12.dp))
             }
@@ -104,7 +104,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
                     text = "Replies",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically),
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -121,14 +121,16 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
                         if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
                             scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
                         }
-                    }
+                    },
                 ) {
                     Icon(
                         if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
                             Icons.Rounded.KeyboardArrowDown
                         } else {
                             Icons.Rounded.KeyboardArrowUp
-                        }, contentDescription = "", tint = colorScheme.primary
+                        },
+                        contentDescription = "",
+                        tint = colorScheme.primary,
                     )
                 }
             }
@@ -139,7 +141,7 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
                 scrollState,
                 modifier = Modifier
                     .weight(1f)
-                    .imePadding()
+                    .imePadding(),
             )
         }
     }
@@ -156,7 +158,6 @@ private fun Replies(
     val colorScheme = getColorScheme()
 
     Column(modifier = modifier.pullRefresh(refreshState)) {
-
         PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
 
         LazyColumn(
@@ -198,10 +199,11 @@ private fun Replies(
                     onClick = {
                         if (viewModel.replyMsg.value.isEmpty()) return@IconButton
                         viewModel.sendReply()
-                    }) {
+                    },
+                ) {
                     Icon(imageVector = Icons.Rounded.Send, contentDescription = "")
                 }
-            }
+            },
         )
     }
 }
@@ -210,7 +212,7 @@ private fun Replies(
 private fun Reply(
     viewModel: PostScreenViewModel,
     reply: Reply,
-    colorScheme: ColorScheme
+    colorScheme: ColorScheme,
 ) {
     Card(
         modifier = Modifier
@@ -220,7 +222,7 @@ private fun Reply(
                     viewModel.replyDeleteItem.value = reply
                     viewModel.showConfirmationDeleteDialog.value = true
                 }
-            }, onClick = {}),
+            }, onClick = {},),
         elevation = CardDefaults.cardElevation(0.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
@@ -228,12 +230,12 @@ private fun Reply(
         Row(
             modifier = Modifier
                 .padding(vertical = 8.dp, horizontal = 12.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             ProfilePicture(
                 modifier = Modifier.align(Alignment.Top),
                 userModel = viewModel.userMap.value[reply.userId] ?: User(),
-                size = 42.dp
+                size = 42.dp,
             )
 
             Column {
@@ -245,7 +247,7 @@ private fun Reply(
                         modifier = Modifier.padding(start = 8.dp),
                         fontSize = 14.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
 
                     if (reply.userId == viewModel.postModel.userId) {
@@ -265,7 +267,7 @@ private fun Reply(
                                     modifier = Modifier
                                         .padding(horizontal = 4.dp)
                                         .align(Alignment.CenterVertically),
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
                             }
                         }
@@ -277,7 +279,7 @@ private fun Reply(
                         style = MaterialTheme.typography.bodySmall,
                         fontSize = 12.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
@@ -287,7 +289,7 @@ private fun Reply(
                     maxLines = 4,
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                     disableLinkMovementMethod = false,
-                    selectable = true
+                    selectable = true,
                 )
             }
         }

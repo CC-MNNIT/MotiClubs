@@ -40,17 +40,20 @@ fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
-        IconButton(modifier = Modifier.align(Alignment.CenterVertically),
+        IconButton(
+            modifier = Modifier.align(Alignment.CenterVertically),
             onClick = {
                 keyboardController?.hide()
                 searchMode.value = false
-            }) {
+            },
+        ) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
                 modifier = Modifier
-                    .height(64.dp), contentDescription = ""
+                    .height(64.dp),
+                contentDescription = "",
             )
         }
         OutlinedTextField(
@@ -64,20 +67,21 @@ fun SearchBar(
             trailingIcon = {
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterVertically),
-                    onClick = { keyboardController?.hide() }) {
+                    onClick = { keyboardController?.hide() },
+                ) {
                     Icon(painter = rememberVectorPainter(image = Icons.Rounded.Search), contentDescription = "")
                 }
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Search
+                imeAction = ImeAction.Search,
             ),
             keyboardActions = KeyboardActions(onAny = { keyboardController?.hide() }),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = colorScheme.surfaceColorAtElevation(2.dp),
                 focusedBorderColor = colorScheme.surfaceColorAtElevation(2.dp),
-            )
+            ),
         )
     }
 }

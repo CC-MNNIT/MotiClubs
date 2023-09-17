@@ -14,7 +14,7 @@ interface Published<T> {
 }
 
 data class PublishedState<T>(
-    private var _value: MutableState<T>
+    private var _value: MutableState<T>,
 ) : Published<T> {
     override var value
         get() = _value.value
@@ -24,7 +24,7 @@ data class PublishedState<T>(
 }
 
 data class PublishedList<T>(
-    private var _value: SnapshotStateList<T>
+    private var _value: SnapshotStateList<T>,
 ) : Published<SnapshotStateList<T>> {
     override var value
         get() = _value
@@ -35,7 +35,7 @@ data class PublishedList<T>(
 }
 
 data class PublishedMap<K, V>(
-    private var _value: SnapshotStateMap<K, V>
+    private var _value: SnapshotStateMap<K, V>,
 ) : Published<SnapshotStateMap<K, V>> {
     override var value
         get() = _value

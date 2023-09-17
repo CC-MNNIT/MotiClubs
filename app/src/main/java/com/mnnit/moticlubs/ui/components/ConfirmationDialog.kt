@@ -24,32 +24,32 @@ fun ConfirmationDialog(
     negativeBtnText: String = "Cancel",
     imageVector: ImageVector = Icons.Rounded.Info,
     onPositive: () -> Unit = {},
-    onNegative: () -> Unit = {}
+    onNegative: () -> Unit = {},
 ) {
     val colorScheme = getColorScheme()
     AlertDialog(onDismissRequest = {
         showDialog.value = false
     }, text = {
-        Text(text = message, fontSize = 16.sp)
-    }, confirmButton = {
-        TextButton(onClick = {
-            showDialog.value = false
-            onPositive()
-        }) {
-            Text(text = positiveBtnText, fontSize = 14.sp, color = colorScheme.primary)
-        }
-    }, dismissButton = {
-        TextButton(onClick = {
-            showDialog.value = false
-            onNegative()
-        }) {
-            Text(text = negativeBtnText, fontSize = 14.sp, color = colorScheme.primary)
-        }
-    }, icon = {
-        Icon(
-            painter = rememberVectorPainter(image = imageVector),
-            contentDescription = "",
-            modifier = Modifier.size(36.dp)
-        )
-    })
+            Text(text = message, fontSize = 16.sp)
+        }, confirmButton = {
+            TextButton(onClick = {
+                showDialog.value = false
+                onPositive()
+            },) {
+                Text(text = positiveBtnText, fontSize = 14.sp, color = colorScheme.primary)
+            }
+        }, dismissButton = {
+            TextButton(onClick = {
+                showDialog.value = false
+                onNegative()
+            },) {
+                Text(text = negativeBtnText, fontSize = 14.sp, color = colorScheme.primary)
+            }
+        }, icon = {
+            Icon(
+                painter = rememberVectorPainter(image = imageVector),
+                contentDescription = "",
+                modifier = Modifier.size(36.dp),
+            )
+        },)
 }

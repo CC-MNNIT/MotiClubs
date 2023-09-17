@@ -24,24 +24,24 @@ fun ProgressDialog(progressMsg: String, modifier: Modifier = Modifier) {
     val colorScheme = getColorScheme()
     Dialog(
         onDismissRequest = {},
-        DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
     ) {
         Box(
             modifier = modifier
                 .fillMaxWidth(0.7f)
                 .clip(RoundedCornerShape(24.dp))
-                .background(colorScheme.background)
+                .background(colorScheme.background),
         ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .align(Alignment.Center)
+                    .align(Alignment.Center),
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally),
-                    color = colorScheme.primary
+                    color = colorScheme.primary,
                 )
                 Text(
                     progressMsg,
@@ -49,7 +49,7 @@ fun ProgressDialog(progressMsg: String, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
                         .padding(16.dp)
-                        .align(Alignment.CenterHorizontally)
+                        .align(Alignment.CenterHorizontally),
                 )
             }
         }
