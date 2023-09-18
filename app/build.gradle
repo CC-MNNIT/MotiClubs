@@ -7,17 +7,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
-    id 'org.jlleitschuh.gradle.ktlint'
-}
-
-ktlint {
-    android = true
-    outputColorName = "RED"
-    reporters {
-        reporter "plain"
-        reporter "checkstyle"
-        reporter "sarif"
-    }
+    id 'org.jmailen.kotlinter'
 }
 
 android {
