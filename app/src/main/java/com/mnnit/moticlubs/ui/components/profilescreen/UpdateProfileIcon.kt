@@ -43,9 +43,10 @@ fun UpdateProfileIcon(
                     .child("profile_images")
                     .child(FirebaseAuth.getInstance().currentUser!!.uid),
                 onSuccess = { downloadUrl ->
-                    appViewModel.updateProfilePic(downloadUrl, {
-                        loading.value = false
-                    },) {
+                    appViewModel.updateProfilePic(
+                        downloadUrl,
+                        { loading.value = false },
+                    ) {
                         loading.value = false
                         Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
                     }

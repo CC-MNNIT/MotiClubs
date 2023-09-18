@@ -40,14 +40,17 @@ fun ProfilePicture(
         modifier = modifier
             .clip(CircleShape)
             .size(size)
-            .clickable(enabled = true, onClick = {
-                if (onClick != null) {
-                    onClick()
-                    return@clickable
-                }
+            .clickable(
+                enabled = true,
+                onClick = {
+                    if (onClick != null) {
+                        onClick()
+                        return@clickable
+                    }
 
-                showDialog.value = true
-            },),
+                    showDialog.value = true
+                },
+            ),
     )
 }
 
@@ -61,17 +64,25 @@ private fun Context.getUrlPainter(url: String, profile: Boolean): Painter {
     val picasso = remember { publishedStateOf(Picasso.Builder(this).build()) }
     val error = remember { publishedStateOf(false) }
     return if (error.value) {
-        picasso.value.rememberPainter(request = {
-            it.load(url).placeholder(resID).error(resID)
-        }, key = url, onError = { Log.d("TAG", "getProfileUrlPainter: network error") },)
+        picasso.value.rememberPainter(
+            request = {
+                it.load(url).placeholder(resID).error(resID)
+            },
+            key = url,
+            onError = { Log.d("TAG", "getProfileUrlPainter: network error") },
+        )
     } else {
-        picasso.value.rememberPainter(request = {
-            it.load(url).networkPolicy(NetworkPolicy.OFFLINE)
-                .placeholder(resID).error(resID)
-        }, key = url, onError = {
+        picasso.value.rememberPainter(
+            request = {
+                it.load(url).networkPolicy(NetworkPolicy.OFFLINE)
+                    .placeholder(resID).error(resID)
+            },
+            key = url,
+            onError = {
                 Log.d("TAG", "getProfileUrlPainter: Error, fallback to network")
                 error.value = true
-            },)
+            },
+        )
     }
 }
 

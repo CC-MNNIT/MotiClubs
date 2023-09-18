@@ -231,13 +231,17 @@ private fun ClubProfilePic(
                     .child("profile_images")
                     .child(viewModel.clubModel.clubId.toString()),
                 onSuccess = { downloadUrl ->
-                    viewModel.updateClub(url = downloadUrl, onResponse = {
-                        viewModel.showProgressDialog.value = false
-                        viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
-                    }, onFailure = {
+                    viewModel.updateClub(
+                        url = downloadUrl,
+                        onResponse = {
+                            viewModel.showProgressDialog.value = false
+                            viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
+                        },
+                        onFailure = {
                             viewModel.showProgressDialog.value = false
                             Toast.makeText(context, "Error setting profile picture", Toast.LENGTH_SHORT).show()
-                        },)
+                        },
+                    )
                 },
             )
         } else {

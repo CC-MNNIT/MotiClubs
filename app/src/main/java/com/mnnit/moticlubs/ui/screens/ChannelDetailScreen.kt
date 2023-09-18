@@ -141,11 +141,11 @@ fun ChannelDetailScreen(
                         ConfirmationDialog(
                             showDialog = viewModel.showRemoveConfirmationDialog,
                             message = "Are you sure you want to remove ${
-                            if (viewModel.removeMemberUserId == -1L) {
-                                "this member"
-                            } else {
-                                viewModel.memberInfo.value.getValue(viewModel.removeMemberUserId).name
-                            }
+                                if (viewModel.removeMemberUserId == -1L) {
+                                    "this member"
+                                } else {
+                                    viewModel.memberInfo.value.getValue(viewModel.removeMemberUserId).name
+                                }
                             } ?",
                             positiveBtnText = "Remove",
                             onPositive = { viewModel.removeMember() },
@@ -156,12 +156,12 @@ fun ChannelDetailScreen(
                         ConfirmationDialog(
                             showDialog = viewModel.showPrivateConfirmationDialog,
                             message = "${
-                            if (viewModel.updateChannelPrivate == 0) {
-                                "Making channel public will allow all the users to access the channel."
-                            } else {
-                                "Making channel private will restrict access to only admins of " +
-                                    "club and members of the channel."
-                            }
+                                if (viewModel.updateChannelPrivate == 0) {
+                                    "Making channel public will allow all the users to access the channel."
+                                } else {
+                                    "Making channel private will restrict access to only admins of " +
+                                        "club and members of the channel."
+                                }
                             }\n\nAre you sure you want to continue ?",
                             positiveBtnText = "Continue",
                             onPositive = { viewModel.updateChannel() },
@@ -203,11 +203,11 @@ fun ChannelDetailScreen(
                             Text(
                                 modifier = Modifier,
                                 text = "${
-                                if (viewModel.channelModel.private == 1) {
-                                    viewModel.memberList.value.size
-                                } else {
-                                    "All"
-                                }
+                                    if (viewModel.channelModel.private == 1) {
+                                        viewModel.memberList.value.size
+                                    } else {
+                                        "All"
+                                    }
                                 } member${if (viewModel.memberList.value.size > 1) "s" else ""}",
                                 fontSize = 14.sp,
                             )

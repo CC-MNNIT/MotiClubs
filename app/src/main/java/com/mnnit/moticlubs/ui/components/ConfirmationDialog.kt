@@ -27,29 +27,39 @@ fun ConfirmationDialog(
     onNegative: () -> Unit = {},
 ) {
     val colorScheme = getColorScheme()
-    AlertDialog(onDismissRequest = {
-        showDialog.value = false
-    }, text = {
+    AlertDialog(
+        onDismissRequest = {
+            showDialog.value = false
+        },
+        text = {
             Text(text = message, fontSize = 16.sp)
-        }, confirmButton = {
-            TextButton(onClick = {
-                showDialog.value = false
-                onPositive()
-            },) {
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    showDialog.value = false
+                    onPositive()
+                },
+            ) {
                 Text(text = positiveBtnText, fontSize = 14.sp, color = colorScheme.primary)
             }
-        }, dismissButton = {
-            TextButton(onClick = {
-                showDialog.value = false
-                onNegative()
-            },) {
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    showDialog.value = false
+                    onNegative()
+                },
+            ) {
                 Text(text = negativeBtnText, fontSize = 14.sp, color = colorScheme.primary)
             }
-        }, icon = {
+        },
+        icon = {
             Icon(
                 painter = rememberVectorPainter(image = imageVector),
                 contentDescription = "",
                 modifier = Modifier.size(36.dp),
             )
-        },)
+        },
+    )
 }
