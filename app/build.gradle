@@ -63,6 +63,12 @@ android {
     }
 }
 
+afterEvaluate {
+    lintVitalRelease.dependsOn('lintKotlin')
+    assembleDebug.dependsOn('formatKotlin').dependsOn('lintVitalRelease')
+    bundleRelease.dependsOn('lintVitalRelease')
+}
+
 dependencies {
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
 
