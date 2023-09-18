@@ -128,7 +128,7 @@ fun UpdateChannelDialog(
                             .padding(top = 16.dp)
                             .align(Alignment.CenterVertically),
                         enabled = viewModel.updateChannelName.isTrimmedNotEmpty() &&
-                                INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.updateChannelName),
+                            INPUT_CHANNEL_NAME_SIZE.lengthInRange(viewModel.updateChannelName),
                     ) {
                         Text(text = "Save", fontSize = 14.sp)
                     }

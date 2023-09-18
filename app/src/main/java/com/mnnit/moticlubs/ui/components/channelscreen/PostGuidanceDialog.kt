@@ -55,62 +55,62 @@ fun PostGuidanceDialog(
 }
 
 private const val MKD_GUIDE = "<align><h2>Markdown Formatting</h2></align>\n\n" +
-        "Here are some syntax you can use for formatting your post.\n\n" +
-        "### Headers: \n" +
-        "```\n" +
-        "# Header 1\n" +
-        "## Header 2\n" +
-        "### Header 3\n" +
-        "```\n" +
-        "# Header 1\n" +
-        "## Header 2\n" +
-        "### Header 3\n\n" +
-        "--------------------------\n" +
-        "### Styles:\n" +
-        "```\n" +
-        "**bold** or 'B' icon\n" +
-        "_italics_ or 'I' icon\n" +
-        "~~strike~~ or 'T' icon\n" +
-        "```\n" +
-        "**bold**\n" +
-        "_italics_\n" +
-        "~~strike~~\n\n" +
-        "-------------------------\n" +
-        "### Listing:\n" +
-        "```\n" +
-        "- item 1\n" +
-        "- item 2\n" +
-        "- item 3\n" +
-        "```\n" +
-        "- item 1\n" +
-        "- item 2\n" +
-        "- item 3\n\n" +
-        "-------------------------\n" +
-        "### Table:\n" +
-        "```\n" +
-        "| Name | Reg No |\n" +
-        "|----|----|\n" +
-        "|Shashank|20204184|\n" +
-        "|Hitesh|20204085|\n" +
-        "|Amit|20204022|\n" +
-        "```\n" +
-        "| Name | Reg No |\n" +
-        "|----|----|\n" +
-        "|Shashank|20204184|\n" +
-        "|Hitesh|20204085|\n" +
-        "|Amit|20204022|\n\n" +
-        "-------------------------\n" +
-        "### Links:\n" +
-        "```\n" +
-        "[link_name](url)\n" +
-        "Eg:\n" +
-        "[Rick Roll](https://youtu.be/xvFZjo5PgG0)\n" +
-        "```\n" +
-        "[Rick Roll](https://youtu.be/xvFZjo5PgG0)\n\n" +
-        "-------------------------\n" +
-        "### Quoting:\n" +
-        "```\n" +
-        "> This is quoted text\n" +
-        "```\n" +
-        "> This is quoted text\n\n" +
-        "**Good Luck !**"
+    "Here are some syntax you can use for formatting your post.\n\n" +
+    "### Headers: \n" +
+    "```\n" +
+    "# Header 1\n" +
+    "## Header 2\n" +
+    "### Header 3\n" +
+    "```\n" +
+    "# Header 1\n" +
+    "## Header 2\n" +
+    "### Header 3\n\n" +
+    "--------------------------\n" +
+    "### Styles:\n" +
+    "```\n" +
+    "**bold** or 'B' icon\n" +
+    "_italics_ or 'I' icon\n" +
+    "~~strike~~ or 'T' icon\n" +
+    "```\n" +
+    "**bold**\n" +
+    "_italics_\n" +
+    "~~strike~~\n\n" +
+    "-------------------------\n" +
+    "### Listing:\n" +
+    "```\n" +
+    "- item 1\n" +
+    "- item 2\n" +
+    "- item 3\n" +
+    "```\n" +
+    "- item 1\n" +
+    "- item 2\n" +
+    "- item 3\n\n" +
+    "-------------------------\n" +
+    "### Table:\n" +
+    "```\n" +
+    "| Name | Reg No |\n" +
+    "|----|----|\n" +
+    "|Shashank|20204184|\n" +
+    "|Hitesh|20204085|\n" +
+    "|Amit|20204022|\n" +
+    "```\n" +
+    "| Name | Reg No |\n" +
+    "|----|----|\n" +
+    "|Shashank|20204184|\n" +
+    "|Hitesh|20204085|\n" +
+    "|Amit|20204022|\n\n" +
+    "-------------------------\n" +
+    "### Links:\n" +
+    "```\n" +
+    "[link_name](url)\n" +
+    "Eg:\n" +
+    "[Rick Roll](https://youtu.be/xvFZjo5PgG0)\n" +
+    "```\n" +
+    "[Rick Roll](https://youtu.be/xvFZjo5PgG0)\n\n" +
+    "-------------------------\n" +
+    "### Quoting:\n" +
+    "```\n" +
+    "> This is quoted text\n" +
+    "```\n" +
+    "> This is quoted text\n\n" +
+    "**Good Luck !**"

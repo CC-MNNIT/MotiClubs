@@ -160,7 +160,7 @@ fun ChannelDetailScreen(
                                     "Making channel public will allow all the users to access the channel."
                                 } else {
                                     "Making channel private will restrict access to only admins of " +
-                                            "club and members of the channel."
+                                        "club and members of the channel."
                                 }
                             }\n\nAre you sure you want to continue ?",
                             positiveBtnText = "Continue",

@@ -89,7 +89,7 @@ fun PostInputLinkDialog(
                         .padding(top = 8.dp)
                         .align(Alignment.CenterHorizontally),
                     enabled = inputLink.value.matches(Patterns.WEB_URL.toRegex()) &&
-                            INPUT_URL_SIZE.lengthInRange(inputLink.value),
+                        INPUT_URL_SIZE.lengthInRange(inputLink.value),
                 ) {
                     Text(text = "Add Link", fontSize = 14.sp)
                 }

@@ -68,7 +68,8 @@ private fun Context.getUrlPainter(url: String, profile: Boolean): Painter {
             request = {
                 it.load(url).placeholder(resID).error(resID)
             },
-            key = url, onError = { Log.d("TAG", "getProfileUrlPainter: network error") },
+            key = url,
+            onError = { Log.d("TAG", "getProfileUrlPainter: network error") },
         )
     } else {
         picasso.value.rememberPainter(

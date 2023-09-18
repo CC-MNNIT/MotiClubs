@@ -312,7 +312,7 @@ fun PostCreateUpdateBottomSheet(
                         shape = RoundedCornerShape(24.dp),
                         colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
                         enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
-                                viewModel.postLengthInRange(),
+                            viewModel.postLengthInRange(),
                     )
                 }
             }

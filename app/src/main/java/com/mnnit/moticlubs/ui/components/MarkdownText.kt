@@ -48,8 +48,8 @@ import io.noties.markwon.image.picasso.PicassoImagesPlugin.PicassoStore
 import io.noties.markwon.image.svg.SvgMediaDecoder
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
-import java.util.Collections
 import org.commonmark.node.SoftLineBreak
+import java.util.Collections
 
 /**
  * Modified from and Credits to : https://github.com/jeziellago/compose-markdown

@@ -193,8 +193,8 @@ class MainActivity : ComponentActivity() {
                             onNavigateChannelClick = { channelId, clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CHANNEL_PAGE}?" +
-                                            "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channelId.toString())}&" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
+                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channelId.toString())}&" +
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
                                 )
                             },
                             onNavigateContactUs = { navController.navigate(AppNavigation.ABOUT_US) },
@@ -202,7 +202,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToClubDetails = { clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CLUB_DETAIL}?" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
                                 )
                             },
                         )
@@ -230,8 +230,8 @@ class MainActivity : ComponentActivity() {
                     // CHANNEL PAGE
                     composable(
                         "${AppNavigation.CHANNEL_PAGE}?" +
-                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
-                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
+                            "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}&" +
+                            "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType },
                             navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
@@ -244,7 +244,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToClubDetails = { clubId ->
                                 navController.navigate(
                                     "${AppNavigation.CLUB_DETAIL}?" +
-                                            "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
+                                        "${NavigationArgs.CLUB_ARG}=${Uri.encode(clubId.toString())}",
                                 )
                             },
                             onNavigateToImageScreen = { url ->
@@ -253,7 +253,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToChannelDetails = { channel ->
                                 navController.navigate(
                                     "${AppNavigation.CHANNEL_DETAIL}?" +
-                                            "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channel.toString())}",
+                                        "${NavigationArgs.CHANNEL_ARG}=${Uri.encode(channel.toString())}",
                                 )
                             },
                             onBackPressed = {
@@ -265,7 +265,7 @@ class MainActivity : ComponentActivity() {
                     // CLUB DETAILS
                     composable(
                         "${AppNavigation.CLUB_DETAIL}?" +
-                                "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
+                            "${NavigationArgs.CLUB_ARG}={${NavigationArgs.CLUB_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CLUB_ARG) { type = NavType.LongType },
                         ),
@@ -280,7 +280,7 @@ class MainActivity : ComponentActivity() {
                     // CHANNEL DETAILS
                     composable(
                         "${AppNavigation.CHANNEL_DETAIL}?" +
-                                "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}",
+                            "${NavigationArgs.CHANNEL_ARG}={${NavigationArgs.CHANNEL_ARG}}",
                         arguments = listOf(
                             navArgument(NavigationArgs.CHANNEL_ARG) { type = NavType.LongType },
                         ),
@@ -310,7 +310,7 @@ class MainActivity : ComponentActivity() {
                         deepLinks = listOf(
                             navDeepLink {
                                 uriPattern = "${Constants.APP_SCHEME_URL}/" +
-                                        "${NavigationArgs.POST_ARG}={${NavigationArgs.POST_ARG}}"
+                                    "${NavigationArgs.POST_ARG}={${NavigationArgs.POST_ARG}}"
                             },
                         ),
                     ) {
