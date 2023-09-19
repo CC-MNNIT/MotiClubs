@@ -34,6 +34,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -89,12 +90,10 @@ class ChannelDetailScreenViewModel @Inject constructor(
 
     private var getMemberJob: Job? = null
     private var removeMemberJob: Job? = null
-    private var getAdminJob: Job? = null
 
     fun refreshAll() {
         getModels()
         memberInfo.value.clear()
-        getAdmins()
     }
 
     fun updateChannel() {
@@ -196,42 +195,65 @@ class ChannelDetailScreenViewModel @Inject constructor(
     }
 
     private fun getMembers() {
-        if (channelModel.private == 0) {
-            memberList.value.clear()
-            return
-        }
-
         getMemberJob?.cancel()
-        getMemberJob = memberUseCases.getMembers(channelId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        memberList.value.clear()
-                        memberList.value.addAll(list)
+        getMemberJob = memberUseCases.getMembers(channelId)
+            .zip(userUseCases.getAllAdmins()) { resourceMember, resourceAdmins ->
+                val admins = when (resourceAdmins) {
+                    is Resource.Loading -> resourceAdmins.data ?: emptyList()
+                    is Resource.Success -> resourceAdmins.data
+                    is Resource.Error -> {
+                        Toast.makeText(
+                            application,
+                            "${resourceAdmins.errCode}: ${resourceAdmins.errMsg}",
+                            Toast.LENGTH_LONG,
+                        ).show()
+
+                        emptyList()
                     }
                 }
 
-                is Resource.Success -> {
-                    memberList.value.clear()
-                    memberList.value.addAll(
-                        resource.data.sortedWith(
+                val members = when (resourceMember) {
+                    is Resource.Loading -> resourceMember.data ?: emptyList()
+                    is Resource.Success -> resourceMember.data
+                    is Resource.Error -> {
+                        Toast.makeText(
+                            application,
+                            "${resourceMember.errCode}: ${resourceMember.errMsg}",
+                            Toast.LENGTH_LONG,
+                        ).show()
+
+                        emptyList()
+                    }
+                }
+
+                Pair(
+                    if (channelModel.private == 0) {
+                        emptyList()
+                    } else {
+                        members.sortedWith(
                             compareBy(
                                 { member ->
-                                    !adminList.value.any { admin ->
+                                    !admins.any { admin ->
                                         admin.userId == member.userId && admin.clubId == channelModel.clubId
                                     }
                                 },
                                 { member -> memberInfo.value[member.userId]?.name ?: "" },
                             ),
-                        ),
-                    )
+                        )
+                    },
+                    admins,
+                )
+            }
+            .onEach { (members, admins) ->
+                adminList.value.clear()
+                adminList.value.addAll(admins)
+                isAdmin = adminList.value.any { admin ->
+                    admin.userId == userId && admin.clubId == channelModel.clubId
                 }
 
-                is Resource.Error -> {
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                memberList.value.clear()
+                memberList.value.addAll(members)
+            }.launchIn(viewModelScope)
     }
 
     fun getUser(userId: Long) {
@@ -248,34 +270,6 @@ class ChannelDetailScreenViewModel @Inject constructor(
                 }
 
                 is Resource.Error -> Log.d(TAG, "getUser: err - ${resource.errCode}: ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    private fun getAdmins() {
-        getAdminJob?.cancel()
-        getAdminJob = userUseCases.getAllAdmins().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        if (list.isNotEmpty()) {
-                            adminList.value.clear()
-                            adminList.value.addAll(list)
-                        }
-                    }
-                }
-
-                is Resource.Success -> {
-                    adminList.value.clear()
-                    adminList.value.addAll(resource.data)
-                    isAdmin = adminList.value.any { admin ->
-                        admin.userId == userId && admin.clubId == channelModel.clubId
-                    }
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
-                }
             }
         }.launchIn(viewModelScope)
     }
