@@ -5,6 +5,7 @@ import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.Admin
 import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.ChannelMember
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Post
@@ -53,7 +54,7 @@ interface Repository {
 
     suspend fun getChannel(channelId: Long): Channel
 
-    suspend fun getAllChannels(): List<Channel>
+    suspend fun getAllChannels(userId: Long): List<Channel>
 
     suspend fun deleteChannel(channel: Channel)
 
@@ -74,6 +75,8 @@ interface Repository {
     suspend fun insertOrUpdateMember(member: Member)
 
     suspend fun getMembers(channelId: Long): List<Member>
+
+    suspend fun getChannelsForMember(userId: Long): List<ChannelMember>
 
     suspend fun deleteMember(member: Member)
 

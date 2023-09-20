@@ -21,17 +21,22 @@ import com.mnnit.moticlubs.domain.usecase.ClubUseCases
 import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.applySorting
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.onResource
+import com.mnnit.moticlubs.domain.util.populate
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setAuthToken
 import com.mnnit.moticlubs.domain.util.setValue
+import com.mnnit.moticlubs.domain.util.transformResources
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,9 +62,7 @@ class HomeScreenViewModel @Inject constructor(
             return
         }
 
-        getUser(loadLocal = true)
-        getClubs(loadLocal = true)
-        getChannels(loadLocal = true)
+        getUserHome(loadLocal = true)
         getAdmins()
     }
 
@@ -84,8 +87,7 @@ class HomeScreenViewModel @Inject constructor(
 
     private var getUserJob: Job? = null
     private var getAdminJob: Job? = null
-    private var getClubJob: Job? = null
-    private var getChannelsJob: Job? = null
+    private var getClubsChannelsJob: Job? = null
     private var addChannelJob: Job? = null
     private var updateUserJob: Job? = null
 
@@ -118,7 +120,7 @@ class HomeScreenViewModel @Inject constructor(
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     showProgressDialog = false
-                    getUser()
+                    getUserHome()
                 }
 
                 is Resource.Error -> {
@@ -131,16 +133,14 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun addChannel() {
-        addChannelJob?.cancel()
-        addChannelJob = channelUseCases.addChannel(eventChannel).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    showAddChannelDialog = false
-                    progressMsg = "Adding"
-                    showProgressDialog = true
-                }
+        showAddChannelDialog = false
+        progressMsg = "Adding"
+        showProgressDialog = true
 
-                is Resource.Success -> {
+        addChannelJob?.cancel()
+        addChannelJob = channelUseCases.addChannel(eventChannel)
+            .onResource(
+                onSuccess = {
                     channelMap.value[eventChannel.clubId]?.value?.removeIf { m ->
                         m.channelId == eventChannel.channelId
                     }
@@ -148,14 +148,12 @@ class HomeScreenViewModel @Inject constructor(
                     showProgressDialog = false
 
                     Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
-                }
-
-                is Resource.Error -> {
+                },
+                onError = {
                     showProgressDialog = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                    Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+                },
+            ).launchIn(viewModelScope)
     }
 
     fun refreshAll() {
@@ -165,9 +163,7 @@ class HomeScreenViewModel @Inject constructor(
         FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.addOnSuccessListener {
             application.setAuthToken(it.token ?: "")
 
-            getUser()
-            getClubs()
-            getChannels()
+            getUserHome()
             getAdmins()
         }?.addOnCompleteListener {
             isFetchingAdmins = false
@@ -179,7 +175,7 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun getUser(loadLocal: Boolean = false) {
+    private fun getUserHome(loadLocal: Boolean = false) {
         if (loadLocal) {
             Log.d(TAG, "getUser: loadLocal")
             viewModelScope.launch {
@@ -189,126 +185,52 @@ class HomeScreenViewModel @Inject constructor(
         }
 
         getUserJob?.cancel()
-        getUserJob = userUseCases.getUser(application.getUserId()).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> resource.data?.let {
-                    userModel = it
-                    eventContact.value = userModel.contact.ifEmpty { "None" }
-                }
+        getUserJob = userUseCases.getUser(application.getUserId()).onResource(
+            onSuccess = {
+                userModel = it
+                eventContact.value = userModel.contact.ifEmpty { "None" }
+            },
+        ).launchIn(viewModelScope)
 
-                is Resource.Success -> {
-                    userModel = resource.data
-                    eventContact.value = userModel.contact.ifEmpty { "None" }
-                }
-
-                is Resource.Error -> Log.d(TAG, "getUser: error: ${resource.errCode} : ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
+        getUserJob?.invokeOnCompletion { getClubsChannels() }
     }
 
     private fun getAdmins() {
         isFetchingAdmins = true
         getAdminJob?.cancel()
-        getAdminJob = userUseCases.getAllAdmins().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        if (list.isNotEmpty()) {
-                            adminList.value.clear()
-                            adminList.value.addAll(list)
-                        }
-                    }
-                    isFetchingAdmins = true
-                }
-
-                is Resource.Success -> {
-                    adminList.value.clear()
-                    adminList.value.addAll(resource.data)
-                    isFetchingAdmins = false
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
-                    isFetchingAdmins = false
-                }
-            }
-        }.launchIn(viewModelScope)
+        getAdminJob = userUseCases.getAllAdmins().onResource(
+            onSuccess = {
+                adminList.apply(it)
+                isFetchingAdmins = false
+            },
+            onError = { isFetchingAdmins = false },
+        ).launchIn(viewModelScope)
     }
 
-    private fun getClubs(loadLocal: Boolean = false) {
+    private fun getClubsChannels(loadLocal: Boolean = false) {
         if (loadLocal) {
-            Log.d(TAG, "getClubs: loadLocal")
+            Log.d(TAG, "getClubsChannels: loadLocal")
             viewModelScope.launch {
-                val list = repository.getClubs()
-                clubsList.value.clear()
-                clubsList.value.addAll(list)
+                populateClubsChannels(repository.getClubs(), repository.getAllChannels(userModel.userId))
             }
             return
         }
 
-        isFetchingClubs = true
-        getClubJob?.cancel()
-        getClubJob = clubUseCases.getClubs().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        if (list.isNotEmpty()) {
-                            clubsList.value.clear()
-                            clubsList.value.addAll(list)
-                        }
-                    }
-                    isFetchingClubs = true
-                }
-
-                is Resource.Success -> {
-                    clubsList.value.clear()
-                    clubsList.value.addAll(resource.data)
-                    isFetchingClubs = false
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getClubs: error: ${resource.errCode}: ${resource.errMsg}")
-                    isFetchingClubs = false
-                }
+        getClubsChannelsJob?.cancel()
+        getClubsChannelsJob = channelUseCases.getAllChannels(userModel.userId)
+            .zip(clubUseCases.getClubs()) { r1, r2 -> transformResources(r1, emptyList(), r2, emptyList()) }
+            .onEach { (channels, clubs) ->
+                Log.d(TAG, "getClubsChannels: setting changes")
+                populateClubsChannels(clubs, channels)
             }
-        }.launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
-    private fun getChannels(loadLocal: Boolean = false) {
-        if (loadLocal) {
-            Log.d(TAG, "getChannels: loadLocal")
-            viewModelScope.launch {
-                val list = repository.getAllChannels()
-                list.forEach { channel -> channelMap.value[channel.clubId] = publishedStateListOf() }
-                list.forEach { channel -> channelMap.value[channel.clubId]?.value?.add(channel) }
-            }
-            return
-        }
+    private suspend fun populateClubsChannels(clubs: List<Club>, channels: List<Channel>) {
+        val channelMembers = repository.getChannelsForMember(userModel.userId)
+        clubsList.apply(clubs.applySorting(channelMembers))
 
-        isFetchingChannels = true
-        getChannelsJob?.cancel()
-        getChannelsJob = channelUseCases.getAllChannels().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        list.forEach { channel -> channelMap.value[channel.clubId] = publishedStateListOf() }
-                        list.forEach { channel -> channelMap.value[channel.clubId]?.value?.add(channel) }
-                    }
-                    isFetchingChannels = true
-                }
-
-                is Resource.Success -> {
-                    resource.data.forEach { channel -> channelMap.value[channel.clubId] = publishedStateListOf() }
-                    resource.data.forEach { channel -> channelMap.value[channel.clubId]?.value?.add(channel) }
-                    isFetchingChannels = false
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getChannels: error: ${resource.errCode}: ${resource.errMsg}")
-                    isFetchingChannels = false
-                }
-            }
-        }.launchIn(viewModelScope)
+        channels.populate(channelMap)
     }
 
     init {
