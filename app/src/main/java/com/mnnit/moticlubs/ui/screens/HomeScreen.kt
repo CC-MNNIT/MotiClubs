@@ -55,7 +55,7 @@ fun HomeScreen(
         refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingHome,
         onRefresh = viewModel::refreshAll,
     )
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     MotiClubsTheme(colorScheme) {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
