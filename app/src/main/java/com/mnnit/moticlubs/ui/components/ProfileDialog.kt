@@ -40,7 +40,7 @@ fun ProfileDialog(
                 .clip(RoundedCornerShape(24.dp))
                 .background(colorScheme.background),
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     "Profile",
                     fontSize = 16.sp,
