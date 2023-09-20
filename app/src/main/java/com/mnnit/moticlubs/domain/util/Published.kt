@@ -32,6 +32,11 @@ data class PublishedList<T>(
             _value.clear()
             _value.addAll(value)
         }
+
+    fun apply(list: List<T>) {
+        _value.clear()
+        _value.addAll(list)
+    }
 }
 
 data class PublishedMap<K, V>(
