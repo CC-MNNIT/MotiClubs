@@ -65,7 +65,8 @@ android {
 
 afterEvaluate {
     lintVitalRelease.dependsOn('lintKotlin')
-    assembleDebug.dependsOn('formatKotlin').dependsOn('lintVitalRelease')
+    lint.dependsOn('lintKotlin')
+    assembleDebug.dependsOn('formatKotlin').dependsOn('lint')
     bundleRelease.dependsOn('lintVitalRelease')
 }
 
