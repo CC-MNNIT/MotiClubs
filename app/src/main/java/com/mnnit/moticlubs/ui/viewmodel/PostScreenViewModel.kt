@@ -34,10 +34,10 @@ import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.usecase.ViewUseCases
 import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.NavigationArgs
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.onResource
 import com.mnnit.moticlubs.domain.util.postRead
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateMapOf
@@ -46,7 +46,6 @@ import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -115,16 +114,9 @@ class PostScreenViewModel @Inject constructor(
 
     fun getUser(userId: Long) {
         userMap.value[userId] = User()
-        userUseCases.getUser(userId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> resource.data?.let { user -> userMap.value[user.userId] = user }
-                is Resource.Success -> userMap.value[resource.data.userId] = resource.data
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getUser: error fetching $userId; ${resource.errCode}: ${resource.errMsg}")
-                }
-            }
-        }.launchIn(viewModelScope)
+        userUseCases.getUser(userId).onResource(
+            onSuccess = { userMap.value[it.userId] = it },
+        ).launchIn(viewModelScope)
     }
 
     fun getReplies(refresh: Boolean = true) {
@@ -143,46 +135,28 @@ class PostScreenViewModel @Inject constructor(
 
         Log.d(TAG, "getReplies: page: $replyPage")
         getReplyJob?.cancel()
-        getReplyJob = replyUseCases.getReplies(postId, replyPage).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    loadingReplies.value = true
-                    resource.data?.let { list ->
-                        when (refresh) {
-                            true -> {
-                                loadingReplies.value = true
-                                replyList.value.clear()
-                            }
-
-                            else -> replyList.value.removeIf { reply -> reply.pageNo == replyPage }
-                        }
-                        replyList.value.addAll(list)
-                    }
+        getReplyJob = replyUseCases.getReplies(postId, replyPage).onResource(
+            onSuccess = {
+                when (refresh) {
+                    true -> replyList.value.clear()
+                    else -> replyList.value.removeIf { reply -> reply.pageNo == replyPage }
                 }
-
-                is Resource.Success -> {
-                    when (refresh) {
-                        true -> replyList.value.clear()
-                        else -> replyList.value.removeIf { reply -> reply.pageNo == replyPage }
-                    }
-                    when (resource.data.isEmpty()) {
-                        true -> pageEnded = true
-                        else -> replyPage++
-                    }
-                    replyList.value.addAll(resource.data)
-                    loadingReplies.value = false
+                when (it.isEmpty()) {
+                    true -> pageEnded = true
+                    else -> replyPage++
                 }
-
-                is Resource.Error -> {
-                    loadingReplies.value = false
-                    Toast.makeText(
-                        application,
-                        "Error ${resource.errCode}: ${resource.errMsg}",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                replyList.value.addAll(it)
+                loadingReplies.value = false
+            },
+            onError = {
+                loadingReplies.value = false
+                Toast.makeText(
+                    application,
+                    "Error ${it.errCode}: ${it.errMsg}",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun sendReply() {
@@ -198,44 +172,36 @@ class PostScreenViewModel @Inject constructor(
                 pageNo = 1,
                 System.currentTimeMillis(),
             ),
-        ).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showProgress.value = true
-                is Resource.Success -> {
-                    replyMsg.value = ""
-                    showDialog.value = false
-                    showProgress.value = false
-                    getReplies()
-                }
-
-                is Resource.Error -> {
-                    showDialog.value = false
-                    showProgress.value = false
-                    Toast.makeText(application, "Error: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        ).onResource(
+            onSuccess = {
+                replyMsg.value = ""
+                showDialog.value = false
+                showProgress.value = false
+                getReplies()
+            },
+            onError = {
+                showDialog.value = false
+                showProgress.value = false
+                Toast.makeText(application, "Error: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun deleteReply() {
         deleteReplyJob?.cancel()
-        deleteReplyJob = replyUseCases.deleteReply(replyDeleteItem.value).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showDeleteDialog.value = true
-                is Resource.Success -> {
-                    Toast.makeText(application, "Reply deleted", Toast.LENGTH_SHORT).show()
+        deleteReplyJob = replyUseCases.deleteReply(replyDeleteItem.value).onResource(
+            onSuccess = {
+                Toast.makeText(application, "Reply deleted", Toast.LENGTH_SHORT).show()
 
-                    replyList.value.removeIf { it.time == replyDeleteItem.value.time }
-                    showDeleteDialog.value = false
-                    replyDeleteItem.value = Reply()
-                }
-
-                is Resource.Error -> {
-                    showDeleteDialog.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                replyList.value.removeIf { reply -> reply.time == replyDeleteItem.value.time }
+                showDeleteDialog.value = false
+                replyDeleteItem.value = Reply()
+            },
+            onError = {
+                showDeleteDialog.value = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     private fun getModels() {
@@ -256,30 +222,17 @@ class PostScreenViewModel @Inject constructor(
     private fun viewPost() {
         viewPostJob?.cancel()
         viewPostJob = viewUseCases.addViews(View(postModel.userId, postModel.postId))
-            .onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> resource.data?.let { list ->
-                        viewCount = list.size.toString()
-                    }
-
-                    is Resource.Success -> viewCount = resource.data.size.toString()
-                    is Resource.Error -> Log.d(
-                        TAG,
-                        "viewPost: ${resource.errCode} : ${resource.errMsg}",
-                    )
-                }
-            }.launchIn(viewModelScope)
+            .onResource(
+                onSuccess = { viewCount = it.size.toString() },
+            )
+            .launchIn(viewModelScope)
     }
 
     private fun getViews() {
         getViewJob?.cancel()
-        getViewJob = viewUseCases.getViews(postModel.postId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> resource.data?.let { list -> viewCount = list.size.toString() }
-                is Resource.Success -> viewCount = resource.data.size.toString()
-                is Resource.Error -> Log.d(TAG, "getViews: ${resource.errCode} : ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
+        getViewJob = viewUseCases.getViews(postModel.postId).onResource(
+            onSuccess = { viewCount = it.size.toString() },
+        ).launchIn(viewModelScope)
     }
 
     private fun registerReplyReceiver() {

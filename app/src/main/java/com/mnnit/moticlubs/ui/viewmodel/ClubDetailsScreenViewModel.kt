@@ -19,18 +19,17 @@ import com.mnnit.moticlubs.domain.usecase.ClubUseCases
 import com.mnnit.moticlubs.domain.usecase.UrlUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.onResource
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -98,18 +97,14 @@ class ClubDetailsScreenViewModel @Inject constructor(
         }
 
         getClubJob?.cancel()
-        getClubJob = clubUseCases.getClubs().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> resource.data?.let { list ->
-                    clubModel = list.find { it.clubId == clubId } ?: Club()
-                }
-
-                is Resource.Success -> clubModel = resource.data.find { it.clubId == clubId } ?: Club()
-                is Resource.Error -> {
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        getClubJob = clubUseCases.getClubs().onResource(
+            onSuccess = {
+                clubModel = it.find { club -> club.clubId == clubId } ?: Club()
+            },
+            onError = {
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_LONG).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun refresh() {
@@ -123,28 +118,19 @@ class ClubDetailsScreenViewModel @Inject constructor(
         showOtherLinkDialog.value = false
 
         addUrlsJob?.cancel()
-        addUrlsJob = urlUseCases.addUrls(clubId, list)
-            .onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        isFetching = true
-                        resource.data?.let { list -> mapUrlList(list) }
-                    }
-
-                    is Resource.Success -> {
-                        isFetching = false
-                        showProgressDialog.value = false
-                        mapUrlList(resource.data)
-                        Toast.makeText(application, "Links updated", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is Resource.Error -> {
-                        isFetching = false
-                        showProgressDialog.value = false
-                        Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }.launchIn(viewModelScope)
+        addUrlsJob = urlUseCases.addUrls(clubId, list).onResource(
+            onSuccess = {
+                isFetching = false
+                showProgressDialog.value = false
+                mapUrlList(it)
+                Toast.makeText(application, "Links updated", Toast.LENGTH_SHORT).show()
+            },
+            onError = {
+                isFetching = false
+                showProgressDialog.value = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_LONG).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun updateClub(
@@ -155,53 +141,35 @@ class ClubDetailsScreenViewModel @Inject constructor(
     ) {
         updateClubJob?.cancel()
         updateClubJob = clubUseCases.updateClub(clubModel.copy(avatar = url, description = description))
-            .onEach { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        isFetching = true
-                        resource.data?.let { model ->
-                            clubModel = model
-                            displayedDescription = clubModel.description
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        isFetching = false
-                        clubModel = resource.data
-                        displayedDescription = clubModel.description
-                        onResponse()
-                    }
-
-                    is Resource.Error -> {
-                        isFetching = false
-                        onFailure(resource.errCode)
-                    }
-                }
-            }.launchIn(viewModelScope)
+            .onResource(
+                onSuccess = {
+                    isFetching = false
+                    clubModel = it
+                    displayedDescription = clubModel.description
+                    onResponse()
+                },
+                onError = {
+                    isFetching = false
+                    onFailure(it.errCode)
+                },
+            )
+            .launchIn(viewModelScope)
     }
 
     private fun getUrls() {
         isFetching = true
 
         getUrlsJob?.cancel()
-        getUrlsJob = urlUseCases.getUrls(clubId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    isFetching = true
-                    resource.data?.let { list -> mapUrlList(list) }
-                }
-
-                is Resource.Success -> {
-                    isFetching = false
-                    mapUrlList(resource.data)
-                }
-
-                is Resource.Error -> {
-                    isFetching = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        getUrlsJob = urlUseCases.getUrls(clubId).onResource(
+            onSuccess = {
+                isFetching = false
+                mapUrlList(it)
+            },
+            onError = {
+                isFetching = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_LONG).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     private fun mapUrlList(urls: List<Url>) {

@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 
 class UpdatePost(private val repository: Repository) {
 
-    operator fun invoke(post: Post, clubId: Long): Flow<Resource<List<Post>>> = repository.networkResource(
+    operator fun invoke(post: Post, clubId: Long): Flow<Resource<Post>> = repository.networkResource(
         "Error updating post",
         stampKey = ResponseStamp.POST.withKey("${post.channelId}").withKey("${post.pageNo}"),
-        query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
+        query = { post },
         apiCall = { apiService, auth, stamp ->
             apiService.updatePost(
                 auth,

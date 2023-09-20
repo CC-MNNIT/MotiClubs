@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.Flow
 
 class DeletePost(private val repository: Repository) {
 
-    operator fun invoke(post: Post, clubId: Long): Flow<Resource<List<Post>>> = repository.networkResource(
+    operator fun invoke(post: Post, clubId: Long): Flow<Resource<Unit>> = repository.networkResource(
         "Error deleting post",
         stampKey = ResponseStamp.POST.withKey("${post.channelId}").withKey("${post.pageNo}"),
-        query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
+        query = { },
         apiCall = { apiService, auth, stamp -> apiService.deletePost(auth, stamp, post.postId, clubId) },
         saveResponse = { _, _ -> repository.deletePost(post) },
         remoteRequired = true,

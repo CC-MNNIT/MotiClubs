@@ -37,11 +37,11 @@ import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_POST_MESSAGE_SIZE
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CHANNEL_ARG
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CLUB_ARG
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.lengthInRange
+import com.mnnit.moticlubs.domain.util.onResource
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
@@ -49,7 +49,6 @@ import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -171,18 +170,12 @@ class ChannelScreenViewModel @Inject constructor(
         }
 
         getMembersJob?.cancel()
-        getMembersJob = memberUseCases.getMembers(channelId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> resource.data?.let { list -> memberCount.intValue = list.size }
-
-                is Resource.Success -> {
-                    memberCount.intValue = resource.data.size
-                    Log.d("TAG", "getMembers: ${memberCount.intValue}")
-                }
-
-                is Resource.Error -> Log.d("TAG", "getMembers: error: ${resource.errCode} : ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
+        getMembersJob = memberUseCases.getMembers(channelId).onResource(
+            onSuccess = {
+                memberCount.intValue = it.size
+                Log.d(TAG, "getMembers: ${memberCount.intValue}")
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun getPostsList(refresh: Boolean = true) {
@@ -201,42 +194,24 @@ class ChannelScreenViewModel @Inject constructor(
 
         Log.d(TAG, "getPostsList: page: $postPage")
         getPostsJob?.cancel()
-        getPostsJob = postUseCases.getPosts(channelId, postPage).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        when (refresh) {
-                            true -> {
-                                loadingPosts.value = true
-                                postsList.value.clear()
-                            }
-
-                            else -> postsList.value.removeIf { post -> post.pageNo == postPage }
-                        }
-                        postsList.value.addAll(list)
-                    }
+        getPostsJob = postUseCases.getPosts(channelId, postPage).onResource(
+            onSuccess = {
+                when (refresh) {
+                    true -> postsList.value.clear()
+                    else -> postsList.value.removeIf { post -> post.pageNo == postPage }
                 }
-
-                is Resource.Success -> {
-                    when (refresh) {
-                        true -> postsList.value.clear()
-                        else -> postsList.value.removeIf { post -> post.pageNo == postPage }
-                    }
-                    when (resource.data.isEmpty()) {
-                        true -> pageEnded = true
-                        else -> postPage++
-                    }
-                    postsList.value.addAll(resource.data)
-                    loadingPosts.value = false
+                when (it.isEmpty()) {
+                    true -> pageEnded = true
+                    else -> postPage++
                 }
-
-                is Resource.Error -> {
-                    loadingPosts.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                postsList.value.addAll(it)
+                loadingPosts.value = false
+            },
+            onError = {
+                loadingPosts.value = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun postLengthInRange(): Boolean {
@@ -262,23 +237,18 @@ class ChannelScreenViewModel @Inject constructor(
         crudPostJob = postUseCases.sendPost(
             Post(time, channelID, time, pageNo = 1, text, userId),
             clubId,
-        ).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showProgress.value = true
-                is Resource.Success -> {
-                    Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
+        ).onResource(
+            onSuccess = {
+                Toast.makeText(application, "Posted", Toast.LENGTH_SHORT).show()
 
-                    postsList.value.clear()
-                    postsList.value.addAll(resource.data)
-                    clearEditor()
-                }
-
-                is Resource.Error -> {
-                    showProgress.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                getPostsList()
+                clearEditor()
+            },
+            onError = {
+                showProgress.value = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun updatePost() {
@@ -291,23 +261,18 @@ class ChannelScreenViewModel @Inject constructor(
 
         crudPostJob?.cancel()
         val post = eventUpdatePost.value.copy(message = text)
-        crudPostJob = postUseCases.updatePost(post, clubId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showProgress.value = true
-                is Resource.Success -> {
-                    Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
+        crudPostJob = postUseCases.updatePost(post, clubId).onResource(
+            onSuccess = {
+                Toast.makeText(application, "Updated", Toast.LENGTH_SHORT).show()
 
-                    postsList.value.replaceAll { p -> if (p.postId == post.postId) post else p }
-                    clearEditor()
-                }
-
-                is Resource.Error -> {
-                    showProgress.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                postsList.value.replaceAll { p -> if (p.postId == post.postId) post else p }
+                clearEditor()
+            },
+            onError = {
+                showProgress.value = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun deletePost() {
@@ -316,23 +281,18 @@ class ChannelScreenViewModel @Inject constructor(
         showProgress.value = true
 
         crudPostJob?.cancel()
-        crudPostJob = postUseCases.deletePost(eventDeletePost.value, clubId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showProgress.value = true
-                is Resource.Success -> {
-                    Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
+        crudPostJob = postUseCases.deletePost(eventDeletePost.value, clubId).onResource(
+            onSuccess = {
+                Toast.makeText(application, "Post deleted", Toast.LENGTH_SHORT).show()
 
-                    postsList.value.removeIf { post -> post.postId == eventDeletePost.value.postId }
-                    showProgress.value = false
-                }
-
-                is Resource.Error -> {
-                    showProgress.value = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                postsList.value.removeIf { post -> post.postId == eventDeletePost.value.postId }
+                showProgress.value = false
+            },
+            onError = {
+                showProgress.value = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     private fun registerPostReceiver() {
