@@ -110,17 +110,24 @@ fun <T1, T2> transformResources(
     default: T1,
     r2: Resource<T2>,
     default2: T2,
+    onError: (String) -> Unit = {},
 ): Pair<T1, T2> {
     val d1 = when (r1) {
         is Resource.Loading -> r1.data ?: default
         is Resource.Success -> r1.data
-        is Resource.Error -> default
+        is Resource.Error -> {
+            onError("${r1.errCode}: ${r1.errMsg}")
+            default
+        }
     }
 
     val d2 = when (r2) {
         is Resource.Loading -> r2.data ?: default2
         is Resource.Success -> r2.data
-        is Resource.Error -> default2
+        is Resource.Error -> {
+            onError("${r2.errCode}: ${r2.errMsg}")
+            default2
+        }
     }
 
     return Pair(d1, d2)
