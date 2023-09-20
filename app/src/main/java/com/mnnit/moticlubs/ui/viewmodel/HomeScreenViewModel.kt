@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -20,7 +21,6 @@ import com.mnnit.moticlubs.domain.usecase.ChannelUseCases
 import com.mnnit.moticlubs.domain.usecase.ClubUseCases
 import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.PublishedList
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.applySorting
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
@@ -62,9 +62,12 @@ class HomeScreenViewModel @Inject constructor(
             return
         }
 
-        getUserHome(loadLocal = true)
+        getUser(loadLocal = true)
+        getClubsChannels(loadLocal = true)
         getAdmins()
     }
+
+    var userId by mutableLongStateOf(-1)
 
     var userModel by publishedStateOf(User())
     val adminList = publishedStateListOf<AdminUser>()
@@ -72,8 +75,7 @@ class HomeScreenViewModel @Inject constructor(
     val channelMap = publishedStateMapOf<Long, PublishedList<Channel>>()
 
     var isFetchingAdmins by publishedStateOf(false)
-    var isFetchingChannels by publishedStateOf(false)
-    var isFetchingClubs by publishedStateOf(false)
+    var isFetchingHome by publishedStateOf(false)
     var editingEnabled = publishedStateOf(false)
 
     var showAddChannelDialog by publishedStateOf(false)
@@ -93,20 +95,13 @@ class HomeScreenViewModel @Inject constructor(
 
     fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: () -> Unit) {
         updateUserJob?.cancel()
-        updateUserJob = userUseCases.updateUser(userModel.copy(avatar = url)).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    userModel = resource.data
-                    onResponse()
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "updateProfilePic: ${resource.errCode}: ${resource.errMsg}")
-                    onFailure()
-                }
-            }
-        }.launchIn(viewModelScope)
+        updateUserJob = userUseCases.updateUser(userModel.copy(avatar = url)).onResource(
+            onSuccess = {
+                userModel = it
+                onResponse()
+            },
+            onError = { onFailure() },
+        ).launchIn(viewModelScope)
     }
 
     fun updateContactInfo() {
@@ -115,21 +110,17 @@ class HomeScreenViewModel @Inject constructor(
         showProgressDialog = true
         progressMsg = "Updating"
         updateUserJob?.cancel()
-        updateUserJob = userUseCases.updateUser(userModel, contact).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    showProgressDialog = false
-                    getUserHome()
-                }
-
-                is Resource.Error -> {
-                    showProgressDialog = false
-                    eventContact.value = userModel.contact.ifEmpty { "None" }
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        updateUserJob = userUseCases.updateUser(userModel, contact).onResource(
+            onSuccess = {
+                showProgressDialog = false
+                getUser()
+            },
+            onError = {
+                showProgressDialog = false
+                eventContact.value = userModel.contact.ifEmpty { "None" }
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun addChannel() {
@@ -138,61 +129,60 @@ class HomeScreenViewModel @Inject constructor(
         showProgressDialog = true
 
         addChannelJob?.cancel()
-        addChannelJob = channelUseCases.addChannel(eventChannel)
-            .onResource(
-                onSuccess = {
-                    channelMap.value[eventChannel.clubId]?.value?.removeIf { m ->
-                        m.channelId == eventChannel.channelId
-                    }
-                    channelMap.value[eventChannel.clubId]?.value?.add(eventChannel)
-                    showProgressDialog = false
+        addChannelJob = channelUseCases.addChannel(eventChannel).onResource(
+            onSuccess = {
+                channelMap.value[eventChannel.clubId]?.value?.removeIf { m ->
+                    m.channelId == eventChannel.channelId
+                }
+                channelMap.value[eventChannel.clubId]?.value?.add(eventChannel)
+                showProgressDialog = false
 
-                    Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
-                },
-                onError = {
-                    showProgressDialog = false
-                    Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
-                },
-            ).launchIn(viewModelScope)
+                Toast.makeText(application, "Added channel", Toast.LENGTH_SHORT).show()
+            },
+            onError = {
+                showProgressDialog = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun refreshAll() {
         Log.d(TAG, "refreshAll")
+        viewModelScope.launch {
+            userId = application.getUserId()
 
-        isFetchingAdmins = true
-        FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.addOnSuccessListener {
-            application.setAuthToken(it.token ?: "")
+            isFetchingAdmins = true
+            FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.addOnSuccessListener {
+                application.setAuthToken(it.token ?: "")
 
-            getUserHome()
-            getAdmins()
-        }?.addOnCompleteListener {
-            isFetchingAdmins = false
-            isFetchingChannels = false
-            isFetchingClubs = false
-            if (!it.isSuccessful) {
-                Toast.makeText(application, "Error refreshing", Toast.LENGTH_SHORT).show()
+                getUser()
+                getClubsChannels()
+                getAdmins()
+            }?.addOnCompleteListener {
+                isFetchingAdmins = false
+                if (!it.isSuccessful) {
+                    Toast.makeText(application, "Error refreshing", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    private fun getUserHome(loadLocal: Boolean = false) {
+    private fun getUser(loadLocal: Boolean = false) {
         if (loadLocal) {
             Log.d(TAG, "getUser: loadLocal")
             viewModelScope.launch {
-                userModel = repository.getUser(application.getUserId()) ?: User()
+                userModel = repository.getUser(userId) ?: User()
             }
             return
         }
 
         getUserJob?.cancel()
-        getUserJob = userUseCases.getUser(application.getUserId()).onResource(
+        getUserJob = userUseCases.getUser(userId).onResource(
             onSuccess = {
                 userModel = it
                 eventContact.value = userModel.contact.ifEmpty { "None" }
             },
         ).launchIn(viewModelScope)
-
-        getUserJob?.invokeOnCompletion { getClubsChannels() }
     }
 
     private fun getAdmins() {
@@ -208,26 +198,36 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getClubsChannels(loadLocal: Boolean = false) {
+        isFetchingHome = true
+
         if (loadLocal) {
             Log.d(TAG, "getClubsChannels: loadLocal")
             viewModelScope.launch {
-                populateClubsChannels(repository.getClubs(), repository.getAllChannels(userModel.userId))
+                populateClubsChannels(repository.getClubs(), repository.getAllChannels(userId))
+                isFetchingHome = false
             }
             return
         }
 
         getClubsChannelsJob?.cancel()
-        getClubsChannelsJob = channelUseCases.getAllChannels(userModel.userId)
-            .zip(clubUseCases.getClubs()) { r1, r2 -> transformResources(r1, emptyList(), r2, emptyList()) }
+        getClubsChannelsJob = channelUseCases.getAllChannels(userId)
+            .zip(clubUseCases.getClubs()) { r1, r2 ->
+                transformResources(r1, emptyList(), r2, emptyList())
+            }
             .onEach { (channels, clubs) ->
-                Log.d(TAG, "getClubsChannels: setting changes")
                 populateClubsChannels(clubs, channels)
+                isFetchingHome = false
             }
             .launchIn(viewModelScope)
     }
 
     private suspend fun populateClubsChannels(clubs: List<Club>, channels: List<Channel>) {
-        val channelMembers = repository.getChannelsForMember(userModel.userId)
+        if (clubs.isEmpty() || channels.isEmpty()) {
+            Log.d(TAG, "populateClubsChannels: clubs or channels, either empty")
+            return
+        }
+
+        val channelMembers = repository.getChannelsForMember(userId)
         clubsList.apply(clubs.applySorting(channelMembers))
 
         channels.populate(channelMap)
