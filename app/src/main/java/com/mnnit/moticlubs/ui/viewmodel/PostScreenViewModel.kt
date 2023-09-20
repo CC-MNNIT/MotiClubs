@@ -80,6 +80,7 @@ class PostScreenViewModel @Inject constructor(
 
     val userMap = publishedStateMapOf<Long, User>()
     var viewCount by publishedStateOf("-")
+    val viewsList = publishedStateListOf<View>()
     val replyList = publishedStateListOf<Reply>()
     val replyMsg = publishedStateOf("")
 
@@ -92,6 +93,7 @@ class PostScreenViewModel @Inject constructor(
 
     val showDeleteDialog = publishedStateOf(false)
     val showConfirmationDeleteDialog = publishedStateOf(false)
+    val showViewedUserDialog = publishedStateOf(false)
     val replyDeleteItem = publishedStateOf(Reply())
 
     @OptIn(ExperimentalMaterialApi::class)
@@ -223,7 +225,10 @@ class PostScreenViewModel @Inject constructor(
         viewPostJob?.cancel()
         viewPostJob = viewUseCases.addViews(View(postModel.userId, postModel.postId))
             .onResource(
-                onSuccess = { viewCount = it.size.toString() },
+                onSuccess = {
+                    viewCount = it.size.toString()
+                    viewsList.apply(it)
+                },
             )
             .launchIn(viewModelScope)
     }
@@ -231,7 +236,10 @@ class PostScreenViewModel @Inject constructor(
     private fun getViews() {
         getViewJob?.cancel()
         getViewJob = viewUseCases.getViews(postModel.postId).onResource(
-            onSuccess = { viewCount = it.size.toString() },
+            onSuccess = {
+                viewsList.apply(it)
+                viewCount = it.size.toString()
+            },
         ).launchIn(viewModelScope)
     }
 
