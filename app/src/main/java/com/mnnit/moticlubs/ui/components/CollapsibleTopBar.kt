@@ -72,6 +72,7 @@ fun CollapsibleTopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    containerColor: Color? = null,
 ) {
     TwoRowsTopAppBar(
         title = bigTitle,
@@ -86,6 +87,7 @@ fun CollapsibleTopAppBar(
         maxHeight = maxHeight,
         pinnedHeight = 64.dp,
         scrollBehavior = scrollBehavior,
+        containerColor = containerColor,
     )
 }
 
@@ -104,6 +106,7 @@ private fun TwoRowsTopAppBar(
     pinnedHeight: Dp,
     scrollBehavior: TopAppBarScrollBehavior?,
     modifier: Modifier = Modifier,
+    containerColor: Color? = null,
 ) {
     if (maxHeight <= pinnedHeight) {
         throw IllegalArgumentException(
@@ -138,7 +141,7 @@ private fun TwoRowsTopAppBar(
     val colorTransitionFraction = scrollBehavior?.state?.collapsedFraction ?: 0f
     val appBarContainerColor by rememberUpdatedState(
         containerColor(
-            containerColor = colorScheme.surface,
+            containerColor = containerColor ?: colorScheme.surface,
             scrolledContainerColor = colorScheme.surfaceColorAtElevation(2.dp),
             colorTransitionFraction = colorTransitionFraction,
         ),
