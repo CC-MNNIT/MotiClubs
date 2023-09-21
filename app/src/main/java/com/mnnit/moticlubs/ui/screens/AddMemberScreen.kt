@@ -42,6 +42,7 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -76,14 +77,17 @@ fun AddMemberScreen(
     val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     MotiClubsTheme(colorScheme) {
-        if (scrollBehavior.state.collapsedFraction > 0.6f) {
-            SetTransparentSystemBars(setStatusBar = false)
-        } else {
-            SetTransparentSystemBars()
+        LaunchedEffect(scrollBehavior.state.collapsedFraction) {
+            if (scrollBehavior.state.collapsedFraction > 0.6f) {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+            }
         }
+
+        SetTransparentSystemBars(setStatusBar = false)
 
         Surface(
             color = colorScheme.background,
@@ -100,6 +104,7 @@ fun AddMemberScreen(
                     CollapsibleTopAppBar(
                         modifier = Modifier,
                         maxHeight = 386.dp,
+                        containerColor = colorScheme.surfaceColorAtElevation(2.dp),
                         bigTitle = {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Text(
@@ -199,7 +204,7 @@ fun AddMemberScreen(
                                         modifier = Modifier.imePadding(),
                                         shape = RoundedCornerShape(24.dp),
                                         border = AssistChipDefaults.assistChipBorder(
-                                            borderColor = colorScheme.background,
+                                            borderColor = colorScheme.primary,
                                         ),
                                     )
                                     Spacer(modifier = Modifier.weight(1f))

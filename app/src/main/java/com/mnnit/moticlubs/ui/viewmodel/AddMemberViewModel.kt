@@ -19,6 +19,7 @@ import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
+import com.mnnit.moticlubs.domain.util.onResource
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
@@ -209,24 +210,22 @@ class AddMemberViewModel @Inject constructor(
     }
 
     fun addMembers(onBackPressed: () -> Unit) {
+        showProgressDialog = true
+
         addMemberJob?.cancel()
         addMemberJob = memberUseCases.addMembers(
             channelModel.clubId,
             channelId,
             selectedUserMap.value.map { it.key },
-        ).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showProgressDialog = true
-                is Resource.Success -> {
-                    showProgressDialog = false
-                    onBackPressed()
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(application, "${resource.errCode} ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        ).onResource(
+            onSuccess = {
+                showProgressDialog = false
+                onBackPressed()
+            },
+            onError = {
+                Toast.makeText(application, "${it.errCode} ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     private fun getModels() {
@@ -246,25 +245,12 @@ class AddMemberViewModel @Inject constructor(
         }
 
         getMemberJob?.cancel()
-        getMemberJob = memberUseCases.getMembers(channelId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        memberList.value.clear()
-                        memberList.value.addAll(list)
-                    }
-                }
-
-                is Resource.Success -> {
-                    memberList.value.clear()
-                    memberList.value.addAll(resource.data)
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        getMemberJob = memberUseCases.getMembers(channelId).onResource(
+            onSuccess = { memberList.apply(it) },
+            onError = {
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_LONG).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     init {

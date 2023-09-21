@@ -7,6 +7,7 @@ import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.Admin
 import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
+import com.mnnit.moticlubs.domain.model.ChannelMember
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.Post
@@ -88,7 +89,7 @@ class RepositoryImpl(
         return dao.getChannel(channelId)
     }
 
-    override suspend fun getAllChannels(): List<Channel> {
+    override suspend fun getAllChannels(userId: Long): List<Channel> {
         return dao.getAllChannels()
     }
 
@@ -118,7 +119,7 @@ class RepositoryImpl(
         db.withTransaction { dao.deletePostId(postID) }
     }
 
-    // ----------- SUBSCRIBER
+    // ----------- MEMBER
 
     override suspend fun insertOrUpdateMember(member: Member) {
         db.withTransaction { dao.insertOrUpdateMember(member) }
@@ -126,6 +127,10 @@ class RepositoryImpl(
 
     override suspend fun getMembers(channelId: Long): List<Member> {
         return dao.getMembers(channelId)
+    }
+
+    override suspend fun getChannelsForMember(userId: Long): List<ChannelMember> {
+        return dao.getChannelsForMember(userId)
     }
 
     override suspend fun deleteMember(member: Member) {

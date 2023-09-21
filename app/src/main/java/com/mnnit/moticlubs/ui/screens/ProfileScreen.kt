@@ -111,6 +111,7 @@ fun ProfileScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     userModel = viewModel.userModel,
                     size = 156.dp,
+                    onClick = {},
                 )
                 UserInfo(
                     userModel = viewModel.userModel,

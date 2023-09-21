@@ -145,13 +145,16 @@ fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = h
                                 )
 
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
                                 ) {
                                     GithubLinkButton(
                                         viewModel,
                                         name = "App",
                                         url = "https://github.com/CC-MNNIT/MotiClubs",
                                     )
+                                    Spacer(modifier = Modifier.padding(4.dp))
                                     GithubLinkButton(
                                         viewModel,
                                         name = "Backend",
@@ -186,9 +189,10 @@ fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = h
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 102.dp),
+                                .padding(bottom = 102.dp, start = 16.dp, end = 16.dp),
                         ) {
                             GithubLinkButton(viewModel, name = "App\nContributors")
+                            Spacer(modifier = Modifier.padding(8.dp))
                             GithubLinkButton(viewModel, name = "Backend\nContributors")
                         }
                     }
@@ -210,8 +214,7 @@ private fun RowScope.GithubLinkButton(
     Card(
         modifier = Modifier
             .weight(1f)
-            .align(Alignment.CenterVertically)
-            .padding(horizontal = 16.dp),
+            .align(Alignment.CenterVertically),
         onClick = {
             if (url.isEmpty()) {
                 viewModel.contributorTagApp = name.startsWith("App")
@@ -239,17 +242,17 @@ private fun RowScope.GithubLinkButton(
                 contentDescription = "",
             )
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(2.dp))
 
             Text(
                 text = name,
-                fontSize = 15.sp,
+                fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.CenterVertically),
             )
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(2.dp))
 
             if (url.isTrimmedNotEmpty()) {
                 Icon(

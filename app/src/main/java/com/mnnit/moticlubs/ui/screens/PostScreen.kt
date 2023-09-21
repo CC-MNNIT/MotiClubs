@@ -42,6 +42,7 @@ import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.postscreen.PostBottomSheetContent
+import com.mnnit.moticlubs.ui.components.postscreen.ViewedUsersDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme
@@ -89,6 +90,10 @@ fun PostScreen(
                                 )
                             }
 
+                            if (viewModel.showViewedUserDialog.value) {
+                                ViewedUsersDialog(viewModel = viewModel)
+                            }
+
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth(),
@@ -130,17 +135,21 @@ fun PostScreen(
                                         name = viewModel.userModel.name,
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
-                                    Row(
+                                    Card(
                                         modifier = Modifier
                                             .align(Alignment.CenterVertically)
                                             .padding(end = 16.dp, bottom = 16.dp),
+                                        colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+                                        onClick = { viewModel.showViewedUserDialog.value = true },
                                     ) {
-                                        Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
-                                        Text(
-                                            modifier = Modifier.padding(start = 8.dp),
-                                            text = viewModel.viewCount,
-                                            fontSize = 14.sp,
-                                        )
+                                        Row(modifier = Modifier.padding(horizontal = 4.dp)) {
+                                            Icon(imageVector = Icons.Outlined.Visibility, contentDescription = "")
+                                            Text(
+                                                modifier = Modifier.padding(start = 8.dp),
+                                                text = viewModel.viewCount,
+                                                fontSize = 14.sp,
+                                            )
+                                        }
                                     }
                                 }
                             }

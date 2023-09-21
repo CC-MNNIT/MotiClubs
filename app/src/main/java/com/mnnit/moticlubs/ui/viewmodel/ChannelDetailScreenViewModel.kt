@@ -22,18 +22,21 @@ import com.mnnit.moticlubs.domain.usecase.ChannelUseCases
 import com.mnnit.moticlubs.domain.usecase.MemberUseCases
 import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
-import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.applySorting
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
+import com.mnnit.moticlubs.domain.util.onResource
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.publishedStateMapOf
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setValue
+import com.mnnit.moticlubs.domain.util.transformResources
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -89,62 +92,50 @@ class ChannelDetailScreenViewModel @Inject constructor(
 
     private var getMemberJob: Job? = null
     private var removeMemberJob: Job? = null
-    private var getAdminJob: Job? = null
 
     fun refreshAll() {
         getModels()
         memberInfo.value.clear()
-        getAdmins()
     }
 
     fun updateChannel() {
         progressMsg = "Updating"
+        showUpdateChannelDialog.value = false
+        isUpdating = true
+
         channelUseCases.updateChannel(
             channelModel.copy(name = updateChannelName, private = updateChannelPrivate),
-        ).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    showUpdateChannelDialog.value = false
-                    isUpdating = true
-                }
-
-                is Resource.Success -> {
-                    showUpdateChannelDialog.value = false
-                    isUpdating = false
-                    channelModel = resource.data
-                    resetUpdate()
-                    refreshAll()
-                }
-
-                is Resource.Error -> {
-                    resetUpdate()
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        ).onResource(
+            onSuccess = {
+                showUpdateChannelDialog.value = false
+                isUpdating = false
+                channelModel = it
+                resetUpdate()
+                refreshAll()
+            },
+            onError = {
+                resetUpdate()
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_LONG).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun deleteChannel(onSuccess: () -> Unit) {
-        channelUseCases.deleteChannel(channelModel).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    showUpdateChannelDialog.value = false
-                    progressMsg = "Deleting"
-                    isUpdating = true
-                }
+        showUpdateChannelDialog.value = false
+        progressMsg = "Deleting"
+        isUpdating = true
 
-                is Resource.Success -> {
-                    isUpdating = false
-                    onSuccess()
-                    Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
-                }
-
-                is Resource.Error -> {
-                    isUpdating = false
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        channelUseCases.deleteChannel(channelModel).onResource(
+            onSuccess = {
+                isUpdating = false
+                onSuccess()
+                Toast.makeText(application, "Channel Deleted", Toast.LENGTH_SHORT).show()
+            },
+            onError = {
+                isUpdating = false
+                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun resetUpdate() {
@@ -164,22 +155,18 @@ class ChannelDetailScreenViewModel @Inject constructor(
             channelModel.clubId,
             channelId,
             removeMemberUserId,
-        ).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> showMemberProgressDialog.value = true
-                is Resource.Success -> {
-                    removeMemberUserId = -1L
-                    showMemberProgressDialog.value = false
-                    refreshAll()
-                }
-
-                is Resource.Error -> {
-                    removeMemberUserId = -1L
-                    showMemberProgressDialog.value = false
-                    Toast.makeText(application, "${resource.errCode} ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+        ).onResource(
+            onSuccess = {
+                removeMemberUserId = -1L
+                showMemberProgressDialog.value = false
+                refreshAll()
+            },
+            onError = {
+                removeMemberUserId = -1L
+                showMemberProgressDialog.value = false
+                Toast.makeText(application, "${it.errCode} ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     private fun getModels() {
@@ -196,88 +183,43 @@ class ChannelDetailScreenViewModel @Inject constructor(
     }
 
     private fun getMembers() {
-        if (channelModel.private == 0) {
-            memberList.value.clear()
-            return
-        }
+        isFetching = true
 
         getMemberJob?.cancel()
-        getMemberJob = memberUseCases.getMembers(channelId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        memberList.value.clear()
-                        memberList.value.addAll(list)
-                    }
-                }
-
-                is Resource.Success -> {
-                    memberList.value.clear()
-                    memberList.value.addAll(
-                        resource.data.sortedWith(
-                            compareBy(
-                                { member ->
-                                    !adminList.value.any { admin ->
-                                        admin.userId == member.userId && admin.clubId == channelModel.clubId
-                                    }
-                                },
-                                { member -> memberInfo.value[member.userId]?.name ?: "" },
-                            ),
-                        ),
-                    )
-                }
-
-                is Resource.Error -> {
-                    Toast.makeText(application, "${resource.errCode}: ${resource.errMsg}", Toast.LENGTH_LONG).show()
+        getMemberJob = memberUseCases.getMembers(channelId)
+            .zip(userUseCases.getAllAdmins()) { resourceMember, resourceAdmins ->
+                transformResources(resourceMember, emptyList(), resourceAdmins, emptyList()) {
+                    Toast.makeText(
+                        application,
+                        it,
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
             }
-        }.launchIn(viewModelScope)
+            .onEach { (members, admins) ->
+                isFetching = false
+                if (members.isEmpty() || admins.isEmpty()) {
+                    Log.d(TAG, "getMembers: members or admins, either empty")
+                    return@onEach
+                }
+
+                admins.forEach { admin -> memberInfo.value[admin.userId] = admin.getUser() }
+
+                isAdmin = admins.any { admin ->
+                    admin.userId == userId && admin.clubId == channelModel.clubId
+                }
+
+                adminList.apply(admins)
+                memberList.apply(members.applySorting(admins, channelModel.clubId, memberInfo))
+            }.launchIn(viewModelScope)
     }
 
     fun getUser(userId: Long) {
         memberInfo.value[userId] = User()
-        userUseCases.getUser(userId).onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { user -> memberInfo.value[user.userId] = user }
-                }
-
-                is Resource.Success -> {
-                    val user = resource.data
-                    memberInfo.value[user.userId] = user
-                }
-
-                is Resource.Error -> Log.d(TAG, "getUser: err - ${resource.errCode}: ${resource.errMsg}")
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    private fun getAdmins() {
-        getAdminJob?.cancel()
-        getAdminJob = userUseCases.getAllAdmins().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    resource.data?.let { list ->
-                        if (list.isNotEmpty()) {
-                            adminList.value.clear()
-                            adminList.value.addAll(list)
-                        }
-                    }
-                }
-
-                is Resource.Success -> {
-                    adminList.value.clear()
-                    adminList.value.addAll(resource.data)
-                    isAdmin = adminList.value.any { admin ->
-                        admin.userId == userId && admin.clubId == channelModel.clubId
-                    }
-                }
-
-                is Resource.Error -> {
-                    Log.d(TAG, "getAdmins: failed: ${resource.errCode}: ${resource.errMsg}")
-                }
-            }
-        }.launchIn(viewModelScope)
+        userUseCases.getUser(userId).onResource(
+            onSuccess = { memberInfo.value[it.userId] = it },
+            onError = { Log.d(TAG, "getUser: err - ${it.errCode}: ${it.errMsg}") },
+        ).launchIn(viewModelScope)
     }
 
     init {

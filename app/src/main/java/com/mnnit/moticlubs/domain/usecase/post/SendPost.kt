@@ -14,10 +14,10 @@ class SendPost(private val repository: Repository) {
     operator fun invoke(
         post: Post,
         clubId: Long,
-    ): Flow<Resource<List<Post>>> = repository.networkResource(
+    ): Flow<Resource<Post>> = repository.networkResource(
         "Error sending post",
         stampKey = ResponseStamp.POST.withKey("${post.channelId}").withKey("${post.pageNo}"),
-        query = { repository.getPostsFromChannel(post.channelId, post.pageNo) },
+        query = { post },
         apiCall = { apiService, auth, stamp -> apiService.sendPost(auth, stamp, clubId, post.mapFromDomain()) },
         saveResponse = { _, new -> repository.insertOrUpdatePost(new.mapToDomain(post.pageNo)) },
         remoteRequired = true,

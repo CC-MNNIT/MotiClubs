@@ -10,6 +10,7 @@ import com.mnnit.moticlubs.domain.util.Constants.STAMP_HEADER
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 
@@ -99,7 +100,52 @@ suspend inline fun <reified T> apiInvoker(
         return Resource.Success(Pair(body, stampHeaderValue))
     } catch (e: Exception) {
         e.printStackTrace()
-        Log.d(TAG, "apiInvoker: ${T::class.simpleName} - ${e.message}")
+        Log.d(TAG, "apiInvoker: ${T::class.java.simpleName} - ${e.message}")
         return Resource.Error(-1, e.localizedMessage ?: "Error")
+    }
+}
+
+fun <T1, T2> transformResources(
+    r1: Resource<T1>,
+    default: T1,
+    r2: Resource<T2>,
+    default2: T2,
+    onError: (String) -> Unit = {},
+): Pair<T1, T2> {
+    val d1 = when (r1) {
+        is Resource.Loading -> r1.data ?: default
+        is Resource.Success -> r1.data
+        is Resource.Error -> {
+            onError("${r1.errCode}: ${r1.errMsg}")
+            default
+        }
+    }
+
+    val d2 = when (r2) {
+        is Resource.Loading -> r2.data ?: default2
+        is Resource.Success -> r2.data
+        is Resource.Error -> {
+            onError("${r2.errCode}: ${r2.errMsg}")
+            default2
+        }
+    }
+
+    return Pair(d1, d2)
+}
+
+inline fun <reified T> Flow<Resource<T>>.onResource(
+    crossinline onSuccess: (T) -> Unit,
+    crossinline onError: (Resource.Error<T>) -> Unit = {},
+): Flow<Resource<T>> = onEach { resource ->
+    when (resource) {
+        is Resource.Loading -> resource.data?.let(onSuccess)
+        is Resource.Success -> onSuccess(resource.data)
+        is Resource.Error -> {
+            Log.d(
+                TAG,
+                "mapResource: [${T::class.java.simpleName}] error: ${resource.errCode} : ${resource.errMsg}",
+            )
+            onError(resource)
+        }
     }
 }

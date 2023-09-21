@@ -52,10 +52,10 @@ fun HomeScreen(
 ) {
     val colorScheme = getColorScheme()
     val refreshState = rememberPullRefreshState(
-        refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingChannels || viewModel.isFetchingClubs,
+        refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingHome,
         onRefresh = viewModel::refreshAll,
     )
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     MotiClubsTheme(colorScheme) {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
@@ -102,29 +102,22 @@ fun HomeScreen(
                         .padding(PaddingValues(top = it.calculateTopPadding()))
                         .pullRefresh(
                             state = refreshState,
-                            enabled = !viewModel.isFetchingAdmins &&
-                                !viewModel.isFetchingChannels &&
-                                !viewModel.isFetchingClubs,
+                            enabled = !viewModel.isFetchingAdmins && !viewModel.isFetchingHome,
                         ),
                 ) {
                     PullDownProgressIndicator(
-                        visible = viewModel.isFetchingAdmins ||
-                            viewModel.isFetchingChannels ||
-                            viewModel.isFetchingClubs,
+                        visible = viewModel.isFetchingAdmins || viewModel.isFetchingHome,
                         refreshState = refreshState,
                     )
 
                     AnimatedVisibility(
                         visible = viewModel.clubsList.value.isEmpty() && !viewModel.isFetchingAdmins &&
-                            !viewModel.isFetchingChannels &&
-                            !viewModel.isFetchingClubs,
+                            !viewModel.isFetchingHome,
                         modifier = Modifier
                             .fillMaxSize()
                             .pullRefresh(
                                 state = refreshState,
-                                enabled = !viewModel.isFetchingAdmins &&
-                                    !viewModel.isFetchingChannels &&
-                                    !viewModel.isFetchingClubs,
+                                enabled = !viewModel.isFetchingAdmins && !viewModel.isFetchingHome,
                             )
                             .verticalScroll(rememberScrollState()),
                     ) {

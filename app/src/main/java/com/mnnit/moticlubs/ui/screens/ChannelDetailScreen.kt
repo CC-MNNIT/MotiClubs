@@ -78,7 +78,7 @@ fun ChannelDetailScreen(
     viewModel: ChannelDetailScreenViewModel = hiltViewModel(),
 ) {
     val colorScheme = getColorScheme()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetching,
