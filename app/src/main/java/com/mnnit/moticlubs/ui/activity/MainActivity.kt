@@ -58,7 +58,6 @@ import com.mnnit.moticlubs.ui.screens.PostScreen
 import com.mnnit.moticlubs.ui.screens.ProfileScreen
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -154,8 +153,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainScreen(user: FirebaseUser?, modifier: Modifier = Modifier) {
-        val colorScheme = getColorScheme()
-        MotiClubsTheme(colorScheme) {
+        MotiClubsTheme {
             SetTransparentSystemBars()
 
             Surface(

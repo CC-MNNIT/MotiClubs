@@ -29,7 +29,7 @@ import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun ColumnScope.DeveloperProfile(
@@ -43,7 +43,6 @@ fun ColumnScope.DeveloperProfile(
 ) {
     val focusManager = LocalFocusManager.current
     val uriHandler = LocalUriHandler.current
-    val colorScheme = getColorScheme()
 
     Card(
         modifier = modifier

@@ -16,12 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -51,16 +48,17 @@ import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ColorPaletteDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputOtherLinkDialog
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputSocialLinkDialog
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.pullRefresh
+import com.mnnit.moticlubs.ui.components.pullrefresh.rememberPullRefreshState
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ClubDetailsScreen(
     onNavigateBackPressed: () -> Unit,
@@ -68,13 +66,12 @@ fun ClubDetailsScreen(
     viewModel: ClubDetailsScreenViewModel = hiltViewModel(),
 ) {
     val scrollState = rememberScrollState()
-    val colorScheme = getColorScheme()
 
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetching,
         onRefresh = viewModel::refresh,
     )
-    MotiClubsTheme(colorScheme = getColorScheme()) {
+    MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = false)
 
         Surface(

@@ -65,7 +65,7 @@ import com.mnnit.moticlubs.ui.components.addmemberscreen.SearchField
 import com.mnnit.moticlubs.ui.components.addmemberscreen.SelectedMemberDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 
 @Composable
@@ -74,12 +74,11 @@ fun AddMemberScreen(
     modifier: Modifier = Modifier,
     viewModel: AddMemberViewModel = hiltViewModel(),
 ) {
-    val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         LaunchedEffect(scrollBehavior.state.collapsedFraction) {
             if (scrollBehavior.state.collapsedFraction > 0.6f) {
                 focusManager.clearFocus()
@@ -338,7 +337,6 @@ fun AddMemberScreen(
 private fun UserList(
     viewModel: AddMemberViewModel,
 ) {
-    val colorScheme = getColorScheme()
     val scrollState = rememberLazyListState()
 
     LazyColumn(

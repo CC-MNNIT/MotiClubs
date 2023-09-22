@@ -28,7 +28,7 @@ import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.mnnit.moticlubs.domain.util.OtherLinkComposeModel
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.publishedStateOf
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.theme.textColorFor
 
 @Composable
@@ -37,7 +37,6 @@ fun ColorPaletteDialog(
     show: PublishedState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val controller = rememberColorPickerController().apply {
         this.setWheelColor(Color.Black)
     }

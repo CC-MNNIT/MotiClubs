@@ -40,7 +40,7 @@ import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AddMemberViewModel
 
 @Composable
@@ -49,7 +49,6 @@ fun SelectedMemberDialog(
     onAdd: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val showConfirmation = remember { publishedStateOf(false) }
     val scrollState = rememberLazyListState()
 
@@ -132,8 +131,6 @@ fun SelectedMemberDialog(
 
 @Composable
 private fun UserItem(user: User, viewModel: AddMemberViewModel) {
-    val colorScheme = getColorScheme()
-
     Card(
         modifier = Modifier
             .safeContentPadding()

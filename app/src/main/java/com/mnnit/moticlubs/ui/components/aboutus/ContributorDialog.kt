@@ -38,7 +38,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.data.network.dto.GithubContributorDto
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AboutUsViewModel
 
 @Composable
@@ -47,7 +47,6 @@ fun ContributorDialog(
     viewModel: AboutUsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val scrollState = rememberLazyListState()
 
     Dialog(
@@ -105,7 +104,6 @@ fun ContributorDialog(
 
 @Composable
 private fun ContributorItem(contributor: GithubContributorDto) {
-    val colorScheme = getColorScheme()
     val uriHandler = LocalUriHandler.current
 
     Card(

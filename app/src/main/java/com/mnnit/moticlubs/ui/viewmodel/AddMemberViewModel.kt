@@ -15,7 +15,6 @@ import com.mnnit.moticlubs.domain.repository.Repository
 import com.mnnit.moticlubs.domain.usecase.MemberUseCases
 import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.NavigationArgs
-import com.mnnit.moticlubs.domain.util.Resource
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
@@ -27,7 +26,6 @@ import com.mnnit.moticlubs.domain.util.setValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -153,27 +151,23 @@ class AddMemberViewModel @Inject constructor(
         getAllUserJob?.cancel()
         allUserList.value.clear()
         isFetching = true
-        getAllUserJob = userUseCases.getAllUsers().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> isFetching = true
-                is Resource.Success -> {
-                    allUserList.value.clear()
-                    selectedUserMap.value.clear()
+        getAllUserJob = userUseCases.getAllUsers().onResource(
+            onSuccess = {
+                allUserList.value.clear()
+                selectedUserMap.value.clear()
 
-                    allUserList.value.addAll(
-                        resource.data.filter { user ->
-                            !memberList.value.any { member -> user.userId == member.userId }
-                        },
-                    )
-                    isFetching = false
-                }
-
-                is Resource.Error -> {
-                    isFetching = false
-                    Toast.makeText(application, "${resource.errCode} ${resource.errMsg}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.launchIn(viewModelScope)
+                allUserList.value.addAll(
+                    it.filter { user ->
+                        !memberList.value.any { member -> user.userId == member.userId }
+                    },
+                )
+                isFetching = false
+            },
+            onError = {
+                isFetching = false
+                Toast.makeText(application, "${it.errCode} ${it.errMsg}", Toast.LENGTH_SHORT).show()
+            },
+        ).launchIn(viewModelScope)
     }
 
     fun filterSearch() {

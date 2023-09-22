@@ -31,7 +31,7 @@ import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.publishedStateOf
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun UserInfo(
@@ -41,7 +41,6 @@ fun UserInfo(
     contactText: PublishedState<String>? = null,
     enabled: PublishedState<Boolean> = publishedStateOf(false),
 ) {
-    val colorScheme = getColorScheme()
     val clipboardManager = LocalClipboardManager.current
 
     Column(modifier = modifier.fillMaxWidth()) {

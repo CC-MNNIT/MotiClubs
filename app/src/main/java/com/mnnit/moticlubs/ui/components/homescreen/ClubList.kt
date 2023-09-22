@@ -37,7 +37,7 @@ import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
 import com.mnnit.moticlubs.domain.util.setValue
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
@@ -49,7 +49,6 @@ fun ClubList(
     onNavigateToClubDetails: (clubId: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val context = LocalContext.current
     val emptyList = remember { publishedStateListOf<Channel>() }
 

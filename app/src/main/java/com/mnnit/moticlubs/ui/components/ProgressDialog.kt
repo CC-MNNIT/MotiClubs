@@ -17,11 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun ProgressDialog(progressMsg: String, modifier: Modifier = Modifier) {
-    val colorScheme = getColorScheme()
     Dialog(
         onDismissRequest = {},
         DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),

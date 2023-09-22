@@ -150,6 +150,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
             return
         }
 
+        showMemberProgressDialog.value = true
         removeMemberJob?.cancel()
         removeMemberJob = memberUseCases.removeMember(
             channelModel.clubId,
@@ -189,20 +190,11 @@ class ChannelDetailScreenViewModel @Inject constructor(
         getMemberJob = memberUseCases.getMembers(channelId)
             .zip(userUseCases.getAllAdmins()) { resourceMember, resourceAdmins ->
                 transformResources(resourceMember, emptyList(), resourceAdmins, emptyList()) {
-                    Toast.makeText(
-                        application,
-                        it,
-                        Toast.LENGTH_LONG,
-                    ).show()
+                    Log.d(TAG, "getMembers: $it")
                 }
             }
             .onEach { (members, admins) ->
                 isFetching = false
-                if (members.isEmpty() || admins.isEmpty()) {
-                    Log.d(TAG, "getMembers: members or admins, either empty")
-                    return@onEach
-                }
-
                 admins.forEach { admin -> memberInfo.value[admin.userId] = admin.getUser() }
 
                 isAdmin = admins.any { admin ->

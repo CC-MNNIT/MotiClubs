@@ -34,6 +34,10 @@ data class PublishedList<T>(
         }
 
     fun apply(list: List<T>) {
+        if (list.isEmpty()) {
+            return
+        }
+
         _value.clear()
         _value.addAll(list)
     }

@@ -24,13 +24,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.GroupAdd
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -61,14 +58,15 @@ import com.mnnit.moticlubs.ui.components.CollapsibleTopAppBar
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.homescreen.UpdateChannelDialog
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.pullRefresh
+import com.mnnit.moticlubs.ui.components.pullrefresh.rememberPullRefreshState
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelDetailScreenViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelDetailScreen(
     onNavigateToAddMember: (channelId: Long) -> Unit,
@@ -77,14 +75,13 @@ fun ChannelDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: ChannelDetailScreenViewModel = hiltViewModel(),
 ) {
-    val colorScheme = getColorScheme()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetching,
         onRefresh = viewModel::refreshAll,
     )
-    MotiClubsTheme(colorScheme = getColorScheme()) {
+    MotiClubsTheme {
         if (scrollBehavior.state.collapsedFraction > 0.6f) {
             SetTransparentSystemBars(setStatusBar = false)
         } else {
@@ -177,7 +174,7 @@ fun ChannelDetailScreen(
                         )
                     }
 
-                    androidx.compose.material.Surface(
+                    Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = colorScheme.background,
                     ) {
@@ -355,8 +352,6 @@ private fun MemberItem(
     member: Member,
     viewModel: ChannelDetailScreenViewModel,
 ) {
-    val colorScheme = getColorScheme()
-
     Card(
         modifier = Modifier
             .padding(top = 8.dp)

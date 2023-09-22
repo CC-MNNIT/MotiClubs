@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 
 @Composable
@@ -39,8 +39,6 @@ fun ChannelTopBar(
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
-
     Card(
         modifier = modifier.fillMaxWidth(),
         onClick = { onNavigateToChannelDetails(viewModel.channelId) },

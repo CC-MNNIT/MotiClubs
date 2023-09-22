@@ -19,7 +19,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.ui.components.profilescreen.UserInfo
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun ProfileDialog(
@@ -27,8 +27,6 @@ fun ProfileDialog(
     showDialog: PublishedState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
-
     Dialog(
         onDismissRequest = { showDialog.value = false },
         properties = DialogProperties(usePlatformDefaultWidth = false),

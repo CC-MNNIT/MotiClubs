@@ -35,7 +35,9 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
     remoteRequired: Boolean = false,
 ): Flow<Resource<ResT>> = flow {
     val data = query()
-    emit(Resource.Loading(data))
+    if (!remoteRequired) {
+        emit(Resource.Loading(data))
+    }
 
     if (!getApplication().connectionAvailable()) {
         emit(
@@ -61,7 +63,9 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
             )
         }
         if (apiResponse is Resource.Success) {
-            insertOrUpdateStamp(Stamp(stampKey.getKey(), apiResponse.data.second))
+            if (!remoteRequired) {
+                insertOrUpdateStamp(Stamp(stampKey.getKey(), apiResponse.data.second))
+            }
 
             val result = apiResponse.data.first
             if (result != null) {
@@ -143,7 +147,7 @@ inline fun <reified T> Flow<Resource<T>>.onResource(
         is Resource.Error -> {
             Log.d(
                 TAG,
-                "mapResource: [${T::class.java.simpleName}] error: ${resource.errCode} : ${resource.errMsg}",
+                "onResource: [${T::class.java.simpleName}] error: ${resource.errCode} : ${resource.errMsg}",
             )
             onError(resource)
         }

@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val LightColorPalette = lightColorScheme(
+private val lightColorPalette = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
     primaryContainer = md_theme_light_primaryContainer,
@@ -49,7 +49,7 @@ private val LightColorPalette = lightColorScheme(
     scrim = md_theme_light_scrim,
 )
 
-private val DarkColorPalette = darkColorScheme(
+private val darkColorPalette = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
     primaryContainer = md_theme_dark_primaryContainer,
@@ -81,33 +81,31 @@ private val DarkColorPalette = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
-@Composable
-fun getColorScheme() =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (isSystemInDarkTheme()) {
+val colorScheme: ColorScheme
+    @Composable
+    get() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> if (isSystemInDarkTheme()) {
             dynamicDarkColorScheme(LocalContext.current)
         } else {
-            dynamicLightColorScheme(
-                LocalContext.current,
-            )
+            dynamicLightColorScheme(LocalContext.current)
         }
-    } else {
-        if (isSystemInDarkTheme()) DarkColorPalette else LightColorPalette
+
+        else -> if (isSystemInDarkTheme()) darkColorPalette else lightColorPalette
     }
 
 @Composable
 fun SetTransparentSystemBars(setStatusBar: Boolean = true, setNavBar: Boolean = true) {
-    val colorScheme = getColorScheme()
+    val surface = colorScheme.surfaceColorAtElevation(2.dp)
     val darkTheme = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
-    LaunchedEffect(systemUiController, darkTheme) {
+    LaunchedEffect(systemUiController, darkTheme, setStatusBar, setNavBar) {
         systemUiController.setStatusBarColor(
-            color = if (setStatusBar) Color.Transparent else colorScheme.surfaceColorAtElevation(2.dp),
+            color = if (setStatusBar) Color.Transparent else surface,
             darkIcons = !darkTheme,
         )
 
         systemUiController.setNavigationBarColor(
-            color = if (setNavBar) Color.Transparent else colorScheme.surfaceColorAtElevation(2.dp),
+            color = if (setNavBar) Color.Transparent else surface,
             darkIcons = !darkTheme,
             navigationBarContrastEnforced = false,
         )
@@ -130,21 +128,6 @@ private fun Color.toRGB(): IntArray {
 
 @Composable
 fun MotiClubsTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit,
-) {
-    val colorScheme = if (darkTheme) DarkColorPalette else LightColorPalette
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        shapes = Shapes(),
-        content = content,
-    )
-}
-
-@Composable
-fun MotiClubsTheme(
-    colorScheme: ColorScheme,
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(

@@ -3,45 +3,38 @@ package com.mnnit.moticlubs.ui.components.channelscreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Article
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,11 +42,12 @@ import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.components.isExpanded
+import com.mnnit.moticlubs.ui.components.isPartiallyExpanded
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostCreateUpdateBottomSheet(
     viewModel: ChannelScreenViewModel,
@@ -62,13 +56,11 @@ fun PostCreateUpdateBottomSheet(
 ) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
-    val colorScheme = getColorScheme()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
     Surface(
-        color = colorScheme.background,
-        tonalElevation = 2.dp,
+        color = colorScheme.surfaceColorAtElevation(2.dp),
         modifier = modifier
             .fillMaxWidth()
             .imePadding(),
@@ -82,7 +74,7 @@ fun PostCreateUpdateBottomSheet(
                 viewModel.updatePost()
                 scope.launch {
                     if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.partialExpand()
                     }
                 }
             }
@@ -93,7 +85,7 @@ fun PostCreateUpdateBottomSheet(
                 viewModel.sendPost()
                 scope.launch {
                     if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.partialExpand()
                     }
                 }
             }
@@ -108,7 +100,7 @@ fun PostCreateUpdateBottomSheet(
                     viewModel.clearEditor()
                     scope.launch {
                         if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
+                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.partialExpand()
                         }
                     }
                 },
@@ -124,197 +116,148 @@ fun PostCreateUpdateBottomSheet(
                 .imePadding()
                 .fillMaxWidth(),
         ) {
-            Box(
-                modifier = Modifier
-                    .width(56.dp)
-                    .height(4.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(contentColorFor(backgroundColor = colorScheme.background)),
-            ) {
-                Text(text = "", modifier = Modifier.padding(12.dp))
-            }
-
-            Row(modifier = Modifier.padding(bottom = 20.dp)) {
-                Text(
-                    text = if (viewModel.editMode.value) "Update Post" else "Write Post",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                )
-                Spacer(modifier = Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-
-                        if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
-                            viewModel.showClearDraftDialog.value = true
-                            return@IconButton
-                        }
-
-                        viewModel.clearEditor()
-                        scope.launch {
-                            if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                                viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse()
-                            }
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                ) {
-                    Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
-                }
-            }
-
-            Column(
+            AnimatedVisibility(
+                visible = viewModel.isPreviewMode.value,
                 modifier = Modifier
                     .imePadding()
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
+                enter = fadeIn(),
+                exit = fadeOut(),
             ) {
-                AnimatedVisibility(
-                    visible = viewModel.isPreviewMode.value,
+                Box(
                     modifier = Modifier
                         .imePadding()
                         .fillMaxWidth()
                         .weight(1f),
-                    enter = fadeIn(),
-                    exit = fadeOut(),
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .imePadding()
-                            .fillMaxWidth()
-                            .weight(1f),
-                    ) {
-                        MarkdownRender(
-                            mkd = viewModel.eventPostMsg.value.text,
-                            imageReplacerMap = viewModel.eventImageReplacerMap,
-                            onImageClick = onNavigateImageClick,
-                        )
-                    }
+                    MarkdownRender(
+                        mkd = viewModel.eventPostMsg.value.text,
+                        imageReplacerMap = viewModel.eventImageReplacerMap,
+                        onImageClick = onNavigateImageClick,
+                    )
                 }
+            }
 
-                AnimatedVisibility(
-                    visible = !viewModel.isPreviewMode.value,
+            AnimatedVisibility(
+                visible = !viewModel.isPreviewMode.value,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .imePadding(),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .weight(1f)
-                        .imePadding(),
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .imePadding()
-                            .weight(1f)
-                            .onFocusChanged {
-                                if (it.hasFocus) {
-                                    scope.launch {
-                                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
-                                            viewModel.scrollValue.intValue = scrollState.value
-                                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand()
-                                        }
+                        .onFocusChanged {
+                            if (it.hasFocus) {
+                                scope.launch {
+                                    if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isPartiallyExpanded) {
+                                        viewModel.scrollValue.intValue = scrollState.value
+                                        viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand()
                                     }
                                 }
-                            },
-                        value = viewModel.eventPostMsg.value,
-                        onValueChange = { viewModel.eventPostMsg.value = it },
-                        shape = RoundedCornerShape(24.dp),
-                        placeholder = { Text(text = "Write your message here\nSupports Markdown formatting") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                    )
-                }
+                            }
+                        },
+                    value = viewModel.eventPostMsg.value,
+                    onValueChange = { viewModel.eventPostMsg.value = it },
+                    shape = RoundedCornerShape(24.dp),
+                    placeholder = { Text(text = "Write your message here\nSupports Markdown formatting") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                )
+            }
 
-                PostTextFormatter(viewModel = viewModel)
+            PostTextFormatter(viewModel = viewModel)
 
-                Row(
+            Row(
+                modifier = Modifier
+                    .imePadding()
+                    .padding(top = 8.dp, bottom = 8.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                FilterChip(
+                    selected = viewModel.isPreviewMode.value,
+                    onClick = {
+                        keyboardController?.hide()
+                        if (!viewModel.isPreviewMode.value) {
+                            scope.launch {
+                                scrollState.animateScrollTo(0)
+                            }
+                        }
+                        viewModel.isPreviewMode.value = !viewModel.isPreviewMode.value
+                    },
+                    label = {
+                        Text(text = "Preview", fontSize = 14.sp)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Rounded.Visibility),
+                            contentDescription = "",
+                        )
+                    },
                     modifier = Modifier
                         .imePadding()
-                        .padding(top = 8.dp, bottom = 8.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                ) {
-                    FilterChip(
-                        selected = viewModel.isPreviewMode.value,
-                        onClick = {
-                            keyboardController?.hide()
-                            if (!viewModel.isPreviewMode.value) {
-                                scope.launch {
-                                    scrollState.animateScrollTo(0)
-                                }
-                            }
-                            viewModel.isPreviewMode.value = !viewModel.isPreviewMode.value
-                        },
-                        label = {
-                            Text(text = "Preview", fontSize = 14.sp)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = rememberVectorPainter(image = Icons.Rounded.Visibility),
-                                contentDescription = "",
-                            )
-                        },
-                        modifier = Modifier
-                            .imePadding()
-                            .align(Alignment.CenterVertically),
-                        shape = RoundedCornerShape(24.dp),
-                    )
+                        .align(Alignment.CenterVertically),
+                    shape = RoundedCornerShape(24.dp),
+                )
 
-                    Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
 
-                    AssistChip(
-                        onClick = {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
-                            if (viewModel.editMode.value) {
-                                viewModel.showEditDialog.value = true
-                            } else {
-                                viewModel.showDialog.value = true
-                            }
-                        },
-                        label = {
-                            Text(
-                                text = if (viewModel.editMode.value) "Update" else "Send",
-                                fontSize = 14.sp,
-                                color = contentColorFor(
-                                    backgroundColor = if (
-                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
-                                        viewModel.postLengthInRange()
-                                    ) {
-                                        colorScheme.primary
-                                    } else {
-                                        colorScheme.onSurface.copy(alpha = 0.38f)
-                                    },
-                                ),
-                            )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = rememberVectorPainter(image = Icons.Rounded.Send),
-                                contentDescription = "",
-                                tint = contentColorFor(
-                                    backgroundColor = if (
-                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
-                                        viewModel.postLengthInRange()
-                                    ) {
-                                        colorScheme.primary
-                                    } else {
-                                        colorScheme.onSurface.copy(alpha = 0.38f)
-                                    },
-                                ),
-                            )
-                        },
-                        modifier = Modifier
-                            .imePadding()
-                            .align(Alignment.CenterVertically),
-                        shape = RoundedCornerShape(24.dp),
-                        colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
-                        enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
-                            viewModel.postLengthInRange(),
-                    )
-                }
+                AssistChip(
+                    onClick = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        if (viewModel.editMode.value) {
+                            viewModel.showEditDialog.value = true
+                        } else {
+                            viewModel.showDialog.value = true
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = if (viewModel.editMode.value) "Update" else "Send",
+                            fontSize = 14.sp,
+                            color = contentColorFor(
+                                backgroundColor = if (
+                                    viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
+                                    viewModel.postLengthInRange()
+                                ) {
+                                    colorScheme.primary
+                                } else {
+                                    colorScheme.onSurface.copy(alpha = 0.38f)
+                                },
+                            ),
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Rounded.Send),
+                            contentDescription = "",
+                            tint = contentColorFor(
+                                backgroundColor = if (
+                                    viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
+                                    viewModel.postLengthInRange()
+                                ) {
+                                    colorScheme.primary
+                                } else {
+                                    colorScheme.onSurface.copy(alpha = 0.38f)
+                                },
+                            ),
+                        )
+                    },
+                    modifier = Modifier
+                        .imePadding()
+                        .align(Alignment.CenterVertically),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = AssistChipDefaults.assistChipColors(containerColor = colorScheme.primary),
+                    enabled = viewModel.eventPostMsg.value.text.isTrimmedNotEmpty() &&
+                        viewModel.postLengthInRange(),
+                )
             }
         }
     }

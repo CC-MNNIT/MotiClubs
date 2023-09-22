@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.publishedStateMapOf
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun MarkdownRender(
@@ -31,8 +31,6 @@ fun MarkdownRender(
     disableLinkMovementMethod: Boolean = false,
     onImageClick: (url: String) -> Unit = {},
 ) {
-    val colorScheme = getColorScheme()
-
     var preprocessText = mkd
     if (imageReplacerMap.value.isEmpty()) {
         mkd.lines().forEach {

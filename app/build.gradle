@@ -66,7 +66,7 @@ android {
 afterEvaluate {
     lintVitalRelease.dependsOn('lintKotlin')
     lint.dependsOn('lintKotlin')
-    assembleDebug.dependsOn('formatKotlin').dependsOn('lint')
+    assembleDebug.dependsOn('formatKotlin').dependsOn('lintKotlin')
     bundleRelease.dependsOn('lintVitalRelease')
 }
 
@@ -94,9 +94,9 @@ dependencies {
     ksp "androidx.room:room-compiler:2.5.2"
     implementation "androidx.room:room-ktx:2.5.2"
 
-    implementation 'androidx.compose.material:material:1.5.1'
+    implementation 'androidx.compose.material3:material3:1.1.2'
+    implementation "androidx.compose.material3:material3-window-size-class:1.1.2"
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.compose.material3:material3:1.1.1'
     implementation 'androidx.compose.material:material-icons-core:1.5.1'
     implementation 'androidx.compose.material:material-icons-extended:1.5.1'
 

@@ -26,13 +26,11 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 
 @Composable
 fun ErrorScreen(viewModel: AppViewModel, modifier: Modifier = Modifier) {
-    val colorScheme = getColorScheme()
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         SetTransparentSystemBars()
 
         Surface(

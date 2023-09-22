@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -113,8 +113,6 @@ private fun TwoRowsTopAppBar(
             "A TwoRowsTopAppBar max height should be greater than its pinned height",
         )
     }
-
-    val colorScheme = getColorScheme()
 
     val pinnedHeightPx: Float
     val maxHeightPx: Float

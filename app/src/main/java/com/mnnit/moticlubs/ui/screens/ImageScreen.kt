@@ -28,7 +28,7 @@ import com.mnnit.moticlubs.domain.util.zoomableContentLocation
 import com.mnnit.moticlubs.ui.components.getImageUrlPainter
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
@@ -48,12 +48,10 @@ fun ImageScreen(
     modifier: Modifier = Modifier,
     viewModel: ImageScreenViewModel = hiltViewModel(),
 ) {
-    val colorScheme = getColorScheme()
-
     val painter = LocalContext.current.getImageUrlPainter(url = viewModel.imageUrl)
     val zoomState = rememberZoomableState()
 
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         SetTransparentSystemBars()
 
         Box(modifier = modifier.fillMaxSize()) {

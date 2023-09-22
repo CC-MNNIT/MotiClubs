@@ -26,7 +26,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_URL_SIZE
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.lengthInRange
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun PostInputLinkDialog(
@@ -36,7 +36,6 @@ fun PostInputLinkDialog(
     postMsg: PublishedState<TextFieldValue>,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
             modifier = modifier

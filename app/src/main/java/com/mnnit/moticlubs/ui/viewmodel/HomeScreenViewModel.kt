@@ -222,11 +222,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private suspend fun populateClubsChannels(clubs: List<Club>, channels: List<Channel>) {
-        if (clubs.isEmpty() || channels.isEmpty()) {
-            Log.d(TAG, "populateClubsChannels: clubs or channels, either empty")
-            return
-        }
-
         val channelMembers = repository.getChannelsForMember(userId)
         clubsList.apply(clubs.applySorting(channelMembers))
 

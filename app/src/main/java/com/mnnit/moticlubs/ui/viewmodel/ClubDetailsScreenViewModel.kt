@@ -101,9 +101,6 @@ class ClubDetailsScreenViewModel @Inject constructor(
             onSuccess = {
                 clubModel = it.find { club -> club.clubId == clubId } ?: Club()
             },
-            onError = {
-                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_LONG).show()
-            },
         ).launchIn(viewModelScope)
     }
 
