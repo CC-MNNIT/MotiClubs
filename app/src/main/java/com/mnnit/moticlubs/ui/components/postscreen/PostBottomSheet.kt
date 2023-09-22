@@ -56,7 +56,7 @@ import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 import kotlinx.coroutines.launch

@@ -51,7 +51,7 @@ import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ColorPaletteDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.DescriptionComponent
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputOtherLinkDialog
 import com.mnnit.moticlubs.ui.components.clubdetailscreen.InputSocialLinkDialog

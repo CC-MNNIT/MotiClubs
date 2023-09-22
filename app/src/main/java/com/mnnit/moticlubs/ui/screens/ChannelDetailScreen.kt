@@ -61,7 +61,7 @@ import com.mnnit.moticlubs.ui.components.CollapsibleTopAppBar
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.homescreen.UpdateChannelDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars

@@ -41,10 +41,11 @@ import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
-import com.mnnit.moticlubs.ui.components.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.channelscreen.ChannelTopBar
 import com.mnnit.moticlubs.ui.components.channelscreen.PostCreateUpdateBottomSheet
 import com.mnnit.moticlubs.ui.components.channelscreen.PostItem
+import com.mnnit.moticlubs.ui.components.pullrefresh.rememberPullRefreshState
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.getColorScheme

@@ -1,4 +1,4 @@
-package com.mnnit.moticlubs.ui.components
+package com.mnnit.moticlubs.ui.components.pullrefresh
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
