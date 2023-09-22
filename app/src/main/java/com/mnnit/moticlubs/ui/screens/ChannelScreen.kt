@@ -110,7 +110,9 @@ fun ChannelScreen(
                                     keyboardController?.hide()
                                     focusManager.clearFocus()
 
-                                    if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
+                                    if (!viewModel.editMode.value &&
+                                        viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()
+                                    ) {
                                         viewModel.showClearDraftDialog.value = true
                                         return@IconButton
                                     }
