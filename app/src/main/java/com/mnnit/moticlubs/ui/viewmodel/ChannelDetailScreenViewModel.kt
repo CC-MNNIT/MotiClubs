@@ -195,11 +195,6 @@ class ChannelDetailScreenViewModel @Inject constructor(
             }
             .onEach { (members, admins) ->
                 isFetching = false
-                if (members.isEmpty() || admins.isEmpty()) {
-                    Log.d(TAG, "getMembers: members or admins, either empty")
-                    return@onEach
-                }
-
                 admins.forEach { admin -> memberInfo.value[admin.userId] = admin.getUser() }
 
                 isAdmin = admins.any { admin ->
