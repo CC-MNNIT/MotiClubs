@@ -41,7 +41,6 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.domain.util.AuthHandler
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
-import com.mnnit.moticlubs.ui.theme.getColorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.LoginScreenViewModel
 
@@ -56,12 +55,11 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel = hiltViewModel(),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val colorScheme = getColorScheme()
     val systemUiController = rememberSystemUiController()
     val bgColor = colorResource(id = R.color.splashColor)
 
     val context = LocalContext.current
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         LaunchedEffect(systemUiController) {
             systemUiController.setStatusBarColor(
                 color = bgColor,

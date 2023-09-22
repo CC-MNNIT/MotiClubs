@@ -26,7 +26,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_CHANNEL_NAME_SIZE
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.lengthInRange
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
@@ -35,7 +35,6 @@ fun InputChannelDialog(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     Dialog(
         onDismissRequest = { viewModel.showAddChannelDialog = false },
         DialogProperties(usePlatformDefaultWidth = false),

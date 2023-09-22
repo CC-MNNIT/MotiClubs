@@ -34,7 +34,7 @@ import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelDetailScreenViewModel
 
 @Composable
@@ -44,7 +44,6 @@ fun UpdateChannelDialog(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val showConfirmation = remember { publishedStateOf(false) }
 
     if (showConfirmation.value) {

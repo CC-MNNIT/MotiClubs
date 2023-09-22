@@ -36,7 +36,7 @@ import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,7 +49,6 @@ fun InputOtherLinkDialog(
     onClick: (list: List<UrlModel>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     Dialog(

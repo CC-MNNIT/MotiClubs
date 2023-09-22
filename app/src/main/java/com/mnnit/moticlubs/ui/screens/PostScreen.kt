@@ -12,17 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.domain.model.Reply
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
+import com.mnnit.moticlubs.ui.components.DragHandle
 import com.mnnit.moticlubs.ui.components.MarkdownRender
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
@@ -45,10 +46,9 @@ import com.mnnit.moticlubs.ui.components.postscreen.PostBottomSheetContent
 import com.mnnit.moticlubs.ui.components.postscreen.ViewedUsersDialog
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostScreen(
     onNavigateImageClick: (url: String) -> Unit,
@@ -56,8 +56,7 @@ fun PostScreen(
     modifier: Modifier = Modifier,
     viewModel: PostScreenViewModel = hiltViewModel(),
 ) {
-    val colorScheme = getColorScheme()
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
         Surface(
             modifier = modifier
@@ -65,9 +64,26 @@ fun PostScreen(
                 .systemBarsPadding(),
             color = colorScheme.background,
         ) {
-            androidx.compose.material.BottomSheetScaffold(
+            BottomSheetScaffold(
                 modifier = Modifier.imePadding(),
                 sheetContent = { PostBottomSheetContent(viewModel = viewModel) },
+                sheetDragHandle = {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                            .imePadding()
+                            .fillMaxWidth(),
+                    ) {
+                        DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
+
+                        Text(
+                            text = "Replies",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier,
+                        )
+                    }
+                },
                 content = {
                     Surface(modifier = Modifier.fillMaxSize(), color = colorScheme.background) {
                         Column(modifier = Modifier.fillMaxWidth()) {
@@ -166,8 +182,7 @@ fun PostScreen(
                 },
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = 72.dp,
-                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
-                sheetGesturesEnabled = viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed,
+                sheetContainerColor = colorScheme.surfaceColorAtElevation(2.dp),
             )
         }
     }

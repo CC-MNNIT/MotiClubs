@@ -50,7 +50,7 @@ import com.mnnit.moticlubs.ui.components.profilescreen.UpdateProfileIcon
 import com.mnnit.moticlubs.ui.components.profilescreen.UserInfo
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AppViewModel
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 import java.nio.charset.StandardCharsets
@@ -64,7 +64,6 @@ fun ProfileScreen(
     onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val scrollState = rememberScrollState()
     val showDialog = remember { publishedStateOf(false) }
     val loading = remember { publishedStateOf(false) }
@@ -72,8 +71,9 @@ fun ProfileScreen(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
-    MotiClubsTheme(getColorScheme()) {
+    MotiClubsTheme {
         SetTransparentSystemBars()
+
         Surface(modifier = modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier

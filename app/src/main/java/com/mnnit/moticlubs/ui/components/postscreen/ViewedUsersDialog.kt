@@ -30,7 +30,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
 
 @Composable
@@ -38,7 +38,6 @@ fun ViewedUsersDialog(
     viewModel: PostScreenViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val scrollState = rememberLazyListState()
 
     Dialog(
@@ -86,8 +85,6 @@ fun ViewedUsersDialog(
 
 @Composable
 private fun UserItem(user: User) {
-    val colorScheme = getColorScheme()
-
     Card(
         modifier = Modifier
             .safeContentPadding()

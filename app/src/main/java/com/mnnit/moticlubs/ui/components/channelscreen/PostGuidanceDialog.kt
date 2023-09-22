@@ -19,14 +19,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.ui.components.MarkdownText
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun PostGuidanceDialog(
     showDialog: PublishedState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val scrollState = rememberScrollState()
     Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(

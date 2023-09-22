@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.util.PublishedState
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun ConfirmationDialog(
@@ -26,7 +26,6 @@ fun ConfirmationDialog(
     onPositive: () -> Unit = {},
     onNegative: () -> Unit = {},
 ) {
-    val colorScheme = getColorScheme()
     AlertDialog(
         onDismissRequest = {
             showDialog.value = false

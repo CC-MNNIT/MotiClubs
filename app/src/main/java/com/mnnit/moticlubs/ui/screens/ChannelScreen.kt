@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -15,12 +17,12 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -28,10 +30,14 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
@@ -41,17 +47,20 @@ import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.util.PublishedMap
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
-import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.DragHandle
 import com.mnnit.moticlubs.ui.components.channelscreen.ChannelTopBar
 import com.mnnit.moticlubs.ui.components.channelscreen.PostCreateUpdateBottomSheet
 import com.mnnit.moticlubs.ui.components.channelscreen.PostItem
+import com.mnnit.moticlubs.ui.components.isExpanded
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.pullRefresh
 import com.mnnit.moticlubs.ui.components.pullrefresh.rememberPullRefreshState
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ChannelScreenViewModel
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelScreen(
     onNavigateToPost: (postId: Long) -> Unit,
@@ -62,6 +71,10 @@ fun ChannelScreen(
     modifier: Modifier = Modifier,
     viewModel: ChannelScreenViewModel = hiltViewModel(),
 ) {
+    val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     val listScrollState = rememberLazyListState()
     val topBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topBarState)
@@ -70,8 +83,7 @@ fun ChannelScreen(
         onRefresh = viewModel::getPostsList,
     )
 
-    val colorScheme = getColorScheme()
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
@@ -82,8 +94,51 @@ fun ChannelScreen(
                 sheetContent = {
                     PostCreateUpdateBottomSheet(viewModel, onNavigateToImageScreen)
                 },
+                sheetDragHandle = {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                            .imePadding()
+                            .fillMaxWidth(),
+                    ) {
+                        DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
+
+                        Row(modifier = Modifier) {
+                            Text(
+                                text = if (viewModel.editMode.value) "Update Post" else "Write Post",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            IconButton(
+                                onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+
+                                    if (!viewModel.editMode.value && viewModel.eventPostMsg.value.text.isTrimmedNotEmpty()) {
+                                        viewModel.showClearDraftDialog.value = true
+                                        return@IconButton
+                                    }
+
+                                    viewModel.clearEditor()
+                                    viewModel.isPreviewMode.value = false
+                                    scope.launch {
+                                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
+                                            viewModel.bottomSheetScaffoldState.value.bottomSheetState.partialExpand()
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                            ) {
+                                Icon(Icons.Rounded.Close, contentDescription = "", tint = colorScheme.primary)
+                            }
+                        }
+                    }
+                },
                 topBar = {
-                    Surface(color = colorScheme.background, tonalElevation = 2.dp) {
+                    Surface(color = colorScheme.surfaceColorAtElevation(2.dp)) {
                         TopBar(
                             viewModel,
                             modifier = Modifier.padding(),
@@ -142,7 +197,7 @@ fun ChannelScreen(
                 },
                 scaffoldState = viewModel.bottomSheetScaffoldState.value,
                 sheetPeekHeight = if (viewModel.isAdmin) 72.dp else 0.dp,
-                sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
+                sheetContainerColor = colorScheme.surfaceColorAtElevation(2.dp),
             )
         }
     }
@@ -185,7 +240,6 @@ fun TopBar(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Posts(
     viewModel: ChannelScreenViewModel,

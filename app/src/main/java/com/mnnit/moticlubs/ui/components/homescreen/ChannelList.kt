@@ -34,7 +34,7 @@ import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.getUnreadPost
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
 @Composable
@@ -45,7 +45,6 @@ fun ChannelList(
     onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     val context = LocalContext.current
     Card(
         modifier = modifier.fillMaxWidth(),

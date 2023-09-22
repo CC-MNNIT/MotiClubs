@@ -4,25 +4,20 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PullDownProgressIndicator(
     visible: Boolean,
     refreshState: PullRefreshState,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
-
     AnimatedVisibility(
         visible = visible || refreshState.progress > 0.69f,
         modifier = modifier

@@ -11,12 +11,11 @@ import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Badge
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -46,10 +45,10 @@ import com.mnnit.moticlubs.domain.util.getUnreadPost
 import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.components.isPartiallyExpanded
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostItem(
     bottomSheetScaffoldState: PublishedState<BottomSheetScaffoldState>,
@@ -67,7 +66,6 @@ fun PostItem(
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
-    val colorScheme = getColorScheme()
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -125,7 +123,7 @@ fun PostItem(
                             }
                             postMsg.value = TextFieldValue(preprocessText)
                             scope.launch {
-                                if (bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
+                                if (bottomSheetScaffoldState.value.bottomSheetState.isPartiallyExpanded) {
                                     bottomSheetScaffoldState.value.bottomSheetState.expand()
                                 }
                             }
@@ -156,7 +154,7 @@ fun PostItem(
         }
         MarkdownText(
             markdown = post.message.replace("<img src=\"${Patterns.WEB_URL.pattern()}\">".toRegex(), "_image 📸_"),
-            color = contentColorFor(backgroundColor = getColorScheme().background),
+            color = contentColorFor(backgroundColor = colorScheme.background),
             maxLines = 4,
             modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 8.dp),
             disableLinkMovementMethod = true,

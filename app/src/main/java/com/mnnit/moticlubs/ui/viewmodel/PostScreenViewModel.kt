@@ -7,17 +7,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.BottomSheetState
-import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Density
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -96,13 +92,11 @@ class PostScreenViewModel @Inject constructor(
     val showViewedUserDialog = publishedStateOf(false)
     val replyDeleteItem = publishedStateOf(Reply())
 
-    @OptIn(ExperimentalMaterialApi::class)
     val bottomSheetScaffoldState = publishedStateOf(
         BottomSheetScaffoldState(
-            drawerState = DrawerState(initialValue = DrawerValue.Closed),
-            bottomSheetState = BottomSheetState(
-                initialValue = BottomSheetValue.Collapsed,
-                density = Density(application),
+            bottomSheetState = SheetState(
+                initialValue = SheetValue.PartiallyExpanded,
+                skipPartiallyExpanded = false,
             ),
             snackbarHostState = SnackbarHostState(),
         ),

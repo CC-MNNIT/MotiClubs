@@ -1,9 +1,7 @@
 package com.mnnit.moticlubs.ui.components.postscreen
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,25 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material.pullrefresh.PullRefreshState
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -38,12 +29,9 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -57,17 +45,14 @@ import com.mnnit.moticlubs.domain.util.toTimeString
 import com.mnnit.moticlubs.ui.components.MarkdownText
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullRefreshState
+import com.mnnit.moticlubs.ui.components.pullrefresh.pullRefresh
+import com.mnnit.moticlubs.ui.components.pullrefresh.rememberPullRefreshState
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.PostScreenViewModel
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-    val colorScheme = getColorScheme()
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
     val scrollState = rememberLazyListState()
 
     val refreshState = rememberPullRefreshState(
@@ -76,65 +61,16 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
     )
 
     Surface(
-        color = colorScheme.background,
-        tonalElevation = 2.dp,
+        color = colorScheme.surfaceColorAtElevation(2.dp),
         modifier = modifier
             .fillMaxWidth()
             .imePadding(),
     ) {
         Column(
             modifier = Modifier
-                .padding(top = 16.dp)
                 .imePadding()
                 .fillMaxWidth(),
         ) {
-            Box(
-                modifier = Modifier
-                    .width(56.dp)
-                    .height(4.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(contentColorFor(backgroundColor = colorScheme.background)),
-            ) {
-                Text(text = "", modifier = Modifier.padding(12.dp))
-            }
-
-            Row(modifier = Modifier.padding(bottom = 12.dp, start = 16.dp, end = 16.dp)) {
-                Text(
-                    text = "Replies",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                )
-                Spacer(modifier = Modifier.weight(1f))
-
-                IconButton(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically),
-                    onClick = {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.collapse() }
-                        }
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isCollapsed) {
-                            scope.launch { viewModel.bottomSheetScaffoldState.value.bottomSheetState.expand() }
-                        }
-                    },
-                ) {
-                    Icon(
-                        if (viewModel.bottomSheetScaffoldState.value.bottomSheetState.isExpanded) {
-                            Icons.Rounded.KeyboardArrowDown
-                        } else {
-                            Icons.Rounded.KeyboardArrowUp
-                        },
-                        contentDescription = "",
-                        tint = colorScheme.primary,
-                    )
-                }
-            }
-
             Replies(
                 viewModel,
                 refreshState,
@@ -147,7 +83,6 @@ fun PostBottomSheetContent(viewModel: PostScreenViewModel, modifier: Modifier = 
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Replies(
     viewModel: PostScreenViewModel,
@@ -155,8 +90,6 @@ private fun Replies(
     scrollState: LazyListState,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
-
     Column(modifier = modifier.pullRefresh(refreshState)) {
         PullDownProgressIndicator(visible = viewModel.loadingReplies.value, refreshState = refreshState)
 
@@ -288,7 +221,7 @@ private fun Reply(
 
                 MarkdownText(
                     markdown = reply.message,
-                    color = contentColorFor(backgroundColor = getColorScheme().background),
+                    color = contentColorFor(backgroundColor = colorScheme.background),
                     maxLines = 4,
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                     disableLinkMovementMethod = false,

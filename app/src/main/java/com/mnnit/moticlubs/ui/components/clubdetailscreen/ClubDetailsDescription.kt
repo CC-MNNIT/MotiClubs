@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_CLUB_DESCRIPTION_SIZE
 import com.mnnit.moticlubs.domain.util.lengthInRange
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.ClubDetailsScreenViewModel
 import kotlinx.coroutines.launch
 
@@ -49,8 +49,6 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
-
-    val colorScheme = getColorScheme()
 
     Column(
         modifier = modifier

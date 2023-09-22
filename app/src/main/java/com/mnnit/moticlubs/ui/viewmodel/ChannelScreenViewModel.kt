@@ -7,19 +7,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.BottomSheetState
-import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.Density
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.SavedStateHandle
@@ -52,7 +48,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalMaterialApi::class)
 @HiltViewModel
 class ChannelScreenViewModel @Inject constructor(
     private val application: Application,
@@ -122,10 +117,9 @@ class ChannelScreenViewModel @Inject constructor(
 
     val bottomSheetScaffoldState = publishedStateOf(
         BottomSheetScaffoldState(
-            drawerState = DrawerState(initialValue = DrawerValue.Closed),
-            bottomSheetState = BottomSheetState(
-                initialValue = BottomSheetValue.Collapsed,
-                density = Density(application),
+            bottomSheetState = SheetState(
+                initialValue = SheetValue.Hidden,
+                skipPartiallyExpanded = false,
             ),
             snackbarHostState = SnackbarHostState(),
         ),

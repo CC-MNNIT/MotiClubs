@@ -18,16 +18,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.OpenInNew
-import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,159 +45,188 @@ import com.mnnit.moticlubs.BuildConfig
 import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
+import com.mnnit.moticlubs.ui.components.DragHandle
 import com.mnnit.moticlubs.ui.components.aboutus.AboutUsContactForm
 import com.mnnit.moticlubs.ui.components.aboutus.ContributorDialog
 import com.mnnit.moticlubs.ui.components.aboutus.DeveloperProfile
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.AboutUsViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = hiltViewModel()) {
     val cc = "https://github.com/CC-MNNIT.png"
     val shank = "https://github.com/shank03.png"
 
     val scrollState = rememberScrollState()
-    val colorScheme = getColorScheme()
     val scaffoldState = rememberBottomSheetScaffoldState()
 
-    MotiClubsTheme(colorScheme) {
+    MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
 
-        BottomSheetScaffold(
+        Surface(
+            color = colorScheme.background,
             modifier = modifier
+                .fillMaxWidth()
                 .imePadding()
                 .systemBarsPadding(),
-            scaffoldState = scaffoldState,
-            sheetPeekHeight = 72.dp,
-            sheetBackgroundColor = colorScheme.surfaceColorAtElevation(2.dp),
-            sheetContent = {
-                AboutUsContactForm()
-            },
-            content = {
-                if (viewModel.showContributorDialog) {
-                    ContributorDialog(app = viewModel.contributorTagApp, viewModel)
-                }
-
-                Surface(modifier = Modifier.fillMaxSize(), color = colorScheme.background) {
+        ) {
+            BottomSheetScaffold(
+                modifier = Modifier
+                    .imePadding()
+                    .systemBarsPadding(),
+                scaffoldState = scaffoldState,
+                sheetPeekHeight = 72.dp,
+                sheetContainerColor = colorScheme.surfaceColorAtElevation(2.dp),
+                sheetContent = {
+                    AboutUsContactForm(modifier = Modifier)
+                },
+                sheetDragHandle = {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(scrollState)
-                            .wrapContentHeight(Alignment.Top),
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                            .imePadding()
+                            .fillMaxWidth(),
                     ) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterHorizontally)
-                                .padding(bottom = 16.dp),
-                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-                            colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(16.dp)
-                                        .clip(CircleShape)
-                                        .background(color = Color(0xFF323E4E)),
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.app_icon),
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .clip(CircleShape)
-                                            .size(108.dp)
-                                            .padding(16.dp)
-                                            .align(Alignment.CenterVertically),
-                                    )
-                                }
-
-                                Text(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally),
-                                    text = LocalContext.current.getString(R.string.app_name),
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 24.sp,
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally),
-                                    text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 15.sp,
-                                )
-
-                                DeveloperProfile(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .padding(bottom = 8.dp),
-                                    name = "Made with 💻\nBy CC Club - MNNIT",
-                                    userModel = User().copy(avatar = cc),
-                                    showIcons = false,
-                                )
-
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                ) {
-                                    GithubLinkButton(
-                                        viewModel,
-                                        name = "App",
-                                        url = "https://github.com/CC-MNNIT/MotiClubs",
-                                    )
-                                    Spacer(modifier = Modifier.padding(4.dp))
-                                    GithubLinkButton(
-                                        viewModel,
-                                        name = "Backend",
-                                        url = "https://github.com/CC-MNNIT/MotiClubs-Service",
-                                    )
-                                }
-                            }
-                        }
+                        DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
 
                         Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Maintainer(s)",
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center,
+                            text = "Contact Us",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 20.dp),
                         )
+                    }
+                },
+                content = {
+                    if (viewModel.showContributorDialog) {
+                        ContributorDialog(app = viewModel.contributorTagApp, viewModel)
+                    }
 
+                    Surface(
+                        modifier = Modifier
+                            .systemBarsPadding()
+                            .fillMaxSize(),
+                        color = colorScheme.background,
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                .verticalScroll(scrollState)
+                                .wrapContentHeight(Alignment.Top),
                         ) {
-                            DeveloperProfile(
-                                userModel = User().copy(avatar = shank),
-                                linkedin = "https://linkedin.com/in/shank03",
-                                name = "Shashank Verma",
-                                stream = "CSE",
-                                year = "Final year",
-                            )
-                        }
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(bottom = 16.dp),
+                                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+                                colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(16.dp)
+                                            .clip(CircleShape)
+                                            .background(color = Color(0xFF323E4E)),
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.app_icon),
+                                            contentDescription = "",
+                                            modifier = Modifier
+                                                .clip(CircleShape)
+                                                .size(108.dp)
+                                                .padding(16.dp)
+                                                .align(Alignment.CenterVertically),
+                                        )
+                                    }
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 102.dp, start = 16.dp, end = 16.dp),
-                        ) {
-                            GithubLinkButton(viewModel, name = "App\nContributors")
-                            Spacer(modifier = Modifier.padding(8.dp))
-                            GithubLinkButton(viewModel, name = "Backend\nContributors")
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally),
+                                        text = LocalContext.current.getString(R.string.app_name),
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 24.sp,
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally),
+                                        text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 15.sp,
+                                    )
+
+                                    DeveloperProfile(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(bottom = 8.dp),
+                                        name = "Made with 💻\nBy CC Club - MNNIT",
+                                        userModel = User().copy(avatar = cc),
+                                        showIcons = false,
+                                    )
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp),
+                                    ) {
+                                        GithubLinkButton(
+                                            viewModel,
+                                            name = "App",
+                                            url = "https://github.com/CC-MNNIT/MotiClubs",
+                                        )
+                                        Spacer(modifier = Modifier.padding(4.dp))
+                                        GithubLinkButton(
+                                            viewModel,
+                                            name = "Backend",
+                                            url = "https://github.com/CC-MNNIT/MotiClubs-Service",
+                                        )
+                                    }
+                                }
+                            }
+
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "Maintainer(s)",
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                            ) {
+                                DeveloperProfile(
+                                    userModel = User().copy(avatar = shank),
+                                    linkedin = "https://linkedin.com/in/shank03",
+                                    name = "Shashank Verma",
+                                    stream = "CSE",
+                                    year = "Final year",
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 102.dp, start = 16.dp, end = 16.dp),
+                            ) {
+                                GithubLinkButton(viewModel, name = "App\nContributors")
+                                Spacer(modifier = Modifier.padding(8.dp))
+                                GithubLinkButton(viewModel, name = "Backend\nContributors")
+                            }
                         }
                     }
-                }
-            },
-        )
+                },
+            )
+        }
     }
 }
 
@@ -209,7 +237,6 @@ private fun RowScope.GithubLinkButton(
     url: String = "",
 ) {
     val uriHandler = LocalUriHandler.current
-    val colorScheme = getColorScheme()
 
     Card(
         modifier = Modifier

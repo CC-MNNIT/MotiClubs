@@ -26,7 +26,7 @@ import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.SocialLinkComposeModel
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun InputSocialLinkDialog(
@@ -36,7 +36,6 @@ fun InputSocialLinkDialog(
     onClick: (list: List<UrlModel>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = getColorScheme()
     Dialog(onDismissRequest = { showDialog.value = false }, DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
             modifier = modifier

@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
@@ -32,15 +29,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
-import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
 import com.mnnit.moticlubs.ui.components.homescreen.ClubList
 import com.mnnit.moticlubs.ui.components.homescreen.InputChannelDialog
+import com.mnnit.moticlubs.ui.components.pullrefresh.PullDownProgressIndicator
+import com.mnnit.moticlubs.ui.components.pullrefresh.pullRefresh
+import com.mnnit.moticlubs.ui.components.pullrefresh.rememberPullRefreshState
 import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
@@ -50,19 +48,14 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
-    val colorScheme = getColorScheme()
     val refreshState = rememberPullRefreshState(
         refreshing = viewModel.isFetchingAdmins || viewModel.isFetchingHome,
         onRefresh = viewModel::refreshAll,
     )
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    MotiClubsTheme(colorScheme) {
-        if (scrollBehavior.state.collapsedFraction > 0.6f) {
-            SetTransparentSystemBars(setStatusBar = false)
-        } else {
-            SetTransparentSystemBars()
-        }
+    MotiClubsTheme {
+        SetTransparentSystemBars(setStatusBar = scrollBehavior.state.collapsedFraction <= 0.6f)
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 

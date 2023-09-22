@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.isTrimmedNotEmpty
-import com.mnnit.moticlubs.ui.theme.getColorScheme
+import com.mnnit.moticlubs.ui.theme.colorScheme
 
 @Composable
 fun SearchField(
@@ -60,7 +60,6 @@ fun SearchField(
     },
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val colorScheme = getColorScheme()
     val colors = OutlinedTextFieldDefaults.colors(
         unfocusedTextColor = colorScheme.onSurface,
         unfocusedLabelColor = colorScheme.onSurfaceVariant,
