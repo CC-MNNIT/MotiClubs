@@ -24,9 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mnnit.moticlubs.R
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.homescreen.ClubList
@@ -66,7 +68,7 @@ fun HomeScreen(
             topBar = {
                 LargeTopAppBar(
                     modifier = Modifier.statusBarsPadding(),
-                    title = { Text(text = "MNNIT Clubs", fontSize = 28.sp) },
+                    title = { Text(text = stringResource(id = R.string.app_name), fontSize = 28.sp) },
                     actions = {
                         ProfilePicture(
                             modifier = Modifier.padding(end = 16.dp),
