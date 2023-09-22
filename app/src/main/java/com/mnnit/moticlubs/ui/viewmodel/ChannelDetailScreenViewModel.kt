@@ -150,6 +150,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
             return
         }
 
+        showMemberProgressDialog.value = true
         removeMemberJob?.cancel()
         removeMemberJob = memberUseCases.removeMember(
             channelModel.clubId,

@@ -219,6 +219,7 @@ class ChannelScreenViewModel @Inject constructor(
 
     fun sendPost() {
         isPreviewMode.value = false
+        showProgress.value = true
 
         var text = eventPostMsg.value.text
         eventImageReplacerMap.value.forEach { (key, value) ->
@@ -247,6 +248,7 @@ class ChannelScreenViewModel @Inject constructor(
 
     fun updatePost() {
         isPreviewMode.value = false
+        showProgress.value = true
 
         var text = eventPostMsg.value.text
         eventImageReplacerMap.value.forEach { (key, value) ->

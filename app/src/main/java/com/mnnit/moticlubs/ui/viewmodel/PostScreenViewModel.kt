@@ -184,6 +184,8 @@ class PostScreenViewModel @Inject constructor(
     }
 
     fun deleteReply() {
+        showDeleteDialog.value = true
+
         deleteReplyJob?.cancel()
         deleteReplyJob = replyUseCases.deleteReply(replyDeleteItem.value).onResource(
             onSuccess = {
