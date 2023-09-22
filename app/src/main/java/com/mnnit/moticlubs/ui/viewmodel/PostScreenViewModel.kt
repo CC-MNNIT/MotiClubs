@@ -146,11 +146,7 @@ class PostScreenViewModel @Inject constructor(
             },
             onError = {
                 loadingReplies.value = false
-                Toast.makeText(
-                    application,
-                    "Error ${it.errCode}: ${it.errMsg}",
-                    Toast.LENGTH_SHORT,
-                ).show()
+                Log.d(TAG, "getReplies: Error ${it.errCode}: ${it.errMsg}")
             },
         ).launchIn(viewModelScope)
     }

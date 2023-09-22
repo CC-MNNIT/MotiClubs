@@ -203,7 +203,7 @@ class ChannelScreenViewModel @Inject constructor(
             },
             onError = {
                 loadingPosts.value = false
-                Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "getPostsList: ${it.errCode}: ${it.errMsg}")
             },
         ).launchIn(viewModelScope)
     }

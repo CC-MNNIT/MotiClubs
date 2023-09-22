@@ -190,11 +190,7 @@ class ChannelDetailScreenViewModel @Inject constructor(
         getMemberJob = memberUseCases.getMembers(channelId)
             .zip(userUseCases.getAllAdmins()) { resourceMember, resourceAdmins ->
                 transformResources(resourceMember, emptyList(), resourceAdmins, emptyList()) {
-                    Toast.makeText(
-                        application,
-                        it,
-                        Toast.LENGTH_LONG,
-                    ).show()
+                    Log.d(TAG, "getMembers: $it")
                 }
             }
             .onEach { (members, admins) ->
