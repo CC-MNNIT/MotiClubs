@@ -63,7 +63,9 @@ inline fun <reified ReqT, ResT> Repository.networkResource(
             )
         }
         if (apiResponse is Resource.Success) {
-            insertOrUpdateStamp(Stamp(stampKey.getKey(), apiResponse.data.second))
+            if (!remoteRequired) {
+                insertOrUpdateStamp(Stamp(stampKey.getKey(), apiResponse.data.second))
+            }
 
             val result = apiResponse.data.first
             if (result != null) {
