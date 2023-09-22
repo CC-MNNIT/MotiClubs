@@ -83,14 +83,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = h
                     AboutUsContactForm(modifier = Modifier)
                 },
                 sheetDragHandle = {
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                            .imePadding()
-                            .fillMaxWidth(),
-                    ) {
-                        DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
-
+                    DragHandle {
                         Text(
                             text = "Contact Us",
                             fontSize = 18.sp,

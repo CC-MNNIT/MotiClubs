@@ -68,14 +68,7 @@ fun PostScreen(
                 modifier = Modifier.imePadding(),
                 sheetContent = { PostBottomSheetContent(viewModel = viewModel) },
                 sheetDragHandle = {
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                            .imePadding()
-                            .fillMaxWidth(),
-                    ) {
-                        DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
-
+                    DragHandle {
                         Text(
                             text = "Replies",
                             fontSize = 20.sp,
