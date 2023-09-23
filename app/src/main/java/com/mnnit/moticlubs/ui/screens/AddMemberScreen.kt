@@ -86,7 +86,7 @@ fun AddMemberScreen(
             }
         }
 
-        SetTransparentSystemBars(setStatusBar = false)
+        SetTransparentSystemBars(setStatusBar = 1f)
 
         Surface(
             color = colorScheme.background,

@@ -84,7 +84,7 @@ fun ChannelScreen(
     )
 
     MotiClubsTheme {
-        SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
+        SetTransparentSystemBars(setStatusBar = 1f, setNavBar = false)
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 

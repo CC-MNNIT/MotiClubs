@@ -82,11 +82,7 @@ fun ChannelDetailScreen(
         onRefresh = viewModel::refreshAll,
     )
     MotiClubsTheme {
-        if (scrollBehavior.state.collapsedFraction > 0.6f) {
-            SetTransparentSystemBars(setStatusBar = false)
-        } else {
-            SetTransparentSystemBars()
-        }
+        SetTransparentSystemBars(setStatusBar = scrollBehavior.state.collapsedFraction)
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 

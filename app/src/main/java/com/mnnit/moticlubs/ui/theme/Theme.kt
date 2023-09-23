@@ -1,6 +1,7 @@
 package com.mnnit.moticlubs.ui.theme
 
 import android.os.Build
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -11,8 +12,8 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -94,22 +95,28 @@ val colorScheme: ColorScheme
     }
 
 @Composable
-fun SetTransparentSystemBars(setStatusBar: Boolean = true, setNavBar: Boolean = true) {
-    val surface = colorScheme.surfaceColorAtElevation(2.dp)
+fun SetTransparentSystemBars(setStatusBar: Float = 0f, setNavBar: Boolean = true) {
     val darkTheme = isSystemInDarkTheme()
     val systemUiController = rememberSystemUiController()
-    LaunchedEffect(systemUiController, darkTheme, setStatusBar, setNavBar) {
-        systemUiController.setStatusBarColor(
-            color = if (setStatusBar) Color.Transparent else surface,
-            darkIcons = !darkTheme,
-        )
 
-        systemUiController.setNavigationBarColor(
-            color = if (setNavBar) Color.Transparent else surface,
-            darkIcons = !darkTheme,
-            navigationBarContrastEnforced = false,
-        )
-    }
+    systemUiController.setStatusBarColor(
+        color = if (setStatusBar == 0f) {
+            Color.Transparent
+        } else {
+            lerp(
+                colorScheme.surface,
+                colorScheme.surfaceColorAtElevation(2.dp),
+                FastOutLinearInEasing.transform(setStatusBar),
+            )
+        },
+        darkIcons = !darkTheme,
+    )
+
+    systemUiController.setNavigationBarColor(
+        color = if (setNavBar) Color.Transparent else colorScheme.surfaceColorAtElevation(2.dp),
+        darkIcons = !darkTheme,
+        navigationBarContrastEnforced = false,
+    )
 }
 
 @Composable

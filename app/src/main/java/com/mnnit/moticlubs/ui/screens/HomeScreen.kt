@@ -57,7 +57,7 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     MotiClubsTheme {
-        SetTransparentSystemBars(setStatusBar = scrollBehavior.state.collapsedFraction <= 0.6f)
+        SetTransparentSystemBars(setStatusBar = scrollBehavior.state.collapsedFraction)
 
         LocalLifecycleOwner.current.lifecycle.addObserver(viewModel)
 

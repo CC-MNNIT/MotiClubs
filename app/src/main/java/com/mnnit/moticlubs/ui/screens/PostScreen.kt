@@ -57,7 +57,7 @@ fun PostScreen(
     viewModel: PostScreenViewModel = hiltViewModel(),
 ) {
     MotiClubsTheme {
-        SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
+        SetTransparentSystemBars(setStatusBar = 1f, setNavBar = false)
         Surface(
             modifier = modifier
                 .fillMaxWidth()

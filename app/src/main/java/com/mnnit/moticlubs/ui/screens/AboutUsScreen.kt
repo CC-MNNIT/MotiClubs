@@ -63,7 +63,7 @@ fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = h
     val scaffoldState = rememberBottomSheetScaffoldState()
 
     MotiClubsTheme {
-        SetTransparentSystemBars(setStatusBar = false, setNavBar = false)
+        SetTransparentSystemBars(setStatusBar = 1f, setNavBar = false)
 
         Surface(
             color = colorScheme.background,

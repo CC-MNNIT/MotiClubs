@@ -72,7 +72,7 @@ fun ClubDetailsScreen(
         onRefresh = viewModel::refresh,
     )
     MotiClubsTheme {
-        SetTransparentSystemBars(setStatusBar = false)
+        SetTransparentSystemBars(setStatusBar = 1f)
 
         Surface(
             modifier = modifier
