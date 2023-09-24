@@ -39,9 +39,9 @@ object Constants {
     const val CLUB_ROUTE = "$URL_PREFIX/clubs"
     const val POST_ROUTE = "$URL_PREFIX/posts"
     const val REPLY_ROUTE = "$URL_PREFIX/reply"
-    const val URL_ROUTE = "$URL_PREFIX/url"
+    const val URL_ROUTE = "$CLUB_ROUTE/url"
     const val USER_ROUTE = "$URL_PREFIX/user"
-    const val VIEW_ROUTE = "$URL_PREFIX/views"
+    const val VIEW_ROUTE = "$POST_ROUTE/views"
 
     const val USER_ID_CLAIM = "userId"
     const val CLUB_ID_CLAIM = "clubId"
