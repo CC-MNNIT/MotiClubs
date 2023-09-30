@@ -16,6 +16,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface UserApi {
@@ -46,21 +47,21 @@ interface UserApi {
         @Path(USER_ID_CLAIM) userId: Long,
     ): Response<UserDto?>
 
-    @POST("$USER_ROUTE/avatar")
+    @PUT("$USER_ROUTE/avatar")
     suspend fun setProfilePicUrl(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Header(STAMP_HEADER) stamp: Long,
         @Body avatar: UpdateUserAvatarDto,
     ): Response<UserDto?>
 
-    @POST("$USER_ROUTE/contact")
+    @PUT("$USER_ROUTE/contact")
     suspend fun setContact(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Header(STAMP_HEADER) stamp: Long,
         @Body contact: UpdateUserContactDto,
     ): Response<UserDto?>
 
-    @POST("$USER_ROUTE/fcm")
+    @PUT("$USER_ROUTE/fcm")
     suspend fun setFCMToken(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Body fcm: FCMTokenDto,
