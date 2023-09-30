@@ -5,7 +5,7 @@ object CourseExtractor {
     data class Course(val stream: String, val branch: String)
 
     // Regex for extracting course identifier from regNo
-    private val COURSE_CODE_REGEX = "(?<=[0-9]{4})([0-9](?=[0-9]{3})|[a-zA-Z]+(?=[0-9]{2}))".toRegex()
+    private val COURSE_CODE_REGEX = "(?<=[0-9]{4})([0-9](?=[0-9]{3})|[a-zA-Z]{2,4}(?=[0-9]{2}))".toRegex()
     private const val UNIDENTIFIED = "N/A"
 
     private val COURSE_MAP = HashMap<String, String>().apply {
@@ -20,10 +20,10 @@ object CourseExtractor {
         this["8"] = "Information Technology"
         this["9"] = "Chemical Engineering"
 
-        // MBA
+        // MCA
         this["CA"] = "Master of Computer Application"
 
-        // MCA
+        // MBA
         this["MB"] = "Master of Business Administration"
 
         // M.Sc.
