@@ -126,7 +126,7 @@ data class AdminDetailDto(
 
     @SerializedName("cid")
     @Expose
-    var clubId: Long,
+    var clubId: List<Long>,
 
     @SerializedName("contact")
     @Expose
