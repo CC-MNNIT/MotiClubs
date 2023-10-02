@@ -22,8 +22,11 @@ class GetAllAdmins(private val repository: Repository) {
 
             old.forEach { admin -> repository.deleteAdmin(admin.userId) }
 
-            new.map { admin -> Admin(admin.uid, admin.clubId) }
-                .forEach { admin -> repository.insertOrUpdateAdmin(admin) }
+            new.forEach { admin ->
+                admin.clubId
+                    .map { clubId -> Admin(admin.uid, clubId) }
+                    .forEach { repository.insertOrUpdateAdmin(it) }
+            }
         },
     )
 }
