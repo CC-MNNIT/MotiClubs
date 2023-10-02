@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.ui.screens
 
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mnnit.moticlubs.domain.util.Constants
+import com.mnnit.moticlubs.domain.util.Constants.PHONE_REGEX
+import com.mnnit.moticlubs.domain.util.Constants.URL_REGEX
 import com.mnnit.moticlubs.domain.util.lengthInRange
 import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ConfirmationDialog
@@ -130,7 +133,14 @@ fun ProfileScreen(
                                 }
                             },
                             colors = IconButtonDefaults.filledIconButtonColors(colorScheme.primary),
-                            enabled = Constants.INPUT_USER_CONTACT_SIZE.lengthInRange(viewModel.eventContact.value),
+                            enabled = viewModel.eventContact.value.trim().isEmpty() || (
+                                Constants.INPUT_USER_CONTACT_SIZE.lengthInRange(viewModel.eventContact.value) &&
+                                    (
+                                        viewModel.eventContact.value matches PHONE_REGEX ||
+                                            viewModel.eventContact.value matches Patterns.EMAIL_ADDRESS.toRegex() ||
+                                            viewModel.eventContact.value matches URL_REGEX
+                                        )
+                                ),
                         ) {
                             Icon(
                                 imageVector = if (viewModel.editingEnabled.value) {

@@ -61,7 +61,7 @@ object AuthHandler {
                 }
 
                 val email = signInCredential.id
-                val regNo = Constants.REG_NO_REGEX.find(email)?.value ?: "none"
+                val regNo = Constants.REG_NO_EXTRACT_REGEX.find(email)?.value ?: "none"
                 val displayName = signInCredential.displayName
 
                 displayName ?: throw Exception("Unable to find display name for $email")
