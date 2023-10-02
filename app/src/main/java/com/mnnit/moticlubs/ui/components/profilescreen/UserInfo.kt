@@ -154,6 +154,9 @@ fun UserInfo(
                 disabledLabelColor = contentColorFor(backgroundColor = colorScheme.background),
                 disabledTrailingIconColor = contentColorFor(backgroundColor = colorScheme.background),
             ),
+            supportingText = {
+                Text(text = "URL, email or phone number")
+            },
         )
     }
 }

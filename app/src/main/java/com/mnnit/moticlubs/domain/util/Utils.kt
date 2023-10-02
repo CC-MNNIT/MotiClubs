@@ -20,7 +20,11 @@ import kotlin.math.min
 
 object Constants {
     val EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@mnnit.ac.in$".toRegex()
-    val REG_NO_REGEX = "(?<=\\.)(.*?)(?=@)".toRegex()
+    val REG_NO_EXTRACT_REGEX = "(?<=\\.)(.*?)(?=@)".toRegex()
+    val PHONE_REGEX = "^[0-9]{10}$".toRegex()
+    val URL_REGEX =
+        "^https?://(?:www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b[-a-zA-Z0-9()@:%_+.~#?&/=]*$"
+            .toRegex()
 
     const val USER_ID = "userID"
     const val SHARED_PREFERENCE = "com.mnnit.moticlubs"
