@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ClubModel(
+data class ClubDto(
     @SerializedName("cid")
     @Expose
     var clubId: Long,
@@ -32,10 +32,6 @@ data class UpdateClubDto(
     @SerializedName("description")
     @Expose
     var description: String,
-
-    @SerializedName("avatar")
-    @Expose
-    var avatar: String,
 
     @SerializedName("summary")
     @Expose

@@ -4,7 +4,6 @@ import com.mnnit.moticlubs.data.network.dto.AdminDetailDto
 import com.mnnit.moticlubs.data.network.dto.FCMDto
 import com.mnnit.moticlubs.data.network.dto.FCMTokenDto
 import com.mnnit.moticlubs.data.network.dto.SaveUserDto
-import com.mnnit.moticlubs.data.network.dto.UpdateUserAvatarDto
 import com.mnnit.moticlubs.data.network.dto.UpdateUserContactDto
 import com.mnnit.moticlubs.data.network.dto.UserDto
 import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
@@ -45,13 +44,6 @@ interface UserApi {
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Header(STAMP_HEADER) stamp: Long,
         @Path(USER_ID_CLAIM) userId: Long,
-    ): Response<UserDto?>
-
-    @PUT("$USER_ROUTE/avatar")
-    suspend fun setProfilePicUrl(
-        @Header(AUTHORIZATION_HEADER) auth: String?,
-        @Header(STAMP_HEADER) stamp: Long,
-        @Body avatar: UpdateUserAvatarDto,
     ): Response<UserDto?>
 
     @PUT("$USER_ROUTE/contact")

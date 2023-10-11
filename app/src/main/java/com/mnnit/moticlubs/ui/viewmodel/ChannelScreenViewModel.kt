@@ -22,6 +22,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.mnnit.moticlubs.data.network.ApiService
 import com.mnnit.moticlubs.domain.model.AdminUser
 import com.mnnit.moticlubs.domain.model.Channel
 import com.mnnit.moticlubs.domain.model.Club
@@ -33,6 +34,9 @@ import com.mnnit.moticlubs.domain.util.Constants
 import com.mnnit.moticlubs.domain.util.Constants.INPUT_POST_MESSAGE_SIZE
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CHANNEL_ARG
 import com.mnnit.moticlubs.domain.util.NavigationArgs.CLUB_ARG
+import com.mnnit.moticlubs.domain.util.Resource
+import com.mnnit.moticlubs.domain.util.apiInvoker
+import com.mnnit.moticlubs.domain.util.getAuthToken
 import com.mnnit.moticlubs.domain.util.getLongArg
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
@@ -46,11 +50,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class ChannelScreenViewModel @Inject constructor(
     private val application: Application,
+    private val apiService: ApiService,
     private val memberUseCases: MemberUseCases,
     private val postUseCases: PostUseCases,
     private val repository: Repository,
@@ -289,6 +297,29 @@ class ChannelScreenViewModel @Inject constructor(
                 Toast.makeText(application, "${it.errCode}: ${it.errMsg}", Toast.LENGTH_SHORT).show()
             },
         ).launchIn(viewModelScope)
+    }
+
+    fun uploadPostImage(file: File, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            val resource = apiInvoker {
+                apiService.uploadPostImage(
+                    application.getAuthToken(),
+                    clubId,
+                    MultipartBody.Part.createFormData("file", file.name, file.asRequestBody()),
+                )
+            }
+            if (resource is Resource.Success) {
+                val dto = resource.data.first
+                if (dto != null) {
+                    Log.d(TAG, "uploadPostImage: url: ${dto.url}")
+                    onSuccess(dto.url)
+                } else {
+                    onFailure("Null response")
+                }
+            } else {
+                onFailure(resource.errorMsg)
+            }
+        }
     }
 
     private fun registerPostReceiver() {

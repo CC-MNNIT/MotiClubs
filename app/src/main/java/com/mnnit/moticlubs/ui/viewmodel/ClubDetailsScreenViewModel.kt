@@ -31,6 +31,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -130,7 +131,7 @@ class ClubDetailsScreenViewModel @Inject constructor(
         ).launchIn(viewModelScope)
     }
 
-    fun updateClub(
+    fun updateClubAvatar(
         url: String = clubModel.avatar,
         description: String = clubModel.description,
         onResponse: () -> Unit,
@@ -138,6 +139,27 @@ class ClubDetailsScreenViewModel @Inject constructor(
     ) {
         updateClubJob?.cancel()
         updateClubJob = clubUseCases.updateClub(clubModel.copy(avatar = url, description = description))
+            .onResource(
+                onSuccess = {
+                    isFetching = false
+                    clubModel = it
+                    displayedDescription = clubModel.description
+                    onResponse()
+                },
+                onError = {
+                    isFetching = false
+                    onFailure(it.errCode)
+                },
+            )
+            .launchIn(viewModelScope)
+    }
+    fun updateClubAvatar(
+        file: File,
+        onResponse: () -> Unit,
+        onFailure: (code: Int) -> Unit,
+    ) {
+        updateClubJob?.cancel()
+        updateClubJob = clubUseCases.updateClub(clubId, file)
             .onResource(
                 onSuccess = {
                     isFetching = false

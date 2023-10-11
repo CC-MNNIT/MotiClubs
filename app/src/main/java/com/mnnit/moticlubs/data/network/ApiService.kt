@@ -1,5 +1,6 @@
 package com.mnnit.moticlubs.data.network
 
+import com.mnnit.moticlubs.data.network.api.AvatarApi
 import com.mnnit.moticlubs.data.network.api.ChannelsApi
 import com.mnnit.moticlubs.data.network.api.ClubApi
 import com.mnnit.moticlubs.data.network.api.GithubApi
@@ -10,6 +11,7 @@ import com.mnnit.moticlubs.data.network.api.UserApi
 import com.mnnit.moticlubs.data.network.api.ViewsApi
 
 interface ApiService :
+    AvatarApi,
     UserApi,
     ClubApi,
     PostsApi,

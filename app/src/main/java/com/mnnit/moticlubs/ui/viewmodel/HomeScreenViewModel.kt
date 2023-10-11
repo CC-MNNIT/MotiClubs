@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -93,9 +94,9 @@ class HomeScreenViewModel @Inject constructor(
     private var addChannelJob: Job? = null
     private var updateUserJob: Job? = null
 
-    fun updateProfilePic(url: String, onResponse: () -> Unit, onFailure: () -> Unit) {
+    fun updateProfilePic(file: File, onResponse: () -> Unit, onFailure: () -> Unit) {
         updateUserJob?.cancel()
-        updateUserJob = userUseCases.updateUser(userModel.copy(avatar = url)).onResource(
+        updateUserJob = userUseCases.updateUser(userId, file).onResource(
             onSuccess = {
                 userModel = it
                 onResponse()

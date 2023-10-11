@@ -73,7 +73,7 @@ fun DescriptionComponent(viewModel: ClubDetailsScreenViewModel, modifier: Modifi
 
                             viewModel.progressMsg = "Updating"
                             viewModel.showProgressDialog.value = true
-                            viewModel.updateClub(
+                            viewModel.updateClubAvatar(
                                 description = viewModel.displayedDescription,
                                 onResponse = {
                                     viewModel.showProgressDialog.value = false
