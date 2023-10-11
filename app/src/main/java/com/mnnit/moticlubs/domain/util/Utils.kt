@@ -39,6 +39,7 @@ object Constants {
 
     const val BASE_URL = "https://sac.mnnit.ac.in/moticlubs/"
     private const val URL_PREFIX = "api/v1"
+    const val AVATAR_ROUTE = "$URL_PREFIX/avatar"
     const val CHANNEL_ROUTE = "$URL_PREFIX/channel"
     const val CLUB_ROUTE = "$URL_PREFIX/clubs"
     const val POST_ROUTE = "$URL_PREFIX/posts"

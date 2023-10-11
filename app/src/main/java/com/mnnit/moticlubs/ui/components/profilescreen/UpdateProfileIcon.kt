@@ -16,9 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.util.ImageUploadManager
 import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
@@ -35,16 +32,13 @@ fun UpdateProfileIcon(
         if (result.isSuccessful) {
             loading.value = true
 
-            ImageUploadManager.uploadImageToFirebase(
+            ImageUploadManager.prepareImage(
                 context = context,
                 imageUri = result.uriContent!!,
                 loading = loading,
-                storageRef = Firebase.storage.reference
-                    .child("profile_images")
-                    .child(FirebaseAuth.getInstance().currentUser!!.uid),
-                onSuccess = { downloadUrl ->
+                onSuccess = { file ->
                     appViewModel.updateProfilePic(
-                        downloadUrl,
+                        file,
                         { loading.value = false },
                     ) {
                         loading.value = false

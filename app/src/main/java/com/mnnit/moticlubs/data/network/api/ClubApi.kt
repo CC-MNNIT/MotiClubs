@@ -1,6 +1,6 @@
 package com.mnnit.moticlubs.data.network.api
 
-import com.mnnit.moticlubs.data.network.dto.ClubModel
+import com.mnnit.moticlubs.data.network.dto.ClubDto
 import com.mnnit.moticlubs.data.network.dto.UpdateClubDto
 import com.mnnit.moticlubs.domain.util.Constants.AUTHORIZATION_HEADER
 import com.mnnit.moticlubs.domain.util.Constants.CLUB_ID_CLAIM
@@ -19,7 +19,7 @@ interface ClubApi {
     suspend fun getClubs(
         @Header(AUTHORIZATION_HEADER) auth: String?,
         @Header(STAMP_HEADER) stamp: Long,
-    ): Response<List<ClubModel>?>
+    ): Response<List<ClubDto>?>
 
     @PUT("$CLUB_ROUTE/{$CLUB_ID_CLAIM}")
     suspend fun updateClub(
@@ -27,5 +27,5 @@ interface ClubApi {
         @Header(STAMP_HEADER) stamp: Long,
         @Path(CLUB_ID_CLAIM) clubId: Long,
         @Body data: UpdateClubDto,
-    ): Response<ClubModel?>
+    ): Response<ClubDto?>
 }

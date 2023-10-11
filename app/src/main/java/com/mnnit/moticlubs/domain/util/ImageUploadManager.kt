@@ -6,22 +6,16 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
-import com.google.firebase.storage.StorageReference
-import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 object ImageUploadManager {
 
-    /**
-     * Uploads the given [imageUri] to Firebase [storageRef]
-     *
-     * @param onSuccess allows caller to handle the downloadUrl upon upload
-     */
-    fun uploadImageToFirebase(
+    fun prepareImage(
         context: Context,
         imageUri: Uri,
         loading: PublishedState<Boolean>,
-        storageRef: StorageReference,
-        onSuccess: (downloadUrl: String) -> Unit,
+        onSuccess: (file: File) -> Unit,
     ) {
         if (!context.connectionAvailable()) {
             Toast.makeText(context, "You're Offline", Toast.LENGTH_SHORT).show()
@@ -32,26 +26,25 @@ object ImageUploadManager {
         val bitmap = compressBitmap(imageUri, context)
         bitmap ?: return
 
-        val boas = ByteArrayOutputStream()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 100, boas)
-        } else {
-            bitmap.compress(Bitmap.CompressFormat.WEBP, 100, boas)
-        }
-        storageRef.putBytes(boas.toByteArray()).continueWithTask { task ->
-            if (!task.isSuccessful) {
-                Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                loading.value = false
+        try {
+            val file = File(context.cacheDir, "tmp.webp")
+            if (!file.exists() && !file.createNewFile()) {
+                throw Exception("Unable to create temp webp file")
             }
-            storageRef.downloadUrl
-        }.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val downloadUrl = task.result.toString()
-                onSuccess(downloadUrl)
+
+            val fos = FileOutputStream(file)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 100, fos)
             } else {
-                Toast.makeText(context, "Error ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                loading.value = false
+                bitmap.compress(Bitmap.CompressFormat.WEBP, 100, fos)
             }
+            bitmap.recycle()
+            fos.close()
+
+            onSuccess(file)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error ${e.message}", Toast.LENGTH_SHORT).show()
+            loading.value = false
         }
     }
 

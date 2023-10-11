@@ -38,8 +38,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.ImageUploadManager
 import com.mnnit.moticlubs.domain.util.Links
@@ -220,19 +218,15 @@ private fun ClubProfilePic(
             viewModel.progressMsg = "Uploading ..."
             viewModel.showProgressDialog.value = true
 
-            ImageUploadManager.uploadImageToFirebase(
+            ImageUploadManager.prepareImage(
                 context = context,
                 imageUri = result.uriContent!!,
                 viewModel.showProgressDialog,
-                storageRef = Firebase.storage.reference
-                    .child("profile_images")
-                    .child(viewModel.clubModel.clubId.toString()),
-                onSuccess = { downloadUrl ->
-                    viewModel.updateClub(
-                        url = downloadUrl,
+                onSuccess = { file ->
+                    viewModel.updateClubAvatar(
+                        file = file,
                         onResponse = {
                             viewModel.showProgressDialog.value = false
-                            viewModel.clubModel = viewModel.clubModel.copy(avatar = downloadUrl)
                         },
                         onFailure = {
                             viewModel.showProgressDialog.value = false

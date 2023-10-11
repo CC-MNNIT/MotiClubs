@@ -69,7 +69,7 @@ private fun Context.getUrlPainter(url: String, profile: Boolean): Painter {
                 it.load(url).placeholder(resID).error(resID)
             },
             key = url,
-            onError = { Log.d("TAG", "getProfileUrlPainter: network error") },
+            onError = { Log.d("TAG", "getProfileUrlPainter: network error: ${it.localizedMessage}") },
         )
     } else {
         picasso.value.rememberPainter(
@@ -79,7 +79,7 @@ private fun Context.getUrlPainter(url: String, profile: Boolean): Painter {
             },
             key = url,
             onError = {
-                Log.d("TAG", "getProfileUrlPainter: Error, fallback to network")
+                Log.d("TAG", "getProfileUrlPainter: Error, fallback to network: ${it.localizedMessage}")
                 error.value = true
             },
         )

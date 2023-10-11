@@ -2,7 +2,7 @@ package com.mnnit.moticlubs.domain.util
 
 import com.mnnit.moticlubs.data.network.dto.AdminDetailDto
 import com.mnnit.moticlubs.data.network.dto.ChannelDto
-import com.mnnit.moticlubs.data.network.dto.ClubModel
+import com.mnnit.moticlubs.data.network.dto.ClubDto
 import com.mnnit.moticlubs.data.network.dto.PostDto
 import com.mnnit.moticlubs.data.network.dto.ReplyDto
 import com.mnnit.moticlubs.data.network.dto.UrlResponseModel
@@ -40,7 +40,7 @@ fun AdminDetailDto.mapToDomain(): User =
         contact = this.contact,
     )
 
-fun ClubModel.mapToDomain(): Club =
+fun ClubDto.mapToDomain(): Club =
     Club(
         clubId = this.clubId,
         name = this.name,
