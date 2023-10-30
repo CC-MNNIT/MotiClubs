@@ -40,6 +40,7 @@ fun ColumnScope.DeveloperProfile(
     stream: String = "",
     year: String = "",
     showIcons: Boolean = true,
+    icons: (@Composable () -> Unit)? = null,
 ) {
     val focusManager = LocalFocusManager.current
     val uriHandler = LocalUriHandler.current
@@ -105,44 +106,48 @@ fun ColumnScope.DeveloperProfile(
                     .fillMaxHeight(),
             ) {
                 if (showIcons) {
-                    if (userModel.avatar.isTrimmedNotEmpty()) {
-                        IconButton(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .align(Alignment.CenterHorizontally),
-                            onClick = {
-                                focusManager.clearFocus(true)
-                                uriHandler.openUri(userModel.avatar.replace(".png", ""))
-                            },
-                        ) {
-                            Icon(
+                    if (icons != null) {
+                        icons()
+                    } else {
+                        if (userModel.avatar.isTrimmedNotEmpty()) {
+                            IconButton(
                                 modifier = Modifier
-                                    .size(20.dp)
+                                    .size(28.dp)
                                     .align(Alignment.CenterHorizontally),
-                                painter = painterResource(id = R.drawable.github),
-                                contentDescription = "",
-                            )
+                                onClick = {
+                                    focusManager.clearFocus(true)
+                                    uriHandler.openUri(userModel.avatar.replace(".png", ""))
+                                },
+                            ) {
+                                Icon(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .align(Alignment.CenterHorizontally),
+                                    painter = painterResource(id = R.drawable.github),
+                                    contentDescription = "",
+                                )
+                            }
                         }
-                    }
 
-                    if (linkedin.isTrimmedNotEmpty()) {
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        IconButton(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .align(Alignment.CenterHorizontally),
-                            onClick = {
-                                focusManager.clearFocus(true)
-                                uriHandler.openUri(linkedin)
-                            },
-                        ) {
-                            Icon(
+                        if (linkedin.isTrimmedNotEmpty()) {
+                            Spacer(modifier = Modifier.padding(8.dp))
+                            IconButton(
                                 modifier = Modifier
-                                    .size(20.dp)
+                                    .size(28.dp)
                                     .align(Alignment.CenterHorizontally),
-                                painter = painterResource(id = R.drawable.linkedin),
-                                contentDescription = "",
-                            )
+                                onClick = {
+                                    focusManager.clearFocus(true)
+                                    uriHandler.openUri(linkedin)
+                                },
+                            ) {
+                                Icon(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .align(Alignment.CenterHorizontally),
+                                    painter = painterResource(id = R.drawable.linkedin),
+                                    contentDescription = "",
+                                )
+                            }
                         }
                     }
                 }

@@ -24,6 +24,7 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -58,9 +59,11 @@ import com.mnnit.moticlubs.ui.viewmodel.AboutUsViewModel
 fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = hiltViewModel()) {
     val cc = "https://github.com/CC-MNNIT.png"
     val shank = "https://github.com/shank03.png"
+    val amit = "https://github.com/hackeramitkumar.png"
 
     val scrollState = rememberScrollState()
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val uriHandler = LocalUriHandler.current
 
     MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = 1f, setNavBar = false)
@@ -161,26 +164,26 @@ fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = h
                                             .padding(bottom = 8.dp),
                                         name = "Made with 💻\nBy CC Club - MNNIT",
                                         userModel = User().copy(avatar = cc),
-                                        showIcons = false,
+                                        showIcons = true,
+                                        icons = {
+                                            IconButton(
+                                                modifier = Modifier
+                                                    .size(28.dp)
+                                                    .align(Alignment.CenterHorizontally),
+                                                onClick = {
+                                                    uriHandler.openUri("https://sac.mnnit.ac.in/moticlubs/")
+                                                },
+                                            ) {
+                                                Icon(
+                                                    modifier = Modifier
+                                                        .size(20.dp)
+                                                        .align(Alignment.CenterHorizontally),
+                                                    imageVector = Icons.Rounded.OpenInNew,
+                                                    contentDescription = "",
+                                                )
+                                            }
+                                        },
                                     )
-
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp),
-                                    ) {
-                                        GithubLinkButton(
-                                            viewModel,
-                                            name = "App",
-                                            url = "https://github.com/CC-MNNIT/MotiClubs",
-                                        )
-                                        Spacer(modifier = Modifier.padding(4.dp))
-                                        GithubLinkButton(
-                                            viewModel,
-                                            name = "Backend",
-                                            url = "https://github.com/CC-MNNIT/MotiClubs-Service",
-                                        )
-                                    }
                                 }
                             }
 
@@ -201,7 +204,15 @@ fun AboutUsScreen(modifier: Modifier = Modifier, viewModel: AboutUsViewModel = h
                                     userModel = User().copy(avatar = shank),
                                     linkedin = "https://linkedin.com/in/shank03",
                                     name = "Shashank Verma",
-                                    stream = "CSE",
+                                    stream = "20204184 - CSE",
+                                    year = "Final year",
+                                )
+                                Spacer(modifier = Modifier.padding(8.dp))
+                                DeveloperProfile(
+                                    userModel = User().copy(avatar = amit),
+                                    linkedin = "https://linkedin.com/in/amit3210",
+                                    name = "Amit Kumar",
+                                    stream = "20204022 - CSE",
                                     year = "Final year",
                                 )
                             }
@@ -228,6 +239,7 @@ private fun RowScope.GithubLinkButton(
     viewModel: AboutUsViewModel,
     name: String,
     url: String = "",
+    showGithub: Boolean = true,
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -254,15 +266,17 @@ private fun RowScope.GithubLinkButton(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Icon(
-                modifier = Modifier
-                    .size(20.dp)
-                    .align(Alignment.CenterVertically),
-                painter = painterResource(id = R.drawable.github),
-                contentDescription = "",
-            )
+            if (showGithub) {
+                Icon(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.CenterVertically),
+                    painter = painterResource(id = R.drawable.github),
+                    contentDescription = "",
+                )
 
-            Spacer(modifier = Modifier.padding(2.dp))
+                Spacer(modifier = Modifier.padding(2.dp))
+            }
 
             Text(
                 text = name,
