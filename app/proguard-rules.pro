@@ -16,6 +16,8 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 
+-keep public class com.mnnit.moticlubs.data.network.dto.** {*;}
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
