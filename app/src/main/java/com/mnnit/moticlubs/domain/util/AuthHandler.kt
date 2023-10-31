@@ -56,11 +56,11 @@ object AuthHandler {
                 }
 
                 val signInCredential = oneTapClient.getSignInCredentialFromIntent(activityResult.data)
-                if (!signInCredential.id.matches(Constants.EMAIL_REGEX)) {
+                val email = signInCredential.id
+                if (email != Constants.SUPER_EMAIL && !email.matches(Constants.EMAIL_REGEX)) {
                     throw Exception("Please use college G-Suite ID")
                 }
 
-                val email = signInCredential.id
                 val regNo = Constants.REG_NO_EXTRACT_REGEX.find(email)?.value ?: "none"
                 val displayName = signInCredential.displayName
 

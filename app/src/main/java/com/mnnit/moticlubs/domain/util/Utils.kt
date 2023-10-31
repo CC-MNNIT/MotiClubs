@@ -20,6 +20,7 @@ import kotlin.math.min
 
 object Constants {
     val EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@mnnit.ac.in$".toRegex()
+    const val SUPER_EMAIL = "moticlubs.cc@gmail.com"
     val REG_NO_EXTRACT_REGEX = "(?<=\\.)(.*?)(?=@)".toRegex()
     val PHONE_REGEX = "^[0-9]{10}$".toRegex()
     val URL_REGEX =
