@@ -133,7 +133,8 @@ fun ClubList(
                 } else {
                     visibleItemsInfo.map { it.index }
                 }
-                showUnreadBtn.value = !visibleItemIds.any { vis -> clubsInfo.value[vis].second }
+                showUnreadBtn.value = clubsInfo.value.any { it.second } &&
+                    !visibleItemIds.any { vis -> clubsInfo.value[vis].second }
             }
         }
     }
