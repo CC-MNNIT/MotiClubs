@@ -18,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.PublishedMap
+import com.mnnit.moticlubs.domain.util.PublishedState
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
 import com.mnnit.moticlubs.ui.components.ProfilePicture
@@ -40,7 +42,9 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 fun ClubList(
     viewModel: HomeScreenViewModel,
     listState: LazyListState,
+    showUnreadBtn: PublishedState<Boolean>,
     clubsList: PublishedList<Club>,
+    clubsInfo: PublishedList<Pair<Boolean, Boolean>>,
     channelMap: PublishedMap<Long, PublishedList<Channel>>,
     onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
     onNavigateToClubDetails: (clubId: Long) -> Unit,
@@ -60,13 +64,13 @@ fun ClubList(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 onClick = {
-                    viewModel.clubsInfo.value[idx] = viewModel.clubsInfo.value[idx].copy(
-                        !viewModel.clubsInfo.value[idx].first,
+                    clubsInfo.value[idx] = clubsInfo.value[idx].copy(
+                        !clubsInfo.value[idx].first,
                     )
-                    context.setExpandedChannel(clubsList.value[idx].clubId, viewModel.clubsInfo.value[idx].first)
+                    context.setExpandedChannel(clubsList.value[idx].clubId, clubsInfo.value[idx].first)
                 },
                 shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(if (viewModel.clubsInfo.value[idx].first) 8.dp else 0.dp),
+                elevation = CardDefaults.cardElevation(if (clubsInfo.value[idx].first) 8.dp else 0.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
             ) {
                 Row(modifier = Modifier.padding(16.dp)) {
@@ -98,7 +102,7 @@ fun ClubList(
                     Spacer(modifier = Modifier.padding(8.dp))
 
                     AnimatedVisibility(
-                        visible = viewModel.clubsInfo.value[idx].second,
+                        visible = clubsInfo.value[idx].second,
                         modifier = Modifier.align(Alignment.CenterVertically),
                     ) {
                         BadgedBox(
@@ -111,7 +115,7 @@ fun ClubList(
                     Spacer(modifier = Modifier.padding(8.dp))
                 }
 
-                AnimatedVisibility(visible = viewModel.clubsInfo.value[idx].first) {
+                AnimatedVisibility(visible = clubsInfo.value[idx].first) {
                     ChannelList(
                         list = channelMap.value.getOrDefault(clubsList.value[idx].clubId, emptyList),
                         viewModel = viewModel,
@@ -119,6 +123,17 @@ fun ClubList(
                         onNavigateChannelClick = onNavigateChannelClick,
                     )
                 }
+            }
+
+            LaunchedEffect(idx) {
+                val layoutInfo = listState.layoutInfo
+                val visibleItemsInfo = layoutInfo.visibleItemsInfo
+                val visibleItemIds = if (visibleItemsInfo.isEmpty()) {
+                    emptyList()
+                } else {
+                    visibleItemsInfo.map { it.index }
+                }
+                showUnreadBtn.value = !visibleItemIds.any { vis -> clubsInfo.value[vis].second }
             }
         }
     }

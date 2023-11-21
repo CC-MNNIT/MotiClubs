@@ -27,6 +27,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnnit.moticlubs.R
+import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.components.ProgressDialog
 import com.mnnit.moticlubs.ui.components.homescreen.ClubList
@@ -66,6 +68,7 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val showUnreadBtn = remember { publishedStateOf(false) }
 
     MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = scrollBehavior.state.collapsedFraction)
@@ -138,7 +141,9 @@ fun HomeScreen(
                     ClubList(
                         viewModel,
                         listState,
+                        showUnreadBtn,
                         clubsList = viewModel.clubsList,
+                        clubsInfo = viewModel.clubsInfo,
                         channelMap = viewModel.channelMap,
                         onNavigateChannelClick = onNavigateChannelClick,
                         onNavigateToClubDetails = onNavigateToClubDetails,
@@ -147,7 +152,7 @@ fun HomeScreen(
             },
             floatingActionButton = {
                 Row(modifier = Modifier.padding()) {
-                    AnimatedVisibility(visible = viewModel.clubsInfo.value.any { it.second }) {
+                    AnimatedVisibility(visible = showUnreadBtn.value) {
                         Card(
                             modifier = Modifier.align(Alignment.Bottom),
                             onClick = {
