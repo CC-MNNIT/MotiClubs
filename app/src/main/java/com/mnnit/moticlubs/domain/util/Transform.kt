@@ -7,9 +7,14 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.Member
 import com.mnnit.moticlubs.domain.model.User
 
-fun List<Club>.applySorting(channelMembers: List<ChannelMember>): List<Club> = sortedWith(
+fun List<Club>.applySorting(
+    admins: List<AdminUser>,
+    channelMembers: List<ChannelMember>,
+    userId: Long,
+): List<Club> = sortedWith(
     compareBy(
-        { club -> club.clubId != 1L },
+        { club -> club.clubId != 1L && club.clubId != 2L },
+        { club -> !admins.any { admin -> admin.userId == userId && admin.clubId == club.clubId } },
         { club -> !channelMembers.any { member -> member.clubId == club.clubId } },
         { club -> club.clubId },
     ),

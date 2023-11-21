@@ -64,8 +64,8 @@ class HomeScreenViewModel @Inject constructor(
         }
 
         getUser(loadLocal = true)
-        getClubsChannels(loadLocal = true)
         getAdmins()
+        getClubsChannels(loadLocal = true)
     }
 
     var userId by mutableLongStateOf(-1)
@@ -157,8 +157,8 @@ class HomeScreenViewModel @Inject constructor(
                 application.setAuthToken(it.token ?: "")
 
                 getUser()
-                getClubsChannels()
                 getAdmins()
+                getClubsChannels()
             }?.addOnCompleteListener {
                 isFetchingAdmins = false
                 if (!it.isSuccessful) {
@@ -204,7 +204,11 @@ class HomeScreenViewModel @Inject constructor(
         if (loadLocal) {
             Log.d(TAG, "getClubsChannels: loadLocal")
             viewModelScope.launch {
-                populateClubsChannels(repository.getClubs(), repository.getAllChannels(userId))
+                populateClubsChannels(
+                    adminList.value.ifEmpty { repository.getAdmins() },
+                    repository.getClubs(),
+                    repository.getAllChannels(userId),
+                )
                 isFetchingHome = false
             }
             return
@@ -216,15 +220,19 @@ class HomeScreenViewModel @Inject constructor(
                 transformResources(r1, emptyList(), r2, emptyList())
             }
             .onEach { (channels, clubs) ->
-                populateClubsChannels(clubs, channels)
+                populateClubsChannels(adminList.value, clubs, channels)
                 isFetchingHome = false
             }
             .launchIn(viewModelScope)
     }
 
-    private suspend fun populateClubsChannels(clubs: List<Club>, channels: List<Channel>) {
-        val channelMembers = repository.getChannelsForMember(userId)
-        clubsList.apply(clubs.applySorting(channelMembers))
+    private suspend fun populateClubsChannels(
+        admins: List<AdminUser>,
+        clubs: List<Club>,
+        channels: List<Channel>,
+    ) {
+        val memberChannels = repository.getChannelsForMember(userId)
+        clubsList.apply(clubs.applySorting(admins, memberChannels, userId))
 
         channels.populate(channelMap)
     }
