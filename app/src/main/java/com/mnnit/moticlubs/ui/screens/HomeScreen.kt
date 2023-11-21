@@ -3,14 +3,21 @@ package com.mnnit.moticlubs.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.rounded.MarkChatUnread
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
@@ -20,6 +27,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -40,6 +48,7 @@ import com.mnnit.moticlubs.ui.theme.MotiClubsTheme
 import com.mnnit.moticlubs.ui.theme.SetTransparentSystemBars
 import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -55,6 +64,8 @@ fun HomeScreen(
         onRefresh = viewModel::refreshAll,
     )
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     MotiClubsTheme {
         SetTransparentSystemBars(setStatusBar = scrollBehavior.state.collapsedFraction)
@@ -126,6 +137,7 @@ fun HomeScreen(
                     }
                     ClubList(
                         viewModel,
+                        listState,
                         clubsList = viewModel.clubsList,
                         channelMap = viewModel.channelMap,
                         onNavigateChannelClick = onNavigateChannelClick,
@@ -134,12 +146,47 @@ fun HomeScreen(
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { onNavigateContactUs() },
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.padding(),
-                ) {
-                    Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "")
+                Row(modifier = Modifier.padding()) {
+                    AnimatedVisibility(visible = viewModel.clubsInfo.value.any { it.second }) {
+                        Card(
+                            modifier = Modifier.align(Alignment.Bottom),
+                            onClick = {
+                                scope.launch {
+                                    val index = viewModel.clubsInfo.value.indexOfFirst { it.second }
+                                    if (index != -1) {
+                                        listState.scrollToItem(index)
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(24.dp),
+                            colors = CardDefaults.cardColors(containerColor = colorScheme.error),
+                        ) {
+                            Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                                Icon(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .size(16.dp),
+                                    imageVector = Icons.Rounded.MarkChatUnread,
+                                    contentDescription = "",
+                                )
+                                Spacer(modifier = Modifier.padding(4.dp))
+                                Text(
+                                    modifier = Modifier.align(Alignment.CenterVertically),
+                                    text = "Jump to unread",
+                                    fontSize = 12.sp,
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.padding(horizontal = 16.dp))
+
+                    FloatingActionButton(
+                        onClick = { onNavigateContactUs() },
+                        shape = RoundedCornerShape(24.dp),
+                    ) {
+                        Icon(imageVector = Icons.Outlined.HelpOutline, contentDescription = "")
+                    }
                 }
             },
         )

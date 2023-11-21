@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -22,6 +23,8 @@ import com.mnnit.moticlubs.domain.usecase.ClubUseCases
 import com.mnnit.moticlubs.domain.usecase.UserUseCases
 import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.applySorting
+import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
+import com.mnnit.moticlubs.domain.util.getExpandedChannel
 import com.mnnit.moticlubs.domain.util.getUserId
 import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.onResource
@@ -73,6 +76,9 @@ class HomeScreenViewModel @Inject constructor(
     var userModel by publishedStateOf(User())
     val adminList = publishedStateListOf<AdminUser>()
     val clubsList = publishedStateListOf<Club>()
+
+    // Pair.first => expanded, .second => unread
+    val clubsInfo = publishedStateListOf<Pair<Boolean, Boolean>>()
     val channelMap = publishedStateMapOf<Long, PublishedList<Channel>>()
 
     var isFetchingAdmins by publishedStateOf(false)
@@ -235,6 +241,20 @@ class HomeScreenViewModel @Inject constructor(
         clubsList.apply(clubs.applySorting(admins, memberChannels, userId))
 
         channels.populate(channelMap)
+
+        clubsList.value.forEach {
+            clubsInfo.value.add(
+                Pair(
+                    application.getExpandedChannel(it.clubId),
+                    application.clubHasUnreadPost(
+                        channelMap.value.getOrDefault(
+                            it.clubId,
+                            PublishedList(mutableStateListOf()),
+                        ).value,
+                    ),
+                ),
+            )
+        }
     }
 
     init {

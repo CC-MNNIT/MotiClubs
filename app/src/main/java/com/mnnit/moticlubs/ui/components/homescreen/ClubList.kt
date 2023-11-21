@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -29,13 +30,8 @@ import com.mnnit.moticlubs.domain.model.Club
 import com.mnnit.moticlubs.domain.model.User
 import com.mnnit.moticlubs.domain.util.PublishedList
 import com.mnnit.moticlubs.domain.util.PublishedMap
-import com.mnnit.moticlubs.domain.util.clubHasUnreadPost
-import com.mnnit.moticlubs.domain.util.getExpandedChannel
-import com.mnnit.moticlubs.domain.util.getValue
 import com.mnnit.moticlubs.domain.util.publishedStateListOf
-import com.mnnit.moticlubs.domain.util.publishedStateOf
 import com.mnnit.moticlubs.domain.util.setExpandedChannel
-import com.mnnit.moticlubs.domain.util.setValue
 import com.mnnit.moticlubs.ui.components.ProfilePicture
 import com.mnnit.moticlubs.ui.theme.colorScheme
 import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
@@ -43,6 +39,7 @@ import com.mnnit.moticlubs.ui.viewmodel.HomeScreenViewModel
 @Composable
 fun ClubList(
     viewModel: HomeScreenViewModel,
+    listState: LazyListState,
     clubsList: PublishedList<Club>,
     channelMap: PublishedMap<Long, PublishedList<Channel>>,
     onNavigateChannelClick: (channelId: Long, clubId: Long) -> Unit,
@@ -55,21 +52,21 @@ fun ClubList(
     LazyColumn(
         modifier = modifier.fillMaxHeight(),
         contentPadding = PaddingValues(bottom = 72.dp, top = 16.dp, start = 16.dp, end = 16.dp),
+        state = listState,
     ) {
         items(clubsList.value.size) { idx ->
-            var channelVisibility by remember {
-                publishedStateOf(context.getExpandedChannel(clubsList.value[idx].clubId))
-            }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 onClick = {
-                    channelVisibility = !channelVisibility
-                    context.setExpandedChannel(clubsList.value[idx].clubId, channelVisibility)
+                    viewModel.clubsInfo.value[idx] = viewModel.clubsInfo.value[idx].copy(
+                        !viewModel.clubsInfo.value[idx].first,
+                    )
+                    context.setExpandedChannel(clubsList.value[idx].clubId, viewModel.clubsInfo.value[idx].first)
                 },
                 shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(if (channelVisibility) 8.dp else 0.dp),
+                elevation = CardDefaults.cardElevation(if (viewModel.clubsInfo.value[idx].first) 8.dp else 0.dp),
                 colors = CardDefaults.cardColors(colorScheme.surfaceColorAtElevation(2.dp)),
             ) {
                 Row(modifier = Modifier.padding(16.dp)) {
@@ -101,12 +98,7 @@ fun ClubList(
                     Spacer(modifier = Modifier.padding(8.dp))
 
                     AnimatedVisibility(
-                        visible = context.clubHasUnreadPost(
-                            channelMap.value.getOrDefault(
-                                clubsList.value[idx].clubId,
-                                emptyList,
-                            ).value,
-                        ),
+                        visible = viewModel.clubsInfo.value[idx].second,
                         modifier = Modifier.align(Alignment.CenterVertically),
                     ) {
                         BadgedBox(
@@ -119,7 +111,7 @@ fun ClubList(
                     Spacer(modifier = Modifier.padding(8.dp))
                 }
 
-                AnimatedVisibility(visible = channelVisibility) {
+                AnimatedVisibility(visible = viewModel.clubsInfo.value[idx].first) {
                     ChannelList(
                         list = channelMap.value.getOrDefault(clubsList.value[idx].clubId, emptyList),
                         viewModel = viewModel,
